@@ -1,0 +1,174 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "prices": "Update Prices",
+    "specialPrices": "Special Prices",
+    "finalize": "Finalize",
+    "categories": "Categories",
+    "analysis": "Analysis",
+    "telegram": "Telegram",
+    "templates": "Templates",
+    "settings": "Settings"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "submit": "Submit",
+    "back": "Back",
+    "loading": "Loading...",
+    "search": "Search...",
+    "noData": "No data available",
+    "confirm": "Confirm",
+    "close": "Close",
+    "panel": "Management Panel",
+    "yes": "Yes",
+    "no": "No",
+    "actions": "Actions",
+    "status": "Status",
+    "name": "Name",
+    "description": "Description",
+    "date": "Date",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "header": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
+  },
+  "footer": {
+    "copyright": "© {year} {name}. All rights reserved.",
+    "support": "Support"
+  },
+  "breadcrumb": {
+    "home": "Home"
+  },
+  "toast": {
+    "saveSuccess": "Saved successfully",
+    "deleteSuccess": "Deleted successfully",
+    "serverError": "Server error, please try again",
+    "networkError": "Network connection error",
+    "validationError": "Please check the provided information",
+    "finalizeSuccess": "Finalization completed successfully",
+    "finalizeFailed": "Finalization failed"
+  },
+  "emptyState": {
+    "noCategories": "No categories yet",
+    "noCategoriesDesc": "Create your first category to get started",
+    "createCategory": "Create Category",
+    "noPrices": "No prices recorded",
+    "noPricesDesc": "Prices will appear after creating categories",
+    "noSpecialPrices": "No special prices recorded",
+    "noSpecialPricesDesc": "Add your first special price",
+    "noTemplates": "No templates created",
+    "noTemplatesDesc": "Create your first template",
+    "createTemplate": "Create Template",
+    "noResults": "No results found",
+    "noResultsDesc": "Try searching with different terms",
+    "noData": "No data available",
+    "noDataDesc": "There is no information to display"
+  },
+  "auth": {
+    "loginTitle": "Login to Panel",
+    "username": "Username",
+    "password": "Password",
+    "loginButton": "Login",
+    "loggingIn": "Logging in..."
+  },
+  "routes": {
+    "dashboard": "Dashboard",
+    "prices": "Update Prices",
+    "updatePrice": "Update Price",
+    "bulkUpdate": "Bulk Update",
+    "priceHistory": "Price History",
+    "specialPrices": "Special Prices",
+    "updateSpecialPrice": "Update Special Price",
+    "specialPriceHistory": "Special Price History",
+    "finalize": "Finalize",
+    "finalizeCategory": "Finalize Category",
+    "finalizeSpecialPrice": "Finalize Special Price",
+    "categories": "Categories",
+    "categoryNew": "New Category",
+    "categoryEdit": "Edit Category",
+    "priceTypeNew": "New Price Type",
+    "settings": "Settings",
+    "logs": "Logs",
+    "analysis": "Analysis",
+    "telegramSend": "Send Telegram",
+    "telegramSettings": "Telegram Settings",
+    "templates": "Templates",
+    "templateNew": "New Template",
+    "templateEditor": "Template Editor"
+  },
+  "lang": {
+    "fa": "فارسی",
+    "en": "English"
+  },
+  "validation": {
+    "required": "This field is required"
+  },
+  "categories": {
+    "backToList": "Back to Categories",
+    "editTitle": "Edit Category",
+    "newTitle": "New Category"
+  },
+  "analysis": {
+    "title": "Analysis",
+    "totalPriceTypes": "Total Price Types",
+    "totalUpdates": "Total Updates",
+    "avgChange": "Avg Change",
+    "recentUpdates": "Recent Updates",
+    "topMovers": "Top Movers",
+    "priceType": "Price Type",
+    "currentPrice": "Current Price",
+    "change24h": "24h Change",
+    "lastUpdate": "Last Update",
+    "priceHistory": "Price History",
+    "noChartData": "No chart data available",
+    "categories": "Categories"
+  },
+  "finalize": {
+    "title": "Finalize Category",
+    "backToList": "Back to Finalize",
+    "selectChannel": "Select a channel",
+    "channel": "Channel",
+    "notes": "Notes (optional)",
+    "pendingCount": "{count} pending prices to finalize",
+    "startFinalize": "Start Finalization",
+    "step": {
+      "validate": "Validating prices",
+      "render": "Rendering image",
+      "send": "Sending to Telegram",
+      "confirm": "Final confirmation"
+    },
+    "status": {
+      "pending": "Pending",
+      "inProgress": "In Progress",
+      "success": "Success",
+      "failed": "Failed"
+    },
+    "processing": "Processing...",
+    "completed": "Finalization completed successfully",
+    "failed": "Finalization failed"
+  },
+  "search": {
+    "placeholder": "Search prices, categories, settings...",
+    "noResults": "No results found",
+    "hint": "Type to search",
+    "recentSearches": "Recent Searches",
+    "categories": "Categories",
+    "prices": "Prices",
+    "specialPrices": "Special Prices",
+    "settings": "Settings",
+    "pages": "Pages",
+    "clearRecent": "Clear"
+  },
+  "pwa": {
+    "installTitle": "Install App",
+    "installDesc": "Install this app on your device",
+    "install": "Install",
+    "dismiss": "Later"
+  }
+}

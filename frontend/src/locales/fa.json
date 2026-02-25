@@ -1,0 +1,174 @@
+{
+  "sidebar": {
+    "dashboard": "داشبورد",
+    "prices": "بروزرسانی قیمت‌ها",
+    "specialPrices": "قیمت‌های ویژه",
+    "finalize": "نهایی‌سازی",
+    "categories": "دسته‌بندی‌ها",
+    "analysis": "تحلیل و بررسی",
+    "telegram": "تلگرام",
+    "templates": "قالب‌ها",
+    "settings": "تنظیمات"
+  },
+  "common": {
+    "save": "ذخیره",
+    "cancel": "انصراف",
+    "delete": "حذف",
+    "edit": "ویرایش",
+    "create": "ایجاد",
+    "submit": "ارسال",
+    "back": "بازگشت",
+    "loading": "در حال بارگذاری...",
+    "search": "جستجو...",
+    "noData": "داده‌ای موجود نیست",
+    "confirm": "تأیید",
+    "close": "بستن",
+    "panel": "پنل مدیریت",
+    "yes": "بله",
+    "no": "خیر",
+    "actions": "عملیات",
+    "status": "وضعیت",
+    "name": "نام",
+    "description": "توضیحات",
+    "date": "تاریخ",
+    "logout": "خروج",
+    "login": "ورود"
+  },
+  "header": {
+    "openMenu": "باز کردن منو",
+    "closeMenu": "بستن منو"
+  },
+  "footer": {
+    "copyright": "© {year} {name}. تمامی حقوق محفوظ است.",
+    "support": "پشتیبانی"
+  },
+  "breadcrumb": {
+    "home": "خانه"
+  },
+  "toast": {
+    "saveSuccess": "با موفقیت ذخیره شد",
+    "deleteSuccess": "با موفقیت حذف شد",
+    "serverError": "خطای سرور، لطفاً دوباره تلاش کنید",
+    "networkError": "خطای اتصال به شبکه",
+    "validationError": "لطفاً اطلاعات را بررسی کنید",
+    "finalizeSuccess": "نهایی‌سازی با موفقیت انجام شد",
+    "finalizeFailed": "خطا در نهایی‌سازی"
+  },
+  "emptyState": {
+    "noCategories": "هنوز دسته‌بندی‌ای ایجاد نشده",
+    "noCategoriesDesc": "اولین دسته‌بندی خود را ایجاد کنید",
+    "createCategory": "ایجاد دسته‌بندی",
+    "noPrices": "قیمتی ثبت نشده است",
+    "noPricesDesc": "قیمت‌ها پس از ایجاد دسته‌بندی نمایش داده می‌شوند",
+    "noSpecialPrices": "قیمت ویژه‌ای ثبت نشده است",
+    "noSpecialPricesDesc": "اولین قیمت ویژه خود را اضافه کنید",
+    "noTemplates": "قالبی ایجاد نشده است",
+    "noTemplatesDesc": "اولین قالب خود را ایجاد کنید",
+    "createTemplate": "ایجاد قالب",
+    "noResults": "نتیجه‌ای یافت نشد",
+    "noResultsDesc": "با عبارت دیگری جستجو کنید",
+    "noData": "داده‌ای موجود نیست",
+    "noDataDesc": "اطلاعاتی برای نمایش وجود ندارد"
+  },
+  "auth": {
+    "loginTitle": "ورود به پنل",
+    "username": "نام کاربری",
+    "password": "رمز عبور",
+    "loginButton": "ورود",
+    "loggingIn": "در حال ورود..."
+  },
+  "routes": {
+    "dashboard": "داشبورد",
+    "prices": "بروزرسانی قیمت‌ها",
+    "updatePrice": "ویرایش قیمت",
+    "bulkUpdate": "بروزرسانی گروهی",
+    "priceHistory": "تاریخچه قیمت",
+    "specialPrices": "قیمت‌های ویژه",
+    "updateSpecialPrice": "ویرایش قیمت ویژه",
+    "specialPriceHistory": "تاریخچه قیمت ویژه",
+    "finalize": "نهایی‌سازی",
+    "finalizeCategory": "نهایی‌سازی دسته‌بندی",
+    "finalizeSpecialPrice": "نهایی‌سازی قیمت ویژه",
+    "categories": "دسته‌بندی‌ها",
+    "categoryNew": "دسته‌بندی جدید",
+    "categoryEdit": "ویرایش دسته‌بندی",
+    "priceTypeNew": "نوع قیمت جدید",
+    "settings": "تنظیمات",
+    "logs": "گزارش‌ها",
+    "analysis": "تحلیل و بررسی",
+    "telegramSend": "ارسال تلگرام",
+    "telegramSettings": "تنظیمات تلگرام",
+    "templates": "قالب‌ها",
+    "templateNew": "قالب جدید",
+    "templateEditor": "ویرایشگر قالب"
+  },
+  "lang": {
+    "fa": "فارسی",
+    "en": "English"
+  },
+  "validation": {
+    "required": "این فیلد الزامی است"
+  },
+  "categories": {
+    "backToList": "بازگشت به دسته‌بندی‌ها",
+    "editTitle": "ویرایش دسته‌بندی",
+    "newTitle": "دسته‌بندی جدید"
+  },
+  "analysis": {
+    "title": "تحلیل و بررسی",
+    "totalPriceTypes": "کل انواع قیمت",
+    "totalUpdates": "کل بروزرسانی‌ها",
+    "avgChange": "میانگین تغییرات",
+    "recentUpdates": "بروزرسانی‌های اخیر",
+    "topMovers": "بیشترین تغییرات",
+    "priceType": "نوع قیمت",
+    "currentPrice": "قیمت فعلی",
+    "change24h": "تغییرات ۲۴ ساعته",
+    "lastUpdate": "آخرین بروزرسانی",
+    "priceHistory": "نمودار قیمت",
+    "noChartData": "داده‌ای برای نمودار موجود نیست",
+    "categories": "دسته‌بندی‌ها"
+  },
+  "finalize": {
+    "title": "نهایی‌سازی دسته‌بندی",
+    "backToList": "بازگشت به نهایی‌سازی",
+    "selectChannel": "انتخاب کانال",
+    "channel": "کانال",
+    "notes": "یادداشت (اختیاری)",
+    "pendingCount": "{count} قیمت در انتظار نهایی‌سازی",
+    "startFinalize": "شروع نهایی‌سازی",
+    "step": {
+      "validate": "اعتبارسنجی قیمت‌ها",
+      "render": "ساخت تصویر",
+      "send": "ارسال به تلگرام",
+      "confirm": "تأیید نهایی"
+    },
+    "status": {
+      "pending": "در انتظار",
+      "inProgress": "در حال انجام",
+      "success": "موفق",
+      "failed": "ناموفق"
+    },
+    "processing": "در حال پردازش...",
+    "completed": "نهایی‌سازی با موفقیت انجام شد",
+    "failed": "خطا در نهایی‌سازی"
+  },
+  "search": {
+    "placeholder": "جستجو در قیمت‌ها، دسته‌بندی‌ها و تنظیمات...",
+    "noResults": "نتیجه‌ای یافت نشد",
+    "hint": "برای جستجو تایپ کنید",
+    "recentSearches": "جستجوهای اخیر",
+    "categories": "دسته‌بندی‌ها",
+    "prices": "قیمت‌ها",
+    "specialPrices": "قیمت‌های ویژه",
+    "settings": "تنظیمات",
+    "pages": "صفحات",
+    "clearRecent": "پاک کردن"
+  },
+  "pwa": {
+    "installTitle": "نصب اپلیکیشن",
+    "installDesc": "این اپلیکیشن را روی دستگاه خود نصب کنید",
+    "install": "نصب",
+    "dismiss": "بعداً"
+  }
+}

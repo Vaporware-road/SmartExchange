@@ -1,0 +1,93 @@
+<template>
+  <Transition name="pwa-slide">
+    <div
+      v-if="showPrompt"
+      class="fixed bottom-4 start-4 end-4 sm:start-auto sm:end-4 sm:w-80 z-50 rounded-2xl p-4 shadow-2xl border"
+      style="background: var(--bg-card); border-color: var(--border-card);"
+    >
+      <div class="flex items-start gap-3">
+        <div
+          class="flex-shrink-0 p-2.5 rounded-xl"
+          style="background: rgba(255, 215, 0, 0.15);"
+        >
+          <i class="fas fa-mobile-alt text-xl text-gold" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <h3 class="font-bold text-[var(--text-primary)] mb-1">{{ $t('pwa.installTitle') }}</h3>
+          <p class="text-sm text-[var(--text-secondary)] mb-3">{{ $t('pwa.installDesc') }}</p>
+          <div class="flex gap-2">
+            <button class="btn-luxury text-sm py-2 px-4" @click="install">
+              <i class="fas fa-download" />
+              {{ $t('pwa.install') }}
+            </button>
+            <button
+              class="btn-luxury-outline text-sm py-2 px-4"
+              @click="dismiss"
+            >
+              {{ $t('pwa.dismiss') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </Transition>
+</template>
+
+<script setup>
+import { ref, onMounted, onUnmounted } from 'vue'
+
+const showPrompt = ref(false)
+let deferredPrompt = null
+
+const DISMISS_KEY = 'smartexchange-pwa-dismissed'
+
+function handleBeforeInstall(e) {
+  e.preventDefault()
+  deferredPrompt = e
+
+  const dismissed = localStorage.getItem(DISMISS_KEY)
+  if (dismissed) {
+    const dismissedAt = Number(dismissed)
+    const daysSinceDismissed = (Date.now() - dismissedAt) / (1000 * 60 * 60 * 24)
+    if (daysSinceDismissed < 7) return
+  }
+
+  showPrompt.value = true
+}
+
+async function install() {
+  if (!deferredPrompt) return
+  deferredPrompt.prompt()
+  const { outcome } = await deferredPrompt.userChoice
+  deferredPrompt = null
+  showPrompt.value = false
+  if (outcome === 'accepted') {
+    localStorage.removeItem(DISMISS_KEY)
+  }
+}
+
+function dismiss() {
+  showPrompt.value = false
+  localStorage.setItem(DISMISS_KEY, String(Date.now()))
+}
+
+onMounted(() => {
+  window.addEventListener('beforeinstallprompt', handleBeforeInstall)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
+})
+</script>
+
+<style scoped>
+.pwa-slide-enter-active,
+.pwa-slide-leave-active {
+  transition: all 0.3s ease;
+}
+.pwa-slide-enter-from,
+.pwa-slide-leave-to {
+  opacity: 0;
+  transform: translateY(1rem);
+}
+</style>
