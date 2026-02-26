@@ -26,11 +26,13 @@ api.interceptors.response.use(
     const toast = useToast()
     const status = error.response?.status
 
+    const isAuthCheck = error.config?.url?.includes('/auth/me')
+
     if (status === 401) {
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
       window.location.href = '/login'
-    } else if (status === 403) {
+    } else if (status === 403 && !isAuthCheck) {
       toast.error('شما دسترسی لازم برای این عملیات را ندارید')
     } else if (status >= 500) {
       toast.error('خطای سرور — لطفاً دوباره تلاش کنید')

@@ -12,6 +12,10 @@
     </h1>
 
     <form @submit.prevent="handleSubmit" class="card-luxury max-w-md space-y-5">
+      <div v-if="errors.non_field_errors" class="p-3 rounded-xl bg-danger/10 border border-danger/30 text-danger text-sm">
+        {{ errors.non_field_errors }}
+      </div>
+
       <FloatingInput
         v-model="form.name"
         :label="$t('common.name')"
@@ -59,8 +63,20 @@ const isEdit = computed(() => !!id.value)
 const isRtl = computed(() => document.documentElement.dir === 'rtl')
 
 const form = ref({ name: '', description: '' })
-const errors = reactive({ name: null })
+const errors = reactive({ name: null, description: null, non_field_errors: null })
 const submitting = ref(false)
+
+function applyServerErrors(responseData) {
+  if (!responseData || typeof responseData !== 'object') return
+  for (const field of Object.keys(errors)) {
+    const val = responseData[field]
+    if (Array.isArray(val)) {
+      errors[field] = val.join(' ')
+    } else if (typeof val === 'string') {
+      errors[field] = val
+    }
+  }
+}
 
 onMounted(async () => {
   if (isEdit.value) {
@@ -87,8 +103,13 @@ async function handleSubmit() {
     }
     toast.success(t('toast.saveSuccess'))
     router.push('/categories')
-  } catch {
-    toast.error(t('toast.serverError'))
+  } catch (err) {
+    const serverData = err?.response?.data
+    if (serverData && typeof serverData === 'object' && err?.response?.status < 500) {
+      applyServerErrors(serverData)
+    } else {
+      toast.error(t('toast.serverError'))
+    }
   } finally {
     submitting.value = false
   }

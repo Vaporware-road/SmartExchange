@@ -3,8 +3,8 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { resolve } from 'path'
 
-export default defineConfig({
-  base: '/static/vue/',
+export default defineConfig(({ command }) => ({
+  base: command === 'serve' ? '/' : '/static/vue/',
   plugins: [
     vue(),
     VitePWA({
@@ -86,4 +86,4 @@ export default defineConfig({
       input: resolve(__dirname, 'index.html'),
     },
   },
-})
+}))

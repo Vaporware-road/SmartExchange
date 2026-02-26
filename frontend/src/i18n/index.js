@@ -2,13 +2,13 @@ import { createI18n } from 'vue-i18n'
 import fa from '@/locales/fa.json'
 import en from '@/locales/en.json'
 
-const savedLocale = localStorage.getItem('smartexchange-locale') || 'fa'
+const savedLocale = localStorage.getItem('smartexchange-locale') || 'en'
 
 const i18n = createI18n({
   legacy: false,
   locale: savedLocale,
-  fallbackLocale: 'en',
-  messages: { fa, en },
+  fallbackLocale: 'fa',
+  messages: { en, fa },
 })
 
 export function setLocale(locale) {

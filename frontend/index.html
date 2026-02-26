@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en" dir="ltr">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,7 +18,7 @@
         document.documentElement.classList.add('dark');
       }
       // Restore locale direction
-      var locale = localStorage.getItem('smartexchange-locale') || 'fa';
+      var locale = localStorage.getItem('smartexchange-locale') || 'en';
       document.documentElement.lang = locale;
       document.documentElement.dir = locale === 'fa' ? 'rtl' : 'ltr';
     })();

@@ -25,7 +25,7 @@
             <i class="fas fa-arrow-up text-2xl text-gold"></i>
           </div>
           <div>
-            <p class="text-2xl font-bold text-white">{{ summary?.highest_price?.toFixed(2) ?? 'N/A' }}</p>
+            <p class="text-2xl font-bold text-white">{{ summary?.highest_price != null ? Number(summary.highest_price).toFixed(2) : 'N/A' }}</p>
             <p class="text-sm text-gray-400">Highest Posted Price</p>
             <p v-if="summary?.highest_price_label" class="text-xs text-gray-500">{{ summary.highest_price_label }}</p>
           </div>
@@ -189,8 +189,10 @@ onMounted(async () => {
       specialPriceApi.list().catch(() => ({ data: [] })),
     ])
     summary.value = summaryRes.data
-    categories.value = categoriesRes.data
-    specialPriceTypes.value = Array.isArray(specialRes?.data) ? specialRes.data : []
+    const catData = categoriesRes.data
+    categories.value = Array.isArray(catData) ? catData : (catData?.results ?? [])
+    const spData = specialRes?.data
+    specialPriceTypes.value = Array.isArray(spData) ? spData : (spData?.results ?? [])
   } catch {
     summary.value = {}
     categories.value = []

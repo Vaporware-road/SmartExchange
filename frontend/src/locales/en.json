@@ -112,7 +112,9 @@
   "categories": {
     "backToList": "Back to Categories",
     "editTitle": "Edit Category",
-    "newTitle": "New Category"
+    "newTitle": "New Category",
+    "modalPlaceholder": "Create a new category from the full form, or integrate the form here later.",
+    "openFullForm": "Open full form"
   },
   "analysis": {
     "title": "Analysis",
@@ -127,7 +129,8 @@
     "lastUpdate": "Last Update",
     "priceHistory": "Price History",
     "noChartData": "No chart data available",
-    "categories": "Categories"
+    "categories": "Categories",
+    "avgPrice": "Avg price"
   },
   "finalize": {
     "title": "Finalize Category",

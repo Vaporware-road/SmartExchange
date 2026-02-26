@@ -92,17 +92,17 @@
                 style="border-color: var(--border-card);"
               >
                 <td class="py-3 px-4 font-medium text-[var(--text-primary)]">{{ item.name }}</td>
-                <td class="py-3 px-4 text-gold font-bold">{{ formatNumber(item.price) }}</td>
+                <td class="py-3 px-4 text-gold font-bold">{{ formatNumber(item.latest_price) }}</td>
                 <td class="py-3 px-4">
                   <span
                     class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-sm font-medium"
-                    :class="item.change > 0 ? 'bg-success/10 text-success' : item.change < 0 ? 'bg-danger/10 text-danger' : 'bg-gray-500/10 text-gray-400'"
+                    :class="(item.change_percent ?? 0) > 0 ? 'bg-success/10 text-success' : (item.change_percent ?? 0) < 0 ? 'bg-danger/10 text-danger' : 'bg-gray-500/10 text-gray-400'"
                   >
-                    <i :class="item.change > 0 ? 'fas fa-caret-up' : item.change < 0 ? 'fas fa-caret-down' : 'fas fa-minus'" />
-                    {{ item.change > 0 ? '+' : '' }}{{ item.change.toFixed(2) }}%
+                    <i :class="(item.change_percent ?? 0) > 0 ? 'fas fa-caret-up' : (item.change_percent ?? 0) < 0 ? 'fas fa-caret-down' : 'fas fa-minus'" />
+                    {{ (item.change_percent ?? 0) > 0 ? '+' : '' }}{{ (item.change_percent ?? 0).toFixed(2) }}%
                   </span>
                 </td>
-                <td class="py-3 px-4 text-sm text-[var(--text-secondary)]">{{ formatRelative(item.updated_at) }}</td>
+                <td class="py-3 px-4 text-sm text-[var(--text-secondary)]">{{ formatRelative(item.timestamp) }}</td>
               </tr>
             </tbody>
           </table>
@@ -116,17 +116,15 @@
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
-            v-for="cat in categoryBreakdown"
-            :key="cat.id"
+            v-for="(cat, idx) in categoryBreakdown"
+            :key="cat.category ?? idx"
             class="p-4 rounded-xl border transition-all hover:border-gold/50"
             style="border-color: var(--border-card); background: var(--bg-elevated);"
           >
-            <h3 class="font-semibold text-gold mb-2">{{ cat.name }}</h3>
+            <h3 class="font-semibold text-gold mb-2">{{ cat.category }}</h3>
             <div class="flex justify-between text-sm text-[var(--text-secondary)]">
-              <span>{{ cat.price_type_count }} {{ $t('analysis.priceType') }}</span>
-              <span :class="cat.avg_change > 0 ? 'text-success' : cat.avg_change < 0 ? 'text-danger' : ''">
-                {{ cat.avg_change > 0 ? '+' : '' }}{{ (cat.avg_change ?? 0).toFixed(2) }}%
-              </span>
+              <span>{{ cat.count ?? 0 }} {{ $t('analysis.priceType') }}</span>
+              <span class="text-gold">{{ $t('analysis.avgPrice') }}: {{ formatNumber(cat.average_price) }}</span>
             </div>
           </div>
         </div>
@@ -136,7 +134,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { analysisApi } from '@/services/api'
 import { useDate } from '@/composables/useDate'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
@@ -147,15 +145,16 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  TimeScale,
   Title,
   Tooltip,
   Legend,
   Filler,
 } from 'chart.js'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, TimeScale, Title, Tooltip, Legend, Filler)
 
-const { formatRelative, formatDate } = useDate()
+const { formatRelative } = useDate()
 
 const loading = ref(true)
 const stats = reactive({ totalPriceTypes: 0, totalUpdates: 0, avgChange: 0, recentUpdates: 0 })
@@ -184,7 +183,7 @@ const chartOptions = {
   scales: {
     x: {
       grid: { color: 'rgba(255, 255, 255, 0.05)' },
-      ticks: { color: '#9CA3AF' },
+      ticks: { color: '#9CA3AF', maxTicksLimit: 10 },
     },
     y: {
       grid: { color: 'rgba(255, 255, 255, 0.05)' },
@@ -198,57 +197,71 @@ function formatNumber(val) {
   return Number(val).toLocaleString(undefined, { maximumFractionDigits: 2 })
 }
 
-function buildChartData(history) {
-  if (!history?.length) return null
+function buildChartFromTimeline(datasets) {
+  if (!datasets?.length) return null
 
-  const datasets = []
-  const colors = ['#FFD700', '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#8B5CF6']
-
-  const grouped = {}
-  for (const item of history) {
-    const key = item.name || item.price_type_name || 'Price'
-    if (!grouped[key]) grouped[key] = []
-    grouped[key].push(item)
+  const allTimestamps = new Set()
+  for (const ds of datasets) {
+    for (const point of ds.data ?? []) {
+      allTimestamps.add(point.x)
+    }
   }
 
-  const labels = [...new Set(history.map(h => formatDate(h.date || h.created_at)))]
+  const labels = [...allTimestamps].sort()
+  if (!labels.length) return null
 
-  let i = 0
-  for (const [name, entries] of Object.entries(grouped)) {
-    const color = colors[i % colors.length]
-    datasets.push({
-      label: name,
-      data: entries.map(e => Number(e.price)),
-      borderColor: color,
-      backgroundColor: color + '15',
-      fill: true,
-      tension: 0.4,
-      pointRadius: 3,
-      pointHoverRadius: 6,
-    })
-    i++
-  }
+  const shortLabels = labels.map(iso => {
+    const d = new Date(iso)
+    return isNaN(d.getTime()) ? iso : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+  })
 
-  return { labels, datasets }
+  const chartDatasets = datasets.map(ds => {
+    const pointMap = {}
+    for (const point of ds.data ?? []) {
+      pointMap[point.x] = point.y
+    }
+    return {
+      label: ds.label ?? 'Price',
+      data: labels.map(ts => pointMap[ts] ?? null),
+      borderColor: ds.borderColor ?? '#FFD700',
+      backgroundColor: ds.backgroundColor ?? 'rgba(255, 215, 0, 0.08)',
+      fill: ds.fill ?? false,
+      tension: ds.tension ?? 0.35,
+      pointRadius: 2,
+      pointHoverRadius: 5,
+      spanGaps: true,
+    }
+  })
+
+  return { labels: shortLabels, datasets: chartDatasets }
 }
 
 onMounted(async () => {
   try {
-    const [dashRes, pricingRes] = await Promise.all([
-      analysisApi.dashboard().catch(() => ({ data: {} })),
-      analysisApi.pricing().catch(() => ({ data: {} })),
-    ])
-
+    const dashRes = await analysisApi.dashboard().catch(() => ({ data: {} }))
     const dash = dashRes.data ?? {}
-    stats.totalPriceTypes = dash.total_price_types ?? pricingRes.data?.total_price_types ?? 0
-    stats.totalUpdates = dash.total_updates ?? pricingRes.data?.total_updates ?? 0
-    stats.avgChange = dash.avg_change ?? pricingRes.data?.avg_24h_change ?? 0
-    stats.recentUpdates = dash.recent_updates_24h ?? pricingRes.data?.recent_updates ?? 0
-    topMovers.value = dash.top_movers ?? pricingRes.data?.top_movers ?? []
-    categoryBreakdown.value = dash.categories ?? pricingRes.data?.categories ?? []
 
-    const history = dash.price_history ?? pricingRes.data?.price_history ?? []
-    chartData.value = buildChartData(history)
+    const overallStats = dash.overall_stats ?? {}
+    stats.totalPriceTypes = overallStats.active_price_types ?? 0
+    stats.totalUpdates = overallStats.total_price_updates ?? 0
+    stats.recentUpdates = overallStats.week_price_updates ?? 0
+
+    const movers = dash.top_movers ?? []
+    topMovers.value = movers
+
+    if (movers.length) {
+      const validChanges = movers
+        .map(m => m.change_percent)
+        .filter(c => c != null)
+      stats.avgChange = validChanges.length
+        ? validChanges.reduce((s, v) => s + v, 0) / validChanges.length
+        : 0
+    }
+
+    categoryBreakdown.value = dash.category_summary ?? []
+
+    const timelines = [...(dash.timeline_data ?? []), ...(dash.special_timeline_data ?? [])]
+    chartData.value = buildChartFromTimeline(timelines)
   } catch {
     /* error toast handled by interceptor */
   } finally {

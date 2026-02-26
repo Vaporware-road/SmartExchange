@@ -12,11 +12,9 @@ const app = createApp(App)
 app.use(createPinia())
 app.use(i18n)
 
-const isRtl = document.documentElement.dir === 'rtl'
-
 app.use(Toast, {
-  position: isRtl ? 'top-left' : 'top-right',
-  rtl: isRtl,
+  position: document.documentElement.dir === 'rtl' ? 'top-left' : 'top-right',
+  rtl: document.documentElement.dir === 'rtl',
   timeout: 4000,
   closeOnClick: true,
   pauseOnFocusLoss: true,
