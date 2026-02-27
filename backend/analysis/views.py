@@ -114,6 +114,7 @@ class AnalyticsDashboardView(TemplateView):
         overall_stats = self._get_overall_statistics(
             price_types, special_price_types, week_start
         )
+        telegram_engagement = self._build_telegram_engagement(window_start)
 
         def _serialize_card(card):
             c = dict(card)
@@ -147,6 +148,7 @@ class AnalyticsDashboardView(TemplateView):
             "timeline_data": timelines,
             "special_timeline_data": special_timelines,
             "category_summary": category_summary,
+            "telegram_engagement": telegram_engagement,
         }
 
     def _get_price_types_with_latest_prices(self):
@@ -529,6 +531,147 @@ class AnalyticsDashboardView(TemplateView):
             "active_price_types": active_price_types,
             "active_special_types": active_special_types,
             "active_channels": active_channels,
+        }
+
+    def _build_telegram_engagement(self, window_start):
+        """
+        Build engagement statistics for Telegram publications.
+
+        Returns a dict with:
+        - ``timeline``: chart-ready datasets (same shape as price timelines)
+        - ``channels``: per-channel aggregates (total, success, failed, success_rate, last_post_at)
+        """
+        # Timeline: aggregate successful/failed posts per day
+        day_buckets = defaultdict(lambda: {"success": 0, "failed": 0})
+
+        final_qs = Finalization.objects.filter(finalized_at__gte=window_start)
+        for f in final_qs:
+            day = timezone.localtime(f.finalized_at).date()
+            bucket = day_buckets[day]
+            if f.message_sent:
+                bucket["success"] += 1
+            else:
+                bucket["failed"] += 1
+
+        special_qs = SpecialPriceFinalization.objects.filter(
+            finalized_at__gte=window_start
+        )
+        for sf in special_qs:
+            day = timezone.localtime(sf.finalized_at).date()
+            bucket = day_buckets[day]
+            if sf.message_sent:
+                bucket["success"] += 1
+            else:
+                bucket["failed"] += 1
+
+        success_points = []
+        failed_points = []
+        for day in sorted(day_buckets.keys()):
+            dt = timezone.make_aware(datetime.combine(day, datetime.min.time()))
+            iso = timezone.localtime(dt).isoformat()
+            bucket = day_buckets[day]
+            if bucket["success"]:
+                success_points.append({"x": iso, "y": bucket["success"]})
+            if bucket["failed"]:
+                failed_points.append({"x": iso, "y": bucket["failed"]})
+
+        timeline = []
+        if success_points:
+            timeline.append(
+                {
+                    "label": "Successful posts",
+                    "data": success_points,
+                    "borderColor": "#22c55e",
+                    "backgroundColor": "#22c55e33",
+                    "tension": 0.35,
+                    "fill": False,
+                }
+            )
+        if failed_points:
+            timeline.append(
+                {
+                    "label": "Failed posts",
+                    "data": failed_points,
+                    "borderColor": "#ef4444",
+                    "backgroundColor": "#ef444433",
+                    "tension": 0.35,
+                    "fill": False,
+                }
+            )
+
+        # Channels: aggregate across Finalization and SpecialPriceFinalization
+        channel_stats = {}
+
+        for f in Finalization.objects.select_related("channel").filter(
+            channel__isnull=False
+        ):
+            key = f.channel_id
+            entry = channel_stats.setdefault(
+                key,
+                {
+                    "channel_id": f.channel_id,
+                    "channel_name": f.channel.name,
+                    "total": 0,
+                    "success": 0,
+                    "failed": 0,
+                    "last_post_at": None,
+                },
+            )
+            entry["total"] += 1
+            if f.message_sent:
+                entry["success"] += 1
+            else:
+                entry["failed"] += 1
+            if not entry["last_post_at"] or f.finalized_at > entry["last_post_at"]:
+                entry["last_post_at"] = f.finalized_at
+
+        for sf in SpecialPriceFinalization.objects.select_related("channel").filter(
+            channel__isnull=False
+        ):
+            key = sf.channel_id
+            entry = channel_stats.setdefault(
+                key,
+                {
+                    "channel_id": sf.channel_id,
+                    "channel_name": sf.channel.name,
+                    "total": 0,
+                    "success": 0,
+                    "failed": 0,
+                    "last_post_at": None,
+                },
+            )
+            entry["total"] += 1
+            if sf.message_sent:
+                entry["success"] += 1
+            else:
+                entry["failed"] += 1
+            if not entry["last_post_at"] or sf.finalized_at > entry["last_post_at"]:
+                entry["last_post_at"] = sf.finalized_at
+
+        channels = []
+        for entry in channel_stats.values():
+            total = entry["total"] or 1
+            success_rate = entry["success"] / total
+            last_ts = entry["last_post_at"]
+            channels.append(
+                {
+                    "channel_id": entry["channel_id"],
+                    "channel_name": entry["channel_name"],
+                    "total": entry["total"],
+                    "success": entry["success"],
+                    "failed": entry["failed"],
+                    "success_rate": success_rate,
+                    "last_post_at": timezone.localtime(last_ts).isoformat()
+                    if last_ts
+                    else None,
+                }
+            )
+
+        channels.sort(key=lambda c: c["total"], reverse=True)
+
+        return {
+            "timeline": timeline,
+            "channels": channels,
         }
 
 

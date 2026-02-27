@@ -99,6 +99,10 @@ const routes = [
         meta: { titleKey: 'routes.categoryNew' },
       },
       {
+        path: 'categories/create',
+        redirect: { name: 'category-new' },
+      },
+      {
         path: 'categories/:id/edit',
         name: 'category-edit',
         component: () => import('@/views/categories/CategoryFormView.vue'),

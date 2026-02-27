@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gold mb-6">Finalize</h1>
+    <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('finalize.title') }}</h1>
     <template v-if="loading">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <BaseSkeleton v-for="i in 6" :key="i" variant="card" class="!h-28" />
@@ -9,11 +9,11 @@
     <template v-else>
       <div v-if="!data?.has_pending && !data?.has_pending_special" class="card-luxury text-center py-12">
         <i class="fas fa-check-circle text-4xl text-gold mb-4"></i>
-        <p class="text-gray-400">All prices are up to date. Nothing to finalize.</p>
+        <p class="text-[var(--text-secondary)]">{{ $t('finalizeDashboard.allUpToDate') }}</p>
       </div>
 
       <div v-if="data?.pending_by_category?.length" class="mb-8">
-        <h2 class="text-lg font-bold text-gold mb-4">Categories with Pending Prices</h2>
+        <h2 class="text-lg font-bold text-gold mb-4">{{ $t('finalizeDashboard.categoriesWithPending') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
             v-for="cat in data.pending_by_category"
@@ -21,19 +21,19 @@
             class="card-luxury p-4"
           >
             <h3 class="font-semibold text-gold mb-2">{{ cat.category_name }}</h3>
-            <p class="text-sm text-gray-400 mb-3">{{ cat.pending_prices?.length ?? 0 }} pending prices</p>
+            <p class="text-sm text-[var(--text-secondary)] mb-3">{{ cat.pending_prices?.length ?? 0 }} {{ $t('finalizeDashboard.pendingPricesCount') }}</p>
             <router-link
               :to="`/finalize/category/${cat.category_id}`"
               class="btn-luxury-outline text-sm py-2"
             >
-              <i class="fas fa-check-circle"></i> Finalize
+              <i class="fas fa-check-circle"></i> {{ $t('finalize.startFinalize') }}
             </router-link>
           </div>
         </div>
       </div>
 
       <div v-if="data?.pending_special_prices?.length">
-        <h2 class="text-lg font-bold text-gold mb-4">Pending Special Prices</h2>
+        <h2 class="text-lg font-bold text-gold mb-4">{{ $t('finalizeDashboard.pendingSpecialPrices') }}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div
             v-for="sp in data.pending_special_prices"
@@ -46,7 +46,7 @@
               :to="`/finalize/special-price/${sp.price_history_id}`"
               class="btn-luxury-outline text-sm py-2"
             >
-              <i class="fas fa-check-circle"></i> Finalize
+              <i class="fas fa-check-circle"></i> {{ $t('finalize.startFinalize') }}
             </router-link>
           </div>
         </div>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('analysis.title') }}</h1>
+    <h1 class="text-2xl font-bold text-gold mb-6 animate-fade-in-up">{{ $t('analysis.title') }}</h1>
 
     <template v-if="loading">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -12,50 +12,25 @@
 
     <template v-else>
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div class="card-luxury flex items-center gap-4">
-          <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
-            <i class="fas fa-tags text-2xl text-gold" />
+        <BaseCard
+          v-for="(stat, statIndex) in statCards"
+          :key="'stat-' + statIndex"
+          variant="glass"
+          padding="sm"
+          class="flex items-center gap-4 hover-lift animate-fade-in-up border border-[var(--glass-border)]"
+          :style="{ animationDelay: `${statIndex * 0.06}s` }"
+        >
+          <div class="p-3 rounded-xl" :style="{ background: stat.iconBg }">
+            <i :class="stat.icon" class="text-2xl" :style="{ color: stat.iconColor }" />
           </div>
           <div>
-            <p class="text-2xl font-bold text-[var(--text-primary)]">{{ stats.totalPriceTypes }}</p>
-            <p class="text-sm text-[var(--text-secondary)]">{{ $t('analysis.totalPriceTypes') }}</p>
+            <p class="text-2xl font-bold" :class="stat.valueClass">{{ stat.value }}</p>
+            <p class="text-sm text-[var(--text-secondary)]">{{ stat.label }}</p>
           </div>
-        </div>
-
-        <div class="card-luxury flex items-center gap-4">
-          <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
-            <i class="fas fa-sync-alt text-2xl text-gold" />
-          </div>
-          <div>
-            <p class="text-2xl font-bold text-[var(--text-primary)]">{{ stats.totalUpdates }}</p>
-            <p class="text-sm text-[var(--text-secondary)]">{{ $t('analysis.totalUpdates') }}</p>
-          </div>
-        </div>
-
-        <div class="card-luxury flex items-center gap-4">
-          <div class="p-3 rounded-xl" style="background: rgba(16, 185, 129, 0.15);">
-            <i class="fas fa-chart-line text-2xl text-success" />
-          </div>
-          <div>
-            <p class="text-2xl font-bold" :class="stats.avgChange > 0 ? 'text-success' : stats.avgChange < 0 ? 'text-danger' : 'text-[var(--text-secondary)]'">
-              {{ stats.avgChange > 0 ? '+' : '' }}{{ stats.avgChange.toFixed(2) }}%
-            </p>
-            <p class="text-sm text-[var(--text-secondary)]">{{ $t('analysis.avgChange') }}</p>
-          </div>
-        </div>
-
-        <div class="card-luxury flex items-center gap-4">
-          <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
-            <i class="fas fa-clock text-2xl text-gold" />
-          </div>
-          <div>
-            <p class="text-xl font-bold text-[var(--text-primary)]">{{ stats.recentUpdates }}</p>
-            <p class="text-sm text-[var(--text-secondary)]">{{ $t('analysis.recentUpdates') }}</p>
-          </div>
-        </div>
+        </BaseCard>
       </div>
 
-      <div v-if="chartData" class="card-luxury mb-6">
+      <div v-if="chartData" class="card-luxury mb-6 animate-fade-in-up hover-lift border border-[var(--glass-border)]" style="animation-delay: 0.1s; background: var(--glass-bg); backdrop-filter: blur(16px);">
         <h2 class="text-lg font-bold text-gold mb-4 flex items-center gap-2">
           <i class="fas fa-chart-area" />
           {{ $t('analysis.priceHistory') }}
@@ -64,12 +39,12 @@
           <Line :data="chartData" :options="chartOptions" />
         </div>
       </div>
-      <div v-else class="card-luxury mb-6 text-center py-12">
+      <div v-else class="card-luxury mb-6 text-center py-12 animate-fade-in-up" style="animation-delay: 0.1s">
         <i class="fas fa-chart-area text-4xl text-[var(--text-secondary)] mb-3" />
         <p class="text-[var(--text-secondary)]">{{ $t('analysis.noChartData') }}</p>
       </div>
 
-      <div v-if="topMovers.length" class="card-luxury mb-6">
+      <div v-if="topMovers.length" class="card-luxury mb-6 animate-fade-in-up hover-lift border border-[var(--glass-border)]" style="animation-delay: 0.15s; background: var(--glass-bg); backdrop-filter: blur(16px);">
         <h2 class="text-lg font-bold text-gold mb-4 flex items-center gap-2">
           <i class="fas fa-fire" />
           {{ $t('analysis.topMovers') }}
@@ -109,35 +84,97 @@
         </div>
       </div>
 
-      <div v-if="categoryBreakdown.length" class="card-luxury">
+      <div
+        v-if="telegramEngagement.timeline?.length || telegramEngagement.channels?.length"
+        class="card-luxury mb-6 animate-fade-in-up hover-lift border border-[var(--glass-border)]"
+        style="animation-delay: 0.18s; background: var(--glass-bg); backdrop-filter: blur(16px);"
+      >
+        <h2 class="text-lg font-bold text-gold mb-4 flex items-center gap-2">
+          <i class="fab fa-telegram-plane" />
+          {{ $t('analysis.telegramEngagement') }}
+        </h2>
+        <div v-if="telegramEngagement.timeline?.length" class="mb-4 h-64">
+          <Line :data="buildTelegramChart" :options="chartOptions" />
+        </div>
+        <div v-if="telegramEngagement.channels?.length" class="overflow-x-auto">
+          <table class="w-full text-start text-sm">
+            <thead>
+              <tr class="text-[var(--text-secondary)] text-sm border-b" style="border-color: var(--border-card);">
+                <th class="py-3 px-4 text-start font-medium">{{ $t('analysis.channel') }}</th>
+                <th class="py-3 px-4 text-start font-medium">{{ $t('analysis.totalPosts') }}</th>
+                <th class="py-3 px-4 text-start font-medium">{{ $t('analysis.successRate') }}</th>
+                <th class="py-3 px-4 text-start font-medium">{{ $t('analysis.lastPost') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="ch in telegramEngagement.channels"
+                :key="ch.channel_id"
+                class="border-b transition-colors hover:bg-[var(--bg-hover)]"
+                style="border-color: var(--border-card);"
+              >
+                <td class="py-3 px-4 font-medium text-[var(--text-primary)]">
+                  {{ ch.channel_name }}
+                </td>
+                <td class="py-3 px-4 text-gold font-semibold">
+                  {{ ch.total }}
+                </td>
+                <td class="py-3 px-4">
+                  <span
+                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-sm font-medium"
+                    :class="ch.success_rate >= 0.9 ? 'bg-success/10 text-success' : ch.success_rate >= 0.7 ? 'bg-amber-500/10 text-amber-300' : 'bg-danger/10 text-danger'"
+                  >
+                    {{ (ch.success_rate * 100).toFixed(1) }}%
+                  </span>
+                </td>
+                <td class="py-3 px-4 text-sm text-[var(--text-secondary)]">
+                  {{ ch.last_post_at ? formatRelative(new Date(ch.last_post_at)) : '—' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <BaseCard
+        v-if="categoryBreakdown.length"
+        variant="glass"
+        padding="default"
+        class="hover-lift animate-fade-in-up border border-[var(--glass-border)]"
+        style="animation-delay: 0.2s"
+      >
         <h2 class="text-lg font-bold text-gold mb-4 flex items-center gap-2">
           <i class="fas fa-folder" />
           {{ $t('analysis.categories') }}
         </h2>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div
+          <BaseCard
             v-for="(cat, idx) in categoryBreakdown"
             :key="cat.category ?? idx"
-            class="p-4 rounded-xl border transition-all hover:border-gold/50"
-            style="border-color: var(--border-card); background: var(--bg-elevated);"
+            variant="glass"
+            padding="sm"
+            class="hover-lift animate-fade-in-up border border-[var(--glass-border)]"
+            :style="{ animationDelay: `${0.25 + idx * 0.04}s` }"
           >
             <h3 class="font-semibold text-gold mb-2">{{ cat.category }}</h3>
             <div class="flex justify-between text-sm text-[var(--text-secondary)]">
               <span>{{ cat.count ?? 0 }} {{ $t('analysis.priceType') }}</span>
               <span class="text-gold">{{ $t('analysis.avgPrice') }}: {{ formatNumber(cat.average_price) }}</span>
             </div>
-          </div>
+          </BaseCard>
         </div>
-      </div>
+      </BaseCard>
     </template>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { analysisApi } from '@/services/api'
 import { useDate } from '@/composables/useDate'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
+import BaseCard from '@/components/ui/BaseCard.vue'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -154,6 +191,7 @@ import {
 
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, TimeScale, Title, Tooltip, Legend, Filler)
 
+const { t } = useI18n()
 const { formatRelative } = useDate()
 
 const loading = ref(true)
@@ -161,6 +199,42 @@ const stats = reactive({ totalPriceTypes: 0, totalUpdates: 0, avgChange: 0, rece
 const topMovers = ref([])
 const categoryBreakdown = ref([])
 const chartData = ref(null)
+const telegramEngagement = ref({ timeline: [], channels: [] })
+
+const statCards = computed(() => [
+  {
+    icon: 'fas fa-tags text-gold',
+    iconBg: 'rgba(255, 215, 0, 0.15)',
+    iconColor: 'var(--primary)',
+    value: stats.totalPriceTypes,
+    valueClass: 'text-[var(--text-primary)]',
+    label: t('analysis.totalPriceTypes'),
+  },
+  {
+    icon: 'fas fa-sync-alt text-gold',
+    iconBg: 'rgba(255, 215, 0, 0.15)',
+    iconColor: 'var(--primary)',
+    value: stats.totalUpdates,
+    valueClass: 'text-[var(--text-primary)]',
+    label: t('analysis.totalUpdates'),
+  },
+  {
+    icon: 'fas fa-chart-line',
+    iconBg: 'rgba(16, 185, 129, 0.15)',
+    iconColor: 'var(--color-success, #10B981)',
+    value: (stats.avgChange > 0 ? '+' : '') + stats.avgChange.toFixed(2) + '%',
+    valueClass: stats.avgChange > 0 ? 'text-success' : stats.avgChange < 0 ? 'text-danger' : 'text-[var(--text-secondary)]',
+    label: t('analysis.avgChange'),
+  },
+  {
+    icon: 'fas fa-clock text-gold',
+    iconBg: 'rgba(255, 215, 0, 0.15)',
+    iconColor: 'var(--primary)',
+    value: stats.recentUpdates,
+    valueClass: 'text-xl text-[var(--text-primary)]',
+    label: t('analysis.recentUpdates'),
+  },
+])
 
 const chartOptions = {
   responsive: true,
@@ -236,6 +310,11 @@ function buildChartFromTimeline(datasets) {
   return { labels: shortLabels, datasets: chartDatasets }
 }
 
+const buildTelegramChart = computed(() => {
+  if (!telegramEngagement.value.timeline?.length) return null
+  return buildChartFromTimeline(telegramEngagement.value.timeline)
+})
+
 onMounted(async () => {
   try {
     const dashRes = await analysisApi.dashboard().catch(() => ({ data: {} }))
@@ -262,6 +341,8 @@ onMounted(async () => {
 
     const timelines = [...(dash.timeline_data ?? []), ...(dash.special_timeline_data ?? [])]
     chartData.value = buildChartFromTimeline(timelines)
+
+    telegramEngagement.value = dash.telegram_engagement ?? { timeline: [], channels: [] }
   } catch {
     /* error toast handled by interceptor */
   } finally {

@@ -1,21 +1,21 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gold mb-6">Update Prices</h1>
-    <div v-if="loading" class="space-y-6">
-      <div class="card-luxury overflow-x-auto p-6">
+    <h1 class="text-2xl font-bold text-gold mb-4">{{ $t('routes.prices') }}</h1>
+    <div v-if="loading" class="space-y-4">
+      <div class="card-luxury overflow-x-auto px-4 py-3">
         <div class="space-y-4">
           <BaseSkeleton v-for="i in 8" :key="i" variant="table-row" />
         </div>
       </div>
-      <div>
-        <BaseSkeleton variant="text" class="mb-4 !max-w-[200px] !h-6" />
+      <div class="card-luxury px-4 py-3">
+        <BaseSkeleton variant="text" class="mb-3 !max-w-[200px] !h-5" />
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <BaseSkeleton v-for="i in 6" :key="i" variant="card" class="!h-20" />
         </div>
       </div>
     </div>
-    <div v-else class="card-luxury overflow-x-auto">
-      <table class="w-full">
+    <div v-else class="card-luxury overflow-x-auto px-4 py-3">
+      <table class="w-full text-sm">
         <thead>
           <tr class="border-b" style="border-color: rgba(255, 215, 0, 0.3);">
             <th class="text-left py-4 px-4 text-gold font-semibold">Price Type</th>
@@ -47,22 +47,36 @@
           </tr>
         </tbody>
       </table>
-      <p v-if="!loading && (!prices || !prices.length)" class="text-center text-gray-500 py-8">No price types found.</p>
+      <p
+        v-if="!loading && (!prices || !prices.length)"
+        class="text-center text-gray-500 py-6"
+      >
+        {{ $t('emptyState.noPrices') }}
+      </p>
     </div>
-    <div class="mt-6">
-      <h2 class="text-lg font-bold text-gold mb-4">Update by Category</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="mt-4">
+      <h2 class="text-lg font-bold text-gold mb-3">Update by Category</h2>
+      <div
+        v-if="categories && categories.length"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+      >
         <div
           v-for="cat in categories"
           :key="cat.id"
           class="card-luxury p-4 flex items-center justify-between"
         >
-          <span>{{ cat.name }}</span>
+          <span class="truncate">{{ cat.name }}</span>
           <router-link :to="`/prices/category/${cat.id}/update`" class="btn-luxury-outline text-sm py-2">
             Bulk Update
           </router-link>
         </div>
       </div>
+      <p
+        v-else
+        class="text-center text-gray-500 py-6"
+      >
+        {{ $t('dashboard.noCategoriesFound') }}
+      </p>
     </div>
   </div>
 </template>
@@ -79,8 +93,13 @@ const categories = ref([])
 onMounted(async () => {
   try {
     const [pRes, cRes] = await Promise.all([priceApi.list(), categoryApi.list()])
-    prices.value = pRes.data
-    categories.value = cRes.data
+
+    const priceData = pRes.data
+    prices.value = Array.isArray(priceData) ? priceData : (priceData?.results ?? [])
+
+    const catData = cRes.data
+    const rawCategories = Array.isArray(catData) ? catData : (catData?.results ?? [])
+    categories.value = rawCategories.filter((c) => c && c.id != null)
   } catch {
     prices.value = []
     categories.value = []

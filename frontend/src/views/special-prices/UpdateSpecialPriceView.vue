@@ -1,29 +1,29 @@
 <template>
   <div>
     <nav class="mb-6">
-      <router-link to="/special-prices" class="text-gray-400 hover:text-gold transition-colors">
-        <i class="fas fa-arrow-left mr-2"></i>Back to Special Prices
+      <router-link to="/special-prices" class="text-[var(--text-secondary)] hover:text-gold transition-colors">
+        <i class="fas me-2" :class="$i18n.locale === 'fa' ? 'fa-arrow-right' : 'fa-arrow-left'"></i>{{ $t('specialPrices.backToList') }}
       </router-link>
     </nav>
-    <h1 class="text-2xl font-bold text-gold mb-6">Update Special Price</h1>
+    <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('specialPrices.updateTitle') }}</h1>
     <div v-if="loading" class="card-luxury max-w-md p-6 space-y-4">
       <BaseSkeleton variant="text" class="!max-w-[200px] !h-4" />
       <BaseSkeleton variant="text" class="!max-w-full !h-12" />
       <BaseSkeleton variant="text" class="!max-w-full !h-12" />
     </div>
     <form v-else-if="sp" @submit.prevent="handleSubmit" class="card-luxury max-w-md space-y-4">
-      <p class="text-gray-400">{{ sp.name }}</p>
+      <p class="text-[var(--text-secondary)]">{{ sp.name }}</p>
       <div>
-        <label class="block text-sm font-medium text-gray-400 mb-2">Price</label>
+        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('specialPrices.price') }}</label>
         <input v-model.number="price" type="number" step="0.01" min="0" class="input-luxury" required />
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-400 mb-2">Notes (optional)</label>
+        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('specialPrices.notesOptional') }}</label>
         <input v-model="notes" type="text" class="input-luxury" />
       </div>
       <div class="flex gap-4">
-        <button type="submit" class="btn-luxury" :disabled="submitting">Save</button>
-        <router-link to="/special-prices" class="btn-luxury-outline">Cancel</router-link>
+        <button type="submit" class="btn-luxury" :disabled="submitting">{{ $t('common.save') }}</button>
+        <router-link to="/special-prices" class="btn-luxury-outline">{{ $t('common.cancel') }}</router-link>
       </div>
     </form>
   </div>

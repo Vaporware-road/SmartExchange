@@ -2,38 +2,41 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
 
+from category.models import Category
+from special_price.models import SpecialPriceType
+
 
 class TelegramBot(models.Model):
     """Model representing a Telegram bot."""
-    
+
     name = models.CharField(
         max_length=100,
         verbose_name="Bot Name",
-        help_text="A friendly name for this bot"
+        help_text="A friendly name for this bot",
     )
     token = models.CharField(
         max_length=200,
         verbose_name="Bot Token",
-        help_text="Telegram bot token from @BotFather"
+        help_text="Telegram bot token from @BotFather",
     )
     is_active = models.BooleanField(
         default=True,
         verbose_name="Active",
-        help_text="Whether this bot is currently active"
+        help_text="Whether this bot is currently active",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Created At"
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="Updated At"
+        verbose_name="Updated At",
     )
 
     class Meta:
         verbose_name = "Telegram Bot"
         verbose_name_plural = "Telegram Bots"
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.name
@@ -41,43 +44,43 @@ class TelegramBot(models.Model):
 
 class TelegramChannel(models.Model):
     """Model representing a Telegram channel."""
-    
+
     bot = models.ForeignKey(
         TelegramBot,
         on_delete=models.CASCADE,
-        related_name='channels',
+        related_name="channels",
         verbose_name="Bot",
-        help_text="The bot used to send messages to this channel"
+        help_text="The bot used to send messages to this channel",
     )
     name = models.CharField(
         max_length=100,
         verbose_name="Channel Name",
-        help_text="A friendly name for this channel"
+        help_text="A friendly name for this channel",
     )
     chat_id = models.CharField(
         max_length=50,
         verbose_name="Chat ID",
-        help_text="Telegram channel chat ID (e.g., @channelname or -1001234567890)"
+        help_text="Telegram channel chat ID (e.g., @channelname or -1001234567890)",
     )
     is_active = models.BooleanField(
         default=True,
         verbose_name="Active",
-        help_text="Whether this channel is currently active"
+        help_text="Whether this channel is currently active",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
-        verbose_name="Created At"
+        verbose_name="Created At",
     )
     updated_at = models.DateTimeField(
         auto_now=True,
-        verbose_name="Updated At"
+        verbose_name="Updated At",
     )
 
     class Meta:
         verbose_name = "Telegram Channel"
         verbose_name_plural = "Telegram Channels"
-        ordering = ['-created_at']
-        unique_together = ['bot', 'chat_id']
+        ordering = ["-created_at"]
+        unique_together = ["bot", "chat_id"]
 
     def __str__(self):
         return f"{self.name} ({self.chat_id})"
@@ -102,7 +105,7 @@ class DefaultMessageSettings(models.Model):
         default=list,
         verbose_name="Default Buttons",
         help_text="JSON structure describing inline buttons. Example: "
-        "[[{\"text\": \"View\", \"url\": \"https://example.com\"}]]",
+        '[{"text": "View", "url": "https://example.com"}]',
     )
     active = models.BooleanField(
         default=True,
@@ -150,3 +153,73 @@ class DefaultMessageSettings(models.Model):
     def __str__(self):
         status = "active" if self.active else "inactive"
         return f"{self.bot} ({status})"
+
+
+class AutoPostConfig(models.Model):
+    """
+    Configuration for automatic Telegram posting.
+
+    This model is configuration-only; a scheduler (Celery/cron) can read it and
+    call the existing price publisher services.
+    """
+
+    channel = models.ForeignKey(
+        TelegramChannel,
+        on_delete=models.CASCADE,
+        related_name="auto_post_configs",
+        verbose_name="Channel",
+    )
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name="auto_post_configs",
+        null=True,
+        blank=True,
+        verbose_name="Category",
+    )
+    special_price_type = models.ForeignKey(
+        SpecialPriceType,
+        on_delete=models.CASCADE,
+        related_name="auto_post_configs",
+        null=True,
+        blank=True,
+        verbose_name="Special Price Type",
+    )
+    time_of_day = models.TimeField(
+        verbose_name="Time of Day",
+        help_text="Local time of day when auto-post should run.",
+    )
+    timezone = models.CharField(
+        max_length=64,
+        default="Asia/Tehran",
+        verbose_name="Time Zone",
+        help_text="IANA timezone name used when interpreting time_of_day.",
+    )
+    enabled = models.BooleanField(
+        default=True,
+        verbose_name="Enabled",
+        help_text="Whether this configuration is currently active.",
+    )
+    notes = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name="Notes",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
+
+    class Meta:
+        verbose_name = "Auto Post Config"
+        verbose_name_plural = "Auto Post Configs"
+        ordering = ["-created_at"]
+
+    def clean(self):
+        super().clean()
+        if not self.category and not self.special_price_type:
+            raise ValidationError(
+                "At least one of category or special_price_type must be set."
+            )
+
+    def __str__(self):
+        target = self.category or self.special_price_type
+        return f"AutoPost for {target} on {self.channel}"

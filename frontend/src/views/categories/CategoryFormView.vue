@@ -1,47 +1,53 @@
 <template>
-  <div>
-    <nav class="mb-6">
-      <router-link to="/categories" class="text-gray-400 hover:text-gold transition-colors">
+  <div class="min-h-[calc(100vh-10rem)] flex flex-col items-center justify-center">
+    <nav class="absolute top-0 start-0">
+      <router-link to="/categories" class="text-[var(--text-secondary)] hover:text-gold transition-colors inline-flex items-center gap-2">
         <i class="fas" :class="isRtl ? 'fa-arrow-right' : 'fa-arrow-left'" />
-        <span class="ms-2">{{ $t('categories.backToList') }}</span>
+        <span>{{ $t('categories.backToList') }}</span>
       </router-link>
     </nav>
 
-    <h1 class="text-2xl font-bold text-gold mb-6">
+    <h1 class="text-2xl font-bold text-gold mb-4">
       {{ isEdit ? $t('categories.editTitle') : $t('categories.newTitle') }}
     </h1>
 
-    <form @submit.prevent="handleSubmit" class="card-luxury max-w-md space-y-5">
-      <div v-if="errors.non_field_errors" class="p-3 rounded-xl bg-danger/10 border border-danger/30 text-danger text-sm">
-        {{ errors.non_field_errors }}
-      </div>
+    <BaseCard
+      variant="glass"
+      padding="default"
+      class="w-full max-w-md animate-fade-in-up border border-[var(--glass-border)]"
+    >
+      <form @submit.prevent="handleSubmit" class="space-y-5">
+        <div v-if="errors.non_field_errors" class="p-3 rounded-xl bg-danger/10 border border-danger/30 text-danger text-sm">
+          {{ errors.non_field_errors }}
+        </div>
 
-      <FloatingInput
-        v-model="form.name"
-        :label="$t('common.name')"
-        :error="errors.name"
-        :rules="[v => !v?.trim() ? $t('validation.required') : true]"
-        required
-        @validate="e => errors.name = e"
-      />
+        <FloatingInput
+          v-model="form.name"
+          :label="$t('common.name')"
+          :error="errors.name"
+          :rules="[v => !v?.trim() ? $t('validation.required') : true]"
+          required
+          @validate="e => errors.name = e"
+        />
 
-      <FloatingInput
-        v-model="form.description"
-        :label="$t('common.description')"
-        multiline
-        :rows="3"
-      />
+        <FloatingInput
+          v-model="form.description"
+          :label="$t('common.description')"
+          multiline
+          :rows="3"
+        />
 
-      <div class="flex gap-4 pt-2">
-        <button type="submit" class="btn-luxury" :disabled="submitting || !!errors.name">
-          <LoadingSpinner v-if="submitting" class="w-5 h-5" />
-          {{ $t('common.save') }}
-        </button>
-        <router-link to="/categories" class="btn-luxury-outline">
-          {{ $t('common.cancel') }}
-        </router-link>
-      </div>
-    </form>
+        <div class="flex gap-4 pt-2">
+          <button type="submit" class="btn-luxury" :disabled="submitting || !!errors.name">
+            <LoadingSpinner v-if="submitting" class="w-5 h-5" />
+            {{ $t('common.save') }}
+          </button>
+          <router-link to="/categories" class="btn-luxury-outline">
+            {{ $t('common.cancel') }}
+          </router-link>
+        </div>
+      </form>
+    </BaseCard>
   </div>
 </template>
 
@@ -53,6 +59,7 @@ import { useToast } from 'vue-toastification'
 import { categoryApi } from '@/services/api'
 import FloatingInput from '@/components/ui/FloatingInput.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import BaseCard from '@/components/ui/BaseCard.vue'
 
 const { t } = useI18n()
 const toast = useToast()

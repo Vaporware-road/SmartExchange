@@ -81,6 +81,16 @@ body {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Subtle ambient gradient to reduce flat/empty feeling */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 80% 0%, rgba(255, 215, 0, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
@@ -119,6 +129,16 @@ body {
 .animate-fade-in-up {
   animation: fadeInUp 0.4s ease-out forwards;
   animation-fill-mode: both;
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(6px);
 }
 
 .animate-scale-in {
@@ -222,4 +242,14 @@ body {
   border-radius: 1rem !important;
   border: 1px solid var(--glass-border) !important;
   font-family: inherit !important;
+}
+
+/* Page transition (used by AppLayout router-view) */
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.2s ease;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
 }

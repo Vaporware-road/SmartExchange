@@ -2,7 +2,7 @@
   <div>
     <div class="flex justify-between items-center mb-6 animate-fade-in-up">
       <h1 class="text-2xl font-bold text-gold">{{ $t('sidebar.categories') }}</h1>
-      <button type="button" class="btn-luxury" @click="showCreateModal = true">
+      <button type="button" class="btn-luxury" @click="$router.push('/categories/new')">
         <i class="fas fa-plus"></i> {{ $t('common.create') }}
       </button>
     </div>
@@ -38,7 +38,7 @@
               v-if="auth.canDeleteItems"
               type="button"
               class="btn-luxury-outline text-sm py-1.5 !border-red-500/50 !text-red-400 hover:!bg-red-500/10"
-              @click="handleDelete(cat)"
+              @click="openDeleteModal(cat)"
             >
               <i class="fas fa-trash" aria-hidden="true" />
             </button>
@@ -60,26 +60,31 @@
       <p class="text-sm text-[var(--text-secondary)] mb-8 max-w-sm">
         {{ $t('emptyState.noCategoriesDesc') }}
       </p>
-      <button type="button" class="btn-luxury" @click="showCreateModal = true">
+      <button type="button" class="btn-luxury" @click="$router.push('/categories/new')">
         <i class="fas fa-plus" />
         {{ $t('emptyState.createCategory') }}
       </button>
     </div>
 
     <BaseModal
-      v-model="showCreateModal"
-      :title="$t('categories.newTitle')"
-      aria-label="Create category"
+      v-model="showDeleteModal"
+      :title="$t('categories.deleteConfirmTitle')"
+      aria-label="Delete category confirmation"
     >
       <p class="text-[var(--text-secondary)] mb-6">
-        {{ $t('categories.modalPlaceholder') }}
+        {{ deleteConfirmMessage }}
       </p>
-      <div class="flex gap-3">
-        <router-link to="/categories/new" class="btn-luxury" @click="showCreateModal = false">
-          {{ $t('categories.openFullForm') }}
-        </router-link>
-        <button type="button" class="btn-luxury-outline" @click="showCreateModal = false">
+      <div class="flex gap-3 justify-end">
+        <button type="button" class="btn-luxury-outline" @click="showDeleteModal = false">
           {{ $t('common.cancel') }}
+        </button>
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-2 px-6 py-2.5 font-semibold rounded-2xl transition-all duration-300 border border-red-500/50 text-red-400 hover:bg-red-500/10 focus:outline-none focus:ring-2 focus:ring-red-500/50"
+          @click="confirmDelete"
+        >
+          <i class="fas fa-trash" aria-hidden="true" />
+          {{ $t('common.delete') }}
         </button>
       </div>
     </BaseModal>
@@ -87,7 +92,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { categoryApi } from '@/services/api'
@@ -101,7 +106,14 @@ const toast = useToast()
 const auth = useAuthStore()
 const loading = ref(true)
 const categories = ref([])
-const showCreateModal = ref(false)
+const showDeleteModal = ref(false)
+const categoryToDelete = ref(null)
+
+const deleteConfirmMessage = computed(() =>
+  categoryToDelete.value
+    ? t('categories.deleteConfirmMessage', { name: categoryToDelete.value.name })
+    : ''
+)
 
 onMounted(async () => {
   try {
@@ -114,14 +126,23 @@ onMounted(async () => {
   }
 })
 
-async function handleDelete(cat) {
-  if (!confirm(t('common.confirm') + '?')) return
+function openDeleteModal(cat) {
+  categoryToDelete.value = cat
+  showDeleteModal.value = true
+}
+
+async function confirmDelete() {
+  const cat = categoryToDelete.value
+  if (!cat) return
+  showDeleteModal.value = false
   try {
     await categoryApi.delete(cat.id)
     categories.value = categories.value.filter(c => c.id !== cat.id)
     toast.success(t('toast.deleteSuccess'))
   } catch {
     toast.error(t('toast.serverError'))
+  } finally {
+    categoryToDelete.value = null
   }
 }
 </script>

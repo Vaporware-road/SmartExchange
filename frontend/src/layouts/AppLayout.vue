@@ -4,10 +4,14 @@
     <AppDrawer :open="drawerOpen" @close="drawerOpen = false" />
     <div class="flex-1 flex flex-col lg:ps-64">
       <AppHeader @toggle-drawer="drawerOpen = !drawerOpen" />
-      <main class="flex-1 py-6 px-4 sm:px-6 lg:px-8">
+      <main class="flex-1 py-4 px-3 sm:px-4 lg:px-5">
         <div class="max-w-7xl mx-auto">
           <AppBreadcrumb />
-          <router-view />
+          <router-view v-slot="{ Component }">
+            <Transition name="page" mode="out-in">
+              <component :is="Component" />
+            </Transition>
+          </router-view>
         </div>
       </main>
       <AppFooter />

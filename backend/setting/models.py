@@ -103,6 +103,13 @@ class SiteSettings(models.Model):
     instagram_link = models.URLField(blank=True)
     twitter_link = models.URLField(blank=True)
     linkedin_link = models.URLField(blank=True)
+    auto_post_on_update = models.BooleanField(
+        default=False,
+        help_text=(
+            "If enabled, finalized prices can be auto-posted when updates occur. "
+            "A scheduler must read this flag and trigger publishing."
+        ),
+    )
 
     class Meta:
         verbose_name = "Site Settings"

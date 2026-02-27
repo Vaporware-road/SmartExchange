@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useToast } from 'vue-toastification'
+import i18n from '@/i18n'
 
 const api = axios.create({
   baseURL: '/api',
@@ -33,11 +34,11 @@ api.interceptors.response.use(
       localStorage.removeItem('refresh_token')
       window.location.href = '/login'
     } else if (status === 403 && !isAuthCheck) {
-      toast.error('شما دسترسی لازم برای این عملیات را ندارید')
+      toast.error(i18n.global.t('errors.forbidden'))
     } else if (status >= 500) {
-      toast.error('خطای سرور — لطفاً دوباره تلاش کنید')
+      toast.error(i18n.global.t('errors.serverError'))
     } else if (!error.response) {
-      toast.error('خطای ارتباط با سرور — اتصال اینترنت خود را بررسی کنید')
+      toast.error(i18n.global.t('errors.networkError'))
     }
 
     return Promise.reject(error)
@@ -113,6 +114,30 @@ export const analysisApi = {
 export const telegramApi = {
   channels: () => api.get('/telegram/channels/'),
   sendMessage: (data) => api.post('/telegram/send-message/', data),
+  bots: {
+    list: () => api.get('/telegram/bots/'),
+    create: (data) => api.post('/telegram/bots/', data),
+    update: (id, data) => api.put(`/telegram/bots/${id}/`, data),
+    delete: (id) => api.delete(`/telegram/bots/${id}/`),
+    testConnection: (id, data) =>
+      api.post(`/telegram/bots/${id}/test-connection/`, data),
+  },
+  channelsManage: {
+    list: () => api.get('/telegram/channels/manage/'),
+    create: (data) => api.post('/telegram/channels/manage/', data),
+    update: (id, data) => api.put(`/telegram/channels/manage/${id}/`, data),
+    delete: (id) => api.delete(`/telegram/channels/manage/${id}/`),
+  },
+  autoPostConfig: {
+    list: () => api.get('/telegram/auto-post-config/'),
+    create: (data) => api.post('/telegram/auto-post-config/', data),
+    update: (id, data) => api.put(`/telegram/auto-post-config/${id}/`, data),
+    delete: (id) => api.delete(`/telegram/auto-post-config/${id}/`),
+  },
+  automationSettings: {
+    get: () => api.get('/telegram/automation-settings/'),
+    update: (data) => api.put('/telegram/automation-settings/', data),
+  },
 }
 
 export const templateApi = {

@@ -5,17 +5,27 @@
         <i class="fas fa-arrow-left mr-2"></i>Back to Prices
       </router-link>
     </nav>
-    <h1 class="text-2xl font-bold text-gold mb-6">Update Price</h1>
-    <div v-if="loading" class="card-luxury max-w-md p-6 space-y-4">
+    <h1 class="text-2xl font-bold text-gold mb-4">Update Price</h1>
+    <div v-if="loading" class="card-luxury max-w-md px-4 py-3 space-y-4">
       <BaseSkeleton variant="text" class="!max-w-[200px] !h-4" />
       <BaseSkeleton variant="text" class="!max-w-full !h-12" />
       <BaseSkeleton variant="text" class="!max-w-full !h-12" />
     </div>
-    <div v-else-if="priceType" class="card-luxury max-w-md">
+    <div v-else-if="priceType" class="card-luxury max-w-md px-4 py-3 space-y-4">
       <p class="text-gray-400 mb-2">{{ priceType.name }}</p>
       <p class="text-sm text-gray-500 mb-4">{{ priceType.source_currency }} / {{ priceType.target_currency }} - {{ priceType.category_name }}</p>
       <form @submit.prevent="handleSubmit" class="space-y-4">
-        <div>
+        <div v-if="isDoublePrice" class="grid grid-cols-1 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('dashboard.cashPrice') }}</label>
+            <input v-model.number="cashPrice" type="number" step="0.01" min="0" class="input-luxury" />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('dashboard.accountPrice') }}</label>
+            <input v-model.number="accountPrice" type="number" step="0.01" min="0" class="input-luxury" />
+          </div>
+        </div>
+        <div v-else>
           <label class="block text-sm font-medium text-gray-400 mb-2">New Price</label>
           <input v-model.number="price" type="number" step="0.01" min="0" class="input-luxury" required />
         </div>
@@ -33,6 +43,12 @@
         </div>
       </form>
     </div>
+    <div
+      v-else
+      class="card-luxury max-w-md px-4 py-6 text-center text-gray-500"
+    >
+      {{ $t('errors.priceNotFound') }}
+    </div>
   </div>
 </template>
 
@@ -49,15 +65,33 @@ const id = computed(() => route.params.id)
 const loading = ref(true)
 const priceType = ref(null)
 const price = ref('')
+const cashPrice = ref('')
+const accountPrice = ref('')
 const notes = ref('')
 const submitting = ref(false)
+
+const isDoublePrice = computed(() => !!priceType.value?.is_double_price)
 
 onMounted(async () => {
   try {
     const { data } = await priceApi.list()
-    priceType.value = data.find((p) => String(p.id) === String(id.value))
-    if (priceType.value?.latest_price != null) {
-      price.value = Number(priceType.value.latest_price)
+    const items = Array.isArray(data) ? data : (data?.results ?? [])
+    priceType.value = items.find((p) => String(p.id) === String(id.value)) || null
+    if (priceType.value) {
+      if (priceType.value.cash_price != null) {
+        cashPrice.value = Number(priceType.value.cash_price)
+      }
+      if (priceType.value.account_price != null) {
+        accountPrice.value = Number(priceType.value.account_price)
+      }
+      if (!isDoublePrice.value && priceType.value.latest_price != null) {
+        const latest = priceType.value.latest_price
+        if (typeof latest === 'number') {
+          price.value = Number(latest)
+        } else if (latest && typeof latest === 'object' && latest.price != null) {
+          price.value = Number(latest.price)
+        }
+      }
     }
   } catch {
     priceType.value = null
@@ -69,7 +103,18 @@ onMounted(async () => {
 async function handleSubmit() {
   submitting.value = true
   try {
-    await priceApi.update(id.value, { price: price.value, notes: notes.value })
+    const body = { notes: notes.value }
+    if (isDoublePrice.value) {
+      if (cashPrice.value !== '' && cashPrice.value != null && !Number.isNaN(cashPrice.value)) {
+        body.cash_price = cashPrice.value
+      }
+      if (accountPrice.value !== '' && accountPrice.value != null && !Number.isNaN(accountPrice.value)) {
+        body.account_price = accountPrice.value
+      }
+    } else {
+      body.price = price.value
+    }
+    await priceApi.update(id.value, body)
     router.push('/prices')
   } finally {
     submitting.value = false

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import TelegramBot, TelegramChannel, DefaultMessageSettings
+from .models import TelegramBot, TelegramChannel, DefaultMessageSettings, AutoPostConfig
 
 
 class TelegramBotSerializer(serializers.ModelSerializer):
@@ -78,3 +78,33 @@ class DefaultMessageSettingsSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+
+class AutoPostConfigSerializer(serializers.ModelSerializer):
+    channel_name = serializers.CharField(source="channel.name", read_only=True)
+    target_type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AutoPostConfig
+        fields = [
+            "id",
+            "channel",
+            "channel_name",
+            "category",
+            "special_price_type",
+            "time_of_day",
+            "timezone",
+            "enabled",
+            "notes",
+            "created_at",
+            "updated_at",
+            "target_type",
+        ]
+        read_only_fields = ["id", "created_at", "updated_at", "target_type"]
+
+    def get_target_type(self, obj):
+        if obj.category_id:
+            return "category"
+        if obj.special_price_type_id:
+            return "special"
+        return "none"
