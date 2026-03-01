@@ -1,1 +1,0 @@
-import{_ as o,o as r,c as e}from"./index-Cv5k3oOg.js";const c={},n={class:"inline-block w-8 h-8 border-2 rounded-full animate-spin",style:{"border-color":"rgba(255, 215, 0, 0.2)","border-top-color":"var(--color-gold)"}};function s(t,a){return r(),e("div",n)}const d=o(c,[["render",s]]);export{d as L};

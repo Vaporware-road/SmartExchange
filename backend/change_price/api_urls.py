@@ -5,6 +5,11 @@ from . import api
 urlpatterns = [
     path("", api.PriceListAPIView.as_view(), name="api-price-list"),
     path(
+        "<int:price_type_id>/",
+        api.PriceDetailAPIView.as_view(),
+        name="api-price-detail",
+    ),
+    path(
         "<int:price_type_id>/update/",
         api.PriceUpdateAPIView.as_view(),
         name="api-price-update",

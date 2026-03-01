@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'template_editor',
     'analysis',
     'landing',
+    'instagram_hub',
     # third-party apps
     'corsheaders',
     'rest_framework',
@@ -49,14 +50,29 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'accounts.auth.JWTAuthenticationWithTokenVersion',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 50,
+    'EXCEPTION_HANDLER': 'core.exceptions.custom_exception_handler',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',
+        'user': '1000/hour',
+        'finalize': '60/hour',
+        'settings': '200/hour',
+    },
 }
+
+# Finalize: when True, do not persist finalization if Telegram publish fails (rollback semantics).
+# When False, persist with message_sent=False on Telegram failure.
+FINALIZE_STRICT_TELEGRAM = os.environ.get('FINALIZE_STRICT_TELEGRAM', 'False').lower() in ('true', '1', 'yes')
 
 from datetime import timedelta as _td  # noqa: E402
 
@@ -70,6 +86,8 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -140,6 +158,8 @@ USE_TZ = True
 
 # URL address for static files
 STATIC_URL = '/static/'
+# Public base URL for media (required for Instagram: Meta fetches images from this URL)
+INSTAGRAM_BASE_URL = os.environ.get('INSTAGRAM_BASE_URL', '').strip()
 STATICFILES_DIRS = [
     BASE_DIR / 'static',  # Location of static files in development
 ]
@@ -205,3 +225,25 @@ else:
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
+
+# RBAC debug: log permission checks (user/role) when DEBUG is True
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {'format': '%(levelname)s %(name)s: %(message)s'},
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+    },
+    'loggers': {
+        'accounts.permissions': {
+            'level': 'INFO',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+    },
+}

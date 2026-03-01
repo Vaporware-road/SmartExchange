@@ -16,6 +16,27 @@ const routes = [
     meta: { public: true },
   },
   {
+    path: '/error/404',
+    name: 'error-404',
+    component: () => import('@/views/errors/ErrorView.vue'),
+    props: { code: 404 },
+    meta: { public: true },
+  },
+  {
+    path: '/error/500',
+    name: 'error-500',
+    component: () => import('@/views/errors/ErrorView.vue'),
+    props: { code: 500 },
+    meta: { public: true },
+  },
+  {
+    path: '/error/403',
+    name: 'error-403',
+    component: () => import('@/views/errors/ErrorView.vue'),
+    props: { code: 403 },
+    meta: { public: true },
+  },
+  {
     path: '/',
     component: Layout,
     meta: { requiresAuth: true, titleKey: 'breadcrumb.home' },
@@ -27,22 +48,27 @@ const routes = [
         meta: { titleKey: 'routes.dashboard' },
       },
       {
-        path: 'prices',
-        name: 'prices',
-        component: () => import('@/views/prices/PricesView.vue'),
-        meta: { titleKey: 'routes.prices' },
+        path: 'update',
+        name: 'update',
+        component: () => import('@/views/prices/PriceManagementView.vue'),
+        meta: { titleKey: 'routes.priceHub' },
       },
       {
-        path: 'prices/:id/update',
-        name: 'update-price',
-        component: () => import('@/views/prices/UpdatePriceView.vue'),
-        meta: { titleKey: 'routes.updatePrice' },
+        path: 'prices',
+        name: 'prices',
+        redirect: { path: '/update' },
       },
       {
         path: 'prices/category/:id/update',
         name: 'bulk-update',
         component: () => import('@/views/prices/BulkUpdateView.vue'),
         meta: { titleKey: 'routes.bulkUpdate' },
+      },
+      {
+        path: 'prices/special/:id/update',
+        name: 'update-special-price',
+        component: () => import('@/views/special-prices/UpdateSpecialPriceView.vue'),
+        meta: { titleKey: 'routes.updateSpecialPrice' },
       },
       {
         path: 'prices/:id/history',
@@ -53,14 +79,30 @@ const routes = [
       {
         path: 'special-prices',
         name: 'special-prices',
-        component: () => import('@/views/special-prices/SpecialPricesView.vue'),
-        meta: { titleKey: 'routes.specialPrices' },
+        redirect: { path: '/update' },
+      },
+      {
+        path: 'special-prices/new',
+        name: 'special-price-new',
+        component: () => import('@/views/special-prices/SpecialPriceFormView.vue'),
+        meta: { titleKey: 'routes.specialPriceNew' },
       },
       {
         path: 'special-prices/:id/update',
-        name: 'update-special-price',
-        component: () => import('@/views/special-prices/UpdateSpecialPriceView.vue'),
-        meta: { titleKey: 'routes.updateSpecialPrice' },
+        name: 'update-special-price-legacy',
+        redirect: (to) => ({ path: `/prices/special/${to.params.id}/update` }),
+      },
+      {
+        path: 'special-prices/:id/template',
+        name: 'special-price-template',
+        component: () => import('@/views/special-prices/SpecialPriceTemplateRedirectView.vue'),
+        meta: { titleKey: 'routes.templateEditor' },
+      },
+      {
+        path: 'special-prices/:id/telegram-studio',
+        name: 'special-price-telegram-studio',
+        component: () => import('@/views/special-prices/SpecialPriceTelegramRedirectView.vue'),
+        meta: { titleKey: 'routes.telegramStudio' },
       },
       {
         path: 'special-prices/:id/history',
@@ -115,10 +157,38 @@ const routes = [
         meta: { titleKey: 'routes.priceTypeNew' },
       },
       {
+        path: 'categories/:id/template',
+        name: 'category-template',
+        component: () => import('@/views/categories/CategoryTemplateRedirectView.vue'),
+        meta: { titleKey: 'routes.templateEditor' },
+      },
+      {
+        path: 'categories/:id/telegram-studio',
+        name: 'telegram-studio',
+        component: () => import('@/views/categories/TelegramStudioView.vue'),
+        meta: { titleKey: 'routes.telegramStudio' },
+      },
+      {
+        path: 'categories/:id/template',
+        name: 'category-template',
+        component: () => import('@/views/categories/CategoryTemplateRedirectView.vue'),
+        meta: { titleKey: 'routes.templateEditor' },
+      },
+      {
         path: 'settings',
         name: 'settings',
         component: () => import('@/views/settings/SettingsView.vue'),
         meta: { titleKey: 'routes.settings' },
+      },
+      {
+        path: 'users',
+        name: 'users',
+        component: () => import('@/views/users/UserManagementView.vue'),
+        meta: {
+          titleKey: 'routes.userCenter',
+          requiresAuth: true,
+          roles: ['super_admin', 'management'],
+        },
       },
       {
         path: 'settings/logs',
@@ -151,6 +221,12 @@ const routes = [
         meta: { titleKey: 'routes.templates' },
       },
       {
+        path: 'instagram',
+        name: 'instagram',
+        component: () => import('@/views/instagram/InstagramHubView.vue'),
+        meta: { titleKey: 'routes.instagramHub' },
+      },
+      {
         path: 'templates/new',
         name: 'template-new',
         component: () => import('@/views/templates/TemplateFormView.vue'),
@@ -163,6 +239,13 @@ const routes = [
         meta: { titleKey: 'routes.templateEditor' },
       },
     ],
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    name: 'not-found',
+    component: () => import('@/views/errors/ErrorView.vue'),
+    props: { code: 404 },
+    meta: { public: true },
   },
 ]
 
@@ -184,7 +267,17 @@ router.beforeEach(async (to, from, next) => {
   } else if (to.meta.requiresAuth && !auth.isAuthenticated) {
     next({ name: 'login', query: { redirect: to.fullPath } })
   } else {
-    next()
+    // Permission-based access: finalize and settings require super_admin or management
+    const path = to.path
+    if (path.startsWith('/finalize') && !auth.can('finalize')) {
+      next({ name: 'error-403' })
+    } else if ((path === '/settings' || path.startsWith('/settings/')) && !auth.can('settings')) {
+      next({ name: 'error-403' })
+    } else if (to.meta.roles && !to.meta.roles.includes(auth.role)) {
+      next({ name: 'error-403' })
+    } else {
+      next()
+    }
   }
 })
 

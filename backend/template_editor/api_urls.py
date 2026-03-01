@@ -17,5 +17,15 @@ urlpatterns = [
         api_views.TemplatePreviewAPIView.as_view(),
         name="api-template-editor-preview",
     ),
+    path(
+        "variables/",
+        api_views.TemplateVariablesAPIView.as_view(),
+        name="api-template-editor-variables",
+    ),
+    path(
+        "fonts/",
+        api_views.TemplateFontsAPIView.as_view(),
+        name="api-template-editor-fonts",
+    ),
     path("", include(router.urls)),
 ]

@@ -37,6 +37,14 @@ from price_publisher.services.special_offer_renderer import (
 from setting.models import SiteSettings
 from telegram_app.services.telegram_client import TelegramService
 
+from template_editor.constants import CATEGORY_BOARD, TETHER_BOARD, SPECIAL_OFFER
+from template_editor.dynamic_data import (
+    build_dynamic_data_for_category_board,
+    build_dynamic_data_for_tether_board,
+    build_dynamic_data_for_special_offer,
+)
+from template_editor.render import render_price_template
+
 
 class PricePublicationError(RuntimeError):
     """Raised when the price publishing pipeline fails."""
@@ -251,6 +259,23 @@ class PricePublisherService:
         """Render and post a special price to Telegram."""
 
         custom_offer = supports_special_offer_type(special_price_type)
+        if getattr(SiteSettings.load(), "use_template_editor_for_boards", False):
+            try:
+                te_template = self._get_template_editor_template_for_special(special_price_type)
+                if te_template and te_template.config.get("themes"):
+                    dynamic_data = build_dynamic_data_for_special_offer(special_price_type, price_history)
+                    pil_image = render_price_template(te_template, SPECIAL_OFFER, dynamic_data)
+                    image = self._pil_image_to_rendered(pil_image)
+                    caption = self._build_special_price_caption(special_price_type, price_history, custom_offer=True)
+                    return self._send_photo(
+                        channel=channel,
+                        image=image,
+                        caption=caption,
+                        buttons=_build_legacy_final_buttons(),
+                    )
+            except Exception:
+                pass
+
         if custom_offer:
             try:
                 image = render_special_offer_board(
@@ -303,6 +328,23 @@ class PricePublisherService:
         timestamp,
         template_assets: Optional[TemplateAssets],
     ) -> RenderedPriceImage:
+        # Optional: use template_editor Template when feature flag is on
+        if getattr(SiteSettings.load(), "use_template_editor_for_boards", False):
+            try:
+                te_template = self._get_template_editor_template_for_category(category)
+                if te_template and te_template.config.get("themes"):
+                    usage_type = TETHER_BOARD if supports_tether_category(category) else CATEGORY_BOARD
+                    dynamic_data = (
+                        build_dynamic_data_for_tether_board(category, price_items, timestamp)
+                        if usage_type == TETHER_BOARD
+                        else build_dynamic_data_for_category_board(category, price_items, timestamp)
+                    )
+                    pil_image = render_price_template(te_template, usage_type, dynamic_data)
+                    return self._pil_image_to_rendered(pil_image)
+            except Exception as exc:
+                # Fall back to legacy renderers on any error
+                pass
+
         if supports_tether_category(category):
             try:
                 return render_tether_board(
@@ -333,6 +375,37 @@ class PricePublisherService:
             )
         except PriceImageRenderingError as exc:  # pragma: no cover - delegated
             raise PricePublicationError(str(exc)) from exc
+
+    def _get_template_editor_template_for_category(self, category):
+        """Return template_editor.Template for this category or default."""
+        from template_editor.models import Template
+        if category:
+            t = Template.objects.filter(category=category).order_by("-updated_at").first()
+            if t:
+                return t
+        return Template.objects.filter(
+            category__isnull=True, special_price_type__isnull=True
+        ).order_by("-updated_at").first()
+
+    def _get_template_editor_template_for_special(self, special_price_type):
+        """Return template_editor.Template for this special price type or default."""
+        from template_editor.models import Template
+        if special_price_type:
+            t = Template.objects.filter(special_price_type=special_price_type).order_by("-updated_at").first()
+            if t:
+                return t
+        return Template.objects.filter(
+            category__isnull=True, special_price_type__isnull=True
+        ).order_by("-updated_at").first()
+
+    @staticmethod
+    def _pil_image_to_rendered(pil_image) -> RenderedPriceImage:
+        """Convert PIL Image to RenderedPriceImage."""
+        buf = io.BytesIO()
+        buf.name = "prices.png"
+        pil_image.convert("RGB").save(buf, format="PNG")
+        buf.seek(0)
+        return RenderedPriceImage(stream=buf, width=pil_image.width, height=pil_image.height)
 
     def _render_special_price_image(
         self,

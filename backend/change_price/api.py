@@ -1,11 +1,15 @@
 from django.db import transaction
 from rest_framework import status
 from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.permissions import IsSuperAdminOrManagement
 from category.models import Category, PriceType
 from setting.utils import log_event
+from accounts.utils import log_activity
+from accounts.models import UserActivityLog
 from .models import PriceHistory
 from .serializers import (
     BulkPriceUpdateSerializer,
@@ -16,7 +20,9 @@ from .serializers import (
 
 
 class PriceListAPIView(APIView):
-    """All price types with their latest prices."""
+    """All price types with their latest prices. Read-only: any authenticated user."""
+
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         price_types = (
@@ -47,8 +53,46 @@ class PriceListAPIView(APIView):
         return Response(serializer.data)
 
 
+class PriceDetailAPIView(APIView):
+    """Single price type by id with same shape as list (for UpdatePriceView). Read-only."""
+
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, price_type_id):
+        try:
+            pt = (
+                PriceType.objects.select_related(
+                    "category", "source_currency", "target_currency"
+                )
+                .prefetch_related("price_histories")
+                .get(id=price_type_id)
+            )
+        except PriceType.DoesNotExist:
+            return Response(
+                {"detail": "Price type not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        latest = pt.price_histories.first()
+        data = {
+            "id": pt.id,
+            "name": pt.name,
+            "slug": pt.slug,
+            "category_id": pt.category_id,
+            "category_name": pt.category.name,
+            "source_currency": pt.source_currency.code,
+            "target_currency": pt.target_currency.code,
+            "trade_type": pt.trade_type,
+            "latest_price": latest.price if latest else None,
+            "latest_price_at": latest.created_at if latest else None,
+        }
+        serializer = PriceTypeWithLatestPriceSerializer(data)
+        return Response(serializer.data)
+
+
 class PriceUpdateAPIView(APIView):
-    """Update a single price type."""
+    """Update a single price type. Management and Super Admin only."""
+
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def post(self, request, price_type_id):
         try:
@@ -58,6 +102,21 @@ class PriceUpdateAPIView(APIView):
 
         serializer = PriceUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+        from category.models import validate_category_buy_sell_spread
+        from rest_framework.exceptions import ValidationError as DRFValidationError
+        from django.core.exceptions import ValidationError as DjangoValidationError
+        category = price_type.category
+        # Build effective prices: current latest for all, new price for this type
+        price_types_in_cat = PriceType.objects.filter(category=category).prefetch_related("price_histories")
+        prices_map = {}
+        for pt in price_types_in_cat:
+            latest = pt.price_histories.first()
+            prices_map[pt.id] = serializer.validated_data["price"] if pt.id == price_type.id else (latest.price if latest else None)
+        try:
+            validate_category_buy_sell_spread(category, prices_map)
+        except DjangoValidationError as e:
+            raise DRFValidationError(e.messages[0] if e.messages else str(e))
 
         old_price_obj = PriceHistory.objects.filter(price_type=price_type).first()
         old_price = old_price_obj.price if old_price_obj else None
@@ -75,6 +134,13 @@ class PriceUpdateAPIView(APIView):
             details=f"Old: {old_price}, New: {price_history.price}",
             user=request.user if request.user.is_authenticated else None,
         )
+        if request.user.is_authenticated:
+            log_activity(
+                request.user,
+                UserActivityLog.ACTION_PRICE_UPDATE,
+                request,
+                details=f"{price_type.name}: {old_price} -> {price_history.price}",
+            )
 
         return Response(
             PriceHistorySerializer(price_history).data,
@@ -83,7 +149,9 @@ class PriceUpdateAPIView(APIView):
 
 
 class BulkPriceUpdateAPIView(APIView):
-    """Bulk-update prices for all price types in a category."""
+    """Bulk-update prices for all price types in a category. Management and Super Admin only."""
+
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def post(self, request, category_id):
         try:
@@ -91,9 +159,8 @@ class BulkPriceUpdateAPIView(APIView):
         except Category.DoesNotExist:
             return Response({"detail": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = BulkPriceUpdateSerializer(data=request.data)
+        serializer = BulkPriceUpdateSerializer(data=request.data, context={"category": category})
         serializer.is_valid(raise_exception=True)
-
         prices_map = serializer.validated_data["prices"]
         notes = serializer.validated_data.get("notes", "")
 
@@ -119,6 +186,13 @@ class BulkPriceUpdateAPIView(APIView):
             details=f"Updated {len(created)} price(s). Notes: {notes or 'None'}",
             user=request.user if request.user.is_authenticated else None,
         )
+        if request.user.is_authenticated:
+            log_activity(
+                request.user,
+                UserActivityLog.ACTION_BULK_PRICE_UPDATE,
+                request,
+                details=f"{category.name}: {len(created)} price(s)",
+            )
 
         return Response(
             PriceHistorySerializer(created, many=True).data,
@@ -127,8 +201,9 @@ class BulkPriceUpdateAPIView(APIView):
 
 
 class PriceHistoryAPIView(ListAPIView):
-    """Price history for a specific price type."""
+    """Price history for a specific price type. Read-only: any authenticated user."""
 
+    permission_classes = [IsAuthenticated]
     serializer_class = PriceHistorySerializer
     pagination_class = None
 

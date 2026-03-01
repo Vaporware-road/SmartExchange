@@ -29,7 +29,7 @@ class SpecialPriceTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = SpecialPriceType
         fields = [
-            "id", "name", "slug",
+            "id", "name", "slug", "icon",
             "source_currency", "target_currency",
             "source_currency_id", "target_currency_id",
             "trade_type", "description",

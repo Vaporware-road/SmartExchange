@@ -59,6 +59,21 @@ class FinalizeSpecialPriceRequestSerializer(serializers.Serializer):
     notes = serializers.CharField(required=False, allow_blank=True, default="")
 
 
+class FinalizeAllRequestSerializer(serializers.Serializer):
+    channel_id = serializers.IntegerField()
+    category_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        default=list,
+    )
+    special_price_history_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        default=list,
+    )
+    post_to_instagram = serializers.BooleanField(required=False, default=False)
+
+
 class PendingPriceSerializer(serializers.Serializer):
     price_type_id = serializers.IntegerField()
     price_type_name = serializers.CharField()

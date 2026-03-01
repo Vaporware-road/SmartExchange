@@ -4,6 +4,7 @@ from . import api_views
 
 urlpatterns = [
     path("dashboard/", api_views.FinalizeDashboardAPIView.as_view(), name="api-finalize-dashboard"),
+    path("all/", api_views.FinalizeAllAPIView.as_view(), name="api-finalize-all"),
     path(
         "category/<int:category_id>/",
         api_views.FinalizeCategoryAPIView.as_view(),

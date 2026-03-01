@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.utils import validate_uploaded_image, MAX_ASSET_SIZE
 from .models import Template
 
 
@@ -23,3 +24,11 @@ class TemplateSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def validate_image(self, value):
+        if value and hasattr(value, "read"):
+            try:
+                validate_uploaded_image(value, max_size=MAX_ASSET_SIZE)
+            except ValueError as e:
+                raise serializers.ValidationError(str(e))
+        return value

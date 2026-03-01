@@ -4,6 +4,8 @@ DRF API views for template editor (Template model with config JSONField).
 from rest_framework import status
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated
+
+from accounts.permissions import IsSuperAdminOrManagement
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
@@ -11,12 +13,14 @@ from django.shortcuts import get_object_or_404
 
 from .models import Template
 from .serializers import TemplateSerializer
+from .variables import get_variable_catalog
+from .utils import get_available_fonts
 
 
 class TemplateViewSet(ModelViewSet):
     """CRUD for Template (template_editor.Template)."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
     queryset = Template.objects.select_related(
         "category", "special_price_type"
     ).order_by("-created_at")
@@ -27,7 +31,7 @@ class TemplateViewSet(ModelViewSet):
 class TemplateConfigUpdateAPIView(APIView):
     """PUT /api/template-editor/templates/<id>/config/ - update config JSON only."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def put(self, request, pk):
         template = get_object_or_404(Template, pk=pk)
@@ -54,7 +58,7 @@ class TemplatePreviewAPIView(APIView):
     POST can override config in body for live preview.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def get(self, request, pk):
         return self._render_preview(request, pk)
@@ -70,3 +74,22 @@ class TemplatePreviewAPIView(APIView):
         preview_view.request = request
         response = preview_view._render_preview(request, pk)
         return response
+
+
+class TemplateVariablesAPIView(APIView):
+    """GET /api/template-editor/variables/ - return variable catalog for editor sidebar."""
+
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+
+    def get(self, request):
+        return Response(get_variable_catalog())
+
+
+class TemplateFontsAPIView(APIView):
+    """GET /api/template-editor/fonts/ - return available font list for editor dropdown."""
+
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+
+    def get(self, request):
+        fonts = get_available_fonts()
+        return Response([{"filename": f[0], "display_name": f[1]} for f in fonts])

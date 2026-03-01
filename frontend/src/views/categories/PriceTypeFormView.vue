@@ -5,7 +5,7 @@
         <i class="fas fa-arrow-left mr-2"></i>Back to Categories
       </router-link>
     </nav>
-    <h1 class="text-2xl font-bold text-gold mb-6">Add Price Type</h1>
+    <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('routes.priceTypeNew') }}</h1>
     <form @submit.prevent="handleSubmit" class="card-luxury max-w-md space-y-4">
       <div>
         <label class="block text-sm font-medium text-gray-400 mb-2">Name</label>

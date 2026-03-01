@@ -5,11 +5,13 @@ from .managers import CustomUserManager
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
+    ROLE_SUPER_ADMIN = 'super_admin'
     ROLE_MANAGEMENT = 'management'
     ROLE_EMPLOYEE = 'employee'
     ROLE_DEVELOPER = 'developer'
 
     ROLE_CHOICES = (
+        (ROLE_SUPER_ADMIN, 'Super Admin'),
         (ROLE_MANAGEMENT, 'Management'),
         (ROLE_EMPLOYEE, 'Employee'),
         (ROLE_DEVELOPER, 'Developer'),
@@ -22,6 +24,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
+    token_version = models.PositiveIntegerField(default=0, help_text='Incremented on force logout to invalidate all tokens.')
 
     objects = CustomUserManager()
 
@@ -40,3 +43,55 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.get_full_name()
+
+
+class UserActivityLog(models.Model):
+    """Audit log for logins, logouts, and sensitive actions."""
+
+    ACTION_LOGIN_SUCCESS = 'login_success'
+    ACTION_LOGIN_FAILED = 'login_failed'
+    ACTION_LOGOUT = 'logout'
+    ACTION_PRICE_UPDATE = 'price_update'
+    ACTION_BULK_PRICE_UPDATE = 'bulk_price_update'
+    ACTION_SPECIAL_PRICE_UPDATE = 'special_price_update'
+    ACTION_TEMPLATE_CHANGE = 'template_change'
+    ACTION_FINALIZE = 'finalize'
+    ACTION_OTHER = 'other'
+
+    ACTION_CHOICES = (
+        (ACTION_LOGIN_SUCCESS, 'Login success'),
+        (ACTION_LOGIN_FAILED, 'Login failed'),
+        (ACTION_LOGOUT, 'Logout'),
+        (ACTION_PRICE_UPDATE, 'Price update'),
+        (ACTION_BULK_PRICE_UPDATE, 'Bulk price update'),
+        (ACTION_SPECIAL_PRICE_UPDATE, 'Special price update'),
+        (ACTION_TEMPLATE_CHANGE, 'Template change'),
+        (ACTION_FINALIZE, 'Finalize'),
+        (ACTION_OTHER, 'Other'),
+    )
+
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='activity_logs',
+    )
+    action_type = models.CharField(max_length=32, choices=ACTION_CHOICES)
+    ip_address = models.CharField(max_length=45, blank=True)  # IPv6 max length
+    user_agent = models.TextField(blank=True)
+    details = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['action_type', '-created_at']),
+            models.Index(fields=['user', '-created_at']),
+        ]
+        verbose_name = 'User activity log'
+        verbose_name_plural = 'User activity logs'
+
+    def __str__(self):
+        return f'{self.action_type} - {self.created_at}'

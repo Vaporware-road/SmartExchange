@@ -1,23 +1,65 @@
 <template>
-  <div>
-    <nav class="mb-6">
+  <div class="flex flex-col items-center">
+    <nav class="mb-6 w-full">
       <router-link to="/finalize" class="text-gray-400 hover:text-gold transition-colors">
         <i class="fas" :class="isRtl ? 'fa-arrow-right' : 'fa-arrow-left'" />
         <span class="ms-2">{{ $t('finalize.backToList') }}</span>
       </router-link>
     </nav>
 
-    <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('finalize.title') }}</h1>
+    <h1 class="text-2xl font-bold text-gold mb-6 w-full text-center">{{ $t('finalize.title') }}</h1>
 
-    <div v-if="loading" class="card-luxury max-w-lg p-6 space-y-4">
+    <div v-if="loading" class="card-luxury max-w-lg w-full p-6 space-y-4">
       <BaseSkeleton variant="text" class="!max-w-full !h-4" />
       <BaseSkeleton variant="text" class="!max-w-full !h-12" />
       <BaseSkeleton variant="text" class="!max-w-full !h-12" />
     </div>
 
     <template v-else>
+      <!-- Comparison summary + Pre-flight (config phase) -->
+      <div v-if="phase === 'config'" class="max-w-lg w-full space-y-6">
+        <!-- Comparison summary -->
+        <div v-if="categoryPending?.pending_prices?.length" class="card-luxury p-4">
+          <h3 class="font-semibold text-gold mb-3">{{ $t('finalize.comparisonSummary') }}</h3>
+          <ul class="space-y-2 text-sm">
+            <li
+              v-for="pp in categoryPending.pending_prices"
+              :key="pp.price_history_id"
+              class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5"
+            >
+              <span class="font-medium text-[var(--text-primary)]">{{ pp.price_type_name }}</span>
+              <template v-if="pp.previous_price != null">
+                <span class="text-[var(--text-secondary)]">{{ $t('finalize.oldPrice') }}: {{ formatPrice(pp.previous_price) }}</span>
+                <span class="text-gold font-bold">{{ $t('finalize.newPrice') }}: {{ formatPrice(pp.price) }}</span>
+                <span :class="priceChangeClass(pp)" class="font-medium">{{ formatPriceChange(pp) }}</span>
+              </template>
+              <template v-else>
+                <span class="text-gold font-bold">{{ formatPrice(pp.price) }}</span>
+                <span class="text-[var(--text-secondary)]">({{ $t('finalize.firstPublication') }})</span>
+              </template>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Pre-flight checklist -->
+        <div v-if="enabledDestinations.length" class="card-luxury p-4">
+          <p class="text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('finalize.preflightDestinations') }}</p>
+          <div class="flex flex-wrap gap-4">
+            <span
+              v-for="d in enabledDestinations"
+              :key="d.id"
+              class="inline-flex items-center gap-2 text-sm"
+            >
+              <i v-if="d.id === 'telegram'" class="fab fa-telegram-plane text-xl text-[var(--text-secondary)]"></i>
+              <i v-else-if="d.id === 'external_api'" class="fas fa-mobile-alt text-lg text-[var(--text-secondary)]"></i>
+              <i v-else class="fas fa-paper-plane text-lg text-[var(--text-secondary)]"></i>
+              <span>{{ d.label }}</span>
+            </span>
+          </div>
+        </div>
+
       <!-- Configuration form (pre-finalization) -->
-      <form v-if="phase === 'config'" @submit.prevent="startFinalize" class="card-luxury max-w-lg space-y-4">
+      <form @submit.prevent="openConfirmModal" class="card-luxury max-w-lg space-y-4">
         <p class="text-[var(--text-secondary)] mb-4">
           {{ $t('finalize.pendingCount', { count: pendingCount }) }}
         </p>
@@ -37,8 +79,8 @@
           :label="$t('finalize.notes')"
         />
 
-        <div class="flex gap-4">
-          <button type="submit" class="btn-luxury" :disabled="!channelId">
+        <div class="flex gap-4 justify-center">
+          <button type="button" class="btn-luxury" :disabled="!channelId" @click="openConfirmModal">
             <i class="fas fa-play" />
             {{ $t('finalize.startFinalize') }}
           </button>
@@ -47,9 +89,10 @@
           </router-link>
         </div>
       </form>
+      </div>
 
       <!-- Step-by-step progress -->
-      <div v-else class="card-luxury max-w-lg space-y-6">
+      <div v-else class="card-luxury max-w-lg w-full space-y-6">
         <div class="space-y-3">
           <div
             v-for="(step, idx) in steps"
@@ -104,7 +147,7 @@
           <p class="text-lg font-bold text-danger">{{ $t('finalize.failed') }}</p>
         </div>
 
-        <div class="flex gap-4 pt-2">
+        <div class="flex gap-4 pt-2 justify-center">
           <router-link v-if="phase === 'done' || phase === 'error'" to="/finalize" class="btn-luxury">
             <i class="fas fa-arrow-left" />
             {{ $t('common.back') }}
@@ -116,6 +159,36 @@
         </div>
       </div>
     </template>
+
+    <BaseModal
+      v-model="confirmModalOpen"
+      :title="$t('finalize.confirmTitle')"
+      :aria-label="$t('finalize.confirmTitle')"
+    >
+      <p class="text-[var(--text-secondary)] mb-4">
+        {{ $t('finalize.confirmCategorySummary', { count: pendingCount, name: categoryPending?.category_name ?? '' }) }}
+      </p>
+      <div v-if="enabledDestinations.length" class="flex flex-wrap gap-4 mb-4">
+        <span
+          v-for="d in enabledDestinations"
+          :key="d.id"
+          class="inline-flex items-center gap-2 text-sm"
+        >
+          <i v-if="d.id === 'telegram'" class="fab fa-telegram-plane text-xl"></i>
+          <i v-else-if="d.id === 'external_api'" class="fas fa-mobile-alt text-lg"></i>
+          <i v-else class="fas fa-paper-plane text-lg"></i>
+          <span>{{ d.label }}</span>
+        </span>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button type="button" class="btn-luxury-outline" @click="confirmModalOpen = false">
+          {{ $t('common.cancel') }}
+        </button>
+        <button type="button" class="btn-luxury" @click="onConfirmPublish">
+          {{ $t('finalize.confirmPublish') }}
+        </button>
+      </div>
+    </BaseModal>
   </div>
 </template>
 
@@ -127,6 +200,7 @@ import { useToast } from 'vue-toastification'
 import { finalizeApi, telegramApi } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import FloatingInput from '@/components/ui/FloatingInput.vue'
+import BaseModal from '@/components/ui/BaseModal.vue'
 
 const { t } = useI18n()
 const toast = useToast()
@@ -141,6 +215,13 @@ const pendingCount = ref(0)
 const channelId = ref('')
 const notes = ref('')
 const phase = ref('config')
+const categoryPending = ref(null)
+const publicationDestinations = ref([])
+const confirmModalOpen = ref(false)
+
+const enabledDestinations = computed(() =>
+  (publicationDestinations.value || []).filter(d => d.enabled)
+)
 
 const STEP_KEYS = ['validate', 'render', 'send', 'confirm']
 
@@ -155,7 +236,7 @@ const progressPercent = computed(() => Math.round((completedSteps.value / steps.
 function stepStyle(step) {
   if (step.status === 'success') return { borderColor: 'rgba(16, 185, 129, 0.3)', background: 'rgba(16, 185, 129, 0.05)' }
   if (step.status === 'failed') return { borderColor: 'rgba(239, 68, 68, 0.3)', background: 'rgba(239, 68, 68, 0.05)' }
-  if (step.status === 'inProgress') return { borderColor: 'rgba(255, 215, 0, 0.4)', background: 'rgba(255, 215, 0, 0.05)' }
+  if (step.status === 'inProgress') return { borderColor: 'var(--border-card-hover)', background: 'var(--primary-muted)' }
   return { borderColor: 'var(--border-card)', background: 'transparent' }
 }
 
@@ -179,9 +260,12 @@ onMounted(async () => {
       finalizeApi.dashboard(),
       telegramApi.channels(),
     ])
-    const cat = dashRes.data?.pending_by_category?.find(
+    const dash = dashRes.data
+    publicationDestinations.value = dash?.publication_destinations ?? []
+    const cat = dash?.pending_by_category?.find(
       c => String(c.category_id) === String(categoryId.value)
     )
+    categoryPending.value = cat ?? null
     pendingCount.value = cat?.pending_prices?.length ?? 0
     channels.value = chRes.data ?? []
   } catch {
@@ -190,6 +274,42 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+function formatPrice(value) {
+  if (value == null || value === '') return '—'
+  const num = typeof value === 'string' ? parseFloat(value) : value
+  if (Number.isNaN(num)) return String(value)
+  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
+function formatPriceChange(item) {
+  const prev = item.previous_price != null ? parseFloat(item.previous_price) : null
+  const next = item.price != null ? parseFloat(item.price) : null
+  if (prev == null || next == null || Number.isNaN(prev) || Number.isNaN(next)) return '—'
+  const diff = next - prev
+  const sign = diff >= 0 ? '+' : ''
+  return sign + formatPrice(String(diff))
+}
+
+function priceChangeClass(item) {
+  const prev = item.previous_price != null ? parseFloat(item.previous_price) : null
+  const next = item.price != null ? parseFloat(item.price) : null
+  if (prev == null || next == null || Number.isNaN(prev) || Number.isNaN(next)) return 'text-[var(--text-secondary)]'
+  const diff = next - prev
+  if (diff > 0) return 'text-success'
+  if (diff < 0) return 'text-danger'
+  return 'text-[var(--text-secondary)]'
+}
+
+function openConfirmModal() {
+  if (!channelId.value) return
+  confirmModalOpen.value = true
+}
+
+function onConfirmPublish() {
+  confirmModalOpen.value = false
+  startFinalize()
+}
 
 async function runStep(idx, fn) {
   steps[idx].status = 'inProgress'

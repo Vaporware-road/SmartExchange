@@ -144,8 +144,7 @@ const STORAGE_KEY = 'smartexchange-recent-searches'
 
 const pageLinks = [
   { to: '/', labelKey: 'sidebar.dashboard', icon: 'fas fa-tachometer-alt' },
-  { to: '/prices', labelKey: 'sidebar.prices', icon: 'fas fa-dollar-sign' },
-  { to: '/special-prices', labelKey: 'sidebar.specialPrices', icon: 'fas fa-star' },
+  { to: '/update', labelKey: 'sidebar.priceHub', icon: 'fas fa-dollar-sign' },
   { to: '/categories', labelKey: 'sidebar.categories', icon: 'fas fa-tags' },
   { to: '/finalize', labelKey: 'sidebar.finalize', icon: 'fas fa-check-circle' },
   { to: '/analysis', labelKey: 'sidebar.analysis', icon: 'fas fa-chart-line' },
@@ -173,7 +172,7 @@ const searchableItems = computed(() => {
       label: sp.name,
       group: t('search.specialPrices'),
       icon: 'fas fa-star',
-      to: `/special-prices/${sp.id}/update`,
+      to: `/prices/special/${sp.id}/update`,
     })
   }
 

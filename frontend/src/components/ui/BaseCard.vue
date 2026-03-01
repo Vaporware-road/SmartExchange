@@ -4,7 +4,7 @@
     :class="[
       paddingClasses[padding],
       variantClasses[variant],
-      { 'hover:shadow-glow hover:border-[rgba(255,215,0,0.4)]': hover && variant === 'default' },
+      { 'hover:shadow-glow hover:border-[var(--border-card-hover)]': hover && variant === 'default' },
       { 'hover:scale-[1.01] hover:shadow-lg': hover && variant === 'elevated' },
     ]"
   >

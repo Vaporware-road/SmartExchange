@@ -114,136 +114,104 @@ class PreviewView(LoginRequiredMixin, View):
     
     def _render_preview(self, request, pk):
         template = get_object_or_404(Template, pk=pk)
-        
+
         if not template.image:
             return JsonResponse({'error': 'Template has no image.'}, status=400)
-        
+
         try:
-            # Load template image
+            # Resolve config: from request body (API or POST) or saved config
+            config_data = None
+            if request.method == 'POST':
+                if hasattr(request, 'data') and request.data:
+                    config_data = request.data.get('config')
+                if config_data is None and request.POST.get('config'):
+                    try:
+                        config_data = json.loads(request.POST.get('config', '{}'))
+                    except json.JSONDecodeError:
+                        pass
+            if config_data is None:
+                config_data = template.config or {}
+
+            config = config_data if isinstance(config_data, dict) else (template.config or {})
+            themes = config.get('themes')
+
+            # New schema: themes with layers — use render_price_template
+            if themes:
+                theme_name = None
+                if request.method == 'POST':
+                    if hasattr(request, 'data') and request.data:
+                        theme_name = request.data.get('theme_name')
+                    if theme_name is None and request.POST.get('theme_name'):
+                        theme_name = request.POST.get('theme_name')
+                if not theme_name:
+                    theme_name = next(iter(themes), None)
+                from .render import _get_layers_sorted, render_price_template
+                from .variables import get_default_sample_value
+                layers = _get_layers_sorted(config, theme_name) if theme_name else []
+                sample_data = {}
+                for layer in layers:
+                    key = layer.get('variable_key') or layer.get('key')
+                    if key:
+                        sample_data[key] = get_default_sample_value(key)
+                img = render_price_template(
+                    template,
+                    '',
+                    sample_data,
+                    theme_name_override=theme_name,
+                    config_override=config,
+                )
+                buffer = BytesIO()
+                img_rgb = img.convert('RGB')
+                img_rgb.save(buffer, format='PNG')
+                buffer.seek(0)
+                img.close()
+                img_rgb.close()
+                return HttpResponse(buffer.getvalue(), content_type='image/png')
+
+            # Legacy schema: config['fields']
             bg_path = template.image.path
             img = Image.open(bg_path).convert('RGBA')
             draw = ImageDraw.Draw(img)
-            
-            # Get configuration - use POST data if available (for live preview), otherwise use saved config
-            if request.method == 'POST' and 'config' in request.POST:
-                try:
-                    config_data = json.loads(request.POST.get('config', '{}'))
-                    config = config_data.get('fields', {})
-                except json.JSONDecodeError:
-                    config = (template.config or {}).get('fields', {})
-            else:
-                config = (template.config or {}).get('fields', {})
-            
-            self.logger.debug(f"Preview config has {len(config)} fields: {list(config.keys())}")
-            
-            # Import font utility to avoid code duplication
-            from .utils import DEFAULT_FONT_CANDIDATES
-            font_candidates = [f for f in DEFAULT_FONT_CANDIDATES if f]
-            
-            # Draw each text field
-            for field_name, field_config in config.items():
+
+            config_fields = config.get('fields', {})
+            self.logger.debug(f"Preview config has {len(config_fields)} fields: {list(config_fields.keys())}")
+
+            from .utils import draw_text_field
+
+            for field_name, field_config in config_fields.items():
                 if not isinstance(field_config, dict):
                     continue
-                
+
                 x = field_config.get('x', 0)
                 y = field_config.get('y', 0)
                 size = field_config.get('size', 32)
                 color = field_config.get('color', '#000000')
                 align = field_config.get('align', 'left')
                 max_width = field_config.get('max_width')
-                
-                # Get sample text (use field name as preview)
+                font_filename = field_config.get('font')
+
                 sample_text = field_config.get('sample_text', field_name.replace('_', ' ').title())
                 if not sample_text or not str(sample_text).strip():
                     sample_text = field_name.replace('_', ' ').title()
-                    if not sample_text:
-                        continue
-                
-                # Check if text is RTL (Persian/Arabic)
-                text_to_draw = str(sample_text)
-                try:
-                    is_rtl = self._is_rtl(text_to_draw)
-                    direction = "rtl" if is_rtl else None
-                except Exception:
-                    direction = None
-                
-                # Load font using utility function
-                from .utils import _get_font
-                font_filename = field_config.get('font')  # Get font filename if specified
-                font = _get_font(size, font_filename=font_filename)
-                
-                # Parse color
-                try:
-                    color_rgb = self._parse_color(color)
-                except Exception:
-                    color_rgb = (0, 0, 0)
-                
-                # Draw text
-                try:
-                    if max_width:
-                        # Wrap text if max_width is specified
-                        lines = self._wrap_text(text_to_draw, font, max_width, draw)
-                        try:
-                            line_height = font.getbbox("Ay")[3] if hasattr(font, 'getbbox') else font.getsize("Ay")[1]
-                        except Exception:
-                            line_height = size + 4  # Fallback line height
-                        for i, line in enumerate(lines):
-                            line_y = y + i * (line_height + 4)
-                            try:
-                                draw.text((x, line_y), line, font=font, fill=color_rgb, direction=direction)
-                            except Exception as line_error:
-                                # Try without direction if it fails
-                                try:
-                                    draw.text((x, line_y), line, font=font, fill=color_rgb)
-                                except Exception:
-                                    self.logger.warning(f"Failed to draw line '{line}' for field '{field_name}': {line_error}")
-                    else:
-                        try:
-                            draw.text((x, y), text_to_draw, font=font, fill=color_rgb, direction=direction)
-                        except Exception:
-                            # Try without direction if it fails
-                            draw.text((x, y), text_to_draw, font=font, fill=color_rgb)
-                except Exception as draw_error:
-                    self.logger.warning(f"Failed to draw text for field '{field_name}': {draw_error}")
-                    # Try to draw without direction as fallback
-                    try:
-                        draw.text((x, y), str(sample_text), font=font, fill=color_rgb)
-                    except Exception:
-                        pass
-            
-            # Convert to RGB for JPEG compatibility
+                if not sample_text:
+                    continue
+
+                draw_text_field(
+                    draw, x, y, str(sample_text),
+                    size=size, color=color, align=align, max_width=max_width,
+                    font_filename=font_filename,
+                )
+
             img_rgb = img.convert('RGB')
-            
-            # Save to BytesIO
             buffer = BytesIO()
             img_rgb.save(buffer, format='PNG')
             buffer.seek(0)
-            
-            # Close image to free memory
             img.close()
             img_rgb.close()
-            
-            # Return as HTTP response
-            response = HttpResponse(buffer.getvalue(), content_type='image/png')
-            return response
-                
+            return HttpResponse(buffer.getvalue(), content_type='image/png')
+
         except Exception as e:
             import traceback
             error_details = traceback.format_exc()
             self.logger.error(f"Preview error: {error_details}")
             return JsonResponse({'error': str(e), 'details': error_details}, status=500)
-    
-    def _parse_color(self, color_str):
-        """Parse color string to RGB tuple."""
-        from .utils import _parse_color as parse_color
-        return parse_color(color_str)
-    
-    def _is_rtl(self, text: str) -> bool:
-        """Check if text is right-to-left (Persian/Arabic)."""
-        from .utils import _is_rtl
-        return _is_rtl(text)
-    
-    def _wrap_text(self, text, font, max_width, draw):
-        """Wrap text to fit within max_width."""
-        from .utils import _wrap_text
-        return _wrap_text(text, font, max_width, draw)

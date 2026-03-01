@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.text import slugify
+from django.core.exceptions import ValidationError
 
 
 class Currency(models.Model):
@@ -19,6 +20,10 @@ class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True, blank=True)
     description = models.TextField(blank=True, null=True)
+    # Telegram message content for this category
+    telegram_message_description = models.TextField(blank=True, null=True)
+    telegram_media_url = models.URLField(max_length=500, blank=True)
+    inline_buttons = models.JSONField(default=list, blank=True)  # [{"label": "...", "url": "..."}]
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -42,6 +47,9 @@ class Category(models.Model):
 
         super().save(*args, **kwargs)
 
+    def clean(self):
+        validate_category_buy_sell_spread(self)
+
     def __str__(self):
         return self.name
 
@@ -60,16 +68,21 @@ class PriceType(models.Model):
     )
     trade_type = models.CharField(max_length=10, choices=TRADE_CHOICES)
     description = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = "PriceType"
         verbose_name_plural = "PriceTypes"
-        ordering = ['name']
-        # Only name should be unique within a category
+        ordering = ['order', 'id']
         constraints = [
             models.UniqueConstraint(fields=['category', 'name'], name='unique_category_pricetype_name'),
+            models.UniqueConstraint(
+                fields=['category', 'source_currency', 'target_currency', 'trade_type'],
+                name='unique_category_currency_pair_trade',
+            ),
         ]
 
     def save(self, *args, **kwargs):
@@ -86,3 +99,45 @@ class PriceType(models.Model):
 
     def __str__(self):
         return f"{self.category.name} - {self.name}"
+
+
+def validate_category_buy_sell_spread(category, prices_map=None):
+    """
+    For the given category, ensure that for each (source_currency, target_currency) pair
+    that has both buy and sell price types, the sell price is >= buy price.
+    prices_map: optional dict mapping price_type_id (int or str) -> Decimal price.
+    If None, latest prices from DB are used.
+    """
+    from decimal import Decimal
+    price_types = PriceType.objects.filter(category=category).select_related(
+        "source_currency", "target_currency"
+    ).prefetch_related("price_histories")
+    pair_to_types = {}
+    for pt in price_types:
+        key = (pt.source_currency_id, pt.target_currency_id)
+        if key not in pair_to_types:
+            pair_to_types[key] = {}
+        if prices_map is not None:
+            price = prices_map.get(pt.id) or prices_map.get(str(pt.id))
+            if price is not None:
+                pair_to_types[key][pt.trade_type] = (pt, Decimal(str(price)))
+            else:
+                latest = pt.price_histories.first()
+                pair_to_types[key][pt.trade_type] = (pt, latest.price if latest else None)
+        else:
+            latest = pt.price_histories.first()
+            pair_to_types[key][pt.trade_type] = (pt, latest.price if latest else None)
+    for key, by_trade in pair_to_types.items():
+        buy_data = by_trade.get("buy")
+        sell_data = by_trade.get("sell")
+        if not buy_data or not sell_data:
+            continue
+        _, buy_price = buy_data
+        _, sell_price = sell_data
+        if buy_price is None or sell_price is None:
+            continue
+        if sell_price < buy_price:
+            raise ValidationError(
+                "Sell price (%s) cannot be lower than buy price (%s) for the same currency pair in category \"%s\"."
+                % (sell_price, buy_price, category.name)
+            )

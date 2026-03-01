@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 
 from category.models import Category, PriceType
 from change_price.models import PriceHistory
+from setting.models import Log
 from special_price.models import SpecialPriceType, SpecialPriceHistory
 from telegram_app.models import TelegramBot, TelegramChannel
 
@@ -73,6 +74,32 @@ class DashboardSummaryAPIView(APIView):
             created_at__gte=twenty_four_hours_ago
         ).count()
 
+        last_price_log = (
+            Log.objects.filter(source='system')
+            .filter(
+                message__icontains='Price updated'
+            )
+            .select_related('user')
+            .order_by('-created_at')
+            .first()
+        )
+        if not last_price_log:
+            last_price_log = (
+                Log.objects.filter(source='system')
+                .filter(message__icontains='prices updated')
+                .select_related('user')
+                .order_by('-created_at')
+                .first()
+            )
+        last_price_update_by = None
+        if last_price_log:
+            u = last_price_log.user
+            last_price_update_by = {
+                "username": u.username if u else None,
+                "full_name": u.get_full_name() if u else None,
+                "at": last_price_log.created_at.isoformat(),
+            }
+
         return Response({
             "highest_price": highest_price,
             "highest_price_label": highest_price_label,
@@ -87,4 +114,5 @@ class DashboardSummaryAPIView(APIView):
             "total_price_updates": total_price_updates,
             "latest_update_time": latest_update_time,
             "recent_updates_24h": recent_updates,
+            "last_price_update_by": last_price_update_by,
         })

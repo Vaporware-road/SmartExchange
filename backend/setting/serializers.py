@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.utils import validate_uploaded_image, MAX_IMAGE_SIZE
 from .models import SiteSettings, Log
 from telegram_app.models import TelegramBot, TelegramChannel
 
@@ -23,7 +24,25 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "instagram_link",
             "twitter_link",
             "linkedin_link",
+            "auto_post_on_update",
+            "use_template_editor_for_boards",
         ]
+
+    def validate_logo(self, value):
+        if value and hasattr(value, "read"):
+            try:
+                validate_uploaded_image(value, max_size=MAX_IMAGE_SIZE)
+            except ValueError as e:
+                raise serializers.ValidationError(str(e))
+        return value
+
+    def validate_favicon(self, value):
+        if value and hasattr(value, "read"):
+            try:
+                validate_uploaded_image(value, max_size=MAX_IMAGE_SIZE)
+            except ValueError as e:
+                raise serializers.ValidationError(str(e))
+        return value
 
 
 class TelegramBotSerializer(serializers.ModelSerializer):

@@ -60,11 +60,36 @@ export default {
           DEFAULT: '#F59E0B',
           dark: '#92400E',
         },
+        buy: {
+          DEFAULT: '#10B981',
+          light: 'rgba(16, 185, 129, 0.15)',
+          dark: '#065F46',
+        },
+        sell: {
+          DEFAULT: '#F43F5E',
+          light: 'rgba(244, 63, 94, 0.15)',
+          dark: '#9F1239',
+        },
+        info: {
+          DEFAULT: '#3B82F6',
+          light: 'rgba(59, 130, 246, 0.15)',
+          dark: '#2563EB',
+        },
+        template: {
+          DEFAULT: '#8B5CF6',
+          light: 'rgba(139, 92, 246, 0.15)',
+          dark: '#5B21B6',
+        },
+        slate: {
+          DEFAULT: '#1E293B',
+          light: '#334155',
+          dark: '#0F172A',
+        },
       },
       boxShadow: {
-        soft: '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
+        soft: 'var(--shadow-card, 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04))',
         glow: '0 0 15px rgba(255, 215, 0, 0.15), 0 0 30px rgba(255, 215, 0, 0.05)',
-        card: '0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04)',
+        card: 'var(--shadow-card, 0 1px 3px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04))',
       },
       backdropBlur: {
         xs: '2px',

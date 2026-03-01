@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { authApi } from '@/services/api'
+import { can as canPermission, ROLES, PERMISSIONS } from '@/config/permissions'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -12,14 +13,51 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: (state) => !!state.user,
     username: (state) => state.user?.username ?? '',
     role: (state) => state.user?.role ?? null,
-    isManager() { return this.role === 'management' },
-    isDeveloper() { return this.role === 'developer' },
-    isEmployee() { return this.role === 'employee' },
-    canAccessSettings() { return this.isManager || this.isDeveloper },
-    canDeleteItems() { return this.isManager },
+
+    isSuperAdmin() {
+      return this.role === ROLES.SUPER_ADMIN
+    },
+    isManager() {
+      return this.role === ROLES.MANAGEMENT
+    },
+    isDeveloper() {
+      return this.role === ROLES.DEVELOPER
+    },
+    isEmployee() {
+      return this.role === ROLES.EMPLOYEE
+    },
+
+    /** دسترسی به نهایی‌سازی (فاینالایز) — فقط super_admin و management */
+    canAccessFinalize() {
+      return canPermission(this.role, 'finalize')
+    },
+    /** دسترسی به تنظیمات پنل — فقط super_admin و management */
+    canAccessSettings() {
+      return canPermission(this.role, 'settings')
+    },
+    /** دسترسی به تحلیل — همه نقش‌ها */
+    canAccessAnalysis() {
+      return canPermission(this.role, 'analysis')
+    },
+    /** دسترسی به مدیریت کاربران/ادمین — فقط super_admin و management */
+    canAccessUserCenter() {
+      return canPermission(this.role, 'adminManagement')
+    },
+    /** اجازه حذف آیتم‌ها — همه نقش‌ها */
+    canDeleteItems() {
+      return canPermission(this.role, 'deleteItems')
+    },
   },
 
   actions: {
+    /**
+     * Check access for a permission key (e.g. 'settings', 'analysis', 'adminManagement').
+     * Must be an action so it can accept arguments (Pinia getters don't take params).
+     */
+    can(permission) {
+      return canPermission(this.role, permission)
+    },
+
     async fetchUser() {
       if (this.loading) return
       this.loading = true

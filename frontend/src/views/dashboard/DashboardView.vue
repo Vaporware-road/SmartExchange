@@ -4,7 +4,7 @@
       <h1 class="text-2xl font-bold text-gold">{{ $t('dashboard.title') }}</h1>
       <div class="flex items-center gap-4 text-sm">
         <span class="flex items-center gap-1.5 text-[var(--text-secondary)]">
-          <span class="w-2 h-2 rounded-full" :class="isOnline ? 'bg-green-500' : 'bg-red-500'"></span>
+          <span class="w-2 h-2 rounded-full" :class="isOnline ? 'bg-buy' : 'bg-sell'"></span>
           {{ isOnline ? $t('dashboard.online') : $t('dashboard.offline') }}
         </span>
         <span class="text-[var(--text-secondary)]" :title="$t('dashboard.connectionStatus')">{{ liveClock }}</span>
@@ -40,7 +40,7 @@
           :style="{ animationDelay: `${statIndex * 0.05}s` }"
         >
           <template v-if="statIndex === 0">
-            <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
+            <div class="p-3 rounded-xl bg-primary-muted">
               <i class="fas fa-arrow-up text-2xl text-gold"></i>
             </div>
             <div>
@@ -51,11 +51,11 @@
             </div>
           </template>
           <template v-else-if="statIndex === 1">
-            <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
+            <div class="p-3 rounded-xl bg-primary-muted">
               <i class="fas fa-chart-line text-2xl text-gold"></i>
             </div>
             <div>
-              <p class="text-2xl font-bold" :class="summary?.avg_24h_change > 0 ? 'text-green-400' : summary?.avg_24h_change < 0 ? 'text-red-400' : 'text-[var(--text-secondary)]'">
+              <p class="text-2xl font-bold" :class="summary?.avg_24h_change > 0 ? 'text-buy' : summary?.avg_24h_change < 0 ? 'text-sell' : 'text-[var(--text-secondary)]'">
                 {{ (summary?.avg_24h_change ?? 0).toFixed(2) }}%
               </p>
               <p class="text-sm text-[var(--text-secondary)]">{{ $t('dashboard.avg24hChange') }}</p>
@@ -64,7 +64,7 @@
             </div>
           </template>
           <template v-else-if="statIndex === 2">
-            <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
+            <div class="p-3 rounded-xl bg-primary-muted">
               <i class="fas fa-robot text-2xl text-gold"></i>
             </div>
             <div>
@@ -75,7 +75,7 @@
             </div>
           </template>
           <template v-else-if="statIndex === 3">
-            <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
+            <div class="p-3 rounded-xl bg-primary-muted">
               <i class="fas fa-broadcast-tower text-2xl text-gold"></i>
             </div>
             <div>
@@ -86,7 +86,7 @@
             </div>
           </template>
           <template v-else-if="statIndex === 4">
-            <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
+            <div class="p-3 rounded-xl bg-primary-muted">
               <i class="fas fa-tags text-2xl text-gold"></i>
             </div>
             <div>
@@ -96,7 +96,7 @@
             </div>
           </template>
           <template v-else-if="statIndex === 5">
-            <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
+            <div class="p-3 rounded-xl bg-primary-muted">
               <i class="fas fa-sync-alt text-2xl text-gold"></i>
             </div>
             <div>
@@ -106,7 +106,7 @@
             </div>
           </template>
           <template v-else-if="statIndex === 6">
-            <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
+            <div class="p-3 rounded-xl bg-primary-muted">
               <i class="fas fa-history text-2xl text-gold"></i>
             </div>
             <div>
@@ -116,7 +116,7 @@
             </div>
           </template>
           <template v-else>
-            <div class="p-3 rounded-xl" style="background: rgba(255, 215, 0, 0.15);">
+            <div class="p-3 rounded-xl bg-primary-muted">
               <i class="fas fa-clock text-2xl text-gold"></i>
             </div>
             <div>
@@ -185,6 +185,32 @@
         </BaseCard>
       </div>
 
+      <BaseCard
+        v-if="summary?.last_price_update_by"
+        variant="glass"
+        padding="sm"
+        class="mb-4 animate-fade-in-up border border-[var(--glass-border)] flex items-center gap-4"
+        style="animation-delay: 0.14s"
+      >
+        <div class="p-3 rounded-xl shrink-0" style="background: rgba(16, 185, 129, 0.15);">
+          <i class="fas fa-user-shield text-xl text-emerald-400"></i>
+        </div>
+        <div class="min-w-0 flex-1">
+          <p class="text-sm font-medium text-[var(--text-secondary)]">{{ $t('dashboard.lastPriceUpdateBy') }}</p>
+          <p class="text-[var(--text-primary)] font-semibold truncate">
+            {{ summary.last_price_update_by.full_name || summary.last_price_update_by.username || '—' }}
+          </p>
+          <p class="text-xs text-[var(--text-secondary)]">{{ formatLastUpdate(summary.last_price_update_by.at) }}</p>
+        </div>
+        <router-link
+          v-if="auth.canAccessUserCenter"
+          to="/users"
+          class="btn-luxury-outline text-sm py-2 shrink-0"
+        >
+          <i class="fas fa-shield-alt me-1"></i>{{ $t('sidebar.adminManagement') }}
+        </router-link>
+      </BaseCard>
+
       <BaseCard variant="glass" padding="default" class="mb-4 hover-lift animate-fade-in-up border border-[var(--glass-border)]" style="animation-delay: 0.1s">
         <h2 class="text-lg font-bold text-gold mb-4 flex items-center gap-2">
           <i class="fas fa-folder"></i> {{ $t('dashboard.categories') }}
@@ -230,15 +256,15 @@
             <p class="text-sm text-[var(--text-secondary)] mb-2">{{ sp.source_currency?.code ?? sp.source_currency }} / {{ sp.target_currency?.code ?? sp.target_currency }}</p>
             <template v-if="sp.cash_price != null || sp.account_price != null">
               <p v-if="sp.cash_price != null" class="text-[var(--text-primary)] text-sm mb-1">
-                <i class="fas fa-money-bill-wave text-gold me-1"></i>{{ $t('dashboard.cashPrice') }}: <span class="font-bold text-gold">{{ Number(sp.cash_price).toLocaleString(undefined, { maximumFractionDigits: 2 }) }}</span>
+                <i class="fas fa-money-bill-wave text-buy me-1"></i>{{ $t('dashboard.cashPrice') }}: <span class="font-bold text-buy">{{ Number(sp.cash_price).toLocaleString(undefined, { maximumFractionDigits: 2 }) }}</span>
               </p>
               <p v-if="sp.account_price != null" class="text-[var(--text-primary)] text-sm mb-3">
-                <i class="fas fa-university text-gold me-1"></i>{{ $t('dashboard.accountPrice') }}: <span class="font-bold text-gold">{{ Number(sp.account_price).toLocaleString(undefined, { maximumFractionDigits: 2 }) }}</span>
+                <i class="fas fa-university text-sell me-1"></i>{{ $t('dashboard.accountPrice') }}: <span class="font-bold text-sell">{{ Number(sp.account_price).toLocaleString(undefined, { maximumFractionDigits: 2 }) }}</span>
               </p>
             </template>
             <p v-else-if="sp.latest_price?.price" class="text-gold font-bold mb-3">{{ Number(sp.latest_price.price).toLocaleString(undefined, { maximumFractionDigits: 2 }) }}</p>
             <router-link
-              :to="`/special-prices/${sp.id}/update`"
+              :to="`/prices/special/${sp.id}/update`"
               class="btn-luxury-outline text-sm py-2"
             >
               <i class="fas fa-edit"></i> {{ $t('dashboard.updatePrice') }}
@@ -255,6 +281,8 @@ import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDate } from '@/composables/useDate'
 import { dashboardApi, categoryApi, specialPriceApi, analysisApi } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
+import { useThemeStore } from '@/stores/theme'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import { Line, Doughnut } from 'vue-chartjs'
@@ -274,6 +302,8 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Filler, Tooltip, Legend, DoughnutController)
 
 const { t, locale } = useI18n()
+const auth = useAuthStore()
+const themeStore = useThemeStore()
 const { formatDateTime } = useDate()
 const loading = ref(true)
 const summary = ref(null)
@@ -299,10 +329,9 @@ const sparklinePath = computed(() => {
 })
 
 const shortcuts = computed(() => {
-  const firstCat = categories.value?.[0]
   return [
-    { to: firstCat ? `/prices/category/${firstCat.id}/update` : '/prices', icon: 'fas fa-sync-alt', label: t('dashboard.shortcutUpdatePrices') },
-    { to: '/special-prices', icon: 'fas fa-star', label: t('dashboard.shortcutSpecialPrices') },
+    { to: '/categories', icon: 'fas fa-sync-alt', label: t('dashboard.shortcutUpdatePrices') },
+    { to: '/categories', icon: 'fas fa-star', label: t('dashboard.shortcutSpecialPrices') },
     { to: '/settings/logs', icon: 'fas fa-list', label: t('dashboard.shortcutViewLogs') },
     { to: '/analysis', icon: 'fas fa-chart-line', label: t('dashboard.shortcutAnalysis') },
   ]
@@ -313,22 +342,63 @@ const priceTrendLabels = computed(() => {
   return timelineData.value.labels
 })
 
+/** 'up' | 'down' | 'neutral' from first vs last data point */
+const priceTrendDirection = computed(() => {
+  const ds = timelineData.value?.datasets?.[0]
+  const data = ds?.data ?? []
+  const values = data.filter((v) => v != null && !Number.isNaN(Number(v))).map(Number)
+  if (values.length < 2) return 'neutral'
+  const first = values[0]
+  const last = values[values.length - 1]
+  if (last > first) return 'up'
+  if (last < first) return 'down'
+  return 'neutral'
+})
+
+/** Read theme colors from CSS variables for Chart.js */
+function getChartThemeColors() {
+  const root = document.documentElement
+  const s = getComputedStyle(root)
+  return {
+    primary: s.getPropertyValue('--primary').trim() || '#2563eb',
+    textPrimary: s.getPropertyValue('--text-primary').trim() || '#1e293b',
+    textSecondary: s.getPropertyValue('--text-secondary').trim() || '#64748b',
+    bgCard: s.getPropertyValue('--bg-card').trim() || '#1e293b',
+    borderColor: s.getPropertyValue('--border-card').trim() || '#334155',
+  }
+}
+
+function hexToRgba(hex, alpha) {
+  const h = hex.replace('#', '')
+  if (h.length !== 6) return hex
+  const r = parseInt(h.slice(0, 2), 16)
+  const g = parseInt(h.slice(2, 4), 16)
+  const b = parseInt(h.slice(4, 6), 16)
+  return `rgba(${r},${g},${b},${alpha})`
+}
+
 const priceTrendData = computed(() => {
+  themeStore.isDark /* reactive: chart colors update on theme toggle */
   if (!priceTrendLabels.value.length || !timelineData.value?.datasets?.length) return null
   const ds = timelineData.value.datasets[0]
   const data = ds?.data ?? []
+  const dir = priceTrendDirection.value
+  const colors = getChartThemeColors()
+  const borderColor = dir === 'up' ? '#10B981' : dir === 'down' ? '#F43F5E' : colors.primary
+  const gradientStart = dir === 'up' ? 'rgba(16, 185, 129, 0.35)' : dir === 'down' ? 'rgba(244, 63, 94, 0.35)' : (colors.primary.startsWith('#') ? hexToRgba(colors.primary, 0.35) : colors.primary.replace(')', ', 0.35)').replace('rgb(', 'rgba('))
+  const bgFallback = dir === 'up' ? 'rgba(16, 185, 129, 0.1)' : dir === 'down' ? 'rgba(244, 63, 94, 0.1)' : (colors.primary.startsWith('#') ? hexToRgba(colors.primary, 0.1) : colors.primary.replace(')', ', 0.1)').replace('rgb(', 'rgba('))
   return {
     labels: timelineData.value.labels,
     datasets: [{
       label: ds?.label ?? t('dashboard.priceTrends'),
       data,
-      borderColor: '#FFD700',
+      borderColor,
       backgroundColor(context) {
         const ctx = context.chart?.ctx
-        if (!ctx) return 'rgba(255, 215, 0, 0.1)'
+        if (!ctx) return bgFallback
         const gradient = ctx.createLinearGradient(0, 0, 0, 250)
-        gradient.addColorStop(0, 'rgba(255, 215, 0, 0.35)')
-        gradient.addColorStop(1, 'rgba(255, 215, 0, 0)')
+        gradient.addColorStop(0, gradientStart)
+        gradient.addColorStop(1, 'transparent')
         return gradient
       },
       fill: true,
@@ -341,76 +411,87 @@ const priceTrendData = computed(() => {
   }
 })
 
-const lineChartOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  interaction: { mode: 'index', intersect: false },
-  plugins: {
-    legend: { display: false },
-    tooltip: {
-      backgroundColor: 'rgba(30, 30, 30, 0.92)',
-      titleColor: '#FFD700',
-      bodyColor: '#F5F5F5',
-      borderColor: 'rgba(255, 215, 0, 0.35)',
-      borderWidth: 1,
-      cornerRadius: 12,
-      padding: 12,
-      callbacks: {
-        label(ctx) {
-          const v = ctx.parsed?.y
-          if (v == null) return ''
-          return `${ctx.dataset.label}: ${Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+const lineChartOptions = computed(() => {
+  themeStore.isDark /* reactive dependency so options update on theme toggle */
+  const c = getChartThemeColors()
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: c.bgCard,
+        titleColor: c.primary,
+        bodyColor: c.textPrimary,
+        borderColor: c.borderColor,
+        borderWidth: 1,
+        cornerRadius: 12,
+        padding: 12,
+        callbacks: {
+          label(ctx) {
+            const v = ctx.parsed?.y
+            if (v == null) return ''
+            return `${ctx.dataset.label}: ${Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+          },
         },
       },
     },
-  },
-  scales: {
-    x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9CA3AF', maxTicksLimit: 8 } },
-    y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#9CA3AF', callback: (v) => typeof v === 'number' ? v.toLocaleString() : v } },
-  },
-}))
+    scales: {
+      x: { grid: { color: c.borderColor }, ticks: { color: c.textSecondary, maxTicksLimit: 8 } },
+      y: { grid: { color: c.borderColor }, ticks: { color: c.textSecondary, callback: (v) => typeof v === 'number' ? v.toLocaleString() : v } },
+    },
+  }
+})
 
 const doughnutData = computed(() => {
   if (!categories.value?.length) return { labels: [], datasets: [{ data: [] }] }
   const labels = categories.value.map((c) => c.name || '—')
   const data = categories.value.map((c) => c.price_type_count ?? c.price_types?.length ?? 1)
-  const goldShades = ['#FFD700', '#E6C200', '#B8860B', '#8A7200', '#5C4C00', '#FFE44D', '#CCAC00', '#9A7B00']
+  const c = getChartThemeColors()
+  const palette = themeStore.isDark
+    ? ['#FFD700', '#E6C200', '#B8860B', '#8A7200', '#5C4C00', '#FFE44D', '#CCAC00', '#9A7B00']
+    : ['#2563eb', '#10b981', '#6366f1', '#0ea5e9', '#8b5cf6', '#14b8a6', '#3b82f6', '#06b6d4']
   return {
     labels,
     datasets: [{
       data,
-      backgroundColor: data.map((_, i) => goldShades[i % goldShades.length]),
-      borderColor: 'rgba(30, 30, 30, 0.8)',
+      backgroundColor: data.map((_, i) => palette[i % palette.length]),
+      borderColor: c.bgCard,
       borderWidth: 2,
       hoverOffset: 6,
     }],
   }
 })
 
-const doughnutOptions = computed(() => ({
-  responsive: true,
-  maintainAspectRatio: false,
-  cutout: '60%',
-  plugins: {
-    legend: { position: 'bottom', labels: { color: '#9CA3AF', usePointStyle: true, padding: 12 } },
-    tooltip: {
-      backgroundColor: 'rgba(30, 30, 30, 0.92)',
-      titleColor: '#FFD700',
-      bodyColor: '#F5F5F5',
-      borderColor: 'rgba(255, 215, 0, 0.35)',
-      borderWidth: 1,
-      cornerRadius: 12,
-      padding: 12,
-      callbacks: {
-        label(ctx) {
-          const total = ctx.dataset.data.reduce((a, b) => a + b, 0)
-          const pct = total ? ((ctx.raw / total) * 100).toFixed(1) : 0
-          return ` ${ctx.label}: ${ctx.raw} (${pct}%)`
+const doughnutOptions = computed(() => {
+  themeStore.isDark /* reactive dependency */
+  const c = getChartThemeColors()
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: { position: 'bottom', labels: { color: c.textSecondary, usePointStyle: true, padding: 12 } },
+      tooltip: {
+        backgroundColor: c.bgCard,
+        titleColor: c.primary,
+        bodyColor: c.textPrimary,
+        borderColor: c.borderColor,
+        borderWidth: 1,
+        cornerRadius: 12,
+        padding: 12,
+        callbacks: {
+          label(ctx) {
+            const total = ctx.dataset.data.reduce((a, b) => a + b, 0)
+            const pct = total ? ((ctx.raw / total) * 100).toFixed(1) : 0
+            return ` ${ctx.label}: ${ctx.raw} (${pct}%)`
+          },
         },
       },
     },
-  },
-}))
+  }
+})
 
 function formatDate(d) {
   return d?.toLocaleString?.() ?? '-'

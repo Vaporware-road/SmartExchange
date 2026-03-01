@@ -24,6 +24,27 @@ class TelegramBot(models.Model):
         verbose_name="Active",
         help_text="Whether this bot is currently active",
     )
+    display_name = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name="Display Name",
+        help_text="Optional friendly display name",
+    )
+    notes = models.TextField(
+        blank=True,
+        verbose_name="Notes",
+        help_text="Optional security or usage notes",
+    )
+    restrict_to_known_channels = models.BooleanField(
+        default=False,
+        verbose_name="Restrict to known channels",
+        help_text="If set, only allow sending to channels registered in this panel",
+    )
+    log_all_messages = models.BooleanField(
+        default=False,
+        verbose_name="Log all messages",
+        help_text="If set, log all messages sent via this bot",
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Created At",

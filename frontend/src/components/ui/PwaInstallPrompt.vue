@@ -8,7 +8,7 @@
       <div class="flex items-start gap-3">
         <div
           class="flex-shrink-0 p-2.5 rounded-xl"
-          style="background: rgba(255, 215, 0, 0.15);"
+          style="background: var(--primary-muted);"
         >
           <i class="fas fa-mobile-alt text-xl text-gold" />
         </div>

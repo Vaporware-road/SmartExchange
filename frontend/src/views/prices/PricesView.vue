@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="w-full min-w-0 overflow-hidden">
     <h1 class="text-2xl font-bold text-gold mb-4">{{ $t('routes.prices') }}</h1>
     <div v-if="loading" class="space-y-4">
       <div class="card-luxury overflow-x-auto px-4 py-3">
@@ -14,10 +14,11 @@
         </div>
       </div>
     </div>
-    <div v-else class="card-luxury overflow-x-auto px-4 py-3">
-      <table class="w-full text-sm">
+    <div v-else class="card-luxury w-full min-w-0 overflow-hidden px-4 py-3">
+      <div class="w-full overflow-x-auto max-w-full">
+        <table class="w-full text-sm min-w-[400px]">
         <thead>
-          <tr class="border-b" style="border-color: rgba(255, 215, 0, 0.3);">
+          <tr class="border-b border-[var(--border-color)]">
             <th class="text-left py-4 px-4 text-gold font-semibold">Price Type</th>
             <th class="text-left py-4 px-4 text-gold font-semibold">Category</th>
             <th class="text-left py-4 px-4 text-gold font-semibold">Pair</th>
@@ -29,24 +30,21 @@
           <tr
             v-for="pt in prices"
             :key="pt.id"
-            class="border-b hover:bg-white/5 transition-colors"
-            style="border-color: rgba(255, 215, 0, 0.1);"
+            class="border-b border-[var(--border-card)] hover:bg-[var(--bg-hover)] transition-colors"
           >
             <td class="py-4 px-4">{{ pt.name }}</td>
             <td class="py-4 px-4 text-gray-400">{{ pt.category_name }}</td>
             <td class="py-4 px-4">{{ pt.source_currency }} / {{ pt.target_currency }}</td>
             <td class="py-4 px-4 text-gold font-semibold">{{ pt.latest_price != null ? Number(pt.latest_price).toFixed(2) : '-' }}</td>
             <td class="py-4 px-4">
-              <router-link :to="`/prices/${pt.id}/update`" class="btn-luxury-outline text-sm py-1.5 px-3">
-                <i class="fas fa-edit"></i> Update
-              </router-link>
-              <router-link :to="`/prices/${pt.id}/history`" class="btn-luxury-outline text-sm py-1.5 px-3 ml-2">
+              <router-link :to="`/prices/${pt.id}/history`" class="btn-luxury-outline text-sm py-1.5 px-3">
                 <i class="fas fa-history"></i> History
               </router-link>
             </td>
           </tr>
         </tbody>
       </table>
+      </div>
       <p
         v-if="!loading && (!prices || !prices.length)"
         class="text-center text-gray-500 py-6"
@@ -55,28 +53,19 @@
       </p>
     </div>
     <div class="mt-4">
-      <h2 class="text-lg font-bold text-gold mb-3">Update by Category</h2>
-      <div
-        v-if="categories && categories.length"
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3"
+      <router-link
+        to="/categories"
+        class="inline-flex items-center gap-2 rounded-2xl border-2 p-4 transition-all duration-300 hover:scale-[1.01] hover:shadow-lg border-[var(--border-color)] bg-[var(--bg-card)]"
       >
-        <div
-          v-for="cat in categories"
-          :key="cat.id"
-          class="card-luxury p-4 flex items-center justify-between"
-        >
-          <span class="truncate">{{ cat.name }}</span>
-          <router-link :to="`/prices/category/${cat.id}/update`" class="btn-luxury-outline text-sm py-2">
-            Bulk Update
-          </router-link>
+        <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary-muted">
+          <i class="fas fa-sync-alt text-gold text-xl"></i>
         </div>
-      </div>
-      <p
-        v-else
-        class="text-center text-gray-500 py-6"
-      >
-        {{ $t('dashboard.noCategoriesFound') }}
-      </p>
+        <div>
+          <span class="text-lg font-bold text-[var(--text-primary)]">{{ $t('common.update') }}</span>
+          <p class="text-sm text-[var(--text-secondary)]">{{ $t('update.byCategory') }}</p>
+        </div>
+        <i class="fas fa-chevron-left text-gold ms-auto"></i>
+      </router-link>
     </div>
   </div>
 </template>

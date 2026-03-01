@@ -9,7 +9,7 @@ export default defineConfig(({ command }) => ({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.png'],
+      includeAssets: ['favicon.svg', 'favicon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
       manifest: {
         name: 'SmartExchange Panel',
         short_name: 'SmartExchange',
@@ -20,10 +20,9 @@ export default defineConfig(({ command }) => ({
         theme_color: '#FFD700',
         orientation: 'any',
         icons: [
-          { src: '/favicon.png', sizes: '64x64', type: 'image/png' },
           { src: '/pwa-192x192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
           { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-          { src: '/pwa-maskable-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          { src: '/pwa-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
       workbox: {
@@ -66,7 +65,8 @@ export default defineConfig(({ command }) => ({
     },
   },
   server: {
-    port: 5173,
+    port: 3000,
+    strictPort: true,
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',

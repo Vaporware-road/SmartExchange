@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from core.utils import validate_uploaded_image, MAX_ASSET_SIZE
 from .models import PriceTemplate
 
 
@@ -27,3 +28,20 @@ class PriceTemplateSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
+
+    def _validate_image_field(self, value):
+        if value and hasattr(value, "read"):
+            try:
+                validate_uploaded_image(value, max_size=MAX_ASSET_SIZE)
+            except ValueError as e:
+                raise serializers.ValidationError(str(e))
+        return value
+
+    def validate_background_image(self, value):
+        return self._validate_image_field(value)
+
+    def validate_logo_image(self, value):
+        return self._validate_image_field(value)
+
+    def validate_watermark_image(self, value):
+        return self._validate_image_field(value)

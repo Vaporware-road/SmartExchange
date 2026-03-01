@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center justify-center py-16 px-4 text-center">
     <div
       class="w-20 h-20 rounded-2xl flex items-center justify-center mb-6"
-      style="background: rgba(255, 215, 0, 0.1); border: 1px solid var(--border-color);"
+      class="rounded-2xl mx-auto w-fit mb-6 flex items-center justify-center bg-primary-muted border border-[var(--border-color)]"
     >
       <i :class="icon" class="text-3xl text-[var(--primary)] opacity-70" />
     </div>

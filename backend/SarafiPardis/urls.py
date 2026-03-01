@@ -32,6 +32,7 @@ urlpatterns = [
     path('landingpage/', include('landing.urls', namespace='landing')),
     path('landing/', RedirectView.as_view(pattern_name='landing:home', permanent=True)),
     path("template-editor/", include("template_editor.frontend_urls", namespace="template_editor_frontend")),
+    path("instagram-hub/", include("instagram_hub.urls")),
     path("", include("accounts.urls", namespace="accounts")),
     re_path(r'^.*$', views.SPAView.as_view(), name='spa'),
 ]

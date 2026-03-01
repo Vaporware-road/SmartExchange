@@ -5,7 +5,7 @@
       </div>
     <div class="w-full max-w-md">
       <div class="card-luxury text-center mb-6">
-        <div class="p-4 rounded-xl mx-auto w-fit mb-4" style="background: rgba(255, 215, 0, 0.15);">
+        <div class="p-4 rounded-xl mx-auto w-fit mb-4 bg-primary-muted">
           <i class="fas fa-coins text-4xl text-gold"></i>
         </div>
         <h1 class="text-2xl font-bold text-gold mb-1">{{ siteName }}</h1>

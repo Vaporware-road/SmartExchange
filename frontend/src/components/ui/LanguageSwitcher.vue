@@ -21,6 +21,7 @@ const currentLabel = computed(() => locale.value === 'fa' ? 'FA' : 'EN')
 const nextLabel = computed(() => locale.value === 'fa' ? 'English' : 'فارسی')
 
 function toggle() {
-  setLocale(locale.value === 'fa' ? 'en' : 'fa')
+  const next = locale.value === 'fa' ? 'en' : 'fa'
+  setLocale(next)
 }
 </script>

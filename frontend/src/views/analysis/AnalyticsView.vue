@@ -1,6 +1,18 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gold mb-6 animate-fade-in-up">{{ $t('analysis.title') }}</h1>
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-6 animate-fade-in-up">
+      <h1 class="text-2xl font-bold text-gold">{{ $t('analysis.title') }}</h1>
+      <BaseButton
+        :loading="exportLoading"
+        variant="outline"
+        size="sm"
+        class="btn-export-excel"
+        @click="exportAnalyticsToExcel"
+      >
+        <i class="fas fa-file-excel" />
+        <span>{{ exportLoading ? $t('analysis.exporting') : $t('analysis.exportData') }}</span>
+      </BaseButton>
+    </div>
 
     <template v-if="loading">
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -44,13 +56,13 @@
         <p class="text-[var(--text-secondary)]">{{ $t('analysis.noChartData') }}</p>
       </div>
 
-      <div v-if="topMovers.length" class="card-luxury mb-6 animate-fade-in-up hover-lift border border-[var(--glass-border)]" style="animation-delay: 0.15s; background: var(--glass-bg); backdrop-filter: blur(16px);">
+      <div v-if="topMovers.length" class="card-luxury mb-6 animate-fade-in-up hover-lift border border-[var(--glass-border)] w-full min-w-0 overflow-hidden" style="animation-delay: 0.15s; background: var(--glass-bg); backdrop-filter: blur(16px);">
         <h2 class="text-lg font-bold text-gold mb-4 flex items-center gap-2">
           <i class="fas fa-fire" />
           {{ $t('analysis.topMovers') }}
         </h2>
-        <div class="overflow-x-auto">
-          <table class="w-full text-start">
+        <div class="w-full overflow-x-auto max-w-full">
+          <table class="w-full text-start min-w-[320px]">
             <thead>
               <tr class="text-[var(--text-secondary)] text-sm border-b" style="border-color: var(--border-card);">
                 <th class="py-3 px-4 text-start font-medium">{{ $t('analysis.priceType') }}</th>
@@ -86,7 +98,7 @@
 
       <div
         v-if="telegramEngagement.timeline?.length || telegramEngagement.channels?.length"
-        class="card-luxury mb-6 animate-fade-in-up hover-lift border border-[var(--glass-border)]"
+        class="card-luxury mb-6 animate-fade-in-up hover-lift border border-[var(--glass-border)] w-full min-w-0 overflow-hidden"
         style="animation-delay: 0.18s; background: var(--glass-bg); backdrop-filter: blur(16px);"
       >
         <h2 class="text-lg font-bold text-gold mb-4 flex items-center gap-2">
@@ -96,8 +108,8 @@
         <div v-if="telegramEngagement.timeline?.length" class="mb-4 h-64">
           <Line :data="buildTelegramChart" :options="chartOptions" />
         </div>
-        <div v-if="telegramEngagement.channels?.length" class="overflow-x-auto">
-          <table class="w-full text-start text-sm">
+        <div v-if="telegramEngagement.channels?.length" class="w-full overflow-x-auto max-w-full">
+          <table class="w-full text-start text-sm min-w-[320px]">
             <thead>
               <tr class="text-[var(--text-secondary)] text-sm border-b" style="border-color: var(--border-card);">
                 <th class="py-3 px-4 text-start font-medium">{{ $t('analysis.channel') }}</th>
@@ -171,10 +183,14 @@
 <script setup>
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { analysisApi } from '@/services/api'
+import { useToast } from 'vue-toastification'
+import * as XLSX from 'xlsx'
+import { analysisApi, authApi } from '@/services/api'
+import { useThemeStore } from '@/stores/theme'
 import { useDate } from '@/composables/useDate'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
+import BaseButton from '@/components/ui/BaseButton.vue'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -192,9 +208,12 @@ import {
 ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, TimeScale, Title, Tooltip, Legend, Filler)
 
 const { t } = useI18n()
+const themeStore = useThemeStore()
+const toast = useToast()
 const { formatRelative } = useDate()
 
 const loading = ref(true)
+const exportLoading = ref(false)
 const stats = reactive({ totalPriceTypes: 0, totalUpdates: 0, avgChange: 0, recentUpdates: 0 })
 const topMovers = ref([])
 const categoryBreakdown = ref([])
@@ -204,7 +223,7 @@ const telegramEngagement = ref({ timeline: [], channels: [] })
 const statCards = computed(() => [
   {
     icon: 'fas fa-tags text-gold',
-    iconBg: 'rgba(255, 215, 0, 0.15)',
+    iconBg: 'var(--primary-muted)',
     iconColor: 'var(--primary)',
     value: stats.totalPriceTypes,
     valueClass: 'text-[var(--text-primary)]',
@@ -212,7 +231,7 @@ const statCards = computed(() => [
   },
   {
     icon: 'fas fa-sync-alt text-gold',
-    iconBg: 'rgba(255, 215, 0, 0.15)',
+    iconBg: 'var(--primary-muted)',
     iconColor: 'var(--primary)',
     value: stats.totalUpdates,
     valueClass: 'text-[var(--text-primary)]',
@@ -228,7 +247,7 @@ const statCards = computed(() => [
   },
   {
     icon: 'fas fa-clock text-gold',
-    iconBg: 'rgba(255, 215, 0, 0.15)',
+    iconBg: 'var(--primary-muted)',
     iconColor: 'var(--primary)',
     value: stats.recentUpdates,
     valueClass: 'text-xl text-[var(--text-primary)]',
@@ -236,35 +255,51 @@ const statCards = computed(() => [
   },
 ])
 
-const chartOptions = {
-  responsive: true,
-  maintainAspectRatio: false,
-  interaction: { mode: 'index', intersect: false },
-  plugins: {
-    legend: {
-      labels: { color: '#9CA3AF', usePointStyle: true, padding: 16 },
-    },
-    tooltip: {
-      backgroundColor: 'rgba(30, 30, 30, 0.9)',
-      titleColor: '#FFD700',
-      bodyColor: '#F5F5F5',
-      borderColor: 'rgba(255, 215, 0, 0.3)',
-      borderWidth: 1,
-      cornerRadius: 12,
-      padding: 12,
-    },
-  },
-  scales: {
-    x: {
-      grid: { color: 'rgba(255, 255, 255, 0.05)' },
-      ticks: { color: '#9CA3AF', maxTicksLimit: 10 },
-    },
-    y: {
-      grid: { color: 'rgba(255, 255, 255, 0.05)' },
-      ticks: { color: '#9CA3AF' },
-    },
-  },
+function getChartThemeColors() {
+  const root = document.documentElement
+  const s = getComputedStyle(root)
+  return {
+    primary: s.getPropertyValue('--primary').trim() || '#2563eb',
+    textPrimary: s.getPropertyValue('--text-primary').trim() || '#1e293b',
+    textSecondary: s.getPropertyValue('--text-secondary').trim() || '#64748b',
+    bgCard: s.getPropertyValue('--bg-card').trim() || '#1e293b',
+    borderColor: s.getPropertyValue('--border-card').trim() || '#334155',
+  }
 }
+
+const chartOptions = computed(() => {
+  themeStore.isDark /* reactive: update on theme toggle */
+  const c = getChartThemeColors()
+  return {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        labels: { color: c.textSecondary, usePointStyle: true, padding: 16 },
+      },
+      tooltip: {
+        backgroundColor: c.bgCard,
+        titleColor: c.primary,
+        bodyColor: c.textPrimary,
+        borderColor: c.borderColor,
+        borderWidth: 1,
+        cornerRadius: 12,
+        padding: 12,
+      },
+    },
+    scales: {
+      x: {
+        grid: { color: c.borderColor },
+        ticks: { color: c.textSecondary, maxTicksLimit: 10 },
+      },
+      y: {
+        grid: { color: c.borderColor },
+        ticks: { color: c.textSecondary },
+      },
+    },
+  }
+})
 
 function formatNumber(val) {
   if (val == null) return '—'
@@ -294,11 +329,23 @@ function buildChartFromTimeline(datasets) {
     for (const point of ds.data ?? []) {
       pointMap[point.x] = point.y
     }
+    const c = getChartThemeColors()
+    const primary = c.primary
+    const primaryRgba = primary.startsWith('#')
+      ? (() => {
+          const h = primary.replace('#', '')
+          if (h.length !== 6) return 'rgba(37, 99, 235, 0.08)'
+          const r = parseInt(h.slice(0, 2), 16)
+          const g = parseInt(h.slice(2, 4), 16)
+          const b = parseInt(h.slice(4, 6), 16)
+          return `rgba(${r},${g},${b},0.08)`
+        })()
+      : primary.replace(')', ', 0.08)').replace('rgb(', 'rgba(')
     return {
       label: ds.label ?? 'Price',
       data: labels.map(ts => pointMap[ts] ?? null),
-      borderColor: ds.borderColor ?? '#FFD700',
-      backgroundColor: ds.backgroundColor ?? 'rgba(255, 215, 0, 0.08)',
+      borderColor: ds.borderColor ?? primary,
+      backgroundColor: ds.backgroundColor ?? primaryRgba,
       fill: ds.fill ?? false,
       tension: ds.tension ?? 0.35,
       pointRadius: 2,
@@ -314,6 +361,124 @@ const buildTelegramChart = computed(() => {
   if (!telegramEngagement.value.timeline?.length) return null
   return buildChartFromTimeline(telegramEngagement.value.timeline)
 })
+
+function formatTimestamp(iso) {
+  if (!iso) return ''
+  try {
+    const d = new Date(iso)
+    if (isNaN(d.getTime())) return String(iso)
+    const y = d.getFullYear()
+    const m = String(d.getMonth() + 1).padStart(2, '0')
+    const day = String(d.getDate()).padStart(2, '0')
+    const h = String(d.getHours()).padStart(2, '0')
+    const min = String(d.getMinutes()).padStart(2, '0')
+    return `${y}-${m}-${day} ${h}:${min}`
+  } catch {
+    return String(iso)
+  }
+}
+
+const PRICE_ACTIONS = ['price_update', 'bulk_price_update', 'special_price_update']
+
+async function exportAnalyticsToExcel() {
+  exportLoading.value = true
+  try {
+    const [dashRes, activityRes] = await Promise.all([
+      analysisApi.dashboard(),
+      authApi.activity({}).catch(() => ({ data: [] })),
+    ])
+    const dash = dashRes.data ?? {}
+    const timelineData = dash.timeline_data ?? []
+    const specialTimelineData = dash.special_timeline_data ?? []
+    const overallStats = dash.overall_stats ?? {}
+    const categorySummary = dash.category_summary ?? []
+    const topMovers = dash.top_movers ?? []
+    const priceStatistics = dash.price_statistics ?? {}
+    const activityList = Array.isArray(activityRes.data) ? activityRes.data : (activityRes.data?.results ?? [])
+
+    const historicalRows = [['Date', 'Currency Pair', 'Category', 'Price']]
+    for (const ds of [...timelineData, ...specialTimelineData]) {
+      const label = ds.label ?? ''
+      const category = ds.category ?? ''
+      for (const point of ds.data ?? []) {
+        historicalRows.push([
+          formatTimestamp(point.x),
+          label,
+          category,
+          point.y != null ? Number(point.y) : '',
+        ])
+      }
+    }
+
+    const summaryRows = [[t('analysis.sheetSummary')], []]
+    summaryRows.push(['Metric', 'Value'])
+    if (overallStats.active_price_types != null) summaryRows.push([t('analysis.totalPriceTypes'), overallStats.active_price_types])
+    if (overallStats.total_price_updates != null) summaryRows.push([t('analysis.totalUpdates'), overallStats.total_price_updates])
+    if (overallStats.week_price_updates != null) summaryRows.push([t('analysis.recentUpdates'), overallStats.week_price_updates])
+    summaryRows.push([])
+    summaryRows.push([t('analysis.topMovers'), ''])
+    for (const m of topMovers.slice(0, 10)) {
+      summaryRows.push([m.name ?? '', `${formatNumber(m.latest_price)} (${(m.change_percent ?? 0).toFixed(2)}%)`])
+    }
+    summaryRows.push([])
+    summaryRows.push([t('analysis.categories'), ''])
+    for (const cat of categorySummary) {
+      summaryRows.push([cat.category ?? '', `Count: ${cat.count ?? 0}, Avg: ${formatNumber(cat.average_price)}, Max: ${formatNumber(cat.max_price)}, Min: ${formatNumber(cat.min_price)}`])
+    }
+    const statsList = Object.values(priceStatistics)
+    if (statsList.length) {
+      summaryRows.push([])
+      summaryRows.push(['Max price in period (sample)', ''])
+      for (const s of statsList.slice(0, 10)) {
+        summaryRows.push([s.price_type_name ?? s.category ?? '', formatNumber(s.max)])
+      }
+    }
+
+    const activityRows = [['Date', 'User', 'Action Type', 'Details']]
+    const filteredActivity = activityList.filter((a) => PRICE_ACTIONS.includes(a.action_type))
+    for (const a of filteredActivity) {
+      const at = a.created_at ? formatTimestamp(a.created_at) : ''
+      activityRows.push([
+        at,
+        a.user_display ?? a.user ?? '—',
+        a.action_type ?? '—',
+        a.details ?? '—',
+      ])
+    }
+
+    const hasHistorical = historicalRows.length > 1
+    const hasSummary = summaryRows.length > 2
+    const hasActivity = activityRows.length > 1
+    if (!hasHistorical && !hasSummary && !hasActivity) {
+      toast.warning(t('analysis.exportEmpty'))
+      return
+    }
+
+    const wb = XLSX.utils.book_new()
+    if (hasHistorical) {
+      const ws = XLSX.utils.aoa_to_sheet(historicalRows)
+      XLSX.utils.book_append_sheet(wb, ws, t('analysis.sheetHistoricalPrices').slice(0, 31))
+    }
+    if (hasSummary) {
+      const wsSummary = XLSX.utils.aoa_to_sheet(summaryRows)
+      XLSX.utils.book_append_sheet(wb, wsSummary, t('analysis.sheetSummary').slice(0, 31))
+    }
+    if (hasActivity) {
+      const wsActivity = XLSX.utils.aoa_to_sheet(activityRows)
+      XLSX.utils.book_append_sheet(wb, wsActivity, t('analysis.sheetActivityLogs').slice(0, 31))
+    }
+
+    const dateStr = new Date().toISOString().slice(0, 10)
+    const fileName = `SmartExchange_Analysis_${dateStr}.xlsx`
+    XLSX.writeFile(wb, fileName)
+    toast.success(t('analysis.exportSuccess'))
+  } catch (e) {
+    console.error(e)
+    toast.error(t('analysis.exportError'))
+  } finally {
+    exportLoading.value = false
+  }
+}
 
 onMounted(async () => {
   try {
@@ -350,3 +515,24 @@ onMounted(async () => {
   }
 })
 </script>
+
+<style scoped>
+.btn-export-excel {
+  --tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  box-shadow: var(--tw-shadow);
+}
+html:not(.dark) .btn-export-excel {
+  border-color: rgb(37 99 235);
+  color: rgb(37 99 235);
+}
+html:not(.dark) .btn-export-excel:hover {
+  background-color: rgba(37 99 235 / 0.08);
+}
+.dark .btn-export-excel {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.dark .btn-export-excel:hover {
+  background-color: var(--primary-muted);
+}
+</style>

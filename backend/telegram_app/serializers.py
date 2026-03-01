@@ -6,7 +6,17 @@ from .models import TelegramBot, TelegramChannel, DefaultMessageSettings, AutoPo
 class TelegramBotSerializer(serializers.ModelSerializer):
     class Meta:
         model = TelegramBot
-        fields = ["id", "name", "is_active", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "name",
+            "display_name",
+            "notes",
+            "is_active",
+            "restrict_to_known_channels",
+            "log_all_messages",
+            "created_at",
+            "updated_at",
+        ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
 
@@ -15,7 +25,18 @@ class TelegramBotDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TelegramBot
-        fields = ["id", "name", "token", "is_active", "created_at", "updated_at"]
+        fields = [
+            "id",
+            "name",
+            "token",
+            "display_name",
+            "notes",
+            "is_active",
+            "restrict_to_known_channels",
+            "log_all_messages",
+            "created_at",
+            "updated_at",
+        ]
         extra_kwargs = {"token": {"write_only": True}}
 
 
@@ -44,12 +65,26 @@ class SendMessageSerializer(serializers.Serializer):
         queryset=TelegramChannel.objects.filter(is_active=True, bot__is_active=True),
         write_only=True,
     )
-    message = serializers.CharField(max_length=4096, trim_whitespace=False)
+    message = serializers.CharField(
+        max_length=4096, trim_whitespace=False, required=False, allow_blank=True
+    )
+    banner_key = serializers.CharField(
+        max_length=64, required=False, allow_blank=True, default=""
+    )
+    cash_price = serializers.DecimalField(
+        max_digits=20, decimal_places=2, min_value=0, required=False, allow_null=True
+    )
+    account_price = serializers.DecimalField(
+        max_digits=20, decimal_places=2, min_value=0, required=False, allow_null=True
+    )
+    price = serializers.DecimalField(
+        max_digits=20, decimal_places=2, min_value=0, required=False, allow_null=True
+    )
 
     def validate_message(self, value):
-        if not value or not value.strip():
-            raise serializers.ValidationError("Message cannot be empty.")
-        return value
+        if value is None:
+            return ""
+        return value or ""
 
     def validate(self, attrs):
         channel = attrs["channel_id"]
@@ -60,6 +95,18 @@ class SendMessageSerializer(serializers.Serializer):
             )
         attrs["bot"] = bot
         attrs["channel"] = channel
+        message = (attrs.get("message") or "").strip()
+        banner_key = (attrs.get("banner_key") or "").strip()
+        cash = attrs.get("cash_price")
+        account = attrs.get("account_price")
+        single = attrs.get("price")
+        has_banner = banner_key and banner_key != "none"
+        has_double = cash is not None or account is not None
+        has_single = single is not None
+        if not message and not has_banner and not has_double and not has_single:
+            raise serializers.ValidationError(
+                {"message": "Provide message text and/or banner/prices."}
+            )
         return attrs
 
 

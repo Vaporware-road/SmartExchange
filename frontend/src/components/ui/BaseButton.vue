@@ -61,7 +61,7 @@ const variantClasses = {
   primary:
     'bg-[var(--primary)] text-[var(--text-on-primary)] border border-[var(--border-color)] hover:bg-[var(--primary-hover)] hover:-translate-y-0.5',
   outline:
-    'bg-transparent border border-[var(--primary)] text-[var(--primary)] hover:bg-[rgba(255,215,0,0.1)] hover:-translate-y-0.5',
+    'bg-transparent border border-[var(--primary)] text-[var(--primary)] hover:bg-[var(--primary-muted)] hover:-translate-y-0.5',
   ghost:
     'bg-transparent border border-transparent text-[var(--text-primary)] hover:bg-[var(--bg-hover)]',
 }

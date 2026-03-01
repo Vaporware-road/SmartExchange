@@ -4,29 +4,28 @@
     style="border-color: var(--border-card);"
   >
     <button
-      class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 ease-in-out text-[var(--primary)] hover:bg-[var(--bg-hover)]"
+      class="md:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 ease-in-out text-[var(--primary)] hover:bg-[var(--bg-hover)]"
       :aria-label="$t('header.openMenu')"
       @click="$emit('toggle-drawer')"
     >
       <i class="fas fa-bars text-xl" />
     </button>
-    <div class="hidden lg:block" />
+    <div class="hidden md:block" />
     <div class="flex items-center gap-3">
       <LanguageSwitcher />
       <ThemeToggle />
       <template v-if="auth.isAuthenticated">
-        <div class="hidden sm:flex items-center gap-3 px-4 py-2 rounded-xl border" style="background: var(--bg-card); border-color: var(--border-color);">
+        <div class="flex items-center gap-3 px-3 py-2 sm:px-4 rounded-xl border shrink-0" style="background: var(--bg-card); border-color: var(--border-color);">
           <div
-            class="w-9 h-9 rounded-full border-2 flex items-center justify-center"
-            style="background: rgba(255, 215, 0, 0.15); border-color: var(--primary);"
+            class="w-9 h-9 rounded-full border-2 flex items-center justify-center shrink-0 bg-primary-muted border-[var(--primary)]"
           >
             <i class="fas fa-user text-sm text-[var(--primary)]" />
           </div>
-          <div class="hidden md:block">
-            <div class="text-sm font-bold text-[var(--text-primary)]">
+          <div class="min-w-0 hidden sm:block">
+            <div class="text-sm font-bold text-[var(--text-primary)] truncate">
               {{ auth.user?.full_name || auth.username }}
             </div>
-            <div v-if="auth.role" class="text-xs text-[var(--primary)] font-medium">
+            <div v-if="auth.role" class="text-xs text-[var(--primary)] font-medium hidden md:block truncate">
               {{ auth.role }}
             </div>
           </div>

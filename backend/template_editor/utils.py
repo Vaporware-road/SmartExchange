@@ -142,46 +142,112 @@ def _is_rtl(text: str) -> bool:
     return False
 
 
-def render_template(template_obj, dynamic_data_dict: Dict[str, Any]) -> Image.Image:
+def draw_text_field(
+    draw: ImageDraw.ImageDraw,
+    x: int,
+    y: int,
+    text_value: str,
+    size: int = 32,
+    color: str = "#000000",
+    align: str = "left",
+    max_width: int = None,
+    font_filename: str = None,
+    weight: str = "normal",
+) -> None:
+    """
+    Draw a single text field on the image (shadow + stroke).
+    Used by render_template and render_price_template.
+    """
+    font = _get_font(size=size, weight=weight, font_filename=font_filename)
+    color_rgb = _parse_color(color)
+    if align == "center" and max_width:
+        text_width = _measure_text(str(text_value), font, draw)
+        if text_width < max_width:
+            x = x + (max_width - int(text_width)) // 2
+    elif align == "right" and max_width:
+        text_width = _measure_text(str(text_value), font, draw)
+        if text_width < max_width:
+            x = x + max_width - int(text_width)
+    is_rtl = _is_rtl(str(text_value))
+    direction = "rtl" if is_rtl else None
+    text_to_draw = str(text_value)
+    if max_width:
+        lines = _wrap_text(text_to_draw, font, max_width, draw)
+        try:
+            line_height = font.getbbox("Ay")[3]
+        except AttributeError:
+            line_height = font.getsize("Ay")[1]
+        for i, line in enumerate(lines):
+            line_y = y + i * (line_height + 4)
+            shadow_offset = max(size // 18, 1)
+            shadow_pos = (x + shadow_offset, line_y + shadow_offset)
+            draw.text(shadow_pos, line, font=font, fill=(0, 0, 0, 192), direction=direction)
+            stroke_width = max(size // 14, 1)
+            draw.text(
+                (x, line_y),
+                line,
+                font=font,
+                fill=color_rgb,
+                stroke_width=stroke_width,
+                stroke_fill=(0, 0, 0),
+                direction=direction,
+            )
+    else:
+        shadow_offset = max(size // 18, 1)
+        shadow_pos = (x + shadow_offset, y + shadow_offset)
+        draw.text(shadow_pos, text_to_draw, font=font, fill=(0, 0, 0, 192), direction=direction)
+        stroke_width = max(size // 14, 1)
+        draw.text(
+            (x, y),
+            text_to_draw,
+            font=font,
+            fill=color_rgb,
+            stroke_width=stroke_width,
+            stroke_fill=(0, 0, 0),
+            direction=direction,
+        )
+
+
+def render_template(template_obj, dynamic_data_dict: Dict[str, Any], config_override: Dict[str, Any] = None) -> Image.Image:
     """
     Render a template with dynamic data.
-    
+
     Args:
         template_obj: Template model instance
         dynamic_data_dict: Dictionary with field names as keys and text values as values
                           Example: {'english_date': '2024-01-15', 'buy_price': '1,234.56'}
-    
+        config_override: Optional config dict to use instead of template_obj.config (e.g. for preview).
+
     Returns:
         PIL Image object with rendered template
     """
     if not template_obj.image:
         raise ValueError("Template has no image.")
-    
+
     # Load template image
     bg_path = template_obj.image.path
     if not Path(bg_path).exists():
         raise FileNotFoundError(f"Template image not found at '{bg_path}'.")
-    
+
     logger.info(f"Rendering template '{template_obj.name}' using image '{bg_path}'.")
-    
+
     # Open and convert to RGBA
     base_image = Image.open(bg_path).convert('RGBA')
     draw = ImageDraw.Draw(base_image)
     canvas_size = base_image.size
-    
+
     # Get configuration
-    config = template_obj.config.get('fields', {})
+    config = (config_override if config_override is not None else template_obj.config or {}).get('fields', {})
     
     # Draw each text field
     for field_name, field_config in config.items():
         # Get value from dynamic_data_dict, or use field name as fallback
         text_value = dynamic_data_dict.get(field_name, field_name)
-        
+
         # Skip if text is empty
         if not str(text_value).strip():
             continue
-        
-        # Get field configuration
+
         x = field_config.get('x', 0)
         y = field_config.get('y', 0)
         size = field_config.get('size', 32)
@@ -189,87 +255,13 @@ def render_template(template_obj, dynamic_data_dict: Dict[str, Any]) -> Image.Im
         align = field_config.get('align', 'left')
         max_width = field_config.get('max_width')
         weight = field_config.get('font_weight', 'normal')
-        font_filename = field_config.get('font')  # Font filename from config
-        
-        # Load font
-        font = _get_font(size=size, weight=weight, font_filename=font_filename)
-        
-        # Parse color
-        color_rgb = _parse_color(color)
-        
-        # Handle alignment
-        if align == 'center' and max_width:
-            # For center alignment with max_width, we need to calculate text width
-            text_width = _measure_text(str(text_value), font, draw)
-            if text_width < max_width:
-                x = x + (max_width - text_width) // 2
-        elif align == 'right' and max_width:
-            text_width = _measure_text(str(text_value), font, draw)
-            if text_width < max_width:
-                x = x + max_width - text_width
-        
-        # Check if text is RTL
-        is_rtl = _is_rtl(str(text_value))
-        direction = "rtl" if is_rtl else None
-        
-        # Use text as-is without reshaping
-        text_to_draw = str(text_value)
-        
-        # Draw text with wrapping if max_width is specified
-        if max_width:
-            lines = _wrap_text(text_to_draw, font, max_width, draw)
-            try:
-                line_height = font.getbbox("Ay")[3]
-            except AttributeError:  # Pillow < 8.0 fallback
-                line_height = font.getsize("Ay")[1]
-            
-            for i, line in enumerate(lines):
-                line_y = y + i * (line_height + 4)
-                
-                # Draw shadow for readability
-                shadow_offset = max(size // 18, 1)
-                shadow_pos = (x + shadow_offset, line_y + shadow_offset)
-                draw.text(
-                    shadow_pos,
-                    line,
-                    font=font,
-                    fill=(0, 0, 0, 192),
-                    direction=direction,
-                )
-                
-                # Draw main text with stroke
-                stroke_width = max(size // 14, 1)
-                draw.text(
-                    (x, line_y),
-                    line,
-                    font=font,
-                    fill=color_rgb,
-                    stroke_width=stroke_width,
-                    stroke_fill=(0, 0, 0),
-                    direction=direction,
-                )
-        else:
-            # Draw single line text
-            shadow_offset = max(size // 18, 1)
-            shadow_pos = (x + shadow_offset, y + shadow_offset)
-            draw.text(
-                shadow_pos,
-                text_to_draw,
-                font=font,
-                fill=(0, 0, 0, 192),
-                direction=direction,
-            )
-            
-            stroke_width = max(size // 14, 1)
-            draw.text(
-                (x, y),
-                text_to_draw,
-                font=font,
-                fill=color_rgb,
-                stroke_width=stroke_width,
-                stroke_fill=(0, 0, 0),
-                direction=direction,
-            )
-    
+        font_filename = field_config.get('font')
+
+        draw_text_field(
+            draw, x, y, str(text_value),
+            size=size, color=color, align=align, max_width=max_width,
+            font_filename=font_filename, weight=weight,
+        )
+
     return base_image
 

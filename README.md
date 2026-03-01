@@ -1,301 +1,335 @@
 # SmartExchange Panel
 
-A comprehensive price management and publishing system for currency exchange operations. SmartExchange Panel provides a complete solution for managing exchange rates, tracking price history, generating branded price images, and automatically publishing them to Telegram channels.
+A full-stack **price management and publishing system** for currency exchange operations. Manage exchange rates, track history, generate branded price images, and publish them to Telegram channels—with an optional **landing page** and a separate **Request Management System (Iraniu)** in the same repository.
 
-## 🚀 Features
-hi
-### Core Functionality
+---
 
-- **Category-Based Price Management**: Organize currency pairs and price types into logical categories for better management
-- **Dual Price System**: 
-  - Regular prices organized by categories
-  - Special prices for promotional or time-sensitive rates
-- **Price History Tracking**: Complete audit trail of all price changes with timestamps and notes
-- **Currency Pair Management**: Support for multiple currencies with buy/sell trade types
-- **Price Finalization Workflow**: Review and finalize prices before publication with approval tracking
+## Table of Contents
+
+- [What This Project Is](#what-this-project-is)
+- [Features](#features)
+- [Architecture & Tech Stack](#architecture--tech-stack)
+- [Project Structure](#project-structure)
+- [Prerequisites](#prerequisites)
+- [Installation & Setup](#installation--setup)
+- [Running the Application](#running-the-application)
+- [Configuration](#configuration)
+- [Usage Overview](#usage-overview)
+- [API Reference](#api-reference)
+- [Security](#security)
+- [Troubleshooting](#troubleshooting)
+- [Related Documentation](#related-documentation)
+- [License & Support](#license--support)
+
+---
+
+## What This Project Is
+
+**SmartExchange Panel** provides:
+
+1. **Price management** — Categories, price types (currency pairs, buy/sell), regular and special prices, full history.
+2. **Finalization workflow** — Review and finalize prices before publication, with approval tracking.
+3. **Image rendering** — Generate branded price images from configurable templates (backgrounds, logos, watermarks).
+4. **Telegram publishing** — Publish price updates to one or more Telegram channels via configured bots.
+5. **Analytics** — Dashboards, charts, trends, top movers, finalization stats.
+6. **Template editor** — Visual drag-and-drop editor for price templates (and a standalone template-editor app under `/template-editor/`).
+7. **Landing page** — Marketing site at `/landingpage/` (mr. sarafi | آقای صرافی) with EN/FA and RTL.
+8. **Instagram Hub** — OAuth and publishing integration for Instagram (optional).
+
+The repository also includes **Request-Manage-System (Iraniu)**, a separate Django application for ad request management (AI moderation, Telegram notifications). It has its own README under `backend/Request-Manage-System/README.md`.
+
+---
+
+## Features
+
+### Core
+
+- **Category-based price management** — Organize currency pairs and price types into categories.
+- **Dual price system** — Regular (category) prices and special/promotional prices.
+- **Price history** — Full audit trail of changes with timestamps and notes.
+- **Currency pairs** — Multiple currencies with buy/sell trade types.
+- **Finalization workflow** — Review, approve, and finalize before publishing.
 
 ### Publishing & Automation
 
-- **Automated Telegram Publishing**: Seamlessly publish price updates to multiple Telegram channels
-- **Custom Image Rendering**: Generate branded price images with customizable templates
-- **Template System**: 
-  - Default templates for general use
-  - Category-specific templates
-  - Special price templates
-  - Background images, logos, and watermarks support
-- **Visual Template Editor**: Drag-and-drop interface for creating and editing price templates
-- **Multi-Channel Support**: Manage multiple Telegram bots and channels
+- **Telegram publishing** — Publish to multiple channels; multiple bots supported.
+- **Custom image rendering** — Branded images from templates (Pillow-based).
+- **Templates** — Default, category-specific, and special-price templates; backgrounds, logos, watermarks.
+- **Visual template editor** — Drag-and-drop layout and styling.
+- **Multi-channel** — Manage several Telegram bots and channels.
 
 ### Analytics & Reporting
 
-- **Comprehensive Analytics Dashboard**: 
-  - Real-time price tracking with interactive charts
-  - Price trend analysis and volatility metrics
-  - Category summaries and statistics
-  - Top movers identification
-  - Finalization statistics
-- **Historical Data Analysis**: 30-day price history visualization
-- **Performance Metrics**: Track publication success rates and channel activity
+- **Analytics dashboard** — Real-time charts, trends, volatility, category summaries, top movers, finalization stats.
+- **Historical data** — e.g. 30-day price history.
+- **Performance** — Publication success and channel activity.
 
-### User Management & Security
+### User & Security
 
-- **Role-Based Access Control**: 
-  - Management role
-  - Employee role
-  - Developer role
-- **Custom Authentication**: Secure login system with session management
-- **Activity Logging**: Comprehensive logging system for all operations
-- **Audit Trail**: Track who finalized prices and when
+- **Roles** — Management, Employee, Developer (and super_admin for users/settings).
+- **Auth** — Custom user model, JWT + session auth, login required for panel.
+- **Activity & audit** — Logging and who finalized what and when.
 
-### Additional Features
+### Other
 
-- **Settings Management**: Centralized configuration management
-- **Log Viewer**: View and filter application logs by level and source
-- **Persian Calendar Support**: Integration with jdatetime for Persian date handling
-- **Responsive UI**: Modern, mobile-friendly interface
+- **Settings** — Centralized site/config management.
+- **Log viewer** — Filter logs by level and source.
+- **Persian calendar** — jdatetime support.
+- **Responsive UI** — Vue 3 SPA with Tailwind; PWA support.
 
-## 🏗️ Architecture
+---
 
-### Technology Stack
+## Architecture & Tech Stack
 
-- **Backend**: Django 5.2+
-- **Database**: SQLite (development) / PostgreSQL (production-ready)
-- **Image Processing**: Pillow (PIL)
-- **Telegram Integration**: python-telegram-bot, Pyrogram
-- **REST API**: Django REST Framework
-- **Frontend**: HTML, CSS, JavaScript with Chart.js for analytics
+| Layer        | Technology |
+|-------------|------------|
+| **Frontend** | Vue 3, Vite, Vue Router, Pinia, Tailwind CSS, Chart.js, vue-i18n, PWA (vite-plugin-pwa) |
+| **Backend**  | Django 5.2+, Django REST Framework, Simple JWT |
+| **Database** | SQLite (default; PostgreSQL-ready) |
+| **Image**    | Pillow (PIL) |
+| **Telegram** | python-telegram-bot, Pyrogram (as used by apps) |
+| **API**      | REST under `/api/`; JSON; session + JWT |
 
-### Project Structure
+The **frontend** is a single-page application (SPA). All non-API routes are served by Django with the same `index.html`; the Vue app handles routing. The frontend can be developed with Vite's dev server (proxying `/api` and `/media` to Django) or served after building into `backend/static/vue/`.
+
+---
+
+## Project Structure
 
 ```
 SmartExchangePanel/
-├── accounts/              # User authentication and management
-├── analysis/              # Analytics dashboard and reporting
-├── category/              # Category and price type management
-├── change_price/          # Price update functionality
-├── dashboard/             # Main dashboard
-├── finalize/              # Price finalization workflow
-├── price_publisher/       # Image rendering and Telegram publishing
-├── setting/               # System settings and logging
-├── special_price/         # Special price management
-├── telegram_app/          # Telegram bot and channel management
-├── template_editor/       # Visual template editor
-└── SarafiPardis/          # Main project configuration
+├── README.md                    # This file
+├── frontend/                    # Vue 3 SPA
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.js           # Builds to ../backend/static/vue/
+│   └── src/
+│       ├── assets/
+│       ├── components/          # layout/, ui/
+│       ├── layouts/
+│       ├── router/
+│       ├── services/            # API client
+│       ├── stores/              # Pinia: auth, theme, siteSettings
+│       └── views/               # auth, dashboard, prices, finalize, categories, settings, analysis, telegram, templates, instagram
+│
+└── backend/                     # Django project root
+    ├── manage.py                # DJANGO_SETTINGS_MODULE=SarafiPardis.settings
+    ├── requirements.txt
+    ├── SarafiPardis/            # Main Django project
+    │   ├── settings.py
+    │   ├── urls.py              # API, landing, template-editor, instagram-hub, SPA catch-all
+    │   ├── api_urls.py          # Mounts all app APIs under /api/
+    │   └── views.py             # SPAView, 404, favicon
+    ├── core/                    # Shared utilities (e.g. DRF exception handler)
+    │   └── exceptions.py
+    ├── accounts/                # Auth, users, roles, JWT, activity log
+    ├── category/                # Currency, Category, PriceType
+    ├── change_price/            # Price updates, bulk update, PriceHistory
+    ├── special_price/           # SpecialPriceType, SpecialPriceHistory
+    ├── finalize/                # Finalization, SpecialPriceFinalization, publishing
+    ├── price_publisher/         # Templates, image rendering, Telegram publishing
+    ├── template_editor/         # Visual template editor (standalone + API)
+    ├── analysis/                # Dashboard API, pricing API, charts
+    ├── telegram_app/            # Bots, channels, sending
+    ├── setting/                 # Site settings, logs
+    ├── dashboard/               # Dashboard API
+    ├── landing/                 # Landing page (mr. sarafi)
+    ├── instagram_hub/           # Instagram OAuth & hub
+    ├── static/                  # Static assets (fonts, etc.); Vue build output → static/vue/
+    ├── templates/               # Django templates (e.g. 404)
+    └── public/
+        ├── staticfiles/         # collectstatic output
+        └── media/               # Uploaded files
+    └── Request-Manage-System/   # Separate app (Iraniu) — see its README
 ```
 
-### Key Modules
+---
 
-#### Category Management (`category/`)
-- `Currency`: Currency definitions (code, name, symbol)
-- `Category`: Price categories for organization
-- `PriceType`: Price types within categories (currency pairs, trade direction)
+## Prerequisites
 
-#### Price Management (`change_price/`)
-- `PriceHistory`: Historical record of all price changes
-- Bulk and individual price update interfaces
-- Price validation and constraints
+- **Python 3.10+**
+- **Node.js 18+** (for frontend dev and build)
+- **pip** and a **virtual environment** (recommended)
 
-#### Special Prices (`special_price/`)
-- `SpecialPriceType`: Standalone special price types
-- `SpecialPriceHistory`: History tracking for special prices
+---
 
-#### Finalization (`finalize/`)
-- `Finalization`: Tracks category price finalizations
-- `SpecialPriceFinalization`: Tracks special price finalizations
-- `FinalizedPriceHistory`: Links prices to finalizations
+## Installation & Setup
 
-#### Price Publisher (`price_publisher/`)
-- `PriceTemplate`: Template configuration (backgrounds, logos, watermarks)
-- Image rendering services:
-  - `PriceImageRenderer`: Main rendering engine
-  - `LegacyCategoryRenderer`: Legacy category support
-  - `TetherRenderer`: Specialized Tether rendering
-- `PricePublisherService`: High-level publishing coordination
+### 1. Clone the repository
 
-#### Template Editor (`template_editor/`)
-- Visual drag-and-drop template editor
-- RESTful API for template management
-- Element positioning and styling
+```bash
+git clone <repository-url>
+cd SmartExchangePanel
+```
 
-#### Analytics (`analysis/`)
-- Interactive charts and graphs
-- Statistical analysis (volatility, trends, averages)
-- Category and channel activity metrics
+### 2. Backend: virtualenv and dependencies
 
-#### Telegram Integration (`telegram_app/`)
-- `TelegramBot`: Bot token management
-- `TelegramChannel`: Channel configuration
-- `TelegramService`: Message and photo sending
-- Default message settings per bot
+```bash
+cd backend
+python -m venv venv
+# Windows:
+#   venv\Scripts\activate
+# Linux/macOS:
+source venv/bin/activate
 
-## 📦 Installation
+pip install -r requirements.txt
+```
 
-### Prerequisites
+### 3. Backend: environment (optional but recommended)
 
-- Python 3.10+
-- pip
-- Virtual environment (recommended)
+Create a `.env` in `backend/` or set:
 
-### Setup Steps
+- **`DJANGO_SECRET_KEY`** — Secret key (e.g. generate with `python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'`).
+- **`DJANGO_DEBUG`** — `True` for dev, `False` in production.
+- **`DJANGO_ALLOWED_HOSTS`** — Comma-separated hosts (e.g. `localhost,127.0.0.1,panel.example.com`).
+- **`FINALIZE_STRICT_TELEGRAM`** — If `True`, finalization is rolled back when Telegram publish fails.
+- **`EXTERNAL_API_URL`** / **`EXTERNAL_API_KEY`** — If you use the external rates API.
+- **`INSTAGRAM_BASE_URL`** — Public base URL for media (for Instagram).
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd SmartExchangePanel
-   ```
+Settings read these via `os.environ.get(...)`.
 
-2. **Create and activate virtual environment**
-   ```bash
-   python -m venv venv
-   # On Windows
-   venv\Scripts\activate
-   # On Linux/Mac
-   source venv/bin/activate
-   ```
+### 4. Backend: database and superuser
 
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+# From backend/
+python manage.py migrate
+python manage.py createsuperuser
+```
 
-4. **Configure settings**
-   - Update `SarafiPardis/settings.py` with your configuration
-   - Set `SECRET_KEY`, `DEBUG`, and `ALLOWED_HOSTS`
-   - Configure database settings if using PostgreSQL
+### 5. Backend: static files (for production-style serving)
 
-5. **Run migrations**
-   ```bash
-   python manage.py migrate
-   ```
+```bash
+python manage.py collectstatic --noinput
+```
 
-6. **Create superuser**
-   ```bash
-   python manage.py createsuperuser
-   ```
+### 6. Frontend: dependencies and build
 
-7. **Collect static files**
-   ```bash
-   python manage.py collectstatic
-   ```
+```bash
+cd ../frontend
+npm install
+npm run build
+```
 
-8. **Run development server**
-   ```bash
-   python manage.py runserver
-   ```
+This writes the SPA into `backend/static/vue/` so Django can serve it.
 
-## 🔧 Configuration
+---
 
-### Telegram Setup
+## Running the Application
 
-1. Create Telegram bots via [@BotFather](https://t.me/botfather)
-2. Add bots in the admin panel (`/admin/telegram_app/telegrambot/`)
-3. Configure channels and add them to the system
-4. Set default message settings per bot if needed
+### Option A: Backend only (serves built SPA)
 
-### Template Configuration
+After building the frontend once:
 
-1. Upload background images via admin panel
-2. Configure logos and watermarks
-3. Create category-specific or special price templates
-4. Use the visual template editor for custom layouts
+```bash
+cd backend
+source venv/bin/activate   # or venv\Scripts\activate on Windows
+python manage.py runserver
+```
 
-### User Roles
+Open **http://127.0.0.1:8000**. The SPA is served for all non-API routes.
 
-- **Management**: Full access to all features
-- **Employee**: Standard operational access
-- **Developer**: Technical access with additional privileges
+### Option B: Frontend dev server + backend (recommended for development)
 
-## 📖 Usage
+**Terminal 1 — Django:**
 
-### Price Management Workflow
+```bash
+cd backend
+source venv/bin/activate
+python manage.py runserver
+```
 
-1. **Create Categories**: Organize your price types into categories
-2. **Define Price Types**: Create price types with currency pairs and trade directions
-3. **Update Prices**: Update prices individually or in bulk
-4. **Review**: Check pending prices in the finalization dashboard
-5. **Finalize**: Select prices, choose channel, add notes, and finalize
-6. **Publish**: System automatically renders image and publishes to Telegram
+**Terminal 2 — Vite:**
 
-### Special Prices
+```bash
+cd frontend
+npm run dev
+```
 
-- Create special price types independently
-- Update special prices separately from regular prices
-- Finalize and publish special prices individually
+Vite runs on **http://localhost:3000** (see `vite.config.js`) and proxies `/api` and `/media` to `http://127.0.0.1:8000`. Use the Vite URL for development.
+
+### CORS
+
+Backend allows credentials and origins for `http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:3000`, `http://127.0.0.1:3000`. Adjust `CORS_ALLOWED_ORIGINS` in `SarafiPardis/settings.py` if you use another origin.
+
+---
+
+## Configuration
+
+### Telegram
+
+1. Create bots via [@BotFather](https://t.me/botfather).
+2. In the panel: **Telegram** (or admin) → add bots and channels.
+3. Configure which channels receive which finalizations.
+
+### Templates
+
+1. Upload backgrounds/logos/watermarks via admin or settings.
+2. Create category-specific or special-price templates.
+3. Use **Template editor** (UI or `/template-editor/`) for layout and styling.
+
+### User roles
+
+- **Management** — Full access (including finalize, settings).
+- **Employee** — Standard operations.
+- **Developer** — Technical access.
+- **Super admin** — User management and sensitive settings.
+
+---
+
+## Usage Overview
+
+### Price workflow
+
+1. **Categories & price types** — Create categories and define price types (currency pairs, buy/sell).
+2. **Update prices** — Use "Price hub" / bulk update by category or single price updates.
+3. **Finalize** — In **Finalize**, select prices, choose channel, add notes, and finalize.
+4. **Publish** — System renders the image and publishes to the selected Telegram channel(s).
+
+### Special prices
+
+- Define special price types independently.
+- Update and finalize them separately; they can use their own templates.
 
 ### Analytics
 
-- Access the analytics dashboard to view:
-  - Price trends over time
-  - Category summaries
-  - Top movers
-  - Finalization statistics
-  - System-wide metrics
+- Open **Analysis** for trends, category summaries, top movers, finalization stats, and historical data.
 
-### Template Editing
+### Template editing
 
-- Use the visual template editor to:
-  - Position text and image elements
-  - Adjust fonts, colors, and sizes
-  - Preview templates before saving
+- Use the **Template editor** to position and style text/image elements and preview before saving.
 
-## 🔒 Security
+---
 
-- All views require authentication (enforced by middleware)
-- Role-based access control
-- CSRF protection enabled
-- Secure session management
-- Input validation and sanitization
+## API Reference
 
-## 📊 Database Models
+All panel APIs are under **`/api/`** and use the same REST conventions. Authentication: **Session** or **JWT** (e.g. `Authorization: Bearer <access_token>`). Login: `POST /api/auth/login/`; refresh: `POST /api/auth/token/refresh/`.
 
-### Core Models
+### Main API prefixes (under `/api/`)
 
-- `CustomUser`: Extended user model with roles
-- `Currency`: Currency definitions
-- `Category`: Price categories
-- `PriceType`: Price type definitions
-- `PriceHistory`: Price change history
-- `SpecialPriceType`: Special price types
-- `SpecialPriceHistory`: Special price history
-- `Finalization`: Finalization records
-- `PriceTemplate`: Template configurations
-- `TelegramBot`: Telegram bot configurations
-- `TelegramChannel`: Telegram channel configurations
-- `Log`: Application logging
+| Prefix | Purpose |
+|--------|--------|
+| `auth/` | Login, logout, me, token refresh, users, activity |
+| `dashboard/` | Dashboard data |
+| `categories/` | Categories and price types |
+| `prices/` | Price list, detail, update, bulk update, history |
+| `special-prices/` | Special price types and updates |
+| `finalize/` | Finalization actions |
+| `telegram/` | Bots and channels |
+| `settings/` | Site settings |
+| `analysis/` | Analytics dashboard and **pricing data** |
+| `templates/` | Price templates (publisher) |
+| `template-editor/` | Template editor API |
+| `instagram-hub/` | Instagram hub |
 
-## 🛠️ Development
+### Public pricing data (read-only)
 
-### Running Tests
+Suitable for dashboards, bots, or external systems:
 
-```bash
-python manage.py test
-```
+- **URL:** `GET /api/analysis/pricing/`
+- **Auth:** Configurable (often unauthenticated for public feed).
+- **Response:** JSON with `generated_at` and `categories`. Each category has `id`, `name`, `slug`, `description`, and `items`. Regular items include `latest_price`, `latest_price_timestamp`; special-price items include `latest_special_price`, `latest_special_price_timestamp`. Special prices only include items updated in the last 6 hours.
 
-### Code Style
-
-Follow PEP 8 guidelines and Django best practices.
-
-### Adding New Features
-
-1. Create migrations for model changes: `python manage.py makemigrations`
-2. Apply migrations: `python manage.py migrate`
-3. Update admin configurations if needed
-4. Add URL patterns and views
-5. Create templates and static files
-
-## 📝 API Endpoints
-
-### Pricing Data API
-
-The Pricing Data API exposes a **read-only JSON view of all pricing data**, suitable for dashboards, bots, and external systems.
-
-- **Base URL (including project routing)**: `GET /analysis/api/pricing/`
-- **Authentication**: Disabled by default for this endpoint (can be enabled via DRF settings).
-- **Methods**: `GET` only (fully read-only).
-
-#### Response Structure
-
-The endpoint returns a single JSON object:
+Example response shape:
 
 ```json
 {
@@ -321,139 +355,67 @@ The endpoint returns a single JSON object:
       "id": null,
       "name": "Special Prices",
       "slug": "special-prices",
-      "description": "Special price types with updates in the last 6 hours.",
-      "items": [
-        {
-          "id": 5,
-          "name": "Special Pound",
-          "pair": "GBP/IRR",
-          "trade_type": "Sell",
-          "latest_special_price": "550000.00",
-          "latest_special_price_timestamp": "2025-01-01T11:40:00Z"
-        }
-      ]
+      "items": []
     }
   ]
 }
 ```
 
-#### Semantics
+### Error format
 
-- **`generated_at`**  
-  ISO8601 timestamp when the payload was generated (server time, UTC).
-
-- **`categories`**  
-  List of **category objects** with the following structure:
-
-  - **`id`**  
-    Database ID of the `Category`.  
-    - For the synthetic *Special Prices* category, this value is **`null`**.
-
-  - **`name`**  
-    Human-readable category name (for example: `"Cash"`).
-
-  - **`slug`**  
-    URL-friendly slug string (for example: `"cash"`).  
-    May be reused in other parts of the system for routing or labels.
-
-  - **`description`** *(optional, nullable)*  
-    Free-text category description.  
-    - May be **`null`** if no description is provided.
-
-  - **`items`**  
-    List of pricing item objects for that category.  
-    - May be an empty list (`[]`) if the category has no current items.
-
-For **regular categories**, each item has:
-
-- **id**: ID of the `PriceType`.
-- **name**: Name of the `PriceType`.
-- **pair**: String representing the currency pair, e.g. `"USD/IRR"`.
-- **trade_type**: Human-readable trade direction, e.g. `"Buy"` or `"Sell"`.
-- **latest_price**: Latest numeric price for this type (stringified decimal).
-- **latest_price_timestamp**: Timestamp of the latest recorded price (`PriceHistory.created_at`).
-
-For the **synthetic "Special Prices" category**, items come from `SpecialPriceType` and `SpecialPriceHistory`:
-
-- **id**: ID of the `SpecialPriceType`.
-- **name**: Name of the special price type.
-- **pair**: Currency pair for the special price.
-- **trade_type**: Human-readable trade direction.
-- **latest_special_price**: Latest special price value (stringified decimal).
-- **latest_special_price_timestamp**: Timestamp of the latest *special price* (`SpecialPriceHistory.created_at`).
-
-#### Business Rules
-
-- **All categories are always included**:
-  - Every `Category` record is returned, even if it currently has no price items.
-  - In that case, `items` is an empty array (`[]`).
-- **Regular price items**:
-  - Each category’s `items` list is built from `PriceType` **with at least one `PriceHistory` entry**.
-  - Only the **latest** price per type is exposed.
-- **Special prices**:
-  - The *Special Prices* category aggregates `SpecialPriceType` entries.
-  - **Only items with a `SpecialPriceHistory` in the last 6 hours are included**.
-  - If no special prices have been updated in the last 6 hours, the *Special Prices* category is still present, but `items` is empty.
-
-#### DRF & Security Notes
-
-- Implemented using **Django REST Framework** (`analysis.views.PricingDataAPIView`).  
-- The view is **GET-only** and does not support POST/PUT/PATCH/DELETE.
-- `authentication_classes` and `permission_classes` are **empty by default** but can be configured:
-  - Example: `SessionAuthentication`, `TokenAuthentication`, `IsAuthenticated`, etc.
-- Throttling support can be enabled via DRF’s `AnonRateThrottle` / `UserRateThrottle` and `DEFAULT_THROTTLE_RATES`.
-- **CORS** is handled globally (e.g. via `django-cors-headers`); the view itself is CORS-agnostic.
-
-#### Typical Use Cases
-
-- Powering a **public JSON endpoint** for currency prices.
-- Feeding **frontend dashboards** or **mobile apps** that need current prices and special offers.
-- Providing a **machine-readable feed** for other services (e.g. partner sites, bots, or monitoring tools).
-
-### Template Editor API
-
-- `GET /api/templates/`: List all templates
-- `POST /api/templates/`: Create new template
-- `GET /api/templates/{id}/`: Get template details
-- `PUT /api/templates/{id}/`: Update template
-- `DELETE /api/templates/{id}/`: Delete template
-
-## 🐛 Troubleshooting
-
-### Common Issues
-
-1. **Telegram publishing fails**
-   - Verify bot token is correct
-   - Ensure bot has permission to send messages to channel
-   - Check channel chat_id is correct
-
-2. **Image rendering errors**
-   - Verify template assets (backgrounds, fonts) exist
-   - Check file permissions
-   - Ensure Pillow is properly installed
-
-3. **Database errors**
-   - Run migrations: `python manage.py migrate`
-   - Check database connection settings
-
-## 📄 License
-
-[Specify your license here]
-
-## 👥 Contributors
-
-[Add contributors here]
-
-## 🔗 Links
-
-- Production: Configure your panel URL in deployment settings
-- Admin: Configure your admin URL in deployment settings
-
-## 📧 Support
-
-For support and questions, please configure your contact details in **Settings > Site Settings** (Logo, Favicon, Support Phone, Email).
+API errors use a common shape: `{ "error": true, "message": "...", "code": "..." }` (e.g. `validation_error`, `permission_denied`, `authentication_failed`, `not_found`, `server_error`).
 
 ---
 
-**Built with ❤️ for efficient currency exchange price management**
+## Security
 
+- **Authentication** — All panel views require login (enforced by middleware); public routes (e.g. login, landing) are excluded.
+- **Authorization** — Role-based access; finalize and settings restricted to appropriate roles.
+- **CSRF** — Enabled for browser requests.
+- **CORS** — Configured for known frontend origins.
+- **Production** — Use `DEBUG=False`, strong `SECRET_KEY`, correct `ALLOWED_HOSTS`, and HTTPS (settings enable secure cookies and HSTS when not DEBUG).
+- **Secrets** — Prefer environment variables or a secrets manager; do not commit real keys.
+
+---
+
+## Troubleshooting
+
+### "Vue app not built"
+
+- Run `cd frontend && npm run build`. Ensure `backend/static/vue/index.html` exists.
+
+### Telegram publishing fails
+
+- Check bot token and that the bot can post in the channel; verify channel/chat IDs.
+
+### Image rendering errors
+
+- Ensure template assets (backgrounds, fonts) exist and paths in settings are correct (e.g. `TEMPLATE_EDITOR_DEFAULT_FONT`, `PRICE_RENDERER_FONT_ROOT`). Check Pillow is installed.
+
+### Database errors
+
+- Run `python manage.py migrate` from `backend/`. If you use PostgreSQL, set `DATABASES` in settings accordingly.
+
+### 401/403 on API from frontend
+
+- Confirm credentials (session cookie or JWT) and that the user has the required role; check CORS and `credentials: true` if using a separate dev origin.
+
+---
+
+## Related Documentation
+
+- **Frontend:** `frontend/README.md` — Vue app structure and scripts.
+- **Landing:** `backend/landing/README.md` — Landing page structure and Django integration.
+- **Template editor:** `backend/template_editor/README.md` — Template manager and visual editor usage.
+- **Request-Manage-System (Iraniu):** `backend/Request-Manage-System/README.md` — Ad request flow, AI moderation, Telegram bots, runbots, and configuration.
+
+---
+
+## License & Support
+
+- **License:** See repository or project license file.
+- **Support:** Configure contact details under **Settings → Site Settings** (e.g. support phone, email). Production and admin URLs are configured in deployment settings.
+
+---
+
+**SmartExchange Panel** — Price management, finalization, and Telegram publishing for currency exchange operations.

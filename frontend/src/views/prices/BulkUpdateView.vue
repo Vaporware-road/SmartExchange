@@ -1,134 +1,314 @@
 <template>
-  <div>
+  <div class="pb-28">
     <nav class="mb-6">
-      <router-link to="/prices" class="text-gray-400 hover:text-gold transition-colors">
-        <i class="fas fa-arrow-left mr-2"></i>Back to Prices
+      <router-link
+        to="/update"
+        class="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors font-medium"
+      >
+        <i class="fas" :class="isRtl ? 'fa-arrow-right' : 'fa-arrow-left'" />
+        {{ $t('priceHub.backToHub') }}
       </router-link>
     </nav>
-    <h1 class="text-2xl font-bold text-gold mb-4">
-      Bulk Update - {{ category?.name ?? 'Category' }}
+    <h1 class="text-2xl font-bold text-gold mb-2">
+      {{ category?.name ?? $t('routes.category') }}
     </h1>
-    <div v-if="loading" class="card-luxury space-y-4 px-4 py-3">
-      <BaseSkeleton v-for="i in 5" :key="i" variant="table-row" class="!h-14" />
-      <BaseSkeleton variant="text" class="!max-w-full !h-12" />
+    <p class="text-[var(--text-secondary)] mb-6">{{ $t('routes.bulkUpdate') }}</p>
+
+    <div v-if="loading" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <BaseSkeleton v-for="i in 6" :key="i" variant="table-row" class="!h-14" />
     </div>
-    <form
-      v-else-if="priceTypes && priceTypes.length"
-      @submit.prevent="handleSubmit"
-      class="card-luxury space-y-4 px-4 py-3"
-    >
+
+    <template v-else-if="priceTypes.length">
+      <!-- Bulk actions card -->
       <div
-        v-for="pt in priceTypes"
-        :key="pt.id"
-        class="flex items-center gap-4 flex-wrap"
+        class="rounded-2xl border-2 p-5 mb-6 flex flex-wrap items-center gap-4 border-[var(--border-color)] bg-[var(--bg-card)] price-card-primary"
       >
-        <label class="flex-1 min-w-[200px]">
-          {{ pt.name }} ({{ pt.source_currency }}/{{ pt.target_currency }})
-        </label>
-        <div
-          v-if="isDoublePrice"
-          class="flex flex-wrap items-center gap-3"
+        <span class="text-base font-bold text-[var(--text-primary)]">{{ $t('bulkUpdate.amountPlaceholder') }}</span>
+        <input
+          v-model.number="bulkAmount"
+          type="number"
+          step="1"
+          class="input-luxury w-28 text-lg py-2.5"
+          placeholder="0"
+        />
+        <button
+          type="button"
+          class="btn-luxury-outline py-2.5 px-5 font-medium"
+          :disabled="bulkAmount === '' || bulkAmount == null || Number.isNaN(Number(bulkAmount))"
+          @click="applyBulkDelta(Number(bulkAmount))"
         >
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-400">{{ $t('dashboard.cashPrice') }}</span>
-            <input
-              v-model.number="cashPrices[pt.id]"
-              type="number"
-              step="0.01"
-              min="0"
-              class="input-luxury w-28"
-              :placeholder="pt.cash_price != null ? String(pt.cash_price) : ''"
-            />
+          <i class="fas fa-plus me-1" /> {{ $t('bulkUpdate.addToAll') }}
+        </button>
+        <button
+          type="button"
+          class="btn-luxury-outline py-2.5 px-5 font-medium"
+          :disabled="bulkAmount === '' || bulkAmount == null || Number.isNaN(Number(bulkAmount))"
+          @click="applyBulkDelta(-Number(bulkAmount))"
+        >
+          <i class="fas fa-minus me-1" /> {{ $t('bulkUpdate.subtractFromAll') }}
+        </button>
+      </div>
+
+      <!-- Two columns: Buy | Sell as large cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Buy column card -->
+        <div
+          class="price-card-buy rounded-2xl border-2 overflow-hidden border-emerald-500/40 bg-[var(--bg-card)]"
+        >
+          <div
+            class="px-5 py-4 text-lg font-bold text-emerald-400"
+            style="background: rgba(16, 185, 129, 0.15);"
+          >
+            {{ $t('bulkUpdate.buy') }}
           </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-400">{{ $t('dashboard.accountPrice') }}</span>
-            <input
-              v-model.number="accountPrices[pt.id]"
-              type="number"
-              step="0.01"
-              min="0"
-              class="input-luxury w-28"
-              :placeholder="pt.account_price != null ? String(pt.account_price) : ''"
-            />
+          <div class="p-5 space-y-4">
+            <div
+              v-for="pt in priceTypesByBuy"
+              :key="pt.id"
+              class="flex flex-wrap items-center gap-4 py-4 px-5 rounded-xl border border-emerald-500/25"
+              style="background: rgba(16, 185, 129, 0.06);"
+            >
+              <label class="flex-1 min-w-[140px] text-base font-bold text-[var(--text-primary)]">
+                {{ pt.name }}
+                <span class="text-sm font-normal text-[var(--text-secondary)]">({{ pt.source_currency }}/{{ pt.target_currency }})</span>
+              </label>
+              <input
+                :value="formatThousands(prices[pt.id])"
+                type="text"
+                inputmode="decimal"
+                class="input-luxury w-44 text-xl py-3.5 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                :placeholder="pt.latest_price != null ? formatThousands(Number(pt.latest_price)) : ''"
+                @input="onPriceInput(pt.id, ($event.target).value)"
+                @focus="($event.target).select()"
+              />
+              <span
+                v-if="pt.latest_price_at"
+                class="text-xs text-[var(--text-secondary)] whitespace-nowrap"
+              >
+                {{ formatDateTime(pt.latest_price_at) }}
+              </span>
+            </div>
+            <p v-if="!priceTypesByBuy.length" class="text-sm text-[var(--text-secondary)] py-2">—</p>
           </div>
         </div>
-        <input
-          v-else
-          v-model.number="prices[pt.id]"
-          type="number"
-          step="0.01"
-          min="0"
-          class="input-luxury flex-1 max-w-[150px]"
-          :placeholder="pt.latest_price != null ? String(pt.latest_price) : ''"
-        />
+
+        <!-- Sell column card -->
+        <div
+          class="price-card-sell rounded-2xl border-2 overflow-hidden border-rose-500/40 bg-[var(--bg-card)]"
+        >
+          <div
+            class="px-5 py-4 text-lg font-bold text-rose-400"
+            style="background: rgba(244, 63, 94, 0.15);"
+          >
+            {{ $t('bulkUpdate.sell') }}
+          </div>
+          <div class="p-5 space-y-4">
+            <div
+              v-for="pt in priceTypesBySell"
+              :key="pt.id"
+              class="flex flex-wrap items-center gap-4 py-4 px-5 rounded-xl border border-rose-500/25"
+              style="background: rgba(244, 63, 94, 0.06);"
+            >
+              <label class="flex-1 min-w-[140px] text-base font-bold text-[var(--text-primary)]">
+                {{ pt.name }}
+                <span class="text-sm font-normal text-[var(--text-secondary)]">({{ pt.source_currency }}/{{ pt.target_currency }})</span>
+              </label>
+              <input
+                :value="formatThousands(prices[pt.id])"
+                type="text"
+                inputmode="decimal"
+                class="input-luxury w-44 text-xl py-3.5 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
+                :placeholder="pt.latest_price != null ? formatThousands(Number(pt.latest_price)) : ''"
+                @input="onPriceInput(pt.id, ($event.target).value)"
+                @focus="($event.target).select()"
+              />
+              <span
+                v-if="pt.latest_price_at"
+                class="text-xs text-[var(--text-secondary)] whitespace-nowrap"
+              >
+                {{ formatDateTime(pt.latest_price_at) }}
+              </span>
+            </div>
+            <p v-if="!priceTypesBySell.length" class="text-sm text-[var(--text-secondary)] py-2">—</p>
+          </div>
+        </div>
       </div>
-      <div class="pt-2">
-        <label class="block text-sm font-medium text-gray-400 mb-2">Notes (optional)</label>
-        <input v-model="notes" type="text" class="input-luxury" />
+
+      <!-- Notes card -->
+      <div
+        class="rounded-2xl border p-5 mb-6"
+        style="border-color: var(--border-card); background: var(--bg-card);"
+      >
+        <label class="block text-sm font-bold text-[var(--text-secondary)] mb-2">
+          {{ $t('bulkUpdate.notesOptional') }}
+        </label>
+        <input v-model="notes" type="text" class="input-luxury w-full max-w-md py-2.5" />
       </div>
-      <div class="flex gap-4">
-        <button type="submit" class="btn-luxury" :disabled="submitting">
-          <LoadingSpinner v-if="submitting" class="w-5 h-5" />
-          Save All
-        </button>
-        <router-link to="/prices" class="btn-luxury-outline">Cancel</router-link>
-      </div>
-    </form>
+    </template>
+
     <div
-      v-else
-      class="card-luxury px-4 py-6 text-center text-gray-500"
+      v-else-if="!loading"
+      class="rounded-2xl border p-8 text-center text-[var(--text-secondary)]"
+      style="border-color: var(--border-card); background: var(--bg-card);"
     >
       {{ $t('emptyState.noPrices') }}
     </div>
+
+    <!-- Floating Save Bar -->
+    <Transition name="fade">
+      <div
+        v-show="priceTypes.length && !loading"
+        class="fixed start-0 end-0 z-40 flex items-center justify-between gap-4 px-4 py-3 border-t shadow-lg bottom-16 md:bottom-0"
+        style="background: var(--bg-card); border-color: var(--border-card); padding-left: max(1rem, env(safe-area-inset-left)); padding-right: max(1rem, env(safe-area-inset-right)); padding-bottom: max(0.75rem, env(safe-area-inset-bottom));"
+      >
+        <span class="text-sm text-[var(--text-secondary)]">
+          {{ $t('bulkUpdate.lastSynced') }}:
+          {{ lastSyncedAt ? formatDateTime(lastSyncedAt) : $t('dashboard.never') }}
+        </span>
+        <button
+          type="button"
+          class="btn-luxury flex items-center gap-2 px-6 py-2.5 font-medium"
+          :class="{ 'save-pulse': hasDirty }"
+          :disabled="submitting || !hasPayload"
+          @click="handleSubmit"
+        >
+          <LoadingSpinner v-if="submitting" class="w-5 h-5" />
+          <i v-else class="fas fa-save" />
+          {{ $t('bulkUpdate.saveChanges') }}
+        </button>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
 import { priceApi, categoryApi } from '@/services/api'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 
 const route = useRoute()
-const router = useRouter()
+const { t } = useI18n()
+const toast = useToast()
+const siteSettings = useSiteSettingsStore()
+const isRtl = computed(() => document.documentElement.dir === 'rtl')
+
 const categoryId = computed(() => route.params.id)
 const loading = ref(true)
 const category = ref(null)
 const priceTypes = ref([])
 const prices = ref({})
-const cashPrices = ref({})
-const accountPrices = ref({})
 const notes = ref('')
 const submitting = ref(false)
+const lastSyncedAt = ref(null)
+const bulkAmount = ref('')
+let previousTitle = ''
 
-const isDoublePrice = computed(() => !!category.value?.is_double_price)
+const priceTypesByBuy = computed(() =>
+  priceTypes.value.filter((p) => p.trade_type === 'buy')
+)
+const priceTypesBySell = computed(() =>
+  priceTypes.value.filter((p) => p.trade_type === 'sell')
+)
+
+const initialPrices = ref({})
+const hasDirty = computed(() => {
+  const current = JSON.stringify(prices.value)
+  const initial = JSON.stringify(initialPrices.value)
+  return current !== initial
+})
+
+const hasPayload = computed(() => {
+  return Object.values(prices.value).some(
+    (v) => v !== '' && v != null && !Number.isNaN(Number(v))
+  )
+})
+
+function formatThousands(val) {
+  if (val === '' || val == null || Number.isNaN(Number(val))) return ''
+  const num = Number(val)
+  const fixed = Number.isInteger(num) ? num.toString() : num.toFixed(2)
+  const [intPart, decPart] = fixed.split('.')
+  const withCommas = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return decPart != null ? `${withCommas}.${decPart}` : withCommas
+}
+
+function parsePriceInput(str) {
+  const raw = String(str).replace(/,/g, '').trim()
+  if (raw === '') return ''
+  const num = parseFloat(raw)
+  return Number.isNaN(num) ? '' : num
+}
+
+function onPriceInput(id, value) {
+  const parsed = parsePriceInput(value)
+  prices.value[id] = parsed
+}
+
+function formatDateTime(val) {
+  if (!val) return '—'
+  const d = new Date(val)
+  if (Number.isNaN(d.getTime())) return '—'
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'short',
+    timeStyle: 'short',
+  }).format(d)
+}
+
+function applyBulkDelta(delta) {
+  const n = Number(delta)
+  if (Number.isNaN(n)) return
+  const next = { ...prices.value }
+  for (const pt of priceTypes.value) {
+    const current = next[pt.id]
+    const num = current === '' || current == null ? 0 : Number(current)
+    const nextVal = Math.max(0, num + n)
+    next[pt.id] = nextVal === 0 ? '' : nextVal
+  }
+  prices.value = next
+}
+
+function setPageTitle() {
+  if (!category.value?.name) return
+  previousTitle = document.title
+  const panelName = siteSettings.siteName || 'Panel'
+  document.title = `${t('routes.priceHub')}: ${category.value.name} | ${panelName}`
+}
+
+function restorePageTitle() {
+  if (previousTitle) document.title = previousTitle
+}
 
 onMounted(async () => {
   try {
     const [pRes, cRes] = await Promise.all([priceApi.list(), categoryApi.list()])
-    const cats = cRes.data
-    category.value = Array.isArray(cats) ? cats.find((c) => String(c.id) === String(categoryId.value)) : null
-    const allPrices = pRes.data
-    priceTypes.value = Array.isArray(allPrices) ? allPrices.filter((p) => String(p.category_id) === String(categoryId.value)) : []
-    prices.value = {}
-    cashPrices.value = {}
-    accountPrices.value = {}
+    const cats = Array.isArray(cRes.data) ? cRes.data : cRes.data?.results ?? []
+    category.value = cats.find((c) => String(c.id) === String(categoryId.value)) ?? null
+    const allPrices = Array.isArray(pRes.data) ? pRes.data : (pRes.data?.results ?? [])
+    priceTypes.value = allPrices.filter(
+      (p) => String(p.category_id) === String(categoryId.value)
+    )
+    const next = {}
     priceTypes.value.forEach((pt) => {
+      let val = ''
       if (pt.latest_price != null && typeof pt.latest_price === 'number') {
-        prices.value[pt.id] = Number(pt.latest_price)
-      } else if (pt.latest_price && typeof pt.latest_price === 'object' && pt.latest_price.price != null) {
-        prices.value[pt.id] = Number(pt.latest_price.price)
-      } else {
-        prices.value[pt.id] = ''
+        val = Number(pt.latest_price)
+      } else if (
+        pt.latest_price &&
+        typeof pt.latest_price === 'object' &&
+        pt.latest_price.price != null
+      ) {
+        val = Number(pt.latest_price.price)
       }
-      if (pt.cash_price != null) {
-        cashPrices.value[pt.id] = Number(pt.cash_price)
-      }
-      if (pt.account_price != null) {
-        accountPrices.value[pt.id] = Number(pt.account_price)
-      }
+      next[pt.id] = val
     })
+    prices.value = next
+    initialPrices.value = JSON.parse(JSON.stringify(next))
+    setPageTitle()
   } catch {
     priceTypes.value = []
   } finally {
@@ -136,40 +316,61 @@ onMounted(async () => {
   }
 })
 
+onBeforeUnmount(() => {
+  restorePageTitle()
+})
+
+watch(
+  () => category.value?.name,
+  () => setPageTitle()
+)
+
 async function handleSubmit() {
   const pricePayload = {}
-  const cashPayload = {}
-  const accountPayload = {}
-
   Object.entries(prices.value).forEach(([k, v]) => {
-    if (v !== '' && v != null && !Number.isNaN(v)) pricePayload[k] = v
+    if (v !== '' && v != null && !Number.isNaN(Number(v))) {
+      pricePayload[k] = Number(v)
+    }
   })
-  Object.entries(cashPrices.value).forEach(([k, v]) => {
-    if (v !== '' && v != null && !Number.isNaN(v)) cashPayload[k] = v
-  })
-  Object.entries(accountPrices.value).forEach(([k, v]) => {
-    if (v !== '' && v != null && !Number.isNaN(v)) accountPayload[k] = v
-  })
-
-  const hasAnyPayload = Object.keys(pricePayload).length || Object.keys(cashPayload).length || Object.keys(accountPayload).length
-  if (!hasAnyPayload) return
+  if (!Object.keys(pricePayload).length) return
 
   submitting.value = true
   try {
-    const body = {
+    await priceApi.bulkUpdate(categoryId.value, {
       prices: pricePayload,
       notes: notes.value,
-    }
-    if (Object.keys(cashPayload).length) {
-      body.cash_prices = cashPayload
-    }
-    if (Object.keys(accountPayload).length) {
-      body.account_prices = accountPayload
-    }
-    await priceApi.bulkUpdate(categoryId.value, body)
-    router.push('/prices')
+    })
+    lastSyncedAt.value = new Date()
+    initialPrices.value = JSON.parse(JSON.stringify(prices.value))
+    toast.success(t('toast.pricesUpdatedBroadcast'))
+  } catch {
+    toast.error(t('toast.serverError'))
   } finally {
     submitting.value = false
   }
 }
 </script>
+
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.save-pulse {
+  animation: savePulse 2s ease-in-out infinite;
+}
+
+@keyframes savePulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(212, 175, 55, 0);
+  }
+}
+</style>

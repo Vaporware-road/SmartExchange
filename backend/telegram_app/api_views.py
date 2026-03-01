@@ -7,6 +7,8 @@ from rest_framework import status, serializers as drf_serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
+
+from accounts.permissions import IsSuperAdminOrManagement
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 
@@ -27,7 +29,7 @@ from .serializers import (
 class TelegramChannelListAPIView(APIView):
     """GET /api/telegram/channels/ - list active channels with their bots."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def get(self, request):
         channels = (
@@ -45,7 +47,36 @@ class TelegramChannelListAPIView(APIView):
 class SendMessageAPIView(APIView):
     """POST /api/telegram/send-message/ - send a message to a channel."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+
+    def _build_message_from_payload(self, data):
+        """Build message text from banner_key and price fields when provided."""
+        banner_key = (data.get("banner_key") or "").strip()
+        if not banner_key or banner_key == "none":
+            return (data.get("message") or "").strip()
+
+        parts = []
+        if banner_key == "buy_gbp_double" or banner_key == "sell_gbp_double":
+            cash = data.get("cash_price")
+            account = data.get("account_price")
+            if cash is not None:
+                parts.append(f"Cash: {cash}")
+            if account is not None:
+                parts.append(f"Account: {account}")
+            label = "Buy GBP" if banner_key == "buy_gbp_double" else "Sell GBP"
+            if parts:
+                parts.insert(0, label)
+        else:
+            single = data.get("price")
+            if single is not None:
+                parts.append(f"Price: {single}")
+            if banner_key == "generic_single" and parts:
+                parts.insert(0, "Price update")
+
+        custom = (data.get("message") or "").strip()
+        if custom:
+            parts.append(custom)
+        return "\n".join(parts) if parts else custom
 
     def post(self, request):
         serializer = SendMessageSerializer(data=request.data)
@@ -54,7 +85,9 @@ class SendMessageAPIView(APIView):
 
         bot = data["bot"]
         channel = data["channel"]
-        message = data["message"]
+        message = self._build_message_from_payload(data)
+        if not message:
+            message = (request.data.get("message") or "").strip() or "—"
 
         if channel.bot_id != bot.id:
             return Response(
@@ -94,7 +127,7 @@ class SendMessageAPIView(APIView):
 class DefaultMessageSettingsListAPIView(APIView):
     """GET /api/telegram/default-settings/ - list default settings (optionally by bot)."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def get(self, request):
         bot_id = request.query_params.get("bot")
@@ -108,7 +141,7 @@ class DefaultMessageSettingsListAPIView(APIView):
 class DefaultMessageSettingsDetailAPIView(APIView):
     """GET/PUT /api/telegram/default-settings/<id>/ - get or update a default setting."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def get_object(self, pk):
         from django.shortcuts import get_object_or_404
@@ -146,7 +179,7 @@ class DefaultMessageSettingsDetailAPIView(APIView):
 class DefaultMessageSettingsCreateAPIView(APIView):
     """POST /api/telegram/default-settings/ - create default settings for a bot."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def post(self, request):
         data = dict(request.data)
@@ -174,7 +207,7 @@ class TelegramBotViewSet(ModelViewSet):
     """
 
     queryset = TelegramBot.objects.all().order_by("-created_at")
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update"):
@@ -246,7 +279,7 @@ class TelegramChannelViewSet(ModelViewSet):
         "-created_at"
     )
     serializer_class = TelegramChannelSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
 
 class AutoPostConfigViewSet(ModelViewSet):
@@ -261,7 +294,7 @@ class AutoPostConfigViewSet(ModelViewSet):
         "channel", "category", "special_price_type"
     ).all()
     serializer_class = AutoPostConfigSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
 
 class AutomationSettingsSerializer(drf_serializers.Serializer):
@@ -277,7 +310,7 @@ class AutomationSettingsAPIView(APIView):
     is handled elsewhere.
     """
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def get(self, request):
         settings = SiteSettings.load()

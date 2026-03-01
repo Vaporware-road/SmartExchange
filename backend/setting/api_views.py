@@ -6,7 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.throttling import ScopedRateThrottle
 
+from accounts.permissions import IsSuperAdmin, IsSuperAdminOrManagement
 from telegram_app.models import TelegramBot, TelegramChannel
 
 from .models import SiteSettings, Log
@@ -21,7 +23,9 @@ from .serializers import (
 class SiteSettingsAPIView(APIView):
     """GET/PUT /api/settings/site/ - singleton site settings."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    throttle_scope = "settings"
+    throttle_classes = [ScopedRateThrottle]
 
     def get(self, request):
         settings_obj = SiteSettings.load()
@@ -39,7 +43,9 @@ class SiteSettingsAPIView(APIView):
 class TelegramBotViewSet(ModelViewSet):
     """CRUD for Telegram bots."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    throttle_scope = "settings"
+    throttle_classes = [ScopedRateThrottle]
     queryset = TelegramBot.objects.all().order_by("-created_at")
     serializer_class = TelegramBotSerializer
 
@@ -47,7 +53,9 @@ class TelegramBotViewSet(ModelViewSet):
 class TelegramChannelViewSet(ModelViewSet):
     """CRUD for Telegram channels."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    throttle_scope = "settings"
+    throttle_classes = [ScopedRateThrottle]
     queryset = TelegramChannel.objects.select_related("bot").all().order_by("-created_at")
     serializer_class = TelegramChannelSerializer
 
@@ -55,7 +63,9 @@ class TelegramChannelViewSet(ModelViewSet):
 class LogListAPIView(APIView):
     """GET /api/settings/logs/ - paginated logs with filters."""
 
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    throttle_scope = "settings"
+    throttle_classes = [ScopedRateThrottle]
 
     def get(self, request):
         from rest_framework.pagination import PageNumberPagination

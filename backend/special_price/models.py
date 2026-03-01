@@ -20,6 +20,8 @@ class SpecialPriceType(models.Model):
     )
     trade_type = models.CharField(max_length=10, choices=TRADE_CHOICES)
     description = models.TextField(blank=True, null=True)
+    # Optional Font Awesome icon class for UI highlight (e.g. "fas fa-star", "fas fa-shield-alt")
+    icon = models.CharField(max_length=64, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from setting.utils import log_event
+from accounts.utils import log_activity
+from accounts.models import UserActivityLog
 from .models import SpecialPriceHistory, SpecialPriceType
 from .serializers import (
     SpecialPriceHistorySerializer,
@@ -48,6 +50,13 @@ class SpecialPriceUpdateAPIView(APIView):
             details=f"Old: {old_price}, New: {ph.price}",
             user=request.user if request.user.is_authenticated else None,
         )
+        if request.user.is_authenticated:
+            log_activity(
+                request.user,
+                UserActivityLog.ACTION_SPECIAL_PRICE_UPDATE,
+                request,
+                details=f"{spt.name}: {old_price} -> {ph.price}",
+            )
 
         return Response(
             SpecialPriceHistorySerializer(ph).data,

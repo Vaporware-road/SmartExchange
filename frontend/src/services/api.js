@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { useToast } from 'vue-toastification'
 import i18n from '@/i18n'
+import router from '@/router'
 
 const api = axios.create({
   baseURL: '/api',
@@ -36,6 +37,11 @@ api.interceptors.response.use(
     } else if (status === 403 && !isAuthCheck) {
       toast.error(i18n.global.t('errors.forbidden'))
     } else if (status >= 500) {
+      const logId = error.response?.data?.log_id ?? error.response?.data?.error_id ?? error.response?.data?.request_id
+      const currentName = router.currentRoute?.value?.name
+      if (currentName !== 'error-500' && currentName !== 'not-found') {
+        router.push({ name: 'error-500', query: logId != null ? { logId: String(logId) } : {} })
+      }
       toast.error(i18n.global.t('errors.serverError'))
     } else if (!error.response) {
       toast.error(i18n.global.t('errors.networkError'))
@@ -50,6 +56,14 @@ export const authApi = {
     api.post('/auth/login/', { username, password }),
   logout: (refresh) => api.post('/auth/logout/', { refresh }),
   me: () => api.get('/auth/me/'),
+  users: {
+    list: (params) => api.get('/auth/users/', { params }),
+    create: (data) => api.post('/auth/users/', data),
+    get: (id) => api.get(`/auth/users/${id}/`),
+    update: (id, data) => api.patch(`/auth/users/${id}/`, data),
+    forceLogout: (id) => api.post(`/auth/users/${id}/force-logout/`),
+  },
+  activity: (params) => api.get('/auth/activity/', { params }),
 }
 
 export const dashboardApi = {
@@ -61,18 +75,28 @@ export const categoryApi = {
   create: (data) => api.post('/categories/', data),
   get: (id) => api.get(`/categories/${id}/`),
   update: (id, data) => api.put(`/categories/${id}/`, data),
+  patch: (id, data) => api.patch(`/categories/${id}/`, data),
   delete: (id) => api.delete(`/categories/${id}/`),
+  uploadTelegramMedia: (id, formData) =>
+    api.post(`/categories/${id}/telegram-media/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    }),
   addPriceType: (categoryId, data) =>
     api.post(`/categories/${categoryId}/price-types/`, data),
+  reorderPriceTypes: (categoryId, orderIds) =>
+    api.post(`/categories/${categoryId}/price-types/reorder/`, { order: orderIds }),
 }
 
 export const priceTypeApi = {
+  get: (categoryId, id) => api.get(`/categories/${categoryId}/price-types/${id}/`),
   update: (categoryId, id, data) => api.put(`/categories/${categoryId}/price-types/${id}/`, data),
+  patch: (categoryId, id, data) => api.patch(`/categories/${categoryId}/price-types/${id}/`, data),
   delete: (categoryId, id) => api.delete(`/categories/${categoryId}/price-types/${id}/`),
 }
 
 export const priceApi = {
   list: () => api.get('/prices/'),
+  get: (id) => api.get(`/prices/${id}/`),
   update: (priceTypeId, data) =>
     api.post(`/prices/${priceTypeId}/update/`, data),
   bulkUpdate: (categoryId, data) =>
@@ -98,6 +122,14 @@ export const finalizeApi = {
     api.post(`/finalize/category/${categoryId}/`, data),
   finalizeSpecialPrice: (specialPriceId, data) =>
     api.post(`/finalize/special-price/${specialPriceId}/`, data),
+  finalizeAll: (data) => api.post('/finalize/all/', data),
+}
+
+export const instagramHubApi = {
+  preview: (data) => api.post('/instagram-hub/preview/', data),
+  status: () => api.get('/instagram-hub/status/'),
+  getConfig: () => api.get('/instagram-hub/config/'),
+  patchConfig: (data) => api.patch('/instagram-hub/config/', data),
 }
 
 export const settingsApi = {
@@ -146,6 +178,23 @@ export const templateApi = {
   get: (id) => api.get(`/templates/${id}/`),
   update: (id, data) => api.put(`/templates/${id}/`, data),
   delete: (id) => api.delete(`/templates/${id}/`),
+}
+
+export const templateEditorApi = {
+  list: () => api.get('/template-editor/templates/'),
+  get: (id) => api.get(`/template-editor/templates/${id}/`),
+  create: (data) => api.post('/template-editor/templates/', data),
+  update: (id, data) => api.put(`/template-editor/templates/${id}/`, data),
+  updateConfig: (id, config) =>
+    api.put(`/template-editor/templates/${id}/config/`, { config }),
+  preview: (id, config = null, themeName = null) => {
+    const payload = config != null ? { config, theme_name: themeName } : {}
+    return api.post(`/template-editor/templates/${id}/preview/`, payload, {
+      responseType: 'blob',
+    })
+  },
+  variables: () => api.get('/template-editor/variables/'),
+  fonts: () => api.get('/template-editor/fonts/'),
 }
 
 export default api

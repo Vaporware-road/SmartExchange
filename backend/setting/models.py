@@ -110,6 +110,13 @@ class SiteSettings(models.Model):
             "A scheduler must read this flag and trigger publishing."
         ),
     )
+    use_template_editor_for_boards = models.BooleanField(
+        default=False,
+        help_text=(
+            "If enabled, category/tether/special price boards use template_editor Template "
+            "and render_price_template instead of legacy renderers."
+        ),
+    )
 
     class Meta:
         verbose_name = "Site Settings"

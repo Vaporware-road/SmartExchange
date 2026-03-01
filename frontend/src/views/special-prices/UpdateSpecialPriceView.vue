@@ -1,8 +1,8 @@
 <template>
   <div>
     <nav class="mb-6">
-      <router-link to="/special-prices" class="text-[var(--text-secondary)] hover:text-gold transition-colors">
-        <i class="fas me-2" :class="$i18n.locale === 'fa' ? 'fa-arrow-right' : 'fa-arrow-left'"></i>{{ $t('specialPrices.backToList') }}
+      <router-link to="/update" class="text-[var(--text-secondary)] hover:text-gold transition-colors">
+        <i class="fas me-2" :class="$i18n.locale === 'fa' ? 'fa-arrow-right' : 'fa-arrow-left'"></i>{{ $t('priceHub.backToHub') }}
       </router-link>
     </nav>
     <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('specialPrices.updateTitle') }}</h1>
@@ -23,7 +23,7 @@
       </div>
       <div class="flex gap-4">
         <button type="submit" class="btn-luxury" :disabled="submitting">{{ $t('common.save') }}</button>
-        <router-link to="/special-prices" class="btn-luxury-outline">{{ $t('common.cancel') }}</router-link>
+        <router-link to="/update" class="btn-luxury-outline">{{ $t('common.cancel') }}</router-link>
       </div>
     </form>
   </div>
@@ -60,7 +60,7 @@ async function handleSubmit() {
   submitting.value = true
   try {
     await specialPriceApi.updatePrice(id.value, { price: price.value, notes: notes.value })
-    router.push('/special-prices')
+    router.push('/update')
   } finally {
     submitting.value = false
   }

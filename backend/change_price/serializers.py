@@ -23,6 +23,17 @@ class BulkPriceUpdateSerializer(serializers.Serializer):
     )
     notes = serializers.CharField(required=False, allow_blank=True, default="")
 
+    def validate(self, attrs):
+        from category.models import validate_category_buy_sell_spread
+        from django.core.exceptions import ValidationError as DjangoValidationError
+        category = self.context.get("category")
+        if category and attrs.get("prices"):
+            try:
+                validate_category_buy_sell_spread(category, attrs["prices"])
+            except DjangoValidationError as e:
+                raise serializers.ValidationError(e.messages[0] if e.messages else str(e))
+        return attrs
+
 
 class PriceTypeWithLatestPriceSerializer(serializers.Serializer):
     id = serializers.IntegerField()
