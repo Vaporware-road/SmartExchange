@@ -1,5 +1,5 @@
 """
-Custom views for the SarafiPardis project.
+Custom views for the SmartExchangePanel project.
 """
 from pathlib import Path
 

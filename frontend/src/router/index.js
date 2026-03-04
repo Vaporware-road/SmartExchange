@@ -209,6 +209,18 @@ const routes = [
         meta: { titleKey: 'routes.telegramSend' },
       },
       {
+        path: 'telegram/bots/new',
+        name: 'telegram-bot-new',
+        component: () => import('@/views/telegram/BotFormView.vue'),
+        meta: { titleKey: 'telegram.botSetup.newBotTitle' },
+      },
+      {
+        path: 'telegram/bots/:id/edit',
+        name: 'telegram-bot-edit',
+        component: () => import('@/views/telegram/BotFormView.vue'),
+        meta: { titleKey: 'telegram.botSetup.editBot' },
+      },
+      {
         path: 'telegram/settings',
         name: 'telegram-settings',
         component: () => import('@/views/telegram/TelegramSettingsView.vue'),

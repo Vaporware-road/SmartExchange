@@ -27,7 +27,7 @@ def instagram_connect(request):
     """Start OAuth: save state, redirect to Meta."""
     config = _get_config_for_oauth()
     if not config:
-        return redirect(_frontend_settings_instagram("error=App+ID+or+App+Secret+not+configured"))
+        return redirect(_frontend_instagram_hub("error=App+ID+or+App+Secret+not+configured"))
 
     app_id = (config.app_id or "").strip()
     redirect_uri = request.build_absolute_uri(reverse("instagram_hub:callback"))
@@ -42,34 +42,32 @@ def instagram_connect(request):
 @login_required
 @require_GET
 def instagram_callback(request):
-    """OAuth callback: validate state, exchange code, save token, redirect to settings."""
+    """OAuth callback: validate state, exchange code, save token, redirect to Instagram Hub."""
     error = request.GET.get("error")
     if error:
         desc = request.GET.get("error_description") or request.GET.get("error_reason") or error
-        return redirect(_frontend_settings_instagram("instagram_callback=error&msg=" + quote(desc)))
+        return redirect(_frontend_instagram_hub("instagram_callback=error&msg=" + quote(desc)))
 
     code = (request.GET.get("code") or "").strip()
     state = (request.GET.get("state") or "").strip()
     if not code:
-        return redirect(_frontend_settings_instagram("instagram_callback=error&msg=No+authorization+code"))
+        return redirect(_frontend_instagram_hub("instagram_callback=error&msg=No+authorization+code"))
 
     config = _get_config_for_oauth()
     if not config or (config.oauth_state or "").strip() != state:
         if config:
             config.oauth_state = ""
             config.save(update_fields=["oauth_state", "updated_at"])
-        return redirect(_frontend_settings_instagram("instagram_callback=error&msg=State+mismatch"))
+        return redirect(_frontend_instagram_hub("instagram_callback=error&msg=State+mismatch"))
 
     redirect_uri = request.build_absolute_uri(reverse("instagram_hub:callback"))
     result = instagram_oauth.perform_full_oauth_exchange(code, redirect_uri, config)
 
     if result.get("success"):
-        return redirect(_frontend_settings_instagram("instagram_callback=success"))
-    return redirect(_frontend_settings_instagram("instagram_callback=error&msg=" + quote(result.get("error", "Unknown"))))
+        return redirect(_frontend_instagram_hub("instagram_callback=success"))
+    return redirect(_frontend_instagram_hub("instagram_callback=error&msg=" + quote(result.get("error", "Unknown"))))
 
 
-def _frontend_settings_instagram(query: str) -> str:
-    """Redirect to frontend /settings with instagram callback result in query."""
-    from django.http import HttpResponseRedirect
-    # SPA is served at /; /settings is a client route. Use query for result.
-    return f"/settings?{query}"
+def _frontend_instagram_hub(query: str) -> str:
+    """Redirect to frontend /instagram with instagram callback result in query."""
+    return f"/instagram?{query}"

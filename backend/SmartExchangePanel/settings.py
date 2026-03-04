@@ -103,10 +103,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Custom 404 middleware to show custom 404 page even when DEBUG=True
-    'SarafiPardis.middleware.Custom404Middleware',
+    'SmartExchangePanel.middleware.Custom404Middleware',
 ]
 
-ROOT_URLCONF = 'SarafiPardis.urls'
+ROOT_URLCONF = 'SmartExchangePanel.urls'
 
 TEMPLATES = [
     {
@@ -126,7 +126,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'SarafiPardis.wsgi.application'
+WSGI_APPLICATION = 'SmartExchangePanel.wsgi.application'
 
 # Database
 DATABASES = {

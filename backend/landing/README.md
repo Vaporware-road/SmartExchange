@@ -191,7 +191,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 The URLs are already configured. Verify in your main `urls.py`:
 
 ```python
-# SarafiPardis/urls.py (or your main urls.py)
+# SmartExchangePanel/urls.py (or your main urls.py)
 from django.urls import path, include
 
 urlpatterns = [

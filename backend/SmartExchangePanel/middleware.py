@@ -1,5 +1,5 @@
 """
-Custom middleware for SarafiPardis project.
+Custom middleware for SmartExchangePanel project.
 """
 from django.shortcuts import render
 from django.http import Http404

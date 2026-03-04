@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from accounts.permissions import IsSuperAdminOrManagement
+from accounts.permissions import IsSuperAdminOrManagementOrEmployee
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.decorators import action
 
@@ -29,7 +29,7 @@ from .serializers import (
 class TelegramChannelListAPIView(APIView):
     """GET /api/telegram/channels/ - list active channels with their bots."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
     def get(self, request):
         channels = (
@@ -47,7 +47,7 @@ class TelegramChannelListAPIView(APIView):
 class SendMessageAPIView(APIView):
     """POST /api/telegram/send-message/ - send a message to a channel."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
     def _build_message_from_payload(self, data):
         """Build message text from banner_key and price fields when provided."""
@@ -127,7 +127,7 @@ class SendMessageAPIView(APIView):
 class DefaultMessageSettingsListAPIView(APIView):
     """GET /api/telegram/default-settings/ - list default settings (optionally by bot)."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
     def get(self, request):
         bot_id = request.query_params.get("bot")
@@ -141,7 +141,7 @@ class DefaultMessageSettingsListAPIView(APIView):
 class DefaultMessageSettingsDetailAPIView(APIView):
     """GET/PUT /api/telegram/default-settings/<id>/ - get or update a default setting."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
     def get_object(self, pk):
         from django.shortcuts import get_object_or_404
@@ -179,7 +179,7 @@ class DefaultMessageSettingsDetailAPIView(APIView):
 class DefaultMessageSettingsCreateAPIView(APIView):
     """POST /api/telegram/default-settings/ - create default settings for a bot."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
     def post(self, request):
         data = dict(request.data)
@@ -207,7 +207,7 @@ class TelegramBotViewSet(ModelViewSet):
     """
 
     queryset = TelegramBot.objects.all().order_by("-created_at")
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update"):
@@ -279,7 +279,7 @@ class TelegramChannelViewSet(ModelViewSet):
         "-created_at"
     )
     serializer_class = TelegramChannelSerializer
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
 
 class AutoPostConfigViewSet(ModelViewSet):
@@ -294,7 +294,7 @@ class AutoPostConfigViewSet(ModelViewSet):
         "channel", "category", "special_price_type"
     ).all()
     serializer_class = AutoPostConfigSerializer
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
 
 class AutomationSettingsSerializer(drf_serializers.Serializer):
@@ -310,7 +310,7 @@ class AutomationSettingsAPIView(APIView):
     is handled elsewhere.
     """
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
     def get(self, request):
         settings = SiteSettings.load()

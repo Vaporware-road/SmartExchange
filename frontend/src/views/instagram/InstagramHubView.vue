@@ -40,7 +40,15 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
 import { instagramHubApi } from '@/services/api'
+
+const { t } = useI18n()
+const route = useRoute()
+const router = useRouter()
+const toast = useToast()
 
 const config = ref({
   has_token: false,
@@ -61,7 +69,21 @@ async function loadConfig() {
   }
 }
 
+function handleOAuthCallback() {
+  const instagramCallback = route.query.instagram_callback
+  const msg = route.query.msg || route.query.error
+  if (instagramCallback === 'success') {
+    toast.success(t('settings.instagram.connectSuccess'))
+  } else if (instagramCallback === 'error') {
+    toast.error(msg || t('settings.instagram.connectError'))
+  }
+  if (instagramCallback) {
+    router.replace({ name: 'instagram', query: {} })
+  }
+}
+
 onMounted(() => {
+  handleOAuthCallback()
   loadConfig()
 })
 </script>

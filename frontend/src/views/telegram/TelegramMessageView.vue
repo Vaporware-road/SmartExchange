@@ -174,120 +174,145 @@
         <!-- Tab 2: Bot Setup -->
         <div
           v-else-if="activeTab === 'bot'"
-          class="card-luxury px-4 py-3 space-y-4 animate-fade-in-up"
+          class="space-y-6 animate-fade-in-up"
         >
-          <h2 class="text-lg font-semibold text-gold">
-            {{ $t('telegram.tabs.botSetup') }}
-          </h2>
-          <p class="text-sm text-gray-400">
-            {{ $t('telegram.botSetup.description') }}
-          </p>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-400 mb-2">
-              {{ $t('telegram.botSetup.selectBot') }}
-            </label>
-            <select v-model="selectedBotId" class="input-luxury" @change="onBotSelect">
-              <option value="">{{ $t('telegram.botSetup.newBot') }}</option>
-              <option
-                v-for="b in botsList"
-                :key="b.id"
-                :value="b.id"
-              >
-                {{ b.name || b.display_name || `Bot #${b.id}` }}
-              </option>
-            </select>
+          <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h2 class="text-lg font-semibold text-gold">
+                {{ $t('telegram.tabs.botSetup') }}
+              </h2>
+              <p class="text-sm text-[var(--text-secondary)] mt-1">
+                {{ $t('telegram.botSetup.description') }}
+              </p>
+            </div>
+            <button
+              type="button"
+              class="btn-luxury inline-flex items-center gap-2"
+              @click="$router.push({ name: 'telegram-bot-new' })"
+            >
+              <i class="fas fa-plus" />
+              {{ $t('telegram.botSetup.addNewBot') }}
+            </button>
           </div>
 
-          <form v-if="selectedBotId !== undefined" @submit.prevent="saveBot" class="space-y-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-2">
-                {{ $t('telegram.botSetup.name') }}
-              </label>
-              <input
-                v-model="botForm.name"
-                type="text"
-                class="input-luxury"
-                :placeholder="$t('telegram.botSetup.namePlaceholder')"
-                required
-              />
+          <!-- Bot list: empty state -->
+          <div
+            v-if="!botsList.length"
+            class="card-luxury px-6 py-12 flex flex-col items-center justify-center text-center"
+          >
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-[var(--glass-bg)] border border-[var(--glass-border)]">
+              <i class="fas fa-robot text-2xl text-gold opacity-80" />
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-2">
-                {{ $t('telegram.botSetup.token') }}
-              </label>
-              <div class="flex gap-2">
-                <input
-                  v-model="botForm.token"
-                  :type="botTokenRevealed ? 'text' : 'password'"
-                  class="input-luxury flex-1"
-                  :placeholder="selectedBotId ? $t('telegram.botSetup.tokenPlaceholderChange') : $t('telegram.botSetup.tokenPlaceholder')"
-                  :required="!selectedBotId"
-                  autocomplete="off"
-                />
+            <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-2">
+              {{ $t('telegram.botSetup.noBots') }}
+            </h3>
+            <p class="text-sm text-[var(--text-secondary)] mb-6 max-w-sm">
+              {{ $t('telegram.botSetup.noBotsDesc') }}
+            </p>
+            <button type="button" class="btn-luxury" @click="$router.push({ name: 'telegram-bot-new' })">
+              <i class="fas fa-plus" />
+              {{ $t('telegram.botSetup.addNewBot') }}
+            </button>
+          </div>
+
+          <!-- Bot list: card grid -->
+          <div
+            v-else
+            class="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            <div
+              v-for="b in botsList"
+              :key="b.id"
+              class="card-luxury px-4 py-4 relative min-w-0 hover-lift transition-all"
+            >
+              <div class="absolute top-3 right-3 flex gap-2 rtl:flex-row-reverse">
                 <button
                   type="button"
-                  class="btn-luxury-outline shrink-0 px-3"
-                  :title="botTokenRevealed ? $t('telegram.botSetup.hide') : $t('telegram.botSetup.reveal')"
-                  @click="botTokenRevealed = !botTokenRevealed"
+                  class="btn-luxury-outline p-2 rounded-lg text-sm"
+                  :title="$t('common.edit')"
+                  @click="$router.push({ name: 'telegram-bot-edit', params: { id: b.id } })"
                 >
-                  <i :class="botTokenRevealed ? 'fas fa-eye-slash' : 'fas fa-eye'" />
+                  <i class="fas fa-pencil-alt" />
+                </button>
+                <button
+                  type="button"
+                  class="p-2 rounded-lg text-sm text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/30 transition-colors"
+                  :title="$t('common.delete')"
+                  @click="openDeleteBotConfirm(b)"
+                >
+                  <i class="fas fa-trash" />
                 </button>
               </div>
+              <div class="pr-24 rtl:pr-4 rtl:pl-24">
+                <h3 class="text-[var(--text-primary)] font-semibold truncate">
+                  {{ b.name || `Bot #${b.id}` }}
+                </h3>
+                <p
+                  v-if="b.display_name"
+                  class="text-sm text-[var(--text-secondary)] truncate mt-0.5"
+                >
+                  {{ b.display_name }}
+                </p>
+                <p
+                  v-if="b.notes"
+                  class="text-sm text-[var(--text-secondary)] mt-2 line-clamp-2"
+                >
+                  {{ b.notes }}
+                </p>
+                <p class="text-xs text-[var(--text-secondary)] mt-2">
+                  {{ formatBotCreatedAt(b.created_at) }}
+                </p>
+                <span
+                  class="inline-block mt-2 text-xs px-2 py-1 rounded-full"
+                  :class="b.is_active ? 'bg-emerald-500/10 text-emerald-400' : 'bg-red-500/10 text-red-400'"
+                >
+                  {{ b.is_active ? $t('telegram.channels.active') : $t('telegram.channels.inactive') }}
+                </span>
+              </div>
             </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-2">
-                {{ $t('telegram.botSetup.displayName') }}
-              </label>
-              <input
-                v-model="botForm.display_name"
-                type="text"
-                class="input-luxury"
-                :placeholder="$t('telegram.botSetup.displayNamePlaceholder')"
-              />
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-2">
-                {{ $t('telegram.botSetup.notes') }}
-              </label>
-              <textarea
-                v-model="botForm.notes"
-                class="input-luxury"
-                rows="2"
-                :placeholder="$t('telegram.botSetup.notesPlaceholder')"
-              />
-            </div>
-            <div class="flex flex-wrap gap-4">
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input v-model="botForm.is_active" type="checkbox" class="rounded border-gray-500" />
-                <span class="text-sm text-gray-400">{{ $t('telegram.botSetup.isActive') }}</span>
-              </label>
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input v-model="botForm.restrict_to_known_channels" type="checkbox" class="rounded border-gray-500" />
-                <span class="text-sm text-gray-400">{{ $t('telegram.botSetup.restrictChannels') }}</span>
-              </label>
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input v-model="botForm.log_all_messages" type="checkbox" class="rounded border-gray-500" />
-                <span class="text-sm text-gray-400">{{ $t('telegram.botSetup.logMessages') }}</span>
-              </label>
-            </div>
-            <div class="flex flex-wrap gap-3">
-              <button type="submit" class="btn-luxury" :disabled="botSaving">
-                <LoadingSpinner v-if="botSaving" class="w-5 h-5" />
-                <span v-else>{{ selectedBotId ? $t('common.save') : $t('common.create') }}</span>
-              </button>
-              <button
-                v-if="selectedBotId"
-                type="button"
-                class="btn-luxury-outline"
-                :disabled="botTesting"
-                @click="testBotConnection"
+          </div>
+
+          <!-- Delete Bot Confirmation Modal -->
+          <Teleport to="body">
+            <Transition name="modal-fade">
+              <div
+                v-if="botDeleteConfirm"
+                class="fixed inset-0 z-50 flex items-center justify-center"
               >
-                <LoadingSpinner v-if="botTesting" class="w-5 h-5" />
-                <span v-else>{{ $t('telegram.botSetup.testConnection') }}</span>
-              </button>
-            </div>
-          </form>
+                <div
+                  class="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                  @click="botDeleteConfirm = null"
+                />
+                <div
+                  class="relative z-10 w-full max-w-md mx-4 rounded-2xl p-6 shadow-2xl"
+                  style="background: var(--bg-card, #1e2535);"
+                  role="dialog"
+                  aria-modal="true"
+                >
+                  <h3 class="text-lg font-semibold text-[var(--text-primary)] mb-2">
+                    {{ $t('common.delete') }}
+                  </h3>
+                  <p class="text-sm text-[var(--text-secondary)] mb-6">
+                    {{ $t('telegram.botSetup.deleteBotConfirm', { name: botDeleteConfirm?.name || `Bot #${botDeleteConfirm?.id}` }) }}
+                  </p>
+                  <div class="flex gap-3 justify-end">
+                    <button type="button" class="btn-luxury-outline" :disabled="botDeleting" @click="botDeleteConfirm = null">
+                      {{ $t('common.cancel') }}
+                    </button>
+                    <button
+                      type="button"
+                      class="px-4 py-2 rounded-lg font-medium bg-red-500/20 text-red-400 border border-red-500/30 hover:bg-red-500/30 transition-colors disabled:opacity-50"
+                      :disabled="botDeleting"
+                      @click="confirmDeleteBot"
+                    >
+                      <LoadingSpinner v-if="botDeleting" class="w-5 h-5 inline" />
+                      <span v-else>{{ $t('common.delete') }}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Transition>
+          </Teleport>
         </div>
 
         <!-- Tab 3: Channels -->
@@ -601,7 +626,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { telegramApi, categoryApi, specialPriceApi } from '@/services/api'
@@ -618,6 +644,11 @@ const tabs = [
 ]
 
 const activeTab = ref('messenger')
+const route = useRoute()
+
+watch(() => route.query.tab, (tab) => {
+  if (tab === 'botSetup') activeTab.value = 'bot'
+}, { immediate: true })
 
 const channels = ref([])
 const channelId = ref('')
@@ -625,19 +656,8 @@ const message = ref('')
 const submitting = ref(false)
 
 const botsList = ref([])
-const selectedBotId = ref('')
-const botForm = ref({
-  name: '',
-  token: '',
-  display_name: '',
-  notes: '',
-  is_active: true,
-  restrict_to_known_channels: false,
-  log_all_messages: false,
-})
-const botTokenRevealed = ref(false)
-const botSaving = ref(false)
-const botTesting = ref(false)
+const botDeleteConfirm = ref(null)
+const botDeleting = ref(false)
 
 const manageChannelsList = ref([])
 const manageChannelsLoading = ref(false)
@@ -945,88 +965,38 @@ async function loadBots() {
   }
 }
 
-function onBotSelect() {
-  const id = selectedBotId.value
-  if (!id) {
-    botForm.value = {
-      name: '',
-      token: '',
-      display_name: '',
-      notes: '',
-      is_active: true,
-      restrict_to_known_channels: false,
-      log_all_messages: false,
-    }
-    return
-  }
-  const bot = botsList.value.find((b) => String(b.id) === String(id))
-  if (bot) {
-    botForm.value = {
-      name: bot.name || '',
-      token: '',
-      display_name: bot.display_name || '',
-      notes: bot.notes || '',
-      is_active: !!bot.is_active,
-      restrict_to_known_channels: !!bot.restrict_to_known_channels,
-      log_all_messages: !!bot.log_all_messages,
-    }
+function formatBotCreatedAt(dateStr) {
+  if (!dateStr) return '—'
+  try {
+    const d = new Date(dateStr)
+    if (Number.isNaN(d.getTime())) return '—'
+    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+  } catch {
+    return '—'
   }
 }
 
-async function saveBot() {
-  botSaving.value = true
+function openDeleteBotConfirm(bot) {
+  botDeleteConfirm.value = { id: bot.id, name: bot.name || bot.display_name || `Bot #${bot.id}` }
+}
+
+async function confirmDeleteBot() {
+  if (!botDeleteConfirm.value) return
+  await deleteBot(botDeleteConfirm.value.id)
+  botDeleteConfirm.value = null
+}
+
+async function deleteBot(id) {
+  botDeleting.value = true
   try {
-    const payload = {
-      name: botForm.value.name.trim(),
-      display_name: (botForm.value.display_name || '').trim(),
-      notes: (botForm.value.notes || '').trim(),
-      is_active: botForm.value.is_active,
-      restrict_to_known_channels: botForm.value.restrict_to_known_channels,
-      log_all_messages: botForm.value.log_all_messages,
-    }
-    if (selectedBotId.value) {
-      if (botForm.value.token && botForm.value.token.trim()) {
-        payload.token = botForm.value.token.trim()
-      }
-      await telegramApi.bots.update(selectedBotId.value, payload)
-      toast.success(t('toast.saveSuccess'))
-    } else {
-      const token = (botForm.value.token || '').trim()
-      if (!token) {
-        toast.error(t('telegram.botSetup.tokenRequired'))
-        return
-      }
-      payload.token = token
-      await telegramApi.bots.create(payload)
-      toast.success(t('toast.saveSuccess'))
-      await loadBots()
-      const created = botsList.value.find((b) => b.name === payload.name)
-      if (created) selectedBotId.value = String(created.id)
-      onBotSelect()
-    }
+    await telegramApi.bots.delete(id)
+    toast.success(t('toast.deleteSuccess'))
+    await loadBots()
   } catch (err) {
-    const msg = err.response?.data?.detail || err.response?.data?.token?.[0] || t('toast.serverError')
+    const msg = err.response?.data?.detail || t('toast.serverError')
     toast.error(typeof msg === 'string' ? msg : t('toast.serverError'))
   } finally {
-    botSaving.value = false
-  }
-}
-
-async function testBotConnection() {
-  if (!selectedBotId.value) return
-  botTesting.value = true
-  try {
-    const { data } = await telegramApi.bots.testConnection(selectedBotId.value, {})
-    if (data?.success) {
-      toast.success(t('telegram.botSetup.testSuccess'))
-    } else {
-      toast.error(data?.detail || t('telegram.botSetup.testFailed'))
-    }
-  } catch (err) {
-    const msg = err.response?.data?.detail || t('telegram.botSetup.testFailed')
-    toast.error(typeof msg === 'string' ? msg : t('telegram.botSetup.testFailed'))
-  } finally {
-    botTesting.value = false
+    botDeleting.value = false
   }
 }
 
@@ -1061,3 +1031,14 @@ async function handleSend() {
   }
 }
 </script>
+
+<style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+</style>
