@@ -9,8 +9,9 @@
         {{ $t('priceHub.backToHub') }}
       </router-link>
     </nav>
-    <h1 class="text-2xl font-bold text-gold mb-2">
-      {{ category?.name ?? $t('routes.category') }}
+    <h1 class="text-2xl font-bold text-gold mb-2 inline-flex items-center gap-2">
+      <CategoryIcon :category-name="category?.name" size-class="h-5 w-5" />
+      <span>{{ category?.name ?? $t('routes.category') }}</span>
     </h1>
     <p class="text-[var(--text-secondary)] mb-6">{{ $t('routes.bulkUpdate') }}</p>
 
@@ -19,36 +20,6 @@
     </div>
 
     <template v-else-if="priceTypes.length">
-      <!-- Bulk actions card -->
-      <div
-        class="rounded-2xl border-2 p-5 mb-6 flex flex-wrap items-center gap-4 border-[var(--border-color)] bg-[var(--bg-card)] price-card-primary"
-      >
-        <span class="text-base font-bold text-[var(--text-primary)]">{{ $t('bulkUpdate.amountPlaceholder') }}</span>
-        <input
-          v-model.number="bulkAmount"
-          type="number"
-          step="1"
-          class="input-luxury w-28 text-lg py-2.5"
-          placeholder="0"
-        />
-        <button
-          type="button"
-          class="btn-luxury-outline py-2.5 px-5 font-medium"
-          :disabled="bulkAmount === '' || bulkAmount == null || Number.isNaN(Number(bulkAmount))"
-          @click="applyBulkDelta(Number(bulkAmount))"
-        >
-          <i class="fas fa-plus me-1" /> {{ $t('bulkUpdate.addToAll') }}
-        </button>
-        <button
-          type="button"
-          class="btn-luxury-outline py-2.5 px-5 font-medium"
-          :disabled="bulkAmount === '' || bulkAmount == null || Number.isNaN(Number(bulkAmount))"
-          @click="applyBulkDelta(-Number(bulkAmount))"
-        >
-          <i class="fas fa-minus me-1" /> {{ $t('bulkUpdate.subtractFromAll') }}
-        </button>
-      </div>
-
       <!-- Two columns: Buy | Sell as large cards -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Buy column card -->
@@ -76,7 +47,7 @@
                 :value="formatThousands(prices[pt.id])"
                 type="text"
                 inputmode="decimal"
-                class="input-luxury w-44 text-xl py-3.5 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                class="w-44 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)] px-3 py-2.5 text-xl text-[var(--text-primary)] outline-none transition focus:border-emerald-500/60 focus:bg-[var(--bg-card)] focus:ring-2 focus:ring-emerald-500/20"
                 :placeholder="pt.latest_price != null ? formatThousands(Number(pt.latest_price)) : ''"
                 @input="onPriceInput(pt.id, ($event.target).value)"
                 @focus="($event.target).select()"
@@ -117,7 +88,7 @@
                 :value="formatThousands(prices[pt.id])"
                 type="text"
                 inputmode="decimal"
-                class="input-luxury w-44 text-xl py-3.5 focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20"
+                class="w-44 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)] px-3 py-2.5 text-xl text-[var(--text-primary)] outline-none transition focus:border-rose-500/60 focus:bg-[var(--bg-card)] focus:ring-2 focus:ring-rose-500/20"
                 :placeholder="pt.latest_price != null ? formatThousands(Number(pt.latest_price)) : ''"
                 @input="onPriceInput(pt.id, ($event.target).value)"
                 @focus="($event.target).select()"
@@ -174,7 +145,7 @@
         >
           <LoadingSpinner v-if="submitting" class="w-5 h-5" />
           <i v-else class="fas fa-save" />
-          {{ $t('bulkUpdate.saveChanges') }}
+          {{ saveButtonLabel }}
         </button>
       </div>
     </Transition>
@@ -184,14 +155,17 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
-import { priceApi, categoryApi } from '@/services/api'
+import { priceApi, categoryApi, getApiErrorDetails } from '@/services/api'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import CategoryIcon from '@/components/ui/CategoryIcon.vue'
 
 const route = useRoute()
+const router = useRouter()
 const { t } = useI18n()
 const toast = useToast()
 const siteSettings = useSiteSettingsStore()
@@ -205,7 +179,6 @@ const prices = ref({})
 const notes = ref('')
 const submitting = ref(false)
 const lastSyncedAt = ref(null)
-const bulkAmount = ref('')
 let previousTitle = ''
 
 const priceTypesByBuy = computed(() =>
@@ -221,11 +194,22 @@ const hasDirty = computed(() => {
   const initial = JSON.stringify(initialPrices.value)
   return current !== initial
 })
+const dirtyCount = computed(() => {
+  let count = 0
+  for (const [key, value] of Object.entries(prices.value)) {
+    const initial = initialPrices.value[key]
+    if (value === '' && initial === '') continue
+    if (Number(value) !== Number(initial)) count += 1
+  }
+  return count
+})
+const saveButtonLabel = computed(() => {
+  const base = t('bulkUpdate.saveChanges')
+  return dirtyCount.value > 0 ? `${base} (${dirtyCount.value})` : base
+})
 
 const hasPayload = computed(() => {
-  return Object.values(prices.value).some(
-    (v) => v !== '' && v != null && !Number.isNaN(Number(v))
-  )
+  return Object.keys(buildEffectivePricePayload()).length > 0
 })
 
 function formatThousands(val) {
@@ -249,6 +233,33 @@ function onPriceInput(id, value) {
   prices.value[id] = parsed
 }
 
+function getLatestPriceNumber(pt) {
+  if (pt?.latest_price != null && pt.latest_price !== '') {
+    const n = Number(pt.latest_price)
+    return Number.isNaN(n) ? null : n
+  }
+  if (pt?.latest_price && typeof pt.latest_price === 'object' && pt.latest_price.price != null) {
+    const n = Number(pt.latest_price.price)
+    return Number.isNaN(n) ? null : n
+  }
+  return null
+}
+
+function buildEffectivePricePayload() {
+  const payload = {}
+  for (const pt of priceTypes.value) {
+    const key = String(pt.id)
+    const entered = prices.value[pt.id]
+    if (entered !== '' && entered != null && !Number.isNaN(Number(entered))) {
+      payload[key] = Number(entered)
+      continue
+    }
+    const fallback = getLatestPriceNumber(pt)
+    if (fallback != null) payload[key] = fallback
+  }
+  return payload
+}
+
 function formatDateTime(val) {
   if (!val) return '—'
   const d = new Date(val)
@@ -257,19 +268,6 @@ function formatDateTime(val) {
     dateStyle: 'short',
     timeStyle: 'short',
   }).format(d)
-}
-
-function applyBulkDelta(delta) {
-  const n = Number(delta)
-  if (Number.isNaN(n)) return
-  const next = { ...prices.value }
-  for (const pt of priceTypes.value) {
-    const current = next[pt.id]
-    const num = current === '' || current == null ? 0 : Number(current)
-    const nextVal = Math.max(0, num + n)
-    next[pt.id] = nextVal === 0 ? '' : nextVal
-  }
-  prices.value = next
 }
 
 function setPageTitle() {
@@ -309,8 +307,9 @@ onMounted(async () => {
     prices.value = next
     initialPrices.value = JSON.parse(JSON.stringify(next))
     setPageTitle()
-  } catch {
+  } catch (error) {
     priceTypes.value = []
+    toast.error(getApiErrorDetails(error).message)
   } finally {
     loading.value = false
   }
@@ -326,12 +325,7 @@ watch(
 )
 
 async function handleSubmit() {
-  const pricePayload = {}
-  Object.entries(prices.value).forEach(([k, v]) => {
-    if (v !== '' && v != null && !Number.isNaN(Number(v))) {
-      pricePayload[k] = Number(v)
-    }
-  })
+  const pricePayload = buildEffectivePricePayload()
   if (!Object.keys(pricePayload).length) return
 
   submitting.value = true
@@ -343,8 +337,9 @@ async function handleSubmit() {
     lastSyncedAt.value = new Date()
     initialPrices.value = JSON.parse(JSON.stringify(prices.value))
     toast.success(t('toast.pricesUpdatedBroadcast'))
-  } catch {
-    toast.error(t('toast.serverError'))
+    await router.push('/update')
+  } catch (error) {
+    toast.error(getApiErrorDetails(error).message || t('toast.serverError'))
   } finally {
     submitting.value = false
   }

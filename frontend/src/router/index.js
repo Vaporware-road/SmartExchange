@@ -157,6 +157,12 @@ const routes = [
         meta: { titleKey: 'routes.priceTypeNew' },
       },
       {
+        path: 'categories/:id/price-types/:priceTypeId/edit',
+        name: 'price-type-edit',
+        component: () => import('@/views/categories/PriceTypeFormView.vue'),
+        meta: { titleKey: 'routes.priceTypeNew' },
+      },
+      {
         path: 'categories/:id/template',
         name: 'category-template',
         component: () => import('@/views/categories/CategoryTemplateRedirectView.vue'),
@@ -245,10 +251,16 @@ const routes = [
         meta: { titleKey: 'routes.templateNew' },
       },
       {
+        path: 'templates/media',
+        name: 'template-media-library',
+        component: () => import('@/views/templates/TemplateMediaLibraryView.vue'),
+        meta: { titleKey: 'routes.templateMediaLibrary' },
+      },
+      {
         path: 'templates/:id/editor',
         name: 'template-editor',
-        component: () => import('@/views/templates/TemplateEditorView.vue'),
-        meta: { titleKey: 'routes.templateEditor' },
+        component: () => import('@/pages/templates/TemplateEditor.vue'),
+        meta: { titleKey: 'routes.templateEditor', templateEditorLayout: true },
       },
     ],
   },

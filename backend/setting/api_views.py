@@ -1,12 +1,21 @@
 """
 DRF API views for settings: site settings, bots, channels, logs.
 """
+import logging
+import os
+import shutil
+from pathlib import Path
+
+from django.db.utils import OperationalError, ProgrammingError
+from django.conf import settings
+from django.core.cache import cache
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import ScopedRateThrottle
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 from accounts.permissions import IsSuperAdmin, IsSuperAdminOrManagement
 from telegram_app.models import TelegramBot, TelegramChannel
@@ -17,24 +26,87 @@ from .serializers import (
     TelegramBotSerializer,
     TelegramChannelSerializer,
     LogSerializer,
+    UploadPolicySerializer,
 )
+
+logger = logging.getLogger(__name__)
+
+DEFAULT_UPLOAD_STORAGE_LIMIT_GB = 10
+
+
+def _upload_settings_fallback():
+    limit_gb = int(os.environ.get("UPLOAD_STORAGE_LIMIT_GB", DEFAULT_UPLOAD_STORAGE_LIMIT_GB))
+    total_bytes = max(limit_gb, 1) * (1024 ** 3)
+    return {
+        "max_file_size_mb": 5,
+        "allowed_formats": ["PNG", "JPG"],
+        "storage": {
+            "used_bytes": 0,
+            "total_bytes": total_bytes,
+            "used_percent": 0,
+            "used_human": _human_gb(0),
+            "total_human": f"{limit_gb} GB",
+        },
+    }
+
+
+def _public_site_settings_fallback():
+    """Shape must match SiteSettingsSerializer (used when DB schema is behind migrations)."""
+    return {
+        "site_name": "SmartExchange",
+        "tagline": "Premium Exchange Panel",
+        "logo": None,
+        "favicon": None,
+        "support_phone": "",
+        "support_phone_2": "",
+        "support_phone_3": "",
+        "base_currency_code": "USD",
+        "support_email": "",
+        "address": "",
+        "office_map_url": "",
+        "business_hours": "دوشنبه تا شنبه: 9:30 صبح تا ۱۷\nیکشنبه ها: تعطیل",
+        "telegram_link": "",
+        "instagram_link": "",
+        "twitter_link": "",
+        "linkedin_link": "",
+        "auto_post_on_update": False,
+        "use_template_editor_for_boards": False,
+    }
 
 
 class SiteSettingsAPIView(APIView):
-    """GET/PUT /api/settings/site/ - singleton site settings."""
+    """GET: public branding (login/landing). PUT: super admin only."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    permission_classes = [AllowAny]
     throttle_scope = "settings"
     throttle_classes = [ScopedRateThrottle]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_permissions(self):
+        if self.request.method == 'GET':
+            return [AllowAny()]
+        return [IsAuthenticated(), IsSuperAdmin()]
 
     def get(self, request):
-        settings_obj = SiteSettings.load()
-        serializer = SiteSettingsSerializer(settings_obj)
-        return Response(serializer.data)
+        try:
+            settings_obj = SiteSettings.load()
+            serializer = SiteSettingsSerializer(settings_obj, context={"request": request})
+            return Response(serializer.data)
+        except (OperationalError, ProgrammingError) as exc:
+            logger.warning(
+                "SiteSettings GET: database schema error (run migrations). Returning fallback. %s",
+                exc,
+            )
+            return Response(_public_site_settings_fallback())
 
     def put(self, request):
         settings_obj = SiteSettings.load()
-        serializer = SiteSettingsSerializer(settings_obj, data=request.data, partial=True)
+        serializer = SiteSettingsSerializer(
+            settings_obj,
+            data=request.data,
+            partial=True,
+            context={"request": request},
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -92,3 +164,129 @@ class LogListAPIView(APIView):
 
         serializer = LogSerializer(qs, many=True)
         return Response(serializer.data)
+
+
+def _safe_iter_files(base_path: Path):
+    if not base_path.exists() or not base_path.is_dir():
+        return
+    for p in base_path.rglob("*"):
+        if p.is_file():
+            yield p
+
+
+def _dir_size_bytes(base_path: Path) -> int:
+    total = 0
+    for fp in _safe_iter_files(base_path):
+        try:
+            total += fp.stat().st_size
+        except OSError:
+            continue
+    return total
+
+
+def _candidate_temp_dirs() -> list[Path]:
+    media_root = Path(settings.MEDIA_ROOT)
+    base_dir = Path(settings.BASE_DIR)
+    return [
+        media_root / "template_editor" / "uploads",
+        media_root / "tmp",
+        media_root / "temp",
+        base_dir / "data" / "tmp",
+        base_dir / "data" / "temp",
+    ]
+
+
+def _human_gb(bytes_value: int) -> str:
+    gb = bytes_value / (1024 ** 3)
+    return f"{gb:.2f} GB"
+
+
+class UploadSettingsAPIView(APIView):
+    """
+    GET: upload policy + temp/cache storage usage.
+    PUT: update upload policy (super admin).
+    """
+
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    throttle_scope = "settings"
+    throttle_classes = [ScopedRateThrottle]
+
+    def get(self, request):
+        try:
+            settings_obj = SiteSettings.load()
+            used_bytes = sum(_dir_size_bytes(p) for p in _candidate_temp_dirs())
+            limit_gb = int(os.environ.get("UPLOAD_STORAGE_LIMIT_GB", DEFAULT_UPLOAD_STORAGE_LIMIT_GB))
+            total_bytes = max(limit_gb, 1) * (1024 ** 3)
+            used_percent = min(100, round((used_bytes / total_bytes) * 100, 2)) if total_bytes > 0 else 0
+            return Response({
+                "max_file_size_mb": settings_obj.upload_max_file_size_mb or 5,
+                "allowed_formats": settings_obj.upload_allowed_formats or ["PNG", "JPG"],
+                "storage": {
+                    "used_bytes": used_bytes,
+                    "total_bytes": total_bytes,
+                    "used_percent": used_percent,
+                    "used_human": _human_gb(used_bytes),
+                    "total_human": f"{limit_gb} GB",
+                },
+            })
+        except (OperationalError, ProgrammingError) as exc:
+            logger.warning(
+                "UploadSettings GET: database schema error (run migrations). Returning fallback. %s",
+                exc,
+            )
+            return Response(_upload_settings_fallback())
+
+    def put(self, request):
+        serializer = UploadPolicySerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        try:
+            settings_obj = SiteSettings.load()
+            settings_obj.upload_max_file_size_mb = serializer.validated_data["max_file_size_mb"]
+            settings_obj.upload_allowed_formats = serializer.validated_data["allowed_formats"]
+            settings_obj.save(update_fields=["upload_max_file_size_mb", "upload_allowed_formats"])
+            return self.get(request)
+        except (OperationalError, ProgrammingError) as exc:
+            logger.warning(
+                "UploadSettings PUT: database schema error (run migrations). %s",
+                exc,
+            )
+            fallback = _upload_settings_fallback()
+            fallback["message"] = "Upload settings are temporarily read-only until migrations are applied."
+            return Response(fallback, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+
+class UploadClearTempAPIView(APIView):
+    """POST: clear temporary upload files + Django cache."""
+
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    throttle_scope = "settings"
+    throttle_classes = [ScopedRateThrottle]
+
+    def post(self, request):
+        deleted_files = 0
+        freed_bytes = 0
+        for temp_dir in _candidate_temp_dirs():
+            if not temp_dir.exists() or not temp_dir.is_dir():
+                continue
+            for fp in _safe_iter_files(temp_dir):
+                try:
+                    size = fp.stat().st_size
+                    fp.unlink(missing_ok=True)
+                    deleted_files += 1
+                    freed_bytes += size
+                except OSError:
+                    continue
+            for subdir in sorted(temp_dir.rglob("*"), reverse=True):
+                if subdir.is_dir():
+                    try:
+                        subdir.rmdir()
+                    except OSError:
+                        continue
+        cache.clear()
+        logger.info("Upload cleanup executed by user=%s deleted_files=%s freed_bytes=%s",
+                    getattr(request.user, "username", None), deleted_files, freed_bytes)
+        return Response({
+            "deleted_files": deleted_files,
+            "freed_bytes": freed_bytes,
+            "freed_human": _human_gb(freed_bytes),
+        }, status=status.HTTP_200_OK)

@@ -88,13 +88,16 @@ export const useAuthStore = defineStore('auth', {
     },
 
     async logout() {
+      const refresh = localStorage.getItem('refresh_token')
+      // Clear session state immediately so UI can transition to unauthenticated mode
+      // and avoid firing protected requests during the logout window.
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      this.user = null
       try {
-        const refresh = localStorage.getItem('refresh_token')
         await authApi.logout(refresh)
-      } finally {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        this.user = null
+      } catch {
+        // Ignore network/logout endpoint failures; client session is already cleared.
       }
     },
 

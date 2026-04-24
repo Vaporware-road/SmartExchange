@@ -99,6 +99,7 @@ class SiteSettings(models.Model):
     )
     support_phone_2 = models.CharField(max_length=30, blank=True)
     support_phone_3 = models.CharField(max_length=30, blank=True)
+    base_currency_code = models.CharField(max_length=10, default="USD")
     telegram_link = models.URLField(blank=True)
     instagram_link = models.URLField(blank=True)
     twitter_link = models.URLField(blank=True)
@@ -116,6 +117,15 @@ class SiteSettings(models.Model):
             "If enabled, category/tether/special price boards use template_editor Template "
             "and render_price_template instead of legacy renderers."
         ),
+    )
+    upload_max_file_size_mb = models.PositiveIntegerField(
+        default=5,
+        help_text="Maximum upload size in MB for managed uploads.",
+    )
+    upload_allowed_formats = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Allowed upload formats list, e.g. ['PNG', 'JPG', 'SVG'].",
     )
 
     class Meta:

@@ -1,7 +1,7 @@
 <template>
   <nav
-    class="fixed bottom-0 start-0 end-0 z-30 flex items-center justify-around py-2 border-t md:hidden"
-    style="background: var(--bg-navbar); border-color: var(--border-card); padding-bottom: max(0.5rem, env(safe-area-inset-bottom));"
+    class="fixed bottom-0 start-0 end-0 z-30 flex items-center justify-around border-t border-slate-200 bg-white py-2 shadow-sm md:hidden dark:border-[var(--border-card)] dark:bg-[var(--bg-navbar)] dark:shadow-none"
+    style="padding-bottom: max(0.5rem, env(safe-area-inset-bottom));"
   >
     <router-link
       v-for="item in items"

@@ -19,7 +19,7 @@ from django.db import transaction
 from category.models import Category, Currency, PriceType
 from change_price.models import PriceHistory
 from finalize.models import Finalization, FinalizedPriceHistory
-from special_price.models import SpecialPriceHistory, SpecialPriceType
+from special_price.models import SpecialPriceHistory, SpecialPricePair, SpecialPriceType
 
 
 # Slug used to mark categories created by this command (for --clear)
@@ -232,8 +232,14 @@ def create_special_prices(currencies):
             },
         )
         if created or not spt.special_price_histories.exists():
+            pair, _ = SpecialPricePair.objects.get_or_create(
+                special_price_type=spt,
+                source_currency=cfg["source"],
+                target_currency=cfg["target"],
+            )
             SpecialPriceHistory.objects.create(
                 special_price_type=spt,
+                pair=pair,
                 price=cfg["price"],
                 notes="Seed demo special price",
             )

@@ -2,6 +2,31 @@ import { defineStore } from 'pinia'
 import { settingsApi } from '@/services/api'
 import i18n from '@/i18n'
 
+function normalizeAssetUrl(value) {
+  if (!value || typeof value !== 'string') return value
+  const trimmed = value.trim()
+  if (!trimmed) return trimmed
+  if (typeof window === 'undefined') return trimmed
+
+  // Already relative to current origin.
+  if (trimmed.startsWith('/media/') || trimmed.startsWith('/static/')) return trimmed
+
+  try {
+    const parsed = new URL(trimmed, window.location.origin)
+    const isAssetPath = parsed.pathname.startsWith('/media/') || parsed.pathname.startsWith('/static/')
+    if (!isAssetPath) return trimmed
+
+    // If backend returns a non-browser-reachable host (e.g. 127.0.0.1:8000 or docker internal host),
+    // keep only path so browser uses current origin/proxy.
+    if (parsed.origin !== window.location.origin) {
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`
+    }
+  } catch {
+    return trimmed
+  }
+  return trimmed
+}
+
 export const useSiteSettingsStore = defineStore('siteSettings', {
   state: () => ({
     settings: {
@@ -12,6 +37,7 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
       support_phone: '',
       support_phone_2: '',
       support_phone_3: '',
+      base_currency_code: 'USD',
       support_email: '',
       address: '',
       office_map_url: '',
@@ -30,12 +56,23 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
   },
 
   actions: {
+    applySettings(data = {}) {
+      const normalized = { ...data }
+      if (Object.hasOwn(normalized, 'logo')) {
+        normalized.logo = normalizeAssetUrl(normalized.logo)
+      }
+      if (Object.hasOwn(normalized, 'favicon')) {
+        normalized.favicon = normalizeAssetUrl(normalized.favicon)
+      }
+      this.settings = { ...this.settings, ...normalized }
+      this._applyDynamicAssets(this.settings)
+    },
+
     async fetch() {
       this.loading = true
       try {
         const { data } = await settingsApi.site()
-        this.settings = data
-        this._applyDynamicAssets(data)
+        this.applySettings(data)
         return data
       } catch {
         return this.settings

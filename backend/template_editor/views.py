@@ -135,6 +135,48 @@ class PreviewView(LoginRequiredMixin, View):
             config = config_data if isinstance(config_data, dict) else (template.config or {})
             themes = config.get('themes')
 
+            config_json = getattr(template, 'config_json', None) or {}
+            if request.method == 'POST':
+                if hasattr(request, 'data') and request.data:
+                    cj_override = request.data.get('config_json')
+                    if isinstance(cj_override, dict):
+                        config_json = cj_override
+            widgets_list = config_json.get('widgets') if isinstance(config_json, dict) else None
+            if (
+                isinstance(widgets_list, list)
+                and len(widgets_list) > 0
+                and not themes
+            ):
+                from .render_config_json import render_template_from_config_json
+
+                sample_data = {}
+                for w in widgets_list:
+                    if not isinstance(w, dict):
+                        continue
+                    st = w.get('style') if isinstance(w.get('style'), dict) else {}
+                    for key in (
+                        w.get('bindingKey'),
+                        w.get('binding_key'),
+                        st.get('bindingKey'),
+                        st.get('binding_key'),
+                    ):
+                        if key and str(key).strip() and str(key) not in sample_data:
+                            from .variables import get_default_sample_value
+
+                            sample_data[str(key).strip()] = get_default_sample_value(
+                                str(key).strip()
+                            )
+                img = render_template_from_config_json(
+                    template, sample_data, config_json_override=config_json
+                )
+                buffer = BytesIO()
+                img_rgb = img.convert('RGB')
+                img_rgb.save(buffer, format='PNG')
+                buffer.seek(0)
+                img.close()
+                img_rgb.close()
+                return HttpResponse(buffer.getvalue(), content_type='image/png')
+
             # New schema: themes with layers — use render_price_template
             if themes:
                 theme_name = None

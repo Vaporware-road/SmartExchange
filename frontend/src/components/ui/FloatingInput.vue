@@ -32,7 +32,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, getCurrentInstance } from 'vue'
+
+let floatingInputCounter = 0
 
 const props = defineProps({
   modelValue: { type: [String, Number], default: '' },
@@ -44,6 +46,7 @@ const props = defineProps({
   multiline: Boolean,
   rows: { type: Number, default: 3 },
   rules: { type: Array, default: () => [] },
+  id: { type: String, default: '' },
 })
 
 const emit = defineEmits(['update:modelValue', 'validate'])
@@ -52,8 +55,9 @@ const inputRef = ref(null)
 const focused = ref(false)
 const touched = ref(false)
 
-let idCounter = 0
-const inputId = `floating-${++idCounter}-${Date.now()}`
+const instance = getCurrentInstance()
+const localId = `floating-${instance?.uid ?? 'x'}-${++floatingInputCounter}`
+const inputId = computed(() => props.id || localId)
 
 const hasValue = computed(() => props.modelValue !== '' && props.modelValue != null)
 const showValid = computed(() => touched.value && hasValue.value && !props.error)

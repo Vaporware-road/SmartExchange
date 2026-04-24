@@ -1,10 +1,22 @@
 <template>
   <div>
-    <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold text-gold">{{ $t('routes.templatesDashboard') }}</h1>
-      <router-link to="/templates/new" class="btn-luxury">
-        <i class="fas fa-plus"></i> Add Template
-      </router-link>
+    <div class="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <h1 class="min-w-0 text-2xl font-bold text-gold">{{ $t('routes.templates') }}</h1>
+      <div class="flex w-full shrink-0 flex-col gap-2 sm:flex-row sm:justify-end md:w-auto">
+        <router-link
+          to="/templates/media"
+          class="btn-luxury-outline inline-flex w-full items-center justify-center gap-2 sm:w-auto"
+        >
+          <i class="fas fa-images"></i>
+          {{ $t('routes.templateMediaLibrary') }}
+        </router-link>
+        <router-link
+          to="/templates/new"
+          class="btn-luxury inline-flex w-full items-center justify-center gap-2 sm:w-auto"
+        >
+          <i class="fas fa-plus"></i> Add Template
+        </router-link>
+      </div>
     </div>
 
     <!-- Loading: vertical card skeletons -->
@@ -110,6 +122,13 @@ const templates = ref([])
 
 /** Extract up to 5 variable_key values from config (themes or legacy fields) for preview. */
 function getPreviewVariableKeys(template) {
+  const cj = template?.config_json
+  if (cj && typeof cj === 'object' && Array.isArray(cj.widgets) && cj.widgets.length) {
+    return cj.widgets
+      .slice(0, 5)
+      .map((w) => w?.name || w?.type)
+      .filter(Boolean)
+  }
   const config = template?.config
   if (!config) return ['$PRICE']
   const themes = config.themes

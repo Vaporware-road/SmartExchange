@@ -87,54 +87,9 @@
           </div>
 
           <div class="space-y-3">
-            <label class="flex items-center justify-between gap-4 cursor-pointer">
-              <span class="text-sm text-[var(--text-primary)]">{{ $t('telegram.botSetup.isActive') }}</span>
-              <button
-                type="button"
-                role="switch"
-                :aria-checked="form.is_active"
-                class="relative w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-gold/50"
-                :class="form.is_active ? 'bg-emerald-500/80' : 'bg-white/10'"
-                @click="form.is_active = !form.is_active"
-              >
-                <span
-                  class="absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform rtl:left-auto rtl:right-1"
-                  :class="form.is_active ? 'translate-x-5 rtl:translate-x-0' : 'translate-x-0 rtl:translate-x-5'"
-                />
-              </button>
-            </label>
-            <label class="flex items-center justify-between gap-4 cursor-pointer">
-              <span class="text-sm text-[var(--text-primary)]">{{ $t('telegram.botSetup.restrictChannels') }}</span>
-              <button
-                type="button"
-                role="switch"
-                :aria-checked="form.restrict_to_known_channels"
-                class="relative w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-gold/50"
-                :class="form.restrict_to_known_channels ? 'bg-emerald-500/80' : 'bg-white/10'"
-                @click="form.restrict_to_known_channels = !form.restrict_to_known_channels"
-              >
-                <span
-                  class="absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform rtl:left-auto rtl:right-1"
-                  :class="form.restrict_to_known_channels ? 'translate-x-5 rtl:translate-x-0' : 'translate-x-0 rtl:translate-x-5'"
-                />
-              </button>
-            </label>
-            <label class="flex items-center justify-between gap-4 cursor-pointer">
-              <span class="text-sm text-[var(--text-primary)]">{{ $t('telegram.botSetup.logMessages') }}</span>
-              <button
-                type="button"
-                role="switch"
-                :aria-checked="form.log_all_messages"
-                class="relative w-11 h-6 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-gold/50"
-                :class="form.log_all_messages ? 'bg-emerald-500/80' : 'bg-white/10'"
-                @click="form.log_all_messages = !form.log_all_messages"
-              >
-                <span
-                  class="absolute top-1 left-1 w-4 h-4 rounded-full bg-white shadow transition-transform rtl:left-auto rtl:right-1"
-                  :class="form.log_all_messages ? 'translate-x-5 rtl:translate-x-0' : 'translate-x-0 rtl:translate-x-5'"
-                />
-              </button>
-            </label>
+            <BaseSwitch v-model="form.is_active" :label="$t('telegram.botSetup.isActive')" />
+            <BaseSwitch v-model="form.restrict_to_known_channels" :label="$t('telegram.botSetup.restrictChannels')" />
+            <BaseSwitch v-model="form.log_all_messages" :label="$t('telegram.botSetup.logMessages')" />
           </div>
 
           <div class="flex flex-wrap gap-3 pt-4 border-t border-[var(--glass-border)]">
@@ -169,6 +124,7 @@ import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { telegramApi } from '@/services/api'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import BaseSwitch from '@/components/ui/BaseSwitch.vue'
 
 const { t } = useI18n()
 const toast = useToast()

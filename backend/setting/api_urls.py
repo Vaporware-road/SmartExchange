@@ -10,5 +10,7 @@ router.register(r"channels", api_views.TelegramChannelViewSet, basename="api-set
 urlpatterns = [
     path("site/", api_views.SiteSettingsAPIView.as_view(), name="api-settings-site"),
     path("logs/", api_views.LogListAPIView.as_view(), name="api-settings-logs"),
+    path("uploads/", api_views.UploadSettingsAPIView.as_view(), name="api-settings-uploads"),
+    path("uploads/clear-temp/", api_views.UploadClearTempAPIView.as_view(), name="api-settings-uploads-clear-temp"),
     path("", include(router.urls)),
 ]

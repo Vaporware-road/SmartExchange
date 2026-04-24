@@ -12,6 +12,8 @@ from django.utils import timezone
 
 from setting.models import SiteSettings
 
+from core.utils import format_price_display
+
 
 def _normalize(s: str) -> str:
     return (s or "").strip().replace(" ", "").replace("-", "").replace("_", "").replace("‌", "").lower()
@@ -66,10 +68,7 @@ PERSIAN_DIGITS = str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹")
 
 
 def _format_price(price) -> str:
-    try:
-        return f"{float(price):,.2f}"
-    except (TypeError, ValueError):
-        return str(price)
+    return format_price_display(price)
 
 
 def _match_category_key(price_type) -> Optional[str]:
@@ -92,16 +91,21 @@ def _match_tether_key(price_type) -> Optional[str]:
 
 def _dates_from_timestamp(timestamp) -> Dict[str, str]:
     now = timezone.localtime(timestamp) if timestamp else timezone.localtime()
-    try:
-        jalali = jdatetime.datetime.fromgregorian(datetime=now)
-    except TypeError:
-        jd = jdatetime.date.fromgregorian(date=now.date())
-        jalali = type('Jalali', (), {'day': jd.day, 'month': jd.month, 'year': jd.year})()
-    farsi_date = f"{jalali.day} {_farsi_month(jalali.month)} {jalali.year}"
+    jd = jdatetime.date.fromgregorian(date=now.date())
+    farsi_date = f"{jd.day} {_farsi_month(jd.month)} {jd.year}"
     farsi_date = farsi_date.translate(PERSIAN_DIGITS)
+    # Jalali compact formats (Persian digits)
+    date_fa_slash = f"{jd.year}/{jd.month:02d}/{jd.day:02d}".translate(PERSIAN_DIGITS)
+    date_fa_slash_short = f"{jd.year}/{jd.month}/{jd.day}".translate(PERSIAN_DIGITS)
+    date_fa_iso = f"{jd.year:04d}-{jd.month:02d}-{jd.day:02d}".translate(PERSIAN_DIGITS)
     farsi_weekday = FARSI_WEEKDAYS.get(now.strftime("%A"), "")
     english_date = now.strftime("%B %d, %Y")
     english_weekday = now.strftime("%A")
+    date_en_iso = now.strftime("%Y-%m-%d")
+    date_en_dmy = now.strftime("%d/%m/%Y")
+    date_en_mdy = now.strftime("%m/%d/%Y")
+    date_en_short = now.strftime("%d %b %Y")
+    date_en_weekday_long = now.strftime("%A, %B %d, %Y")
     tether_date = now.strftime("%d %b").lower()
     tether_year = now.strftime("%Y")
     time_str = now.strftime("%H:%M")
@@ -109,9 +113,19 @@ def _dates_from_timestamp(timestamp) -> Dict[str, str]:
         "date_fa": farsi_date,
         "date_en": english_date,
         "farsi_date": farsi_date,
+        "date_fa_slash": date_fa_slash,
+        "date_fa_slash_short": date_fa_slash_short,
+        "date_fa_iso": date_fa_iso,
         "farsi_weekday": farsi_weekday,
+        "weekday_fa": farsi_weekday,
         "english_date": english_date,
         "english_weekday": english_weekday,
+        "weekday_en": english_weekday,
+        "date_en_iso": date_en_iso,
+        "date_en_dmy": date_en_dmy,
+        "date_en_mdy": date_en_mdy,
+        "date_en_short": date_en_short,
+        "date_en_weekday_long": date_en_weekday_long,
         "tether_date": tether_date,
         "tether_year": tether_year,
         "time": time_str,
@@ -136,6 +150,34 @@ def _branding_from_site() -> Dict[str, str]:
     }
 
 
+def _slug_binding_key(price_type) -> Optional[str]:
+    slug = getattr(price_type, "slug", None) or ""
+    slug = str(slug).strip()
+    if not slug:
+        return None
+    return f"price__{slug}"
+
+
+def _trade_binding_key(price_type) -> Optional[str]:
+    trade_type = str(getattr(price_type, "trade_type", "") or "").strip().lower()
+    if trade_type not in ("buy", "sell"):
+        return None
+    slug = str(getattr(price_type, "slug", "") or "").strip()
+    if slug:
+        return f"price_{trade_type}__{slug}"
+    return None
+
+
+def _register_caption_price_tokens(price_type, formatted: str, data: dict) -> None:
+    """Bare slug/name keys for captions like {خرید-یورو} (UI inserts slug, not price__slug)."""
+    slug = str(getattr(price_type, "slug", "") or "").strip()
+    name = str(getattr(price_type, "name", "") or "").strip()
+    if slug:
+        data[slug] = formatted
+    if name:
+        data[name] = formatted
+
+
 def build_dynamic_data_for_category_board(
     category,
     price_items: Iterable[Tuple[Any, Any]],
@@ -148,10 +190,18 @@ def build_dynamic_data_for_category_board(
     data["pair_name"] = (category.name or "") if category else ""
 
     for price_type, price_history in price_items:
+        price = getattr(price_history, "price", None) or getattr(price_history, "value", None)
+        formatted = _format_price(price)
+        bk = _slug_binding_key(price_type)
+        if bk:
+            data[bk] = formatted
+        tb = _trade_binding_key(price_type)
+        if tb:
+            data[tb] = formatted
         key = _match_category_key(price_type)
         if key:
-            price = getattr(price_history, "price", None) or getattr(price_history, "value", None)
-            data[key] = _format_price(price)
+            data[key] = formatted
+        _register_caption_price_tokens(price_type, formatted, data)
     return data
 
 
@@ -167,10 +217,18 @@ def build_dynamic_data_for_tether_board(
     data["pair_name"] = (category.name or "") if category else ""
 
     for price_type, price_history in price_items:
+        price = getattr(price_history, "price", None) or getattr(price_history, "value", None)
+        formatted = _format_price(price)
+        bk = _slug_binding_key(price_type)
+        if bk:
+            data[bk] = formatted
+        tb = _trade_binding_key(price_type)
+        if tb:
+            data[tb] = formatted
         key = _match_tether_key(price_type)
         if key:
-            price = getattr(price_history, "price", None) or getattr(price_history, "value", None)
-            data[key] = _format_price(price)
+            data[key] = formatted
+        _register_caption_price_tokens(price_type, formatted, data)
     return data
 
 
@@ -186,6 +244,14 @@ def build_dynamic_data_for_special_offer(
     data["pair_name"] = getattr(special_price_type, "name", "") or ""
     price = getattr(price_history, "price", None) or getattr(price_history, "value", None)
     data["price"] = _format_price(price)
+    sp_slug = getattr(special_price_type, "slug", None) or ""
+    sp_slug = str(sp_slug).strip()
+    if sp_slug:
+        data[f"price__{sp_slug}"] = data["price"]
+        data[sp_slug] = data["price"]
+    sp_name = str(getattr(special_price_type, "name", "") or "").strip()
+    if sp_name:
+        data[sp_name] = data["price"]
     # Map special GBP-style keys if name matches
     name_norm = _normalize(getattr(special_price_type, "name", "") or "")
     if "خرید" in name_norm or "buy" in name_norm:

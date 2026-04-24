@@ -1,15 +1,16 @@
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 py-12 relative" style="background: var(--bg-base);">
-    <div class="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
+    <div class="absolute top-4 right-4 flex items-center gap-2">
+      <LanguageSwitcher />
+      <ThemeToggle />
+    </div>
     <div class="w-full max-w-md">
       <div class="card-luxury text-center mb-6">
-        <div class="p-4 rounded-xl mx-auto w-fit mb-4 bg-primary-muted">
-          <i class="fas fa-coins text-4xl text-gold"></i>
+        <div class="mx-auto w-fit mb-4">
+          <AppBrandLogo size="xl" rounded="xl" />
         </div>
         <h1 class="text-2xl font-bold text-gold mb-1">{{ siteName }}</h1>
-        <p class="text-gray-400 text-sm">Sign in to the panel</p>
+        <p class="text-gray-400 text-sm">{{ $t('auth.loginTitle') }}</p>
       </div>
 
       <div class="card-luxury">
@@ -19,24 +20,24 @@
           </AlertMessage>
 
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-2">Username</label>
+            <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('auth.username') }}</label>
             <input
               v-model="username"
               type="text"
               class="input-luxury"
-              placeholder="Enter username"
+              :placeholder="$t('auth.username')"
               required
               autofocus
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-2">Password</label>
+            <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('auth.password') }}</label>
             <input
               v-model="password"
               type="password"
               class="input-luxury"
-              placeholder="Enter password"
+              :placeholder="$t('auth.password')"
               required
             />
           </div>
@@ -48,7 +49,7 @@
           >
             <LoadingSpinner v-if="loading" class="w-5 h-5" />
             <i v-else class="fas fa-sign-in-alt"></i>
-            <span>{{ loading ? 'Signing in...' : 'Sign In' }}</span>
+            <span>{{ loading ? $t('auth.loggingIn') : $t('auth.loginButton') }}</span>
           </button>
         </form>
       </div>
@@ -61,9 +62,12 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
+import { getApiErrorDetails } from '@/services/api'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import ThemeToggle from '@/components/ui/ThemeToggle.vue'
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue'
 import AlertMessage from '@/components/ui/AlertMessage.vue'
+import AppBrandLogo from '@/components/layout/AppBrandLogo.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -87,7 +91,7 @@ async function handleSubmit() {
     const redirect = route.query.redirect || '/'
     router.push(redirect)
   } catch (err) {
-    error.value = err.response?.data?.detail || err.response?.data?.non_field_errors?.[0] || 'Invalid credentials'
+    error.value = getApiErrorDetails(err).message
   } finally {
     loading.value = false
   }

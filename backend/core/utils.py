@@ -67,3 +67,31 @@ def validate_uploaded_image(file_obj, max_size=MAX_IMAGE_SIZE, allowed_extension
             raise ValueError(
                 "File extension not allowed. Allowed: %s" % ", ".join(sorted(allowed_extensions))
             )
+
+
+def format_price_display(price) -> str:
+    """
+    Format a numeric price with thousands separators.
+    Omit fractional part when the value is a whole number (no trailing .00).
+    """
+    from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
+
+    if price is None:
+        return ""
+    try:
+        d = Decimal(str(price)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    except (InvalidOperation, TypeError, ValueError):
+        return str(price)
+    if d == d.to_integral_value():
+        return f"{int(d):,}"
+    text = format(d, "f").rstrip("0").rstrip(".")
+    if "." in text:
+        whole, frac = text.split(".", 1)
+        try:
+            return f"{int(whole):,}.{frac}"
+        except ValueError:
+            return text
+    try:
+        return f"{int(d):,}"
+    except ValueError:
+        return str(d)

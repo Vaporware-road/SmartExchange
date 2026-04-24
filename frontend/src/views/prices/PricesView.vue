@@ -33,7 +33,14 @@
             class="border-b border-[var(--border-card)] hover:bg-[var(--bg-hover)] transition-colors"
           >
             <td class="py-4 px-4">{{ pt.name }}</td>
-            <td class="py-4 px-4 text-gray-400">{{ pt.category_name }}</td>
+            <td class="py-4 px-4 text-gray-400">
+              <span class="inline-flex items-center gap-2">
+                <span class="inline-flex h-6 w-6 items-center justify-center rounded-md bg-primary-muted">
+                  <CategoryIcon :category-name="pt.category_name" size-class="h-3.5 w-3.5" />
+                </span>
+                <span>{{ pt.category_name }}</span>
+              </span>
+            </td>
             <td class="py-4 px-4">{{ pt.source_currency }} / {{ pt.target_currency }}</td>
             <td class="py-4 px-4 text-gold font-semibold">{{ pt.latest_price != null ? Number(pt.latest_price).toFixed(2) : '-' }}</td>
             <td class="py-4 px-4">
@@ -74,6 +81,7 @@
 import { ref, onMounted } from 'vue'
 import { priceApi, categoryApi } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
+import CategoryIcon from '@/components/ui/CategoryIcon.vue'
 
 const loading = ref(true)
 const prices = ref([])

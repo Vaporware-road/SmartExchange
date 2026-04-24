@@ -7,6 +7,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, Li
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
+from core.exceptions import error_response
 from .models import CustomUser, UserActivityLog
 from .serializers import (
     LoginSerializer,
@@ -70,7 +71,13 @@ class LogoutAPIView(APIView):
 
 
 class MeAPIView(APIView):
+    """Return current user JSON, or JSON null when anonymous (no 403 noise on login page)."""
+
+    permission_classes = [AllowAny]
+
     def get(self, request):
+        if not request.user.is_authenticated:
+            return Response(None)
         return Response(UserSerializer(request.user).data)
 
 
@@ -105,7 +112,11 @@ class ForceLogoutAPIView(APIView):
         try:
             user = CustomUser.objects.get(pk=pk)
         except CustomUser.DoesNotExist:
-            return Response({'detail': 'User not found.'}, status=status.HTTP_404_NOT_FOUND)
+            return error_response(
+                "User not found.",
+                code="user_not_found",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
         user.token_version += 1
         user.save(update_fields=['token_version'])
         return Response({'detail': 'All sessions invalidated for this user.'}, status=status.HTTP_200_OK)

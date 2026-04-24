@@ -4,8 +4,14 @@
     :class="[
       paddingClasses[padding],
       variantClasses[variant],
-      { 'hover:shadow-glow hover:border-[var(--border-card-hover)]': hover && variant === 'default' },
-      { 'hover:scale-[1.01] hover:shadow-lg': hover && variant === 'elevated' },
+      {
+        'hover:shadow-md hover:border-slate-200 dark:hover:shadow-glow dark:hover:border-[var(--border-card-hover)]':
+          hover && variant === 'default',
+      },
+      {
+        'hover:scale-[1.01] hover:shadow-xl hover:border-slate-200 dark:hover:shadow-lg dark:hover:border-[var(--border-card-hover)]':
+          hover && variant === 'elevated',
+      },
     ]"
   >
     <slot />
@@ -38,8 +44,10 @@ const paddingClasses = {
 }
 
 const variantClasses = {
-  default: 'bg-[var(--bg-card)] border border-[var(--border-card)] shadow-soft',
+  default:
+    'bg-white border border-slate-100 shadow-sm dark:bg-[var(--bg-card)] dark:border-[var(--border-card)] dark:shadow-soft',
   glass: 'glass',
-  elevated: 'bg-[var(--bg-elevated)] border border-[var(--border-card)] shadow-card',
+  elevated:
+    'bg-white border border-slate-100 shadow-md dark:bg-[var(--bg-elevated)] dark:border-[var(--border-card)] dark:shadow-card',
 }
 </script>

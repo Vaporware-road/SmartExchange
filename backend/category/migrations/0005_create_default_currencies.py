@@ -13,27 +13,28 @@ def create_default_currencies(apps, schema_editor):
     # List of commonly used currencies in the website
     default_currencies = [
         {'code': 'USD', 'name': 'US Dollar', 'symbol': '$'},
-        {'code': 'EUR', 'name': 'Euro', 'symbol': '€'},
-        {'code': 'GBP', 'name': 'British Pound', 'symbol': '£'},
-        {'code': 'IRR', 'name': 'Iranian Rial', 'symbol': '﷼'},
-        {'code': 'IRT', 'name': 'Iranian Toman', 'symbol': 'تومان'},
         {'code': 'USDT', 'name': 'Tether', 'symbol': 'USDT'},
-        {'code': 'AED', 'name': 'UAE Dirham', 'symbol': 'د.إ'},
-        {'code': 'TRY', 'name': 'Turkish Lira', 'symbol': '₺'},
-        {'code': 'CAD', 'name': 'Canadian Dollar', 'symbol': 'C$'},
-        {'code': 'AUD', 'name': 'Australian Dollar', 'symbol': 'A$'},
-        {'code': 'JPY', 'name': 'Japanese Yen', 'symbol': '¥'},
+        {'code': 'EUR', 'name': 'Euro', 'symbol': 'EUR'},
+        {'code': 'GBP', 'name': 'British Pound', 'symbol': 'GBP'},
+        {'code': 'AUD', 'name': 'Australian Dollar', 'symbol': 'AUD'},
+        {'code': 'CAD', 'name': 'Canadian Dollar', 'symbol': 'CAD'},
         {'code': 'CHF', 'name': 'Swiss Franc', 'symbol': 'CHF'},
+        {'code': 'CNY', 'name': 'Chinese Yuan', 'symbol': 'CNY'},
+        {'code': 'TRY', 'name': 'Turkish Lira', 'symbol': 'TRY'},
+        {'code': 'IRR', 'name': 'Iranian Rial', 'symbol': 'IRR'},
+        {'code': 'IRT', 'name': 'Iranian Toman', 'symbol': 'IRT'},
+        {'code': 'AED', 'name': 'UAE Dirham', 'symbol': 'AED'},
+        {'code': 'JPY', 'name': 'Japanese Yen', 'symbol': 'JPY'},
+        {'code': 'RUB', 'name': 'Russian Ruble', 'symbol': 'RUB'},
+        {'code': 'IQD', 'name': 'Iraqi Dinar', 'symbol': 'IQD'},
+        {'code': 'XAU', 'name': 'Gold', 'symbol': 'XAU'},
     ]
     
     # Create currencies if they don't exist
     for currency_data in default_currencies:
-        Currency.objects.get_or_create(
+        Currency.objects.update_or_create(
             code=currency_data['code'],
-            defaults={
-                'name': currency_data['name'],
-                'symbol': currency_data['symbol']
-            }
+            defaults={'name': currency_data['name'], 'symbol': currency_data['symbol']}
         )
 
 

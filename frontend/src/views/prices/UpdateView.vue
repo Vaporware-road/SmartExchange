@@ -63,7 +63,7 @@
                   {{ sp.name }}
                 </h3>
                 <p class="text-sm text-[var(--text-secondary)] mt-1">
-                  {{ sp.source_currency?.code ?? sp.source_currency }} / {{ sp.target_currency?.code ?? sp.target_currency }}
+                  {{ renderPairSummary(sp) }}
                 </p>
               </div>
               <div
@@ -99,6 +99,19 @@ import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 const loading = ref(true)
 const categories = ref([])
 const specialPrices = ref([])
+
+function renderPairSummary(sp) {
+  const pairs = Array.isArray(sp?.pairs) ? sp.pairs : []
+  if (!pairs.length) {
+    return `${sp.source_currency?.code ?? sp.source_currency ?? '—'} / ${sp.target_currency?.code ?? sp.target_currency ?? '—'}`
+  }
+  if (pairs.length === 1) {
+    const type = pairs[0].trade_type === 'sell' ? 'Sell' : 'Buy'
+    return `${pairs[0].name ?? ''} - ${pairs[0].source_currency?.code ?? '—'} / ${pairs[0].target_currency?.code ?? '—'} (${type})`
+  }
+  const type = pairs[0].trade_type === 'sell' ? 'Sell' : 'Buy'
+  return `${pairs[0].name ?? ''} - ${pairs[0].source_currency?.code ?? '—'} / ${pairs[0].target_currency?.code ?? '—'} (${type}) +${pairs.length - 1}`
+}
 
 onMounted(async () => {
   try {

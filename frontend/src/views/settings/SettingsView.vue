@@ -54,34 +54,74 @@
                     :placeholder="$t('settings.general.platformName')"
                   />
                 </div>
+                <div>
+                  <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">لوگو / Brand Logo</label>
+                  <div class="rounded-xl border p-3 sm:p-4 flex flex-col gap-3" style="border-color: var(--glass-border); background: var(--bg-input);">
+                    <div class="flex items-center gap-3 sm:gap-4">
+                      <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl border bg-primary-muted flex items-center justify-center overflow-hidden shrink-0" style="border-color: var(--border-color);">
+                        <img
+                          v-if="logoPreviewUrl"
+                          :src="logoPreviewUrl"
+                          alt="Site logo preview"
+                          class="w-full h-full object-contain"
+                        >
+                        <i v-else class="fas fa-coins text-xl sm:text-2xl text-[var(--primary)]" />
+                      </div>
+                      <div class="min-w-0">
+                        <p class="text-sm font-medium text-[var(--text-primary)]">
+                          {{ selectedLogoFile ? selectedLogoFile.name : 'لوگوی فعلی / Current logo' }}
+                        </p>
+                        <p class="text-xs mt-1 text-[var(--text-secondary)]">
+                          فرمت مجاز: PNG, JPG, GIF, WebP (حداکثر 2MB)
+                        </p>
+                      </div>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                      <input
+                        ref="logoInputRef"
+                        type="file"
+                        accept="image/png,image/jpeg,image/gif,image/webp"
+                        class="hidden"
+                        @change="onLogoFileChange"
+                      >
+                      <button
+                        type="button"
+                        class="btn-luxury-outline min-h-[48px]"
+                        :disabled="!canEditSiteSettings"
+                        @click="openLogoPicker"
+                      >
+                        <i class="fas fa-upload" />
+                        آپلود لوگو
+                      </button>
+                      <button
+                        type="button"
+                        class="btn-luxury-outline min-h-[48px] border-red-500/50 text-red-400 hover:bg-red-500/10"
+                        :disabled="!canEditSiteSettings || (!logoPreviewUrl && !selectedLogoFile)"
+                        @click="removeSelectedLogo"
+                      >
+                        <i class="fas fa-trash-alt" />
+                        حذف لوگو
+                      </button>
+                    </div>
+                  </div>
+                </div>
                 <!-- Vertical stack on mobile, row on desktop; touch target 48px for switch -->
                 <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
-                  <label class="text-sm font-medium text-[var(--text-secondary)]">{{ $t('settings.general.maintenanceMode') }}</label>
-                  <button
-                    type="button"
-                    role="switch"
-                    :aria-checked="generalForm.maintenanceMode"
-                    class="relative inline-flex items-center justify-center min-h-[48px] min-w-[48px] sm:min-w-0 h-8 w-14 sm:h-7 sm:w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-[var(--bg-base)]"
-                    :class="generalForm.maintenanceMode ? 'bg-gold' : 'bg-[var(--border-card)]'"
-                    @click="generalForm.maintenanceMode = !generalForm.maintenanceMode"
-                  >
-                    <span
-                      class="pointer-events-none inline-block h-6 w-6 sm:h-5 sm:w-5 transform rounded-full bg-white shadow ring-0 transition duration-200"
-                      :class="generalForm.maintenanceMode ? 'translate-x-6 sm:translate-x-5' : 'translate-x-1'"
-                    />
-                  </button>
+                  <BaseSwitch v-model="generalForm.maintenanceMode" :label="$t('settings.general.maintenanceMode')" size="md" />
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.general.defaultBaseCurrency') }}</label>
-                  <select v-model="generalForm.defaultBaseCurrency" class="input-luxury w-full min-w-0 min-h-[48px]">
-                    <option value="USDT">USDT</option>
-                    <option value="IRR">IRR</option>
-                    <option value="USD">USD</option>
-                    <option value="EUR">EUR</option>
-                  </select>
+                  <BaseCurrencySelect
+                    v-model="generalForm.defaultBaseCurrency"
+                    :options="currenciesStore.canonicalItems"
+                    value-key="code"
+                    :placeholder="$t('settings.general.defaultBaseCurrency')"
+                    :search-placeholder="$t('common.search')"
+                    :empty-text="$t('emptyState.noData')"
+                  />
                 </div>
                 <!-- Desktop: inline submit -->
-                <button type="submit" class="btn-luxury min-h-[48px] hidden md:inline-flex">
+                <button type="submit" class="btn-luxury min-h-[48px] hidden md:inline-flex" :disabled="!canEditSiteSettings">
                   <i class="fas fa-save" />
                   {{ $t('settings.general.saveChanges') }}
                 </button>
@@ -96,25 +136,18 @@
                   <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.uploads.maxFileSize') }}</label>
                   <select v-model="uploadsForm.maxFileSizeMb" class="input-luxury w-full min-w-0 min-h-[48px]">
                     <option :value="1">1 MB</option>
+                    <option :value="2">2 MB</option>
                     <option :value="5">5 MB</option>
                     <option :value="10">10 MB</option>
+                    <option :value="20">20 MB</option>
                   </select>
                 </div>
                 <div>
                   <label class="block text-sm font-medium text-[var(--text-secondary)] mb-3">{{ $t('settings.uploads.allowedFormats') }}</label>
                   <div class="flex flex-wrap gap-3 sm:gap-4">
-                    <label class="flex items-center gap-2 cursor-pointer min-h-[48px] md:min-h-0">
-                      <input v-model="uploadsForm.allowedFormats" type="checkbox" value="PNG" class="rounded border-gold/50 text-gold focus:ring-gold w-5 h-5 md:w-4 md:h-4 shrink-0" />
-                      <span class="text-[var(--text-primary)]">{{ $t('settings.uploads.formatPng') }}</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer min-h-[48px] md:min-h-0">
-                      <input v-model="uploadsForm.allowedFormats" type="checkbox" value="JPG" class="rounded border-gold/50 text-gold focus:ring-gold w-5 h-5 md:w-4 md:h-4 shrink-0" />
-                      <span class="text-[var(--text-primary)]">{{ $t('settings.uploads.formatJpg') }}</span>
-                    </label>
-                    <label class="flex items-center gap-2 cursor-pointer min-h-[48px] md:min-h-0">
-                      <input v-model="uploadsForm.allowedFormats" type="checkbox" value="SVG" class="rounded border-gold/50 text-gold focus:ring-gold w-5 h-5 md:w-4 md:h-4 shrink-0" />
-                      <span class="text-[var(--text-primary)]">{{ $t('settings.uploads.formatSvg') }}</span>
-                    </label>
+                    <BaseCheckbox v-model="uploadsForm.allowedFormats" value="PNG">{{ $t('settings.uploads.formatPng') }}</BaseCheckbox>
+                    <BaseCheckbox v-model="uploadsForm.allowedFormats" value="JPG">{{ $t('settings.uploads.formatJpg') }}</BaseCheckbox>
+                    <BaseCheckbox v-model="uploadsForm.allowedFormats" value="SVG">{{ $t('settings.uploads.formatSvg') }}</BaseCheckbox>
                   </div>
                 </div>
                 <div>
@@ -132,11 +165,21 @@
                 <div class="pt-4 border-t" style="border-color: var(--glass-border);">
                   <button
                     type="button"
+                    class="btn-luxury min-h-[48px] mb-3"
+                    :disabled="!canEditSiteSettings || uploadsSaving"
+                    @click="saveUploadsSettings"
+                  >
+                    <i class="fas fa-save" />
+                    {{ uploadsSaving ? $t('common.loading') : $t('settings.general.saveChanges') }}
+                  </button>
+                  <button
+                    type="button"
                     class="btn-luxury-outline border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500/70 min-h-[48px]"
+                    :disabled="!canEditSiteSettings || clearingCache"
                     @click="showClearCacheModal = true"
                   >
                     <i class="fas fa-trash-alt" />
-                    {{ $t('settings.uploads.clearTempUploads') }}
+                    {{ clearingCache ? $t('common.loading') : $t('settings.uploads.clearTempUploads') }}
                   </button>
                 </div>
               </div>
@@ -219,6 +262,9 @@
                     <i class="fas fa-apple-alt text-gold" />
                     {{ $t('settings.installAppContent.iosInstructions') }}
                   </p>
+                  <ol class="mt-2 list-decimal space-y-1 ps-5 text-xs text-[var(--text-secondary)]">
+                    <li v-for="step in iosInstallSteps" :key="step">{{ step }}</li>
+                  </ol>
                 </div>
                 <!-- Desktop: show install hint for mobile -->
                 <div
@@ -245,6 +291,7 @@
       <button
         type="button"
         class="btn-luxury w-full min-h-[48px] flex items-center justify-center gap-2"
+        :disabled="!canEditSiteSettings"
         @click="saveGeneral"
       >
         <i class="fas fa-save" />
@@ -281,14 +328,21 @@ import { useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useI18n } from 'vue-i18n'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
+import { useCurrenciesStore } from '@/stores/currencies'
+import { useAuthStore } from '@/stores/auth'
 import { settingsApi, instagramHubApi } from '@/services/api'
 import LogsView from './LogsView.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
+import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
+import BaseCurrencySelect from '@/components/ui/BaseCurrencySelect.vue'
+import BaseSwitch from '@/components/ui/BaseSwitch.vue'
 
 const route = useRoute()
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const siteSettings = useSiteSettingsStore()
+const currenciesStore = useCurrenciesStore()
+const auth = useAuthStore()
 
 const tabs = [
   { id: 'general', labelKey: 'settings.tabs.general', icon: 'fas fa-sliders-h' },
@@ -302,6 +356,12 @@ const activeTab = ref('general')
 const showClearCacheModal = ref(false)
 let deferredInstallPrompt = null
 const installing = ref(false)
+const uploadsSaving = ref(false)
+const clearingCache = ref(false)
+const logoInputRef = ref(null)
+const selectedLogoFile = ref(null)
+const logoPreviewUrl = ref('')
+const removeLogo = ref(false)
 
 const isStandalone = computed(() => {
   if (typeof window === 'undefined') return false
@@ -316,25 +376,41 @@ const isIos = computed(() => {
 })
 
 const deferredPrompt = ref(null)
+const canEditSiteSettings = computed(() => auth.isSuperAdmin)
 
 // General form: platform name from store, rest local
 const generalForm = reactive({
   platformName: '',
   maintenanceMode: false,
-  defaultBaseCurrency: 'USDT',
+  defaultBaseCurrency: 'USD',
 })
 
-// Uploads: all local / mock
+// Uploads: managed by backend
 const uploadsForm = reactive({
   maxFileSizeMb: 5,
   allowedFormats: ['PNG', 'JPG'],
 })
-const storageUsedPercent = 45
-const storageTotalGb = '10 GB'
+const storageUsedPercent = ref(0)
+const storageTotalGb = ref('10 GB')
 
 const instagramForm = reactive({ appId: '', appSecret: '' })
 const instagramConfig = ref({ has_app_id: false, has_token: false, token_expires_at: null })
 const instagramConnectUrl = ref('')
+const iosInstallSteps = computed(() =>
+  locale.value === 'fa'
+    ? [
+      'حتماً مرورگر Safari را استفاده کنید (در Chrome آیفون گزینه نصب نمایش داده نمی‌شود).',
+      'روی دکمه Share بزنید و گزینه Add to Home Screen را انتخاب کنید.',
+      'در صفحه بعد روی Add بزنید تا آیکن برنامه به صفحه اصلی اضافه شود.',
+      'بعد از نصب، برنامه را از Home Screen باز کنید تا مثل اپ کامل اجرا شود.',
+    ]
+    : [
+      'Use Safari on iPhone/iPad (install option is not available in Chrome).',
+      'Tap Share, then choose Add to Home Screen.',
+      'Tap Add on the next screen to place the app icon on your home screen.',
+      'Open it from Home Screen for full app-like experience.',
+    ]
+)
 
 function setTab(id) {
   activeTab.value = id
@@ -352,12 +428,105 @@ function initFromHash() {
 }
 
 async function saveGeneral() {
+  if (!canEditSiteSettings.value) {
+    toast.error(t('errors.forbidden'))
+    return
+  }
   try {
-    await settingsApi.updateSite({ site_name: generalForm.platformName })
-    siteSettings.settings = { ...siteSettings.settings, site_name: generalForm.platformName }
+    let payload = null
+    if (selectedLogoFile.value) {
+      const formData = new FormData()
+      formData.append('site_name', generalForm.platformName || '')
+      formData.append('base_currency_code', generalForm.defaultBaseCurrency || 'USD')
+      formData.append('logo', selectedLogoFile.value)
+      payload = formData
+    } else {
+      payload = {
+        site_name: generalForm.platformName,
+        base_currency_code: generalForm.defaultBaseCurrency,
+      }
+      if (removeLogo.value) {
+        payload.logo = null
+      }
+    }
+    const { data } = await settingsApi.updateSite(payload)
+    siteSettings.applySettings(data)
+    selectedLogoFile.value = null
+    removeLogo.value = false
+    setLogoPreviewFromSettings()
     toast.success(t('toast.saveSuccess'))
   } catch {
     toast.error(t('toast.serverError'))
+  }
+}
+
+function openLogoPicker() {
+  logoInputRef.value?.click()
+}
+
+function clearLogoPreviewObjectUrl() {
+  if (logoPreviewUrl.value && logoPreviewUrl.value.startsWith('blob:')) {
+    URL.revokeObjectURL(logoPreviewUrl.value)
+  }
+}
+
+function setLogoPreviewFromSettings() {
+  clearLogoPreviewObjectUrl()
+  const logo = siteSettings.settings?.logo
+  logoPreviewUrl.value = typeof logo === 'string' ? logo : ''
+}
+
+function onLogoFileChange(event) {
+  const file = event.target?.files?.[0] ?? null
+  if (!file) return
+  clearLogoPreviewObjectUrl()
+  selectedLogoFile.value = file
+  removeLogo.value = false
+  logoPreviewUrl.value = URL.createObjectURL(file)
+}
+
+function removeSelectedLogo() {
+  clearLogoPreviewObjectUrl()
+  selectedLogoFile.value = null
+  removeLogo.value = true
+  logoPreviewUrl.value = ''
+  if (logoInputRef.value) {
+    logoInputRef.value.value = ''
+  }
+}
+
+async function loadUploadSettings() {
+  try {
+    const { data } = await settingsApi.uploads()
+    uploadsForm.maxFileSizeMb = Number(data?.max_file_size_mb ?? 5)
+    uploadsForm.allowedFormats = Array.isArray(data?.allowed_formats) ? data.allowed_formats : ['PNG', 'JPG']
+    storageUsedPercent.value = Number(data?.storage?.used_percent ?? 0)
+    storageTotalGb.value = data?.storage?.total_human ?? '10 GB'
+  } catch {
+    // Keep safe defaults when endpoint is unavailable.
+  }
+}
+
+async function saveUploadsSettings() {
+  if (!canEditSiteSettings.value) {
+    toast.error(t('errors.forbidden'))
+    return
+  }
+  uploadsSaving.value = true
+  try {
+    const { data } = await settingsApi.updateUploads({
+      max_file_size_mb: uploadsForm.maxFileSizeMb,
+      allowed_formats: uploadsForm.allowedFormats,
+    })
+    uploadsForm.maxFileSizeMb = Number(data?.max_file_size_mb ?? uploadsForm.maxFileSizeMb)
+    uploadsForm.allowedFormats = Array.isArray(data?.allowed_formats) ? data.allowed_formats : uploadsForm.allowedFormats
+    storageUsedPercent.value = Number(data?.storage?.used_percent ?? storageUsedPercent.value)
+    storageTotalGb.value = data?.storage?.total_human ?? storageTotalGb.value
+    toast.success(t('toast.saveSuccess'))
+  } catch {
+    toast.error(t('toast.serverError'))
+  } finally {
+    uploadsSaving.value = false
   }
 }
 
@@ -390,12 +559,28 @@ async function loadInstagramConfig() {
   }
 }
 
-function clearCache() {
-  showClearCacheModal.value = false
-  toast.success(t('toast.cacheCleared'))
+async function clearCache() {
+  if (!canEditSiteSettings.value) {
+    toast.error(t('errors.forbidden'))
+    return
+  }
+  clearingCache.value = true
+  try {
+    await settingsApi.clearTempUploads()
+    showClearCacheModal.value = false
+    await loadUploadSettings()
+    toast.success(t('toast.cacheCleared'))
+  } catch {
+    toast.error(t('toast.serverError'))
+  } finally {
+    clearingCache.value = false
+  }
 }
 
 function handleBeforeInstall(e) {
+  // Keep the browser's native banner behavior if our custom install UI is not needed.
+  const dismissed = localStorage.getItem('smartexchange-pwa-dismissed')
+  if (dismissed) return
   e.preventDefault()
   deferredInstallPrompt = e
   deferredPrompt.value = e
@@ -433,17 +618,24 @@ onMounted(() => {
     activeTab.value = 'instagram'
   }
   loadInstagramConfig()
+  loadUploadSettings()
+  currenciesStore.fetch()
   if (siteSettings.settings?.site_name != null) {
     generalForm.platformName = siteSettings.settings.site_name
+    generalForm.defaultBaseCurrency = siteSettings.settings?.base_currency_code ?? 'USD'
+    setLogoPreviewFromSettings()
   } else {
     siteSettings.fetch().then(() => {
       generalForm.platformName = siteSettings.settings?.site_name ?? ''
+      generalForm.defaultBaseCurrency = siteSettings.settings?.base_currency_code ?? 'USD'
+      setLogoPreviewFromSettings()
     })
   }
 })
 
 onUnmounted(() => {
   window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
+  clearLogoPreviewObjectUrl()
 })
 
 watch(() => route.path, () => initFromHash())

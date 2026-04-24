@@ -16,6 +16,7 @@ from .models import TelegramBot, TelegramChannel, DefaultMessageSettings, AutoPo
 from .services.telegram_client import TelegramService
 from setting.models import SiteSettings
 from setting.utils import log_telegram_event
+from core.exceptions import error_response
 from .serializers import (
     TelegramChannelSerializer,
     TelegramBotSerializer,
@@ -90,9 +91,10 @@ class SendMessageAPIView(APIView):
             message = (request.data.get("message") or "").strip() or "—"
 
         if channel.bot_id != bot.id:
-            return Response(
-                {"detail": "Channel does not belong to the selected bot."},
-                status=status.HTTP_400_BAD_REQUEST,
+            return error_response(
+                "Channel does not belong to the selected bot.",
+                code="telegram_channel_bot_mismatch",
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
 
         try:
@@ -118,9 +120,11 @@ class SendMessageAPIView(APIView):
                 details=str(e),
                 user=request.user,
             )
-            return Response(
-                {"success": False, "detail": str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            return error_response(
+                "Could not send Telegram message.",
+                code="telegram_send_failed",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                extra={"success": False, "detail": str(e)},
             )
 
 
@@ -166,9 +170,11 @@ class DefaultMessageSettingsDetailAPIView(APIView):
                 try:
                     default_buttons = json.loads(default_buttons)
                 except json.JSONDecodeError:
-                    return Response(
-                        {"default_buttons": ["Invalid JSON."]},
-                        status=status.HTTP_400_BAD_REQUEST,
+                    return error_response(
+                        "Invalid JSON.",
+                        code="invalid_json",
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        errors={"default_buttons": "Invalid JSON."},
                     )
             serializer.validated_data["default_buttons"] = default_buttons
 
@@ -188,9 +194,11 @@ class DefaultMessageSettingsCreateAPIView(APIView):
             try:
                 data["default_buttons"] = json.loads(default_buttons)
             except json.JSONDecodeError:
-                return Response(
-                    {"default_buttons": ["Invalid JSON."]},
-                    status=status.HTTP_400_BAD_REQUEST,
+                return error_response(
+                    "Invalid JSON.",
+                    code="invalid_json",
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    errors={"default_buttons": "Invalid JSON."},
                 )
 
         serializer = DefaultMessageSettingsSerializer(data=data)
@@ -228,12 +236,11 @@ class TelegramBotViewSet(ModelViewSet):
         if not chat_id:
             channel = bot.channels.filter(is_active=True).first()
             if not channel:
-                return Response(
-                    {
-                        "success": False,
-                        "detail": "No active channel found for this bot to test against.",
-                    },
-                    status=status.HTTP_400_BAD_REQUEST,
+                return error_response(
+                    "No active channel found for this bot to test against.",
+                    code="telegram_no_active_channel",
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    extra={"success": False},
                 )
             chat_id = channel.chat_id
 
@@ -261,9 +268,11 @@ class TelegramBotViewSet(ModelViewSet):
                 details=str(exc),
                 user=request.user,
             )
-            return Response(
-                {"success": False, "detail": str(exc)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            return error_response(
+                "Bot connection test failed.",
+                code="telegram_test_connection_failed",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                extra={"success": False, "detail": str(exc)},
             )
 
 

@@ -25,17 +25,26 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { templateApi, templateEditorApi, categoryApi } from '@/services/api'
+import { useToast } from 'vue-toastification'
+import { templateEditorApi, categoryApi } from '@/services/api'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 
 const router = useRouter()
 const route = useRoute()
+const toast = useToast()
 const name = ref('')
 const submitting = ref(false)
 const presetCategory = ref(null)
 
 const categoryIdFromQuery = computed(() => {
   const id = route.query.category_id
+  if (id == null || id === '') return null
+  const n = Number(id)
+  return Number.isFinite(n) ? n : null
+})
+
+const specialPriceTypeIdFromQuery = computed(() => {
+  const id = route.query.specialPriceTypeId
   if (id == null || id === '') return null
   const n = Number(id)
   return Number.isFinite(n) ? n : null
@@ -53,17 +62,36 @@ onMounted(async () => {
   }
 })
 
+function formatCreateError(data) {
+  if (!data || typeof data !== 'object') return 'Create failed'
+  if (typeof data.detail === 'string') return data.detail
+  const parts = []
+  for (const [key, val] of Object.entries(data)) {
+    if (key === 'detail') continue
+    const msg = Array.isArray(val) ? val.join(' ') : String(val)
+    parts.push(`${key}: ${msg}`)
+  }
+  return parts.length ? parts.join(' ') : 'Create failed'
+}
+
 async function handleSubmit() {
+  const trimmed = name.value.trim()
+  if (!trimmed) {
+    toast.error('Please enter a template name.')
+    return
+  }
   submitting.value = true
   try {
     const cid = categoryIdFromQuery.value
-    if (cid != null) {
-      const { data } = await templateEditorApi.create({ name: name.value, category: cid })
-      router.push(`/templates/${data.id}/editor`)
-      return
-    }
-    await templateApi.create({ name: name.value })
-    router.push('/templates')
+    const spid = specialPriceTypeIdFromQuery.value
+    const payload = { name: trimmed }
+    if (cid != null) payload.category = cid
+    else if (spid != null) payload.special_price_type = spid
+
+    const { data } = await templateEditorApi.create(payload)
+    router.push(`/templates/${data.id}/editor`)
+  } catch (e) {
+    toast.error(formatCreateError(e.response?.data))
   } finally {
     submitting.value = false
   }

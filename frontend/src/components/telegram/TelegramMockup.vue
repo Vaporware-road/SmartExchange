@@ -1,16 +1,16 @@
 <template>
   <div
-    class="telegram-mockup rounded-2xl overflow-hidden border shadow-lg max-w-[340px] mx-auto bg-slate-100 border-slate-200 dark:bg-[#1c1c1e] dark:border-[var(--glass-border)]"
+    class="telegram-mockup rounded-2xl overflow-hidden border shadow-lg max-w-[420px] mx-auto bg-slate-100 border-slate-200 dark:bg-[#1c1c1e] dark:border-[var(--glass-border)]"
     style="font-family: 'Vazirmatn', 'IRANSans', system-ui, sans-serif;"
   >
     <div class="p-3 sm:p-4">
       <!-- Telegram message bubble -->
       <div class="rounded-2xl overflow-hidden bg-white border border-slate-200 dark:bg-[#2b2b2d] dark:border-white/5">
-        <div v-if="imageUrl" class="relative w-full aspect-video bg-slate-200 dark:bg-black/40">
+        <div v-if="imageUrl" class="relative w-full aspect-video bg-slate-200 dark:bg-black/40 p-2">
           <img
             :src="imageUrl"
             alt=""
-            class="w-full h-full object-cover"
+            class="w-full h-full object-contain rounded-lg"
             @error="imageError = true"
           />
           <div
@@ -70,10 +70,14 @@ const displayDescription = computed(() => {
   let text = props.description || ''
   if (!text || !Object.keys(props.variableValues).length) return text
   Object.entries(props.variableValues).forEach(([key, value]) => {
-    const placeholder = `{{${key}}}`
-    text = text.split(placeholder).join(String(value))
+    const legacyPlaceholder = `{{${key}}}`
+    const canonicalPlaceholder = `{${key}}`
+    const resolved = String(value)
+    text = text.split(legacyPlaceholder).join(resolved)
+    text = text.split(canonicalPlaceholder).join(resolved)
   })
-  text = text.replace(/\{\{[^}]+\}\}/g, (m) => props.variableValues[m.slice(2, -2)] ?? m)
+  text = text.replace(/\{\{([^}]+)\}\}/g, (_, key) => props.variableValues[key] ?? `{{${key}}}`)
+  text = text.replace(/\{([^{}]+)\}/g, (_, key) => props.variableValues[key] ?? `{${key}}`)
   return text
 })
 </script>

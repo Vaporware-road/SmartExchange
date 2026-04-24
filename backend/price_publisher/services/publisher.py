@@ -3,9 +3,12 @@
 from __future__ import annotations
 
 import io
+import logging
+import re
 from dataclasses import dataclass
-from typing import Iterable, Optional
+from typing import Iterable, List, Optional
 
+from django.db import transaction
 from django.utils import timezone
 import jdatetime
 
@@ -34,6 +37,7 @@ from price_publisher.services.special_offer_renderer import (
     resolve_special_offer_template,
     supports_special_offer_type,
 )
+from core.utils import format_price_display
 from setting.models import SiteSettings
 from telegram_app.services.telegram_client import TelegramService
 
@@ -44,6 +48,8 @@ from template_editor.dynamic_data import (
     build_dynamic_data_for_special_offer,
 )
 from template_editor.render import render_price_template
+
+logger = logging.getLogger(__name__)
 
 
 class PricePublicationError(RuntimeError):
@@ -139,6 +145,47 @@ def _build_legacy_final_message() -> str:
     )
 
 
+class _SafeFormatDict(dict):
+    """Missing keys in caption templates render as {key} instead of raising."""
+
+    def __missing__(self, key):
+        return "{" + str(key) + "}"
+
+
+def _safe_format_caption(template_str: str, dynamic_data: dict) -> str:
+    if not template_str or not str(template_str).strip():
+        return ""
+    try:
+        normalized = re.sub(r"\{\{\s*([^{}]+?)\s*\}\}", r"{\1}", str(template_str).strip())
+        return normalized.format_map(_SafeFormatDict(dynamic_data))
+    except (ValueError, KeyError, IndexError):
+        return str(template_str).strip()
+
+
+def _normalize_inline_keyboard(raw) -> list:
+    """Build Telegram inline_keyboard rows: [[{text, url}, ...], ...]."""
+    if not raw or not isinstance(raw, list):
+        return []
+    rows: List[list] = []
+    for item in raw:
+        if isinstance(item, list):
+            row = []
+            for b in item:
+                if isinstance(b, dict):
+                    t = b.get("text") or b.get("label")
+                    u = b.get("url")
+                    if t and u:
+                        row.append({"text": str(t), "url": str(u)})
+            if row:
+                rows.append(row)
+        elif isinstance(item, dict):
+            t = item.get("text") or item.get("label")
+            u = item.get("url")
+            if t and u:
+                rows.append([{"text": str(t), "url": str(u)}])
+    return rows
+
+
 def _build_legacy_final_buttons() -> list:
     """Build legacy inline buttons from SiteSettings support_phone fields."""
     s = _get_site_settings()
@@ -223,7 +270,7 @@ class PricePublisherService:
         template = self._get_template_for_category(category)
         template_assets = self._build_template_assets(template)
 
-        image = self._render_category_image(
+        image, te_template_used = self._render_category_image(
             category=category,
             price_items=price_items,
             category_name=category.name,
@@ -233,19 +280,16 @@ class PricePublisherService:
             template_assets=template_assets,
         )
 
-        # Use professional caption for Tether and GBP categories
-        if supports_tether_category(category):
-            caption = self._build_tether_caption(latest_timestamp)
-        elif supports_category(category):
-            caption = self._build_gbp_category_caption(latest_timestamp)
-        else:
-            caption = _build_legacy_final_message()
-            
+        caption = self._build_category_publish_caption(
+            category, price_items, latest_timestamp, te_template_used
+        )
+        buttons = self._build_category_publish_buttons(category, te_template_used)
+
         return self._send_photo(
             channel=channel,
             image=image,
             caption=caption,
-            buttons=_build_legacy_final_buttons(),
+            buttons=buttons,
         )
 
     def publish_special_price(
@@ -259,22 +303,43 @@ class PricePublisherService:
         """Render and post a special price to Telegram."""
 
         custom_offer = supports_special_offer_type(special_price_type)
-        if getattr(SiteSettings.load(), "use_template_editor_for_boards", False):
-            try:
-                te_template = self._get_template_editor_template_for_special(special_price_type)
-                if te_template and te_template.config.get("themes"):
-                    dynamic_data = build_dynamic_data_for_special_offer(special_price_type, price_history)
-                    pil_image = render_price_template(te_template, SPECIAL_OFFER, dynamic_data)
-                    image = self._pil_image_to_rendered(pil_image)
-                    caption = self._build_special_price_caption(special_price_type, price_history, custom_offer=True)
-                    return self._send_photo(
-                        channel=channel,
-                        image=image,
-                        caption=caption,
-                        buttons=_build_legacy_final_buttons(),
-                    )
-            except Exception:
-                pass
+        te_template = self._select_next_template_editor_for_special(special_price_type)
+        try:
+            if te_template and self._template_editor_eligible(te_template):
+                dynamic_data = build_dynamic_data_for_special_offer(
+                    special_price_type, price_history
+                )
+                pil_image = render_price_template(te_template, SPECIAL_OFFER, dynamic_data)
+                image = self._pil_image_to_rendered(pil_image)
+                if getattr(te_template, "is_active", True):
+                    self._mark_special_price_template_used(special_price_type, te_template)
+                caption = self._build_special_publish_caption(
+                    special_price_type, price_history, dynamic_data, te_template, custom_offer=True
+                )
+                buttons = self._build_special_publish_buttons(te_template)
+                return self._send_photo(
+                    channel=channel,
+                    image=image,
+                    caption=caption,
+                    buttons=buttons,
+                )
+            if not te_template:
+                logger.warning(
+                    "template_editor special fallback: no template special_price_type_id=%s",
+                    getattr(special_price_type, "id", None),
+                )
+            else:
+                logger.warning(
+                    "template_editor special fallback: ineligible template_id=%s special_price_type_id=%s",
+                    getattr(te_template, "id", None),
+                    getattr(special_price_type, "id", None),
+                )
+        except Exception:
+            logger.exception(
+                "template_editor special fallback: render failed special_price_type_id=%s template_id=%s",
+                getattr(special_price_type, "id", None),
+                getattr(te_template, "id", None) if te_template else None,
+            )
 
         if custom_offer:
             try:
@@ -304,9 +369,9 @@ class PricePublisherService:
                 template_assets=template_assets,
             )
 
-        # Build caption for special GBP offers (inspired by Tether)
-        caption = self._build_special_price_caption(special_price_type, price_history, custom_offer)
-            
+        caption = self._build_special_price_caption(
+            special_price_type, price_history, custom_offer
+        )
         return self._send_photo(
             channel=channel,
             image=image,
@@ -317,6 +382,130 @@ class PricePublisherService:
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
+    def _template_editor_eligible(self, te_template) -> bool:
+        if not te_template:
+            return False
+        cfg = te_template.config if isinstance(getattr(te_template, "config", None), dict) else {}
+        if cfg.get("themes"):
+            return True
+        cj = te_template.config_json if isinstance(te_template.config_json, dict) else {}
+        ws = cj.get("widgets")
+        if isinstance(ws, list) and len(ws) > 0:
+            return True
+        fields = cfg.get("fields")
+        if isinstance(fields, dict) and len(fields) > 0:
+            return bool(te_template.image)
+        return bool(te_template.image)
+
+    def _select_next_template_editor_for_category(self, category):
+        """Round-robin among active templates for this category; fallback to any category template."""
+        from template_editor.models import Template
+
+        if not category:
+            return Template.objects.filter(
+                category__isnull=True, special_price_type__isnull=True
+            ).order_by("-updated_at").first()
+
+        active = list(
+            Template.objects.filter(category=category, is_active=True).order_by(
+                "publish_order", "id"
+            )
+        )
+        if not active:
+            return (
+                Template.objects.filter(category=category)
+                .order_by("-updated_at")
+                .first()
+            )
+        # Prefer templates that have PixelCast widgets so finalize does not pick an
+        # empty placeholder row and fall back to the generic PriceImageRenderer card.
+        with_widgets = [t for t in active if self._template_widget_count(t) > 0]
+        pool = with_widgets if with_widgets else active
+        ids = [t.pk for t in pool]
+        last_id = getattr(category, "last_used_template_id", None)
+        if last_id not in ids:
+            return pool[0]
+        idx = ids.index(last_id)
+        return pool[(idx + 1) % len(pool)]
+
+    @staticmethod
+    def _template_widget_count(te_template) -> int:
+        cj = getattr(te_template, "config_json", None)
+        if not isinstance(cj, dict):
+            return 0
+        w = cj.get("widgets")
+        return len(w) if isinstance(w, list) else 0
+
+    def _mark_category_template_used(self, category, te_template) -> None:
+        if not category or not te_template:
+            return
+        if getattr(te_template, "category_id", None) != getattr(category, "pk", None):
+            return
+        try:
+            from category.models import Category
+
+            with transaction.atomic():
+                cat = Category.objects.select_for_update().get(pk=category.pk)
+                cat.last_used_template = te_template
+                cat.save(update_fields=["last_used_template", "updated_at"])
+        except Exception:
+            logger.exception("Failed to update category.last_used_template")
+
+    def _mark_special_price_template_used(self, special_price_type, te_template) -> None:
+        if not special_price_type or not te_template:
+            return
+        if getattr(te_template, "special_price_type_id", None) != getattr(
+            special_price_type, "pk", None
+        ):
+            return
+        try:
+            from special_price.models import SpecialPriceType
+
+            with transaction.atomic():
+                spt = SpecialPriceType.objects.select_for_update().get(pk=special_price_type.pk)
+                spt.last_used_template = te_template
+                spt.save(update_fields=["last_used_template", "updated_at"])
+        except Exception:
+            logger.exception("Failed to update special_price_type.last_used_template")
+
+    def _build_category_publish_caption(self, category, price_items, timestamp, te_template):
+        usage_tether = supports_tether_category(category)
+        dynamic_data = (
+            build_dynamic_data_for_tether_board(category, price_items, timestamp)
+            if usage_tether
+            else build_dynamic_data_for_category_board(category, price_items, timestamp)
+        )
+        if te_template and getattr(te_template, "telegram_caption_template", "").strip():
+            return _safe_format_caption(te_template.telegram_caption_template, dynamic_data)
+        if category and (category.telegram_message_description or "").strip():
+            return _safe_format_caption(category.telegram_message_description, dynamic_data)
+        return ""
+
+    def _build_category_publish_buttons(self, category, te_template):
+        if te_template and isinstance(te_template.telegram_buttons_json, list):
+            norm = _normalize_inline_keyboard(te_template.telegram_buttons_json)
+            if norm:
+                return norm
+        if category and category.inline_buttons:
+            norm = _normalize_inline_keyboard(category.inline_buttons)
+            if norm:
+                return norm
+        return []
+
+    def _build_special_publish_caption(
+        self, special_price_type, price_history, dynamic_data, te_template, custom_offer: bool
+    ):
+        if te_template and getattr(te_template, "telegram_caption_template", "").strip():
+            return _safe_format_caption(te_template.telegram_caption_template, dynamic_data)
+        return ""
+
+    def _build_special_publish_buttons(self, te_template):
+        if te_template and isinstance(te_template.telegram_buttons_json, list):
+            norm = _normalize_inline_keyboard(te_template.telegram_buttons_json)
+            if norm:
+                return norm
+        return []
+
     def _render_category_image(
         self,
         *,
@@ -327,76 +516,122 @@ class PricePublisherService:
         notes: Optional[str],
         timestamp,
         template_assets: Optional[TemplateAssets],
-    ) -> RenderedPriceImage:
-        # Optional: use template_editor Template when feature flag is on
-        if getattr(SiteSettings.load(), "use_template_editor_for_boards", False):
-            try:
-                te_template = self._get_template_editor_template_for_category(category)
-                if te_template and te_template.config.get("themes"):
-                    usage_type = TETHER_BOARD if supports_tether_category(category) else CATEGORY_BOARD
-                    dynamic_data = (
-                        build_dynamic_data_for_tether_board(category, price_items, timestamp)
-                        if usage_type == TETHER_BOARD
-                        else build_dynamic_data_for_category_board(category, price_items, timestamp)
-                    )
-                    pil_image = render_price_template(te_template, usage_type, dynamic_data)
-                    return self._pil_image_to_rendered(pil_image)
-            except Exception as exc:
-                # Fall back to legacy renderers on any error
-                pass
+    ):
+        """Returns (RenderedPriceImage, template_editor.Template | None)."""
+        # Always prefer template_editor Template for finalize publication.
+        te_template = self._select_next_template_editor_for_category(category)
+        try:
+            if te_template and self._template_editor_eligible(te_template):
+                usage_type = (
+                    TETHER_BOARD if supports_tether_category(category) else CATEGORY_BOARD
+                )
+                dynamic_data = (
+                    build_dynamic_data_for_tether_board(category, price_items, timestamp)
+                    if usage_type == TETHER_BOARD
+                    else build_dynamic_data_for_category_board(category, price_items, timestamp)
+                )
+                pil_image = render_price_template(te_template, usage_type, dynamic_data)
+                if getattr(te_template, "is_active", True):
+                    self._mark_category_template_used(category, te_template)
+                return self._pil_image_to_rendered(pil_image), te_template
+            if not te_template:
+                logger.warning(
+                    "template_editor category fallback: no template category_id=%s",
+                    getattr(category, "id", None),
+                )
+            else:
+                logger.warning(
+                    "template_editor category fallback: ineligible template_id=%s category_id=%s",
+                    getattr(te_template, "id", None),
+                    getattr(category, "id", None),
+                )
+        except Exception:
+            logger.exception(
+                "template_editor category fallback: render failed category_id=%s template_id=%s",
+                getattr(category, "id", None),
+                getattr(te_template, "id", None) if te_template else None,
+            )
 
         if supports_tether_category(category):
             try:
-                return render_tether_board(
-                    category=category,
-                    price_items=price_items,
-                    timestamp=timestamp,
+                return (
+                    render_tether_board(
+                        category=category,
+                        price_items=price_items,
+                        timestamp=timestamp,
+                    ),
+                    None,
                 )
             except FileNotFoundError as exc:
                 raise PricePublicationError(str(exc)) from exc
 
         if supports_category(category):
             try:
-                return render_category_board(
-                    category=category,
-                    price_items=price_items,
-                    timestamp=timestamp,
+                return (
+                    render_category_board(
+                        category=category,
+                        price_items=price_items,
+                        timestamp=timestamp,
+                    ),
+                    None,
                 )
             except FileNotFoundError as exc:
                 raise PricePublicationError(str(exc)) from exc
 
         try:
-            return self._renderer.render_category_prices(
-                category_name=category_name,
-                price_entries=entries,
-                notes=notes,
-                timestamp=timestamp,
-                template_assets=template_assets,
+            return (
+                self._renderer.render_category_prices(
+                    category_name=category_name,
+                    price_entries=entries,
+                    notes=notes,
+                    timestamp=timestamp,
+                    template_assets=template_assets,
+                ),
+                None,
             )
         except PriceImageRenderingError as exc:  # pragma: no cover - delegated
             raise PricePublicationError(str(exc)) from exc
 
-    def _get_template_editor_template_for_category(self, category):
-        """Return template_editor.Template for this category or default."""
+    def _select_next_template_editor_for_special(self, special_price_type):
+        """Round-robin among active templates for this special price type; else any type template; else global default."""
         from template_editor.models import Template
-        if category:
-            t = Template.objects.filter(category=category).order_by("-updated_at").first()
-            if t:
-                return t
-        return Template.objects.filter(
-            category__isnull=True, special_price_type__isnull=True
-        ).order_by("-updated_at").first()
 
-    def _get_template_editor_template_for_special(self, special_price_type):
-        """Return template_editor.Template for this special price type or default."""
-        from template_editor.models import Template
-        if special_price_type:
-            t = Template.objects.filter(special_price_type=special_price_type).order_by("-updated_at").first()
-            if t:
-                return t
-        return Template.objects.filter(
-            category__isnull=True, special_price_type__isnull=True
-        ).order_by("-updated_at").first()
+        def _global_default():
+            return (
+                Template.objects.filter(
+                    category__isnull=True, special_price_type__isnull=True
+                )
+                .order_by("-updated_at")
+                .first()
+            )
+
+        if not special_price_type:
+            return _global_default()
+
+        active = list(
+            Template.objects.filter(
+                special_price_type=special_price_type, is_active=True
+            ).order_by("publish_order", "id")
+        )
+        if active:
+            with_widgets = [t for t in active if self._template_widget_count(t) > 0]
+            pool = with_widgets if with_widgets else active
+            ids = [t.pk for t in pool]
+            last_id = getattr(special_price_type, "last_used_template_id", None)
+            if last_id not in ids:
+                return pool[0]
+            idx = ids.index(last_id)
+            return pool[(idx + 1) % len(pool)]
+
+        candidates = list(
+            Template.objects.filter(special_price_type=special_price_type).order_by(
+                "-updated_at"
+            )
+        )
+        if candidates:
+            rich = [t for t in candidates if self._template_widget_count(t) > 0]
+            return rich[0] if rich else candidates[0]
+        return _global_default()
 
     @staticmethod
     def _pil_image_to_rendered(pil_image) -> RenderedPriceImage:
@@ -480,7 +715,7 @@ class PricePublisherService:
 
     @staticmethod
     def _format_price(price) -> str:
-        return f"{price:,.2f}"
+        return format_price_display(price)
 
     @staticmethod
     def _prepare_stream(stream: io.BytesIO, fallback_name: str) -> io.BytesIO:

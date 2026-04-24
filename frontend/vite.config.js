@@ -3,7 +3,12 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { resolve } from 'path'
 
-export default defineConfig(({ command }) => ({
+export default defineConfig(({ command }) => {
+  // In Docker, point proxy to backend service name.
+  // Outside Docker it still defaults to local Django.
+  const apiProxyTarget = process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000'
+
+  return {
   base: command === 'serve' ? '/' : '/static/vue/',
   plugins: [
     vue(),
@@ -65,15 +70,19 @@ export default defineConfig(({ command }) => ({
     },
   },
   server: {
+    host: true,
     port: 3000,
     strictPort: true,
+    watch: {
+      usePolling: true,
+    },
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8000',
+        target: apiProxyTarget,
         changeOrigin: true,
       },
       '/media': {
-        target: 'http://127.0.0.1:8000',
+        target: apiProxyTarget,
         changeOrigin: true,
       },
     },
@@ -86,4 +95,5 @@ export default defineConfig(({ command }) => ({
       input: resolve(__dirname, 'index.html'),
     },
   },
-}))
+}
+})

@@ -42,9 +42,6 @@ let deferredPrompt = null
 const DISMISS_KEY = 'smartexchange-pwa-dismissed'
 
 function handleBeforeInstall(e) {
-  e.preventDefault()
-  deferredPrompt = e
-
   const dismissed = localStorage.getItem(DISMISS_KEY)
   if (dismissed) {
     const dismissedAt = Number(dismissed)
@@ -52,6 +49,8 @@ function handleBeforeInstall(e) {
     if (daysSinceDismissed < 7) return
   }
 
+  e.preventDefault()
+  deferredPrompt = e
   showPrompt.value = true
 }
 

@@ -13,11 +13,7 @@
       style="border-color: var(--border-card);"
     >
       <router-link to="/" class="flex items-center gap-3 group min-w-0 md:justify-center">
-        <div
-          class="p-2.5 rounded-xl transition-all duration-300 ease-in-out border group-hover:scale-105 shrink-0 bg-primary-muted border-[var(--border-color)]"
-        >
-          <i class="fas fa-coins text-xl text-[var(--primary)] group-hover:rotate-12" />
-        </div>
+        <AppBrandLogo size="md" rounded="xl" class="group-hover:scale-105 transition-all duration-300 ease-in-out shrink-0" />
         <!-- Text hidden on mobile/tablet and when collapsed; only icons visible in collapsed mode -->
         <div
           class="flex flex-col min-w-0 overflow-hidden transition-all duration-300 ease-in-out hidden md:hidden"
@@ -82,6 +78,7 @@ import { useRoute } from 'vue-router'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useAuthStore } from '@/stores/auth'
 import { useSidebarStore } from '@/stores/sidebar'
+import AppBrandLogo from '@/components/layout/AppBrandLogo.vue'
 
 const route = useRoute()
 const siteSettings = useSiteSettingsStore()

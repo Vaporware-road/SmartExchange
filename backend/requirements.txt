@@ -13,3 +13,4 @@ python-bidi>=0.4.2
 python-telegram-bot>=20.0
 pytz>=2023.3
 requests>=2.31
+gunicorn>=22.0.0

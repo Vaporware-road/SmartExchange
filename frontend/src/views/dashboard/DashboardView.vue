@@ -12,7 +12,7 @@
     </div>
 
     <template v-if="loading">
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <BaseSkeleton v-for="i in 8" :key="i" variant="card" />
       </div>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
@@ -30,7 +30,7 @@
       </div>
     </template>
     <template v-else>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <div class="hidden md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         <BaseCard
           v-for="(_, statIndex) in 8"
           :key="'stat-' + statIndex"
@@ -160,11 +160,11 @@
           style="animation-delay: 0.1s"
         >
           <h2 class="text-lg font-bold text-gold mb-4 flex items-center gap-2">
-            <i class="fas fa-chart-pie"></i> {{ $t('dashboard.categoryDistribution') }}
+            <i class="fas fa-chart-bar"></i> {{ topCategoriesChartTitle }}
           </h2>
-          <div class="h-56 flex items-center justify-center">
-            <Doughnut v-if="doughnutData && doughnutData.labels.length" :data="doughnutData" :options="doughnutOptions" class="max-w-[200px]" />
-            <p v-else class="text-[var(--text-secondary)] text-sm">{{ $t('dashboard.noCategoriesFound') }}</p>
+          <div class="h-56">
+            <Bar v-if="topCategoriesData && topCategoriesData.labels.length" :data="topCategoriesData" :options="topCategoriesOptions" />
+            <p v-else class="h-full flex items-center justify-center text-[var(--text-secondary)] text-sm">{{ $t('dashboard.noCategoriesFound') }}</p>
           </div>
         </BaseCard>
       </div>
@@ -196,7 +196,7 @@
           <i class="fas fa-user-shield text-xl text-emerald-400"></i>
         </div>
         <div class="min-w-0 flex-1">
-          <p class="text-sm font-medium text-[var(--text-secondary)]">{{ $t('dashboard.lastPriceUpdateBy') }}</p>
+          <p class="text-sm font-medium text-[var(--text-secondary)]">{{ lastPriceUpdateByLabel }}</p>
           <p class="text-[var(--text-primary)] font-semibold truncate">
             {{ summary.last_price_update_by.full_name || summary.last_price_update_by.username || '—' }}
           </p>
@@ -224,7 +224,10 @@
             class="text-center hover-lift animate-fade-in-up border border-[var(--glass-border)]"
             :style="{ animationDelay: `${0.15 + index * 0.05}s` }"
           >
-            <h3 class="font-semibold text-gold mb-2">{{ cat.name }}</h3>
+            <h3 class="font-semibold text-gold mb-2 inline-flex items-center justify-center gap-2 w-full">
+              <CategoryIcon :category-name="cat.name" size-class="h-4 w-4" />
+              <span class="truncate">{{ cat.name }}</span>
+            </h3>
             <p class="text-sm text-[var(--text-secondary)] mb-3">{{ cat.price_type_count ?? cat.price_types?.length ?? 0 }} {{ $t('analysis.priceType') }}</p>
             <router-link
               :to="`/prices/category/${cat.id}/update`"
@@ -285,21 +288,21 @@ import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
-import { Line, Doughnut } from 'vue-chartjs'
+import CategoryIcon from '@/components/ui/CategoryIcon.vue'
+import { Line, Bar } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
-  ArcElement,
+  BarElement,
   Filler,
   Tooltip,
   Legend,
-  DoughnutController,
 } from 'chart.js'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, ArcElement, Filler, Tooltip, Legend, DoughnutController)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Filler, Tooltip, Legend)
 
 const { t, locale } = useI18n()
 const auth = useAuthStore()
@@ -315,6 +318,9 @@ const timelineData = ref(null)
 let clockIntervalId = null
 
 const liveClock = computed(() => formatDateTime(now.value))
+const lastPriceUpdateByLabel = computed(() =>
+  locale.value === 'fa' ? 'آخرین بروزرسانی قیمت توسط' : 'Last price update by'
+)
 
 const sparklinePath = computed(() => {
   const points = [12, 18, 14, 22, 19, 28, 24]
@@ -444,35 +450,46 @@ const lineChartOptions = computed(() => {
   }
 })
 
-const doughnutData = computed(() => {
+const topCategoriesChartTitle = computed(() =>
+  locale.value === 'fa'
+    ? 'پُرکارترین دسته‌بندی‌ها (بر اساس نوع قیمت)'
+    : 'Top Categories by Price Types'
+)
+
+const topCategoriesData = computed(() => {
   if (!categories.value?.length) return { labels: [], datasets: [{ data: [] }] }
-  const labels = categories.value.map((c) => c.name || '—')
-  const data = categories.value.map((c) => c.price_type_count ?? c.price_types?.length ?? 1)
+  const rows = [...categories.value]
+    .map((c) => ({
+      name: c.name || '—',
+      count: Number(c.price_type_count ?? c.price_types?.length ?? 0),
+    }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 8)
+
   const c = getChartThemeColors()
-  const palette = themeStore.isDark
-    ? ['#FFD700', '#E6C200', '#B8860B', '#8A7200', '#5C4C00', '#FFE44D', '#CCAC00', '#9A7B00']
-    : ['#2563eb', '#10b981', '#6366f1', '#0ea5e9', '#8b5cf6', '#14b8a6', '#3b82f6', '#06b6d4']
   return {
-    labels,
+    labels: rows.map((r) => r.name),
     datasets: [{
-      data,
-      backgroundColor: data.map((_, i) => palette[i % palette.length]),
-      borderColor: c.bgCard,
-      borderWidth: 2,
-      hoverOffset: 6,
+      label: t('dashboard.priceTypes'),
+      data: rows.map((r) => r.count),
+      backgroundColor: c.primary.startsWith('#') ? hexToRgba(c.primary, 0.6) : c.primary,
+      borderColor: c.primary,
+      borderWidth: 1,
+      borderRadius: 8,
+      maxBarThickness: 28,
     }],
   }
 })
 
-const doughnutOptions = computed(() => {
+const topCategoriesOptions = computed(() => {
   themeStore.isDark /* reactive dependency */
   const c = getChartThemeColors()
   return {
     responsive: true,
     maintainAspectRatio: false,
-    cutout: '60%',
+    indexAxis: 'y',
     plugins: {
-      legend: { position: 'bottom', labels: { color: c.textSecondary, usePointStyle: true, padding: 12 } },
+      legend: { display: false },
       tooltip: {
         backgroundColor: c.bgCard,
         titleColor: c.primary,
@@ -481,13 +498,20 @@ const doughnutOptions = computed(() => {
         borderWidth: 1,
         cornerRadius: 12,
         padding: 12,
-        callbacks: {
-          label(ctx) {
-            const total = ctx.dataset.data.reduce((a, b) => a + b, 0)
-            const pct = total ? ((ctx.raw / total) * 100).toFixed(1) : 0
-            return ` ${ctx.label}: ${ctx.raw} (${pct}%)`
-          },
+      },
+    },
+    scales: {
+      x: {
+        beginAtZero: true,
+        grid: { color: c.borderColor },
+        ticks: {
+          color: c.textSecondary,
+          precision: 0,
         },
+      },
+      y: {
+        grid: { display: false },
+        ticks: { color: c.textSecondary },
       },
     },
   }

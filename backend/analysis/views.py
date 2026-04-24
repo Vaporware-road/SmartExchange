@@ -1,19 +1,34 @@
 import json
+import logging
 import math
 from collections import defaultdict
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone as dt_timezone
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import OuterRef, Subquery, Count
 from django.utils import timezone
 from django.views.generic import TemplateView
 
+logger = logging.getLogger(__name__)
+
+
+def _ensure_aware_datetime(dt):
+    """Coerce naive datetimes so ``timezone.localtime`` never raises."""
+    if dt is None:
+        return None
+    if timezone.is_naive(dt):
+        try:
+            return timezone.make_aware(dt, timezone.get_current_timezone())
+        except Exception:
+            return timezone.make_aware(dt, dt_timezone.utc)
+    return dt
+
 
 class ChartJSONEncoder(DjangoJSONEncoder):
     """Custom JSON encoder that ensures dates are in ISO format for Chart.js"""
     def default(self, obj):
         if isinstance(obj, datetime):
-            return timezone.localtime(obj).isoformat()
+            return timezone.localtime(_ensure_aware_datetime(obj)).isoformat()
         return super().default(obj)
 
 from rest_framework.response import Response
@@ -28,6 +43,17 @@ from telegram_app.models import TelegramChannel
 from .serializers import (
     PricingResponseSerializer,
 )
+
+
+def _json_safe_float(value):
+    """Return a finite float, or None (avoids ValueError in strict JSON encoders)."""
+    if value is None:
+        return None
+    try:
+        f = float(value)
+    except (TypeError, ValueError):
+        return None
+    return f if math.isfinite(f) else None
 
 
 class AnalyticsDashboardView(TemplateView):
@@ -114,22 +140,35 @@ class AnalyticsDashboardView(TemplateView):
         overall_stats = self._get_overall_statistics(
             price_types, special_price_types, week_start
         )
-        telegram_engagement = self._build_telegram_engagement(window_start)
+        try:
+            telegram_engagement = self._build_telegram_engagement(window_start)
+        except Exception:
+            logger.exception("Failed to build telegram engagement for analytics dashboard")
+            telegram_engagement = {"timeline": [], "channels": []}
 
         def _serialize_card(card):
             c = dict(card)
             if c.get("timestamp"):
-                c["timestamp"] = timezone.localtime(c["timestamp"]).isoformat()
+                ts = _ensure_aware_datetime(c["timestamp"])
+                c["timestamp"] = timezone.localtime(ts).isoformat() if ts else None
+            for num_key in ("latest_price", "change_value", "change_percent"):
+                if num_key in c:
+                    c[num_key] = _json_safe_float(c.get(num_key))
             return c
 
         def _serialize_value(v):
             from decimal import Decimal
             if hasattr(v, "isoformat"):  # datetime
-                return timezone.localtime(v).isoformat() if v else None
+                av = _ensure_aware_datetime(v)
+                return timezone.localtime(av).isoformat() if av else None
             if isinstance(v, Decimal):
-                return float(v)
+                return _json_safe_float(v)
+            if isinstance(v, float):
+                return _json_safe_float(v)
             if isinstance(v, dict):
                 return {k: _serialize_value(val) for k, val in v.items()}
+            if isinstance(v, list):
+                return [_serialize_value(item) for item in v]
             return v
 
         def _serialize_stats(stats):
@@ -143,8 +182,8 @@ class AnalyticsDashboardView(TemplateView):
             "special_cards": [_serialize_card(c) for c in special_cards],
             "top_movers": [_serialize_card(c) for c in top_movers],
             "price_statistics": _serialize_stats(price_statistics),
-            "finalization_stats": finalization_stats,
-            "overall_stats": overall_stats,
+            "finalization_stats": _serialize_stats(finalization_stats),
+            "overall_stats": _serialize_stats(overall_stats),
             "timeline_data": timelines,
             "special_timeline_data": special_timelines,
             "category_summary": category_summary,
@@ -194,11 +233,12 @@ class AnalyticsDashboardView(TemplateView):
         timeline_map = defaultdict(list)
         for history in history_qs:
             # Convert datetime to ISO string for Chart.js compatibility
-            timestamp = timezone.localtime(history.created_at).isoformat()
+            ts = _ensure_aware_datetime(history.created_at)
+            timestamp = timezone.localtime(ts).isoformat() if ts else ""
             timeline_map[history.price_type_id].append(
                 {
                     "x": timestamp,
-                    "y": float(history.price),
+                    "y": _json_safe_float(history.price) or 0.0,
                 }
             )
 
@@ -245,6 +285,7 @@ class AnalyticsDashboardView(TemplateView):
                 if previous_price not in (None, 0)
                 else None
             )
+            change_percent = _json_safe_float(change_percent)
 
             cards.append(
                 {
@@ -255,7 +296,7 @@ class AnalyticsDashboardView(TemplateView):
                     "trade": price_type.get_trade_type_display(),
                     "latest_price": latest_price,
                     "timestamp": price_type.latest_timestamp,
-                    "change_value": change_value,
+                    "change_value": _json_safe_float(change_value),
                     "change_percent": change_percent,
                 }
             )
@@ -337,11 +378,12 @@ class AnalyticsDashboardView(TemplateView):
         timeline_map = defaultdict(list)
         for history in history_qs:
             # Convert datetime to ISO string for Chart.js compatibility
-            timestamp = timezone.localtime(history.created_at).isoformat()
+            ts = _ensure_aware_datetime(history.created_at)
+            timestamp = timezone.localtime(ts).isoformat() if ts else ""
             timeline_map[history.special_price_type_id].append(
                 {
                     "x": timestamp,
-                    "y": float(history.price),
+                    "y": _json_safe_float(history.price) or 0.0,
                 }
             )
 
@@ -390,6 +432,7 @@ class AnalyticsDashboardView(TemplateView):
                 if previous_price not in (None, 0)
                 else None
             )
+            change_percent = _json_safe_float(change_percent)
 
             cards.append(
                 {
@@ -399,7 +442,7 @@ class AnalyticsDashboardView(TemplateView):
                     "trade": special_price_type.get_trade_type_display(),
                     "latest_price": latest_price,
                     "timestamp": special_price_type.latest_timestamp,
-                    "change_value": change_value,
+                    "change_value": _json_safe_float(change_value),
                     "change_percent": change_percent,
                     "is_special": True,
                 }
@@ -434,6 +477,7 @@ class AnalyticsDashboardView(TemplateView):
             # Calculate standard deviation (volatility)
             if n > 1:
                 variance = sum((p - avg_price) ** 2 for p in prices) / (n - 1)
+                variance = max(0.0, float(variance))
                 volatility = math.sqrt(variance)
             else:
                 volatility = 0
@@ -541,12 +585,24 @@ class AnalyticsDashboardView(TemplateView):
         - ``timeline``: chart-ready datasets (same shape as price timelines)
         - ``channels``: per-channel aggregates (total, success, failed, success_rate, last_post_at)
         """
+
+        def _day_bucket_iso(day):
+            """ISO timestamp for chart x-axis; avoids make_aware edge cases."""
+            try:
+                naive_mid = datetime.combine(day, datetime.min.time())
+                aware = timezone.make_aware(
+                    naive_mid, timezone.get_current_timezone()
+                )
+                return timezone.localtime(aware).isoformat()
+            except Exception:
+                return day.isoformat()
+
         # Timeline: aggregate successful/failed posts per day
         day_buckets = defaultdict(lambda: {"success": 0, "failed": 0})
 
         final_qs = Finalization.objects.filter(finalized_at__gte=window_start)
         for f in final_qs:
-            day = timezone.localtime(f.finalized_at).date()
+            day = timezone.localtime(_ensure_aware_datetime(f.finalized_at)).date()
             bucket = day_buckets[day]
             if f.message_sent:
                 bucket["success"] += 1
@@ -557,7 +613,7 @@ class AnalyticsDashboardView(TemplateView):
             finalized_at__gte=window_start
         )
         for sf in special_qs:
-            day = timezone.localtime(sf.finalized_at).date()
+            day = timezone.localtime(_ensure_aware_datetime(sf.finalized_at)).date()
             bucket = day_buckets[day]
             if sf.message_sent:
                 bucket["success"] += 1
@@ -567,8 +623,7 @@ class AnalyticsDashboardView(TemplateView):
         success_points = []
         failed_points = []
         for day in sorted(day_buckets.keys()):
-            dt = timezone.make_aware(datetime.combine(day, datetime.min.time()))
-            iso = timezone.localtime(dt).isoformat()
+            iso = _day_bucket_iso(day)
             bucket = day_buckets[day]
             if bucket["success"]:
                 success_points.append({"x": iso, "y": bucket["success"]})
@@ -610,7 +665,7 @@ class AnalyticsDashboardView(TemplateView):
                 key,
                 {
                     "channel_id": f.channel_id,
-                    "channel_name": f.channel.name,
+                    "channel_name": (f.channel.name if f.channel else "") or "",
                     "total": 0,
                     "success": 0,
                     "failed": 0,
@@ -633,7 +688,7 @@ class AnalyticsDashboardView(TemplateView):
                 key,
                 {
                     "channel_id": sf.channel_id,
-                    "channel_name": sf.channel.name,
+                    "channel_name": (sf.channel.name if sf.channel else "") or "",
                     "total": 0,
                     "success": 0,
                     "failed": 0,
@@ -651,7 +706,7 @@ class AnalyticsDashboardView(TemplateView):
         channels = []
         for entry in channel_stats.values():
             total = entry["total"] or 1
-            success_rate = entry["success"] / total
+            success_rate = _json_safe_float(entry["success"] / total) or 0.0
             last_ts = entry["last_post_at"]
             channels.append(
                 {
@@ -661,7 +716,9 @@ class AnalyticsDashboardView(TemplateView):
                     "success": entry["success"],
                     "failed": entry["failed"],
                     "success_rate": success_rate,
-                    "last_post_at": timezone.localtime(last_ts).isoformat()
+                    "last_post_at": timezone.localtime(
+                        _ensure_aware_datetime(last_ts)
+                    ).isoformat()
                     if last_ts
                     else None,
                 }

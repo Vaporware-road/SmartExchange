@@ -22,13 +22,13 @@
         {{ category.name }}
       </p>
 
-      <!-- Incomplete message warning -->
+      <!-- Template media warning -->
       <div
         v-if="isIncomplete"
         class="mb-6 rounded-xl border px-4 py-3 text-sm flex items-center gap-2 border-[var(--border-card-hover)] bg-primary-muted text-[var(--text-primary)]"
       >
         <i class="fas fa-exclamation-triangle shrink-0 text-gold" />
-        <span>{{ $t('telegramStudio.incompleteMessage') || 'Media or message description is not set. The Telegram message may appear incomplete.' }}</span>
+        <span>{{ $t('telegramStudio.incompleteMessage') || 'No active template media found. Preview is unavailable until a template image is set.' }}</span>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
@@ -51,46 +51,32 @@
             </div>
             <div class="flex flex-col sm:flex-row gap-4 items-start">
               <div
-                class="w-full sm:w-40 h-32 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden cursor-pointer transition-colors hover:border-gold/50"
+                class="w-full sm:w-52 h-36 rounded-xl border-2 border-dashed flex items-center justify-center overflow-hidden p-2"
                 style="border-color: var(--border-card); background: var(--bg-input);"
-                @click="fileInput?.click()"
               >
                 <img
-                  v-if="form.telegram_media_url"
-                  :src="form.telegram_media_url"
+                  v-if="templateMediaUrl"
+                  :src="templateMediaUrl"
                   alt=""
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-contain rounded-lg"
                 />
                 <span v-else class="text-sm text-[var(--text-secondary)] px-2 text-center">
-                  {{ $t('telegramStudio.uploadImage') || 'Click to upload' }}
+                  {{ $t('telegramStudio.uploadImage') || 'No template media' }}
                 </span>
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm text-[var(--text-secondary)] mb-2">
-                  {{ $t('telegramStudio.mediaHint') || 'Image for the Telegram message.' }}
+                  {{ $t('telegramStudio.mediaHint') || 'Media is inherited from the active Template Editor template.' }}
                 </p>
-                <button
-                  type="button"
-                  class="btn-luxury-outline text-sm py-2"
-                  :disabled="uploadingMedia"
-                  @click="fileInput?.click()"
-                >
-                  <LoadingSpinner v-if="uploadingMedia" class="w-4 h-4 inline-block me-2" />
-                  {{ uploadingMedia ? ($t('telegramStudio.uploading') || 'Uploading…') : ($t('telegramStudio.changeImage') || 'Change image') }}
-                </button>
+                <p v-if="category.last_used_template" class="text-xs text-[var(--text-secondary)]">
+                  {{ $t('telegramStudio.templateMediaHint') || 'Template ID:' }} {{ category.last_used_template }}
+                </p>
               </div>
             </div>
-            <input
-              ref="fileInput"
-              type="file"
-              accept="image/*"
-              class="hidden"
-              @change="onFileSelect"
-            />
           </section>
 
           <!-- Section 2: Description -->
-          <section class="card-luxury overflow-hidden">
+          <section class="card-luxury overflow-visible">
             <div
               class="flex items-center justify-between gap-2 flex-wrap pb-4 mb-4 border-b"
               style="border-color: var(--border-card);"
@@ -117,9 +103,22 @@
                 </button>
                 <div
                   v-if="showVariableMenu"
-                  class="absolute top-full end-0 mt-1 z-20 min-w-[200px] rounded-xl border shadow-lg py-2 max-h-60 overflow-y-auto"
+                  class="absolute top-full end-0 mt-1 z-50 min-w-[240px] rounded-xl border shadow-lg py-2 max-h-[min(70vh,28rem)] overflow-y-auto overscroll-contain"
                   style="border-color: var(--border-card); background: var(--bg-card);"
                 >
+                  <p class="px-3 py-1 text-xs text-[var(--text-secondary)]">
+                    {{ $t('telegramStudio.commonVariables') || 'Common variables' }}
+                  </p>
+                  <button
+                    v-for="v in staticVariables"
+                    :key="v.key"
+                    type="button"
+                    class="w-full text-start px-3 py-2 text-sm transition-colors hover:bg-[var(--bg-hover)]"
+                    style="color: var(--text-primary);"
+                    @click="insertVariable(v.key)"
+                  >
+                    {{ v.label }} — <code class="text-gold">{{ variableCode({ slug: v.key, name: v.key }) }}</code>
+                  </button>
                   <p class="px-3 py-1 text-xs text-[var(--text-secondary)]">
                     {{ $t('telegramStudio.priceTypes') || 'Price types' }}
                   </p>
@@ -232,7 +231,7 @@
               </h2>
             </div>
             <TelegramMockup
-              :image-url="form.telegram_media_url"
+              :image-url="templateMediaUrl"
               :description="form.telegram_message_description"
               :buttons="validButtons"
               :variable-values="variableValues"
@@ -250,14 +249,15 @@
 
 <script setup>
 import { ref, computed, onMounted, nextTick } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { useI18n } from 'vue-i18n'
-import { categoryApi } from '@/services/api'
+import { categoryApi, templateEditorApi } from '@/services/api'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import TelegramMockup from '@/components/telegram/TelegramMockup.vue'
 
 const route = useRoute()
+const router = useRouter()
 const toast = useToast()
 const { t } = useI18n()
 
@@ -267,31 +267,72 @@ const loading = ref(true)
 const category = ref(null)
 const form = ref({
   telegram_message_description: '',
-  telegram_media_url: '',
   inline_buttons: [],
 })
 const showVariableMenu = ref(false)
-const fileInput = ref(null)
 const descriptionTextarea = ref(null)
-const uploadingMedia = ref(false)
 const saving = ref(false)
+const templateMediaUrl = ref('')
+function formatPricePreview(raw) {
+  if (raw == null || raw === '') return '—'
+  const n = Number(String(raw).replace(/,/g, ''))
+  if (Number.isNaN(n)) return String(raw)
+  if (Math.abs(n - Math.round(n)) < 1e-9) return Math.round(n).toLocaleString('en-US')
+  const s = n.toFixed(2).replace(/\.?0+$/, '')
+  if (!s.includes('.')) return Number(s).toLocaleString('en-US')
+  const [w, frac] = s.split('.')
+  return `${Number(w).toLocaleString('en-US')}.${frac}`
+}
+
+const staticVariables = [
+  { key: 'date_fa', label: 'Persian date' },
+  { key: 'date_en', label: 'English date' },
+  { key: 'farsi_weekday', label: 'Persian weekday' },
+  { key: 'english_weekday', label: 'English weekday' },
+  { key: 'time', label: 'Time' },
+]
 
 const validButtons = computed(() =>
   (form.value.inline_buttons || []).filter((b) => b && (b.label || b.url)).map((b) => ({ label: b.label || '', url: b.url || '' }))
 )
 
 const isIncomplete = computed(() => {
-  const hasMedia = !!form.value.telegram_media_url?.trim()
-  const hasDescription = !!form.value.telegram_message_description?.trim()
-  return !hasMedia || !hasDescription
+  return !templateMediaUrl.value
 })
 
 const variableValues = computed(() => {
-  const out = {}
+  const now = new Date()
+  const faWeek = new Intl.DateTimeFormat('fa-IR', { weekday: 'long' }).format(now)
+  const enWeek = new Intl.DateTimeFormat('en-US', { weekday: 'long' }).format(now)
+  const out = {
+    date_fa: new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    }).format(now),
+    date_en: new Intl.DateTimeFormat('en-GB', {
+      year: 'numeric',
+      month: 'long',
+      day: '2-digit',
+    }).format(now),
+    farsi_weekday: faWeek,
+    english_weekday: enWeek,
+    weekday_fa: faWeek,
+    weekday_en: enWeek,
+    time: new Intl.DateTimeFormat('fa-IR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(now),
+  }
   const pts = category.value?.price_types || []
   pts.forEach((pt) => {
-    const key = pt.slug || pt.name
-    if (key) out[key] = pt.latest_price != null ? String(pt.latest_price) : '—'
+    const raw = pt.latest_price
+    const val = formatPricePreview(raw)
+    const slug = (pt.slug || '').trim()
+    const name = (pt.name || '').trim()
+    if (slug) out[slug] = val
+    if (name) out[name] = val
   })
   return out
 })
@@ -305,9 +346,17 @@ async function loadCategory() {
   try {
     const { data } = await categoryApi.get(categoryId.value)
     category.value = data
+    templateMediaUrl.value = (data.template_media_url || '').trim()
+    if (!templateMediaUrl.value && data.last_used_template) {
+      try {
+        const templateRes = await templateEditorApi.get(data.last_used_template)
+        templateMediaUrl.value = templateRes?.data?.image || ''
+      } catch {
+        templateMediaUrl.value = ''
+      }
+    }
     form.value = {
       telegram_message_description: data.telegram_message_description ?? '',
-      telegram_media_url: data.telegram_media_url ?? '',
       inline_buttons: Array.isArray(data.inline_buttons)
         ? data.inline_buttons.map((b) => ({ label: b?.label ?? '', url: b?.url ?? '' }))
         : [],
@@ -320,7 +369,7 @@ async function loadCategory() {
 }
 
 function insertVariable(slugOrName) {
-  const code = `{{${slugOrName}}}`
+  const code = `{${slugOrName}}`
   const ta = descriptionTextarea.value
   if (ta) {
     const start = ta.selectionStart
@@ -338,7 +387,7 @@ function insertVariable(slugOrName) {
 }
 
 function variableCode(pt) {
-  return `{{${pt.slug || pt.name}}}`
+  return `{${pt.slug || pt.name}}`
 }
 
 function addButton() {
@@ -350,35 +399,15 @@ function removeButton(idx) {
   form.value.inline_buttons.splice(idx, 1)
 }
 
-async function onFileSelect(e) {
-  const file = e.target?.files?.[0]
-  if (!file || !categoryId.value) return
-  uploadingMedia.value = true
-  try {
-    const fd = new FormData()
-    fd.append('file', file)
-    const { data } = await categoryApi.uploadTelegramMedia(categoryId.value, fd)
-    if (data?.url) {
-      form.value.telegram_media_url = data.url
-      toast.success(t('toast.saveSuccess'))
-    }
-  } catch (err) {
-    toast.error(err.response?.data?.detail || t('toast.serverError'))
-  } finally {
-    uploadingMedia.value = false
-    e.target.value = ''
-  }
-}
-
 async function save() {
   saving.value = true
   try {
     await categoryApi.patch(categoryId.value, {
       telegram_message_description: form.value.telegram_message_description || null,
-      telegram_media_url: form.value.telegram_media_url || '',
       inline_buttons: form.value.inline_buttons.filter((b) => b && (b.label || b.url)),
     })
     toast.success(t('toast.saveSuccess'))
+    router.push('/categories')
   } catch (err) {
     toast.error(err.response?.data?.detail || t('toast.serverError'))
   } finally {

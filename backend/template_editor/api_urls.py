@@ -8,6 +8,11 @@ router.register(r"templates", api_views.TemplateViewSet, basename="api-template-
 
 urlpatterns = [
     path(
+        "media/",
+        api_views.TemplateEditorMediaUploadAPIView.as_view(),
+        name="api-template-editor-media",
+    ),
+    path(
         "templates/<int:pk>/config/",
         api_views.TemplateConfigUpdateAPIView.as_view(),
         name="api-template-editor-config",
@@ -26,6 +31,11 @@ urlpatterns = [
         "fonts/",
         api_views.TemplateFontsAPIView.as_view(),
         name="api-template-editor-fonts",
+    ),
+    path(
+        "price-bindings-preview/",
+        api_views.TemplatePriceBindingsPreviewAPIView.as_view(),
+        name="api-template-editor-price-bindings-preview",
     ),
     path("", include(router.urls)),
 ]

@@ -32,12 +32,22 @@ VARIABLE_CATALOG: List[Dict[str, Any]] = [
     {"key": "special_sell_cash_gbp_price", "type": VAR_TYPE_NUMBER, "description": "Special sell cash GBP", "group": "prices"},
     {"key": "special_sell_account_gbp_price", "type": VAR_TYPE_NUMBER, "description": "Special sell account GBP", "group": "prices"},
     # Date / time
-    {"key": "date_fa", "type": VAR_TYPE_TEXT, "description": "Date (Persian)", "group": "dates"},
-    {"key": "date_en", "type": VAR_TYPE_TEXT, "description": "Date (English)", "group": "dates"},
-    {"key": "farsi_date", "type": VAR_TYPE_TEXT, "description": "Farsi date", "group": "dates"},
+    {"key": "date_fa", "type": VAR_TYPE_TEXT, "description": "Date (Persian, month name)", "group": "dates"},
+    {"key": "date_en", "type": VAR_TYPE_TEXT, "description": "Date (English, long)", "group": "dates"},
+    {"key": "farsi_date", "type": VAR_TYPE_TEXT, "description": "Farsi date (alias of date_fa)", "group": "dates"},
+    {"key": "date_fa_slash", "type": VAR_TYPE_TEXT, "description": "Jalali YYYY/MM/DD (Persian digits)", "group": "dates"},
+    {"key": "date_fa_slash_short", "type": VAR_TYPE_TEXT, "description": "Jalali Y/M/D (Persian digits)", "group": "dates"},
+    {"key": "date_fa_iso", "type": VAR_TYPE_TEXT, "description": "Jalali YYYY-MM-DD (Persian digits)", "group": "dates"},
     {"key": "farsi_weekday", "type": VAR_TYPE_TEXT, "description": "Farsi weekday", "group": "dates"},
-    {"key": "english_date", "type": VAR_TYPE_TEXT, "description": "English date", "group": "dates"},
+    {"key": "weekday_fa", "type": VAR_TYPE_TEXT, "description": "Farsi weekday (alias)", "group": "dates"},
+    {"key": "english_date", "type": VAR_TYPE_TEXT, "description": "English date (alias of date_en)", "group": "dates"},
     {"key": "english_weekday", "type": VAR_TYPE_TEXT, "description": "English weekday", "group": "dates"},
+    {"key": "weekday_en", "type": VAR_TYPE_TEXT, "description": "English weekday (alias)", "group": "dates"},
+    {"key": "date_en_iso", "type": VAR_TYPE_TEXT, "description": "Gregorian ISO YYYY-MM-DD", "group": "dates"},
+    {"key": "date_en_dmy", "type": VAR_TYPE_TEXT, "description": "Gregorian DD/MM/YYYY", "group": "dates"},
+    {"key": "date_en_mdy", "type": VAR_TYPE_TEXT, "description": "Gregorian MM/DD/YYYY (US)", "group": "dates"},
+    {"key": "date_en_short", "type": VAR_TYPE_TEXT, "description": "Gregorian short (e.g. 21 Apr 2026)", "group": "dates"},
+    {"key": "date_en_weekday_long", "type": VAR_TYPE_TEXT, "description": "English weekday + long date", "group": "dates"},
     {"key": "tether_date", "type": VAR_TYPE_TEXT, "description": "Tether date (e.g. 14 dec)", "group": "dates"},
     {"key": "tether_year", "type": VAR_TYPE_TEXT, "description": "Tether year", "group": "dates"},
     {"key": "time", "type": VAR_TYPE_TEXT, "description": "Time", "group": "dates"},
@@ -53,19 +63,73 @@ VARIABLE_CATALOG: List[Dict[str, Any]] = [
 # Keys only, for quick lookup
 VARIABLE_KEYS = [v["key"] for v in VARIABLE_CATALOG]
 
+# Static samples for editor preview / tests (not live "today")
+_DATE_SAMPLE_VALUES: Dict[str, str] = {
+    "date_fa": "۲۱ فروردین ۱۴۰۴",
+    "farsi_date": "۲۱ فروردین ۱۴۰۴",
+    "date_fa_slash": "۱۴۰۴/۰۱/۲۱",
+    "date_fa_slash_short": "۱۴۰۴/۱/۲۱",
+    "date_fa_iso": "۱۴۰۴-۰۱-۲۱",
+    "date_en": "April 21, 2026",
+    "english_date": "April 21, 2026",
+    "date_en_iso": "2026-04-21",
+    "date_en_dmy": "21/04/2026",
+    "date_en_mdy": "04/21/2026",
+    "date_en_short": "21 Apr 2026",
+    "date_en_weekday_long": "Tuesday, April 21, 2026",
+    "farsi_weekday": "سه‌شنبه",
+    "weekday_fa": "سه‌شنبه",
+    "english_weekday": "Tuesday",
+    "weekday_en": "Tuesday",
+    "tether_date": "21 apr",
+    "tether_year": "2026",
+    "time": "14:30",
+}
+
 
 def get_variable_catalog() -> List[Dict[str, Any]]:
     """Return the full variable catalog for API/UI."""
     return list(VARIABLE_CATALOG)
 
 
+def extend_variable_catalog_with_category(category_id: int) -> List[Dict[str, Any]]:
+    """Append ``price__{{slug}}`` entries for each active PriceType in the category."""
+    from category.models import PriceType
+
+    base = list(VARIABLE_CATALOG)
+    seen = {v["key"] for v in base}
+    for pt in PriceType.objects.filter(
+        category_id=category_id, is_active=True
+    ).order_by("order", "id"):
+        slug = (pt.slug or "").strip()
+        if not slug:
+            continue
+        k = f"price__{slug}"
+        if k not in seen:
+            base.append(
+                {
+                    "key": k,
+                    "type": VAR_TYPE_NUMBER,
+                    "description": pt.name,
+                    "group": "prices",
+                }
+            )
+            seen.add(k)
+    return base
+
+
 def get_default_sample_value(key: str) -> str:
     """Return a sample string for preview when no dynamic_data is provided."""
+    k = str(key or "").strip()
+    if k.startswith("price__"):
+        return "1,234.56"
+    if k in _DATE_SAMPLE_VALUES:
+        return _DATE_SAMPLE_VALUES[k]
     for v in VARIABLE_CATALOG:
-        if v["key"] == key:
+        if v["key"] == k:
             if v["type"] == VAR_TYPE_NUMBER:
                 return "1,234.56"
             if v["type"] == VAR_TYPE_IMAGE:
                 return ""
-            return key.replace("_", " ").title()
-    return key.replace("_", " ").title()
+            return k.replace("_", " ").title()
+    return k.replace("_", " ").title()

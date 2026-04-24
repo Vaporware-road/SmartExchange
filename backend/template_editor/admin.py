@@ -64,12 +64,14 @@ class TemplateAdmin(admin.ModelAdmin):
         "thumbnail_tag",
         "name",
         "assignment_target",
+        "is_active",
+        "publish_order",
         "field_count",
         "updated_at",
         "preview_link",
     )
     list_display_links = ("thumbnail_tag", "name")
-    list_filter = ("category", "special_price_type", "created_at", "updated_at")
+    list_filter = ("category", "special_price_type", "is_active", "created_at", "updated_at")
     search_fields = ("name", "category__name", "special_price_type__name")
     readonly_fields = ("created_at", "updated_at", "rendered_config", "live_preview", "field_overview")
     ordering = ("-updated_at",)

@@ -1,0 +1,655 @@
+<template>
+  <aside class="flex w-72 shrink-0 flex-col gap-3 overflow-y-auto rounded-xl border border-[var(--border-card)] bg-[var(--bg-card)] p-3 text-sm">
+    <h2 class="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">Inspector</h2>
+
+    <template v-if="!w">
+      <div class="space-y-2 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/45 p-3">
+        <p class="text-xs font-semibold text-[var(--text-primary)]">Template settings</p>
+        <div class="space-y-1.5">
+          <label class="block text-xs text-[var(--text-secondary)]">Template name</label>
+          <input v-model="templateName" type="text" class="input-luxury w-full text-sm" />
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="space-y-1.5">
+            <label class="block text-xs text-[var(--text-secondary)]">Width</label>
+            <input v-model.number="canvasWidthValue" type="number" min="320" max="4096" class="input-luxury w-full text-sm" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-xs text-[var(--text-secondary)]">Height</label>
+            <input v-model.number="canvasHeightValue" type="number" min="320" max="4096" class="input-luxury w-full text-sm" />
+          </div>
+        </div>
+        <div class="grid grid-cols-[1fr_auto] gap-2">
+          <div class="space-y-1.5">
+            <label class="block text-xs text-[var(--text-secondary)]">Canvas background</label>
+            <input v-model="canvasBgColor" type="text" class="input-luxury w-full text-sm font-mono" placeholder="#ffffff" />
+          </div>
+          <div class="space-y-1.5">
+            <label class="block text-xs text-transparent">.</label>
+            <input v-model="canvasBgColor" type="color" class="h-10 w-full min-w-[2.75rem] cursor-pointer rounded border border-[var(--border-card)] bg-transparent p-0" />
+          </div>
+        </div>
+        <button
+          type="button"
+          class="btn-luxury-outline flex w-full items-center justify-center gap-2 py-2 text-xs"
+          @click="te.openBackgroundPicker?.()"
+        >
+          <i class="fas fa-image" />
+          Upload background image
+        </button>
+      </div>
+      <p class="text-xs text-[var(--text-secondary)]">Select a widget to edit style, typography and data bindings.</p>
+    </template>
+
+    <template v-else>
+      <div class="grid grid-cols-3 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/55 p-1">
+        <button
+          v-for="tab in inspectorTabs"
+          :key="tab.id"
+          type="button"
+          class="rounded-md px-2 py-1.5 text-xs font-medium transition-colors"
+          :class="activeTab === tab.id ? 'bg-[var(--bg-card)] text-[var(--primary)] shadow-sm' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'"
+          @click="activeTab = tab.id"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-xs text-[var(--text-secondary)]">Name</label>
+        <input v-model="w.name" type="text" class="input-luxury w-full text-sm" />
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-xs text-[var(--text-secondary)]">Type</label>
+        <input :value="w.type" type="text" class="input-luxury w-full text-sm opacity-70" disabled />
+      </div>
+
+      <div v-if="activeTab === 'data' && (w.type === 'text' || w.type === 'marquee')" class="space-y-2">
+        <label class="block text-xs text-[var(--text-secondary)]">Binding key (optional)</label>
+        <input
+          v-model="bindingKey"
+          type="text"
+          class="input-luxury w-full text-sm font-mono"
+          placeholder="e.g. price__usdt-buy or date_fa"
+          @blur="refitSelectedAfterTick"
+        />
+        <p class="text-[10px] text-[var(--text-secondary)]">
+          When set, published image uses this key from live prices / dates instead of static content.
+        </p>
+        <div
+          v-if="bindingPreviewInfo"
+          class="rounded border border-[var(--border-card)] bg-[var(--bg-input)]/40 px-2 py-1.5 text-[10px] text-[var(--text-secondary)]"
+        >
+          Preview source:
+          <span class="font-semibold text-[var(--text-primary)]">{{ bindingPreviewInfo.sourceLabel }}</span>
+          <span v-if="bindingPreviewInfo.value"> | Value: <span class="font-mono text-[var(--text-primary)]">{{ bindingPreviewInfo.value }}</span></span>
+        </div>
+        <label class="block text-xs text-[var(--text-secondary)]">Fallback value (used when live value is unavailable)</label>
+        <textarea v-model="w.content" rows="3" class="input-luxury w-full text-sm font-mono" @blur="refitSelectedAfterTick" />
+      </div>
+
+      <div v-if="activeTab === 'data' && (w.type === 'date' || w.type === 'weekday')" class="space-y-2">
+        <label class="block text-xs text-[var(--text-secondary)]">
+          {{ w.type === 'weekday' ? $t('templateEditor.weekdaySource') : $t('templateEditor.dateSource') }}
+        </label>
+        <select v-model="dateKey" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
+          <option v-for="k in datePresetKeyList" :key="k" :value="k">
+            {{ presetLabel(k) }}
+          </option>
+        </select>
+        <p class="text-[10px] leading-snug text-[var(--text-secondary)]">
+          {{ $t('templateEditor.dateSourceHelp') }}
+        </p>
+      </div>
+
+      <div v-if="activeTab === 'data' && w.type === 'clock'" class="space-y-2">
+        <p class="text-xs text-[var(--text-secondary)]">Uses <code class="font-mono">time</code> from server data.</p>
+      </div>
+
+      <div v-if="activeTab === 'typography' && isTextLikeWidget" class="space-y-3 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/40 p-2">
+        <p class="text-xs font-semibold text-[var(--text-primary)]">Typography</p>
+        <div class="space-y-2">
+          <label class="block text-xs text-[var(--text-secondary)]">Font size</label>
+          <input v-model.number="styleFontSize" type="number" min="8" max="200" class="input-luxury w-full text-sm" />
+        </div>
+        <div class="grid grid-cols-[1fr_auto] gap-2">
+          <div class="space-y-2">
+            <label class="block text-xs text-[var(--text-secondary)]">Text color</label>
+            <input v-model="styleColorHex" type="text" class="input-luxury w-full text-sm font-mono" placeholder="#ffffff" />
+          </div>
+          <div class="space-y-2">
+            <label class="block text-xs text-transparent">.</label>
+            <input v-model="styleColorHex" type="color" class="h-10 w-full min-w-[2.75rem] cursor-pointer rounded border border-[var(--border-card)] bg-transparent p-0" title="Pick color" />
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-xs text-[var(--text-secondary)]">Font file (PNG export)</label>
+          <select v-model="styleFontFile" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
+            <option value="">Default (server)</option>
+            <option v-for="f in fontsList" :key="f.filename" :value="f.filename">
+              {{ f.display_name || f.filename }}
+            </option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-xs text-[var(--text-secondary)]">Align</label>
+          <select v-model="styleAlign" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
+            <option value="left">Left</option>
+            <option value="center">Center</option>
+            <option value="right">Right</option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-xs text-[var(--text-secondary)]">Weight</label>
+          <select v-model="styleFontWeight" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
+            <option value="normal">Normal</option>
+            <option value="bold">Bold</option>
+          </select>
+        </div>
+        <div class="space-y-2">
+          <label class="block text-xs text-[var(--text-secondary)]">Line height (optional)</label>
+          <input
+            v-model="styleLineHeight"
+            type="text"
+            class="input-luxury w-full text-sm"
+            placeholder="e.g. 1.2 or 32"
+            @blur="refitSelectedAfterTick"
+          />
+        </div>
+        <BaseCheckbox v-model="stylePlainText">Plain text on export (no outline / shadow)</BaseCheckbox>
+        <template v-if="!stylePlainText">
+          <BaseCheckbox v-model="styleShadowEnabled">Drop shadow (PNG)</BaseCheckbox>
+          <BaseCheckbox v-model="styleOutlineEnabled">Text outline (PNG)</BaseCheckbox>
+        </template>
+      </div>
+
+      <div v-if="activeTab === 'appearance' && w.type === 'image'" class="space-y-2">
+        <label class="block text-xs text-[var(--text-secondary)]">Image URL</label>
+        <input v-model="w.content" type="url" class="input-luxury w-full text-sm" placeholder="https://… or /media/…" />
+        <input ref="imageFileInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp" class="hidden" @change="onImageFile" />
+        <button
+          type="button"
+          class="btn-luxury-outline flex w-full items-center justify-center gap-2 py-2 text-xs"
+          :disabled="uploading"
+          @click="openImagePicker"
+        >
+          <i class="fas fa-cloud-upload-alt" />
+          {{ uploading ? 'Uploading…' : 'Upload image' }}
+        </button>
+        <router-link
+          to="/templates/media"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="block text-center text-[10px] text-[var(--primary)] underline-offset-2 hover:underline"
+        >
+          Open media library
+        </router-link>
+      </div>
+
+      <div v-if="activeTab === 'appearance' && w.type === 'price_board'" class="space-y-3">
+        <div class="space-y-2">
+          <label class="block text-xs text-[var(--text-secondary)]">Title</label>
+          <input v-model="styleTitle" type="text" class="input-luxury w-full text-sm" />
+        </div>
+        <div class="space-y-2">
+          <label class="block text-xs text-[var(--text-secondary)]">Columns</label>
+          <input v-model.number="styleColumns" type="number" min="1" max="4" class="input-luxury w-full text-sm" />
+        </div>
+        <p class="text-xs font-semibold text-[var(--text-primary)]">Colors (PNG)</p>
+        <div class="grid grid-cols-2 gap-2">
+          <div class="space-y-1">
+            <label class="text-[10px] text-[var(--text-secondary)]">Header bg</label>
+            <input v-model="styleHeaderBg" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] text-[var(--text-secondary)]">Header text</label>
+            <input v-model="styleHeaderColor" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] text-[var(--text-secondary)]">Row bg</label>
+            <input v-model="styleRowBg" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] text-[var(--text-secondary)]">Price</label>
+            <input v-model="stylePriceColor" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
+          </div>
+          <div class="space-y-1">
+            <label class="text-[10px] text-[var(--text-secondary)]">Label</label>
+            <input v-model="styleLabelColor" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
+          </div>
+        </div>
+      </div>
+
+      <div v-if="activeTab === 'appearance'" class="space-y-2">
+        <label class="block text-xs text-[var(--text-secondary)]">Opacity (editor + PNG)</label>
+        <input v-model.number="styleOpacity" type="range" min="0" max="1" step="0.01" class="w-full accent-[var(--primary)]" />
+        <div class="text-right text-[10px] tabular-nums text-[var(--text-secondary)]">{{ Math.round(styleOpacity * 100) }}%</div>
+      </div>
+
+      <div v-if="activeTab === 'appearance'" class="grid grid-cols-2 gap-2">
+        <div>
+          <label class="block text-xs text-[var(--text-secondary)]">z-index</label>
+          <input v-model.number="w.zIndex" type="number" class="input-luxury w-full text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs text-[var(--text-secondary)]">Rotation</label>
+          <input v-model.number="w.rotation" type="number" class="input-luxury w-full text-sm" />
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn-luxury-outline w-full py-2 text-xs text-red-600 dark:text-red-300"
+        @click="te.deleteWidget(w.id)"
+      >
+        Delete widget
+      </button>
+    </template>
+  </aside>
+</template>
+
+<script setup>
+import { ref, computed, onMounted, nextTick } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useToast } from 'vue-toastification'
+import { formatDrfError, templateEditorApi } from '@/services/api'
+import { useTemplateEditorInjected } from './templateEditorInjectionKey.js'
+import { injectTemplateEditorFontFaces } from './templateEditorFonts.js'
+import { DATE_WIDGET_DATE_KEYS, WEEKDAY_WIDGET_KEYS } from './dateWidgetPresets.js'
+import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
+
+const { t } = useI18n()
+const te = useTemplateEditorInjected()
+const toast = useToast()
+
+function refitSelectedAfterTick() {
+  nextTick(() => {
+    te.refitSelectedWidget?.()
+  })
+}
+const imageFileInput = ref(null)
+const uploading = ref(false)
+const fontsList = ref([])
+
+const w = computed(() => te.selectedWidget?.value ?? null)
+const activeTab = ref('appearance')
+const inspectorTabs = [
+  { id: 'appearance', label: 'Appearance' },
+  { id: 'typography', label: 'Font' },
+  { id: 'data', label: 'Data' },
+]
+
+const isTextLikeWidget = computed(() => {
+  const ty = w.value?.type
+  return ['text', 'marquee', 'date', 'weekday', 'clock'].includes(ty)
+})
+const templateName = computed({
+  get() {
+    return te.template?.value?.name || ''
+  },
+  set(v) {
+    if (!te.template?.value) return
+    te.template.value.name = v
+  },
+})
+
+const canvasWidthValue = computed({
+  get() {
+    return Number(te.canvasWidth?.value) || 1920
+  },
+  set(v) {
+    if (!te.canvasWidth) return
+    te.canvasWidth.value = Math.min(4096, Math.max(320, Number(v) || 1920))
+  },
+})
+const canvasHeightValue = computed({
+  get() {
+    return Number(te.canvasHeight?.value) || 1080
+  },
+  set(v) {
+    if (!te.canvasHeight) return
+    te.canvasHeight.value = Math.min(4096, Math.max(320, Number(v) || 1080))
+  },
+})
+const canvasBgColor = computed({
+  get() {
+    return te.backgroundColor?.value || '#ffffff'
+  },
+  set(v) {
+    if (!te.backgroundColor) return
+    let s = String(v || '').trim()
+    if (!s.startsWith('#')) s = `#${s}`
+    te.backgroundColor.value = /^#[0-9A-Fa-f]{6}$/i.test(s) || /^#[0-9A-Fa-f]{3}$/i.test(s) ? s : '#ffffff'
+  },
+})
+
+const datePresetKeyList = computed(() => {
+  const sw = w.value
+  if (!sw) return DATE_WIDGET_DATE_KEYS
+  if (sw.type === 'weekday') return WEEKDAY_WIDGET_KEYS
+  return DATE_WIDGET_DATE_KEYS
+})
+
+function presetLabel(key) {
+  const sw = w.value
+  const map = sw?.type === 'weekday' ? 'weekdayFormats' : 'dateFormats'
+  const path = `templateEditor.${map}.${key}`
+  const translated = t(path)
+  return translated === path ? key : translated
+}
+
+onMounted(async () => {
+  try {
+    const { data } = await templateEditorApi.fonts()
+    fontsList.value = Array.isArray(data) ? data : []
+    injectTemplateEditorFontFaces(fontsList.value)
+  } catch {
+    fontsList.value = []
+  }
+})
+
+function openImagePicker() {
+  imageFileInput.value?.click()
+}
+
+async function onImageFile(ev) {
+  const file = ev.target?.files?.[0]
+  if (ev.target) ev.target.value = ''
+  const sw = w.value
+  if (!file || !sw) return
+  uploading.value = true
+  try {
+    const fd = new FormData()
+    fd.append('file', file)
+    const { data } = await templateEditorApi.uploadMedia(fd)
+    const url = data?.url
+    if (url) sw.content = typeof url === 'string' ? url : ''
+    toast.success('Image uploaded')
+  } catch (e) {
+    toast.error(formatDrfError(e.response?.data))
+  } finally {
+    uploading.value = false
+  }
+}
+
+const styleTitle = computed({
+  get() {
+    const sw = w.value
+    if (!sw) return ''
+    return sw.style?.title ?? ''
+  },
+  set(v) {
+    const sw = w.value
+    if (!sw) return
+    if (!sw.style || typeof sw.style !== 'object') sw.style = {}
+    sw.style.title = v
+  },
+})
+
+const bindingKey = computed({
+  get() {
+    const sw = w.value
+    if (!sw) return ''
+    return sw.style?.bindingKey || sw.style?.binding_key || ''
+  },
+  set(v) {
+    const sw = w.value
+    if (!sw) return
+    if (!sw.style || typeof sw.style !== 'object') sw.style = {}
+    const s = String(v || '').trim()
+    if (s) {
+      sw.style.bindingKey = s
+      delete sw.style.binding_key
+    } else {
+      delete sw.style.bindingKey
+      delete sw.style.binding_key
+    }
+  },
+})
+
+const bindingPreviewInfo = computed(() => {
+  const sw = w.value
+  if (!sw || (sw.type !== 'text' && sw.type !== 'marquee')) return null
+  const key = String(sw.style?.bindingKey || sw.style?.binding_key || '').trim()
+  if (!key) return null
+  const row = te.priceBindingPreviewMap?.value?.[key]
+  const source = String(row?.source || '').trim()
+  const sourceLabel = source === 'finalized'
+    ? 'Latest finalized'
+    : source === 'latest'
+      ? 'Latest submitted'
+      : 'Fallback only'
+  return {
+    sourceLabel,
+    value: row?.value != null ? String(row.value) : '',
+  }
+})
+
+const dateKey = computed({
+  get() {
+    const sw = w.value
+    if (!sw) return 'date_fa'
+    const raw = sw.style?.dateKey || sw.style?.date_key
+    const fallback = sw.type === 'weekday' ? 'farsi_weekday' : 'date_fa'
+    const k = String(raw || '').trim() || fallback
+    const allowed = sw.type === 'weekday' ? WEEKDAY_WIDGET_KEYS : DATE_WIDGET_DATE_KEYS
+    return allowed.includes(k) ? k : fallback
+  },
+  set(v) {
+    const sw = w.value
+    if (!sw) return
+    if (!sw.style || typeof sw.style !== 'object') sw.style = {}
+    const allowed = sw.type === 'weekday' ? WEEKDAY_WIDGET_KEYS : DATE_WIDGET_DATE_KEYS
+    const fallback = sw.type === 'weekday' ? 'farsi_weekday' : 'date_fa'
+    const s = String(v || '').trim()
+    sw.style.dateKey = allowed.includes(s) ? s : fallback
+    delete sw.style.date_key
+  },
+})
+
+const styleColumns = computed({
+  get() {
+    const sw = w.value
+    if (!sw) return 2
+    return Number(sw.style?.columns) || 2
+  },
+  set(v) {
+    const sw = w.value
+    if (!sw) return
+    if (!sw.style || typeof sw.style !== 'object') sw.style = {}
+    sw.style.columns = Math.min(4, Math.max(1, Number(v) || 1))
+  },
+})
+
+function ensureStyle() {
+  const sw = w.value
+  if (!sw) return null
+  if (!sw.style || typeof sw.style !== 'object') sw.style = {}
+  return sw.style
+}
+
+const styleFontSize = computed({
+  get() {
+    const s = w.value?.style
+    const n = Number(s?.fontSize ?? s?.font_size ?? 24)
+    return Number.isFinite(n) ? Math.min(200, Math.max(8, n)) : 24
+  },
+  set(v) {
+    const st = ensureStyle()
+    if (!st) return
+    st.fontSize = Math.min(200, Math.max(8, Number(v) || 24))
+    delete st.font_size
+  },
+})
+
+const styleColorHex = computed({
+  get() {
+    const c = w.value?.style?.color
+    if (typeof c === 'string' && /^#[0-9A-Fa-f]{6}$/.test(c)) return c
+    if (typeof c === 'string' && /^#[0-9A-Fa-f]{3}$/.test(c)) return c
+    return '#ffffff'
+  },
+  set(v) {
+    const st = ensureStyle()
+    if (!st) return
+    let s = String(v || '').trim()
+    if (!s.startsWith('#')) s = `#${s}`
+    if (/^#[0-9A-Fa-f]{3}$/.test(s) || /^#[0-9A-Fa-f]{6}$/i.test(s)) st.color = s
+    else st.color = '#ffffff'
+  },
+})
+
+const styleFontFile = computed({
+  get() {
+    const s = w.value?.style
+    return s?.font || s?.fontFilename || s?.font_filename || ''
+  },
+  set(v) {
+    const st = ensureStyle()
+    if (!st) return
+    const s = String(v || '').trim()
+    if (!s) {
+      delete st.font
+      delete st.fontFilename
+      delete st.font_filename
+      return
+    }
+    st.font = s
+    delete st.fontFilename
+    delete st.font_filename
+  },
+})
+
+const styleAlign = computed({
+  get() {
+    const a = String(w.value?.style?.align || 'center').toLowerCase()
+    if (a === 'left' || a === 'start') return 'left'
+    if (a === 'right' || a === 'end') return 'right'
+    return 'center'
+  },
+  set(v) {
+    const st = ensureStyle()
+    if (!st) return
+    st.align = v || 'center'
+  },
+})
+
+const styleFontWeight = computed({
+  get() {
+    const fw = w.value?.style?.fontWeight || w.value?.style?.weight
+    if (fw === 'bold' || fw === 700 || fw === '700') return 'bold'
+    return 'normal'
+  },
+  set(v) {
+    const st = ensureStyle()
+    if (!st) return
+    st.fontWeight = v === 'bold' ? 'bold' : 'normal'
+    delete st.weight
+  },
+})
+
+const styleLineHeight = computed({
+  get() {
+    const s = w.value?.style
+    if (s?.lineHeight != null && s.lineHeight !== '') return String(s.lineHeight)
+    if (s?.line_height != null && s.line_height !== '') return String(s.line_height)
+    return ''
+  },
+  set(v) {
+    const st = ensureStyle()
+    if (!st) return
+    const s = String(v || '').trim()
+    if (!s) {
+      delete st.lineHeight
+      delete st.line_height
+      return
+    }
+    st.lineHeight = s
+    delete st.line_height
+  },
+})
+
+const stylePlainText = computed({
+  get() {
+    return w.value?.style?.plainText === true || w.value?.style?.plain_text === true
+  },
+  set(on) {
+    const st = ensureStyle()
+    if (!st) return
+    if (on) {
+      st.plainText = true
+      delete st.plain_text
+    } else {
+      delete st.plainText
+      delete st.plain_text
+    }
+  },
+})
+
+const styleShadowEnabled = computed({
+  get() {
+    if (w.value?.style?.plainText || w.value?.style?.plain_text) return false
+    const ts = w.value?.style?.textShadow
+    if (ts === false || ts === 0) return false
+    return true
+  },
+  set(on) {
+    const st = ensureStyle()
+    if (!st) return
+    if (on) delete st.textShadow
+    else st.textShadow = false
+  },
+})
+
+const styleOutlineEnabled = computed({
+  get() {
+    if (w.value?.style?.plainText || w.value?.style?.plain_text) return false
+    const o = w.value?.style?.textOutline
+    if (o === false) return false
+    return true
+  },
+  set(on) {
+    const st = ensureStyle()
+    if (!st) return
+    if (on) delete st.textOutline
+    else st.textOutline = false
+  },
+})
+
+const styleOpacity = computed({
+  get() {
+    const o = w.value?.style?.opacity
+    const n = o != null && o !== '' ? Number(o) : 1
+    return Number.isFinite(n) ? Math.min(1, Math.max(0, n)) : 1
+  },
+  set(v) {
+    const st = ensureStyle()
+    if (!st) return
+    const n = Math.min(1, Math.max(0, Number(v)))
+    if (n >= 0.999) delete st.opacity
+    else st.opacity = n
+  },
+})
+
+function colorField(key, fallback) {
+  return computed({
+    get() {
+      const c = w.value?.style?.[key]
+      if (typeof c === 'string' && /^#[0-9A-Fa-f]{3,8}$/i.test(c)) return c
+      return fallback
+    },
+    set(v) {
+      const st = ensureStyle()
+      if (!st) return
+      st[key] = String(v || fallback)
+    },
+  })
+}
+
+const styleHeaderBg = colorField('headerBg', '#1e293b')
+const styleHeaderColor = colorField('headerColor', '#e2e8f0')
+const styleRowBg = colorField('rowBg', '#334155')
+const stylePriceColor = colorField('priceColor', '#d4af37')
+const styleLabelColor = colorField('labelColor', '#f1f5f9')
+</script>

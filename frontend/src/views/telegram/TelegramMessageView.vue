@@ -360,10 +360,9 @@
                     <option v-for="b in botsList" :key="b.id" :value="b.id">{{ b.name || b.display_name || `Bot #${b.id}` }}</option>
                   </select>
                 </div>
-                <label class="inline-flex items-center gap-2 cursor-pointer mt-6">
-                  <input v-model="channelForm.is_active" type="checkbox" class="rounded border-gray-500" />
-                  <span class="text-sm text-gray-400">{{ $t('telegram.channels.active') }}</span>
-                </label>
+                <div class="mt-6">
+                  <BaseCheckbox v-model="channelForm.is_active">{{ $t('telegram.channels.active') }}</BaseCheckbox>
+                </div>
                 <button type="submit" class="btn-luxury" :disabled="channelSaving">
                   <LoadingSpinner v-if="channelSaving" class="w-5 h-5" />
                   <span v-else>{{ $t('telegram.channels.add') }}</span>
@@ -455,10 +454,7 @@
                   <option v-for="b in botsList" :key="b.id" :value="b.id">{{ b.name || b.display_name || `Bot #${b.id}` }}</option>
                 </select>
               </div>
-              <label class="inline-flex items-center gap-2 cursor-pointer">
-                <input v-model="editChannelForm.is_active" type="checkbox" class="rounded border-gray-500" />
-                <span class="text-sm text-gray-400">{{ $t('telegram.channels.active') }}</span>
-              </label>
+              <BaseCheckbox v-model="editChannelForm.is_active">{{ $t('telegram.channels.active') }}</BaseCheckbox>
               <div class="flex gap-2 pt-2">
                 <button type="button" class="btn-luxury" :disabled="channelSaving" @click="saveEditChannel">
                   <LoadingSpinner v-if="channelSaving" class="w-5 h-5" />
@@ -486,16 +482,9 @@
             </p>
 
             <div class="mb-6">
-              <label class="flex items-center gap-3 cursor-pointer">
-                <input
-                  v-model="autoPostOnUpdate"
-                  type="checkbox"
-                  class="rounded border-gray-500 w-5 h-5"
-                  :disabled="automationSettingsSaving"
-                  @change="saveAutoPostOnUpdate"
-                />
-                <span class="text-sm text-[var(--text-primary)]">{{ $t('telegram.automation.autoPostOnUpdate') }}</span>
-              </label>
+              <BaseCheckbox v-model="autoPostOnUpdate" :disabled="automationSettingsSaving" @update:model-value="saveAutoPostOnUpdate">
+                {{ $t('telegram.automation.autoPostOnUpdate') }}
+              </BaseCheckbox>
               <p class="text-xs text-gray-500 mt-1 ml-8">
                 {{ $t('telegram.automation.autoPostOnUpdateHint') }}
               </p>
@@ -551,10 +540,7 @@
                   />
                 </div>
                 <div class="flex items-end gap-2">
-                  <label class="inline-flex items-center gap-2 cursor-pointer">
-                    <input v-model="scheduleForm.enabled" type="checkbox" class="rounded border-gray-500" />
-                    <span class="text-sm text-gray-400">{{ $t('telegram.automation.enabled') }}</span>
-                  </label>
+                  <BaseCheckbox v-model="scheduleForm.enabled">{{ $t('telegram.automation.enabled') }}</BaseCheckbox>
                   <button type="submit" class="btn-luxury" :disabled="scheduleSaving">
                     <LoadingSpinner v-if="scheduleSaving" class="w-5 h-5" />
                     <span v-else>{{ $t('telegram.automation.add') }}</span>
@@ -632,6 +618,7 @@ import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { telegramApi, categoryApi, specialPriceApi } from '@/services/api'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
+import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
 
 const { t } = useI18n()
 const toast = useToast()

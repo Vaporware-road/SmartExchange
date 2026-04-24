@@ -20,11 +20,7 @@
           >
             <div class="flex items-center justify-between px-6 py-5 border-b" style="border-color: var(--border-card);">
               <router-link to="/" class="flex items-center gap-3" @click="$emit('close')">
-                <div
-                  class="p-2.5 rounded-xl bg-primary-muted border border-[var(--border-color)]"
-                >
-                  <i class="fas fa-coins text-xl text-[var(--primary)]" />
-                </div>
+                <AppBrandLogo size="md" rounded="xl" />
                 <span class="text-lg font-bold text-[var(--primary)]">{{ siteName }}</span>
               </router-link>
               <button
@@ -66,6 +62,7 @@ import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useAuthStore } from '@/stores/auth'
+import AppBrandLogo from '@/components/layout/AppBrandLogo.vue'
 
 defineProps({
   open: Boolean,

@@ -22,6 +22,14 @@ class SpecialPriceType(models.Model):
     description = models.TextField(blank=True, null=True)
     # Optional Font Awesome icon class for UI highlight (e.g. "fas fa-star", "fas fa-shield-alt")
     icon = models.CharField(max_length=64, blank=True, null=True)
+    last_used_template = models.ForeignKey(
+        "template_editor.Template",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        help_text="Last template used for Telegram finalize (round-robin among active templates).",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -45,8 +53,58 @@ class SpecialPriceType(models.Model):
         return self.name
 
 
+class SpecialPricePair(models.Model):
+    TRADE_CHOICES = (
+        ("buy", "Buy"),
+        ("sell", "Sell"),
+    )
+
+    special_price_type = models.ForeignKey(
+        SpecialPriceType,
+        on_delete=models.CASCADE,
+        related_name="pairs",
+    )
+    name = models.CharField(max_length=150)
+    source_currency = models.ForeignKey(
+        Currency,
+        on_delete=models.PROTECT,
+        related_name="special_price_pairs_source",
+    )
+    target_currency = models.ForeignKey(
+        Currency,
+        on_delete=models.PROTECT,
+        related_name="special_price_pairs_target",
+    )
+    trade_type = models.CharField(max_length=10, choices=TRADE_CHOICES, default="buy")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Special Price Pair"
+        verbose_name_plural = "Special Price Pairs"
+        ordering = ["id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["special_price_type", "source_currency", "target_currency", "trade_type"],
+                name="uniq_special_price_pair_per_type",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.special_price_type.name}: {self.name}"
+
+
 class SpecialPriceHistory(models.Model):
-    special_price_type = models.ForeignKey(SpecialPriceType, on_delete=models.CASCADE, related_name='special_price_histories')
+    special_price_type = models.ForeignKey(
+        SpecialPriceType,
+        on_delete=models.CASCADE,
+        related_name="special_price_histories",
+    )
+    pair = models.ForeignKey(
+        SpecialPricePair,
+        on_delete=models.CASCADE,
+        related_name="histories",
+    )
     price = models.DecimalField(max_digits=20, decimal_places=2, validators=[MinValueValidator(0)])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

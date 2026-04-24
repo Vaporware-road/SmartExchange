@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from template_editor.models import Template
 from template_editor.utils import render_template
 
-from .models import SpecialPriceHistory, SpecialPriceType
+from .models import SpecialPriceHistory, SpecialPricePair, SpecialPriceType
 
 BADGE_STYLE = (
     "display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;"
@@ -65,6 +65,9 @@ class SpecialPriceHistoryAdmin(admin.ModelAdmin):
     actions = ('preview_with_template',)
     list_select_related = (
         'special_price_type',
+        'pair',
+        'pair__source_currency',
+        'pair__target_currency',
         'special_price_type__source_currency',
         'special_price_type__target_currency',
     )
@@ -84,14 +87,14 @@ class SpecialPriceHistoryAdmin(admin.ModelAdmin):
         return qs.annotate(
             previous_price=Window(
                 expression=Lag('price'),
-                partition_by=[F('special_price_type')],
+                partition_by=[F('pair')],
                 order_by=[F('created_at').asc()],
             )
         )
 
     def formatted_price(self, obj):
         value = f"{obj.price:,.2f}"
-        pair = f"{obj.special_price_type.source_currency.code}/{obj.special_price_type.target_currency.code}"
+        pair = f"{obj.pair.source_currency.code}/{obj.pair.target_currency.code}"
         return format_html('<span class="price-value">{}</span> <small>{}</small>', value, pair)
 
     formatted_price.short_description = _("Price")
@@ -191,5 +194,12 @@ class SpecialPriceHistoryAdmin(admin.ModelAdmin):
         value = entry.price
         if isinstance(value, Decimal):
             value = f"{value:,.2f}"
-        pair = f"{entry.special_price_type.source_currency.code}/{entry.special_price_type.target_currency.code}"
+        pair = f"{entry.pair.source_currency.code}/{entry.pair.target_currency.code}"
         return f"{value} {pair}"
+
+
+@admin.register(SpecialPricePair)
+class SpecialPricePairAdmin(admin.ModelAdmin):
+    list_display = ("special_price_type", "source_currency", "target_currency", "created_at")
+    list_filter = ("source_currency", "target_currency", "special_price_type")
+    search_fields = ("special_price_type__name", "source_currency__code", "target_currency__code")

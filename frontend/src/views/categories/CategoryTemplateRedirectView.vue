@@ -8,7 +8,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { templateEditorApi } from '@/services/api'
+import { categoryApi, templateEditorApi } from '@/services/api'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 
 const route = useRoute()
@@ -16,18 +16,30 @@ const router = useRouter()
 const id = route.params.id
 
 onMounted(async () => {
+  const categoryId = Number(id)
+  if (!Number.isFinite(categoryId)) {
+    router.replace({ path: '/templates' })
+    return
+  }
+
   try {
-    const { data } = await templateEditorApi.list()
-    const list = Array.isArray(data) ? data : data?.results ?? []
-    const categoryId = Number(id)
-    const template = list.find(
-      (t) => t.category === categoryId || t.category_id === categoryId
-    )
-    if (template?.id) {
-      router.replace({ path: `/templates/${template.id}/editor` })
-    } else {
+    const { data: category } = await categoryApi.get(categoryId)
+    const categoryName = String(category?.name ?? '').trim()
+    if (!categoryName) {
       router.replace({ path: '/templates/new', query: { category_id: id } })
+      return
     }
+
+    const { data: created } = await templateEditorApi.create({
+      name: categoryName,
+      category: categoryId,
+    })
+    if (created?.id) {
+      router.replace({ path: `/templates/${created.id}/editor` })
+      return
+    }
+
+    router.replace({ path: '/templates/new', query: { category_id: id } })
   } catch {
     router.replace({ path: '/templates', query: { category_id: id } })
   }

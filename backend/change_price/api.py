@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.permissions import IsSuperAdminOrManagement
+from core.exceptions import error_response
 from category.models import Category, PriceType
 from setting.utils import log_event
 from accounts.utils import log_activity
@@ -68,9 +69,10 @@ class PriceDetailAPIView(APIView):
                 .get(id=price_type_id)
             )
         except PriceType.DoesNotExist:
-            return Response(
-                {"detail": "Price type not found."},
-                status=status.HTTP_404_NOT_FOUND,
+            return error_response(
+                "Price type not found.",
+                code="price_type_not_found",
+                status_code=status.HTTP_404_NOT_FOUND,
             )
         latest = pt.price_histories.first()
         data = {
@@ -98,7 +100,11 @@ class PriceUpdateAPIView(APIView):
         try:
             price_type = PriceType.objects.select_related("category").get(id=price_type_id)
         except PriceType.DoesNotExist:
-            return Response({"detail": "Price type not found."}, status=status.HTTP_404_NOT_FOUND)
+            return error_response(
+                "Price type not found.",
+                code="price_type_not_found",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
 
         serializer = PriceUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -157,7 +163,11 @@ class BulkPriceUpdateAPIView(APIView):
         try:
             category = Category.objects.get(id=category_id)
         except Category.DoesNotExist:
-            return Response({"detail": "Category not found."}, status=status.HTTP_404_NOT_FOUND)
+            return error_response(
+                "Category not found.",
+                code="category_not_found",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
 
         serializer = BulkPriceUpdateSerializer(data=request.data, context={"category": category})
         serializer.is_valid(raise_exception=True)

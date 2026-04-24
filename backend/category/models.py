@@ -24,6 +24,14 @@ class Category(models.Model):
     telegram_message_description = models.TextField(blank=True, null=True)
     telegram_media_url = models.URLField(max_length=500, blank=True)
     inline_buttons = models.JSONField(default=list, blank=True)  # [{"label": "...", "url": "..."}]
+    last_used_template = models.ForeignKey(
+        "template_editor.Template",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        help_text="Last template_editor.Template used for round-robin price image publishing.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -34,7 +42,7 @@ class Category(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            base_slug = slugify(self.name) or "category"
+            base_slug = slugify(self.name, allow_unicode=True) or "category"
             slug = base_slug
             counter = 1
 
@@ -88,7 +96,7 @@ class PriceType(models.Model):
     def save(self, *args, **kwargs):
         # Ensure slug is unique within the same category
         if not self.slug:
-            base_slug = slugify(self.name) or 'pricetype'
+            base_slug = slugify(self.name, allow_unicode=True) or 'pricetype'
             slug = base_slug
             counter = 1
             while PriceType.objects.filter(category=self.category, slug=slug).exclude(pk=self.pk).exists():

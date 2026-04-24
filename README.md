@@ -147,9 +147,10 @@ SmartExchangePanel/
 
 ## Prerequisites
 
-- **Python 3.10+**
+- **Python 3.10–3.12** (recommended; use a **venv** and `pip install -r backend/requirements.txt`. Avoid running `manage.py` with a random global `python` that does not have project dependencies — you will see errors like `No module named 'pytz'`.)
 - **Node.js 18+** (for frontend dev and build)
-- **pip** and a **virtual environment** (recommended)
+- **pip** and a **virtual environment** (required for local backend commands)
+- **Docker + Docker Compose** (recommended for easiest setup)
 
 ---
 
@@ -173,6 +174,20 @@ python -m venv venv
 source venv/bin/activate
 
 pip install -r requirements.txt
+```
+
+**Windows (PowerShell):** from repo root, `cd backend` only once (not `backend\backend`). After `venv` exists, prefer the venv interpreter explicitly:
+
+```powershell
+cd C:\Work\Project\SmartExchangePanel\backend
+.\venv\Scripts\python.exe manage.py migrate
+.\venv\Scripts\python.exe manage.py ensure_default_admin
+```
+
+Or from repo root:
+
+```powershell
+.\scripts\ensure-default-admin.ps1
 ```
 
 ### 3. Backend: environment (optional but recommended)
@@ -215,6 +230,67 @@ This writes the SPA into `backend/static/vue/` so Django can serve it.
 ---
 
 ## Running the Application
+
+### Option 0: Docker (single container + hot reload)
+
+From repository root:
+
+```bash
+docker compose up --build
+```
+
+Then open:
+
+- **http://localhost:5173** (frontend with HMR)
+- **http://localhost:8000** (backend API/Admin)
+
+Useful commands:
+
+```bash
+# View logs
+docker compose logs -f app
+
+# Stop containers
+docker compose down
+
+# Stop and remove Docker volumes (media + collected static; SQLite file lives on disk under backend/data/)
+docker compose down -v
+```
+
+Default login (created automatically on backend startup in Docker):
+
+- **Username:** `admin`
+- **Password:** `admin`
+- **Role:** `super_admin` (full panel access, including user management and site settings)
+
+To create another superuser manually:
+
+```bash
+docker compose exec app python manage.py createsuperuser
+```
+
+To seed the same default user without Docker (from `backend/` after migrate), use the venv’s Python (not a global interpreter):
+
+```bash
+# Linux/macOS (venv activated)
+python manage.py ensure_default_admin
+```
+
+```powershell
+# Windows (explicit venv path)
+.\venv\Scripts\python.exe manage.py ensure_default_admin
+```
+
+Optional env vars: `DEFAULT_ADMIN_USERNAME`, `DEFAULT_ADMIN_PASSWORD`, `DEFAULT_ADMIN_SYNC_PASSWORD` (when `true`, existing default user’s password is reset on each `ensure_default_admin` run — enabled in `docker-compose` for local dev).
+
+Notes for Docker mode:
+
+- A single `app` container runs both Django (`:8000`) and Vite (`:5173`) from one entrypoint script (no extra process manager package).
+- Frontend runs with Vite HMR inside Docker (`CHOKIDAR_USEPOLLING` / `WATCHPACK_POLLING` help file watching on Windows).
+- Backend runs with Django `runserver` auto-reload; code is bind-mounted from `./backend`.
+- `migrate` and default admin seed (`ensure_default_admin`) run automatically at startup.
+- SQLite remains SQLite. The database file is stored at **`backend/data/db.sqlite3` on your machine** (bind-mounted into the container via `SQLITE_PATH=/app/backend/data/db.sqlite3`), so panel changes are written to that file directly.
+- Uploaded media and collected static files stay in Docker volumes (`media_data`, `static_data`).
 
 ### Option A: Backend only (serves built SPA)
 

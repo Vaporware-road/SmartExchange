@@ -2,58 +2,33 @@
   <div>
     <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('routes.priceHub') }}</h1>
 
-    <div v-if="loading" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-3">
+    <div v-if="loading" class="grid grid-cols-1 gap-3">
       <BaseSkeleton v-for="i in 8" :key="i" variant="card" class="!h-36" />
     </div>
 
     <template v-else>
-      <!-- Section 1: Standard Categories -->
       <section class="mb-10">
         <h2 class="text-lg font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-4 flex items-center gap-2">
           <i class="fas fa-coins text-gold"></i>
           {{ $t('priceHub.standardCategories') }}
         </h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-3">
-          <div
+        <div class="space-y-3">
+          <CategoryGroup
             v-for="cat in categories"
             :key="cat.id"
-            class="group rounded-xl border-2 p-3 sm:p-4 flex flex-col min-h-[140px] max-h-[160px] transition-all duration-300 ease-in-out hover:scale-[1.02] hover:shadow-lg border-[var(--border-color)] bg-[var(--bg-card)]"
-          >
-            <!-- Header: name top-left (small, truncate), icon top-right -->
-            <div class="flex items-start justify-between gap-2 mb-2 shrink-0">
-              <h3 class="text-sm font-semibold text-[var(--text-primary)] group-hover:text-gold transition-colors truncate min-w-0 flex-1" :title="cat.name">
-                {{ cat.name }}
-              </h3>
-              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary-muted">
-                <i class="fas fa-coins text-gold text-sm"></i>
-              </div>
-            </div>
-            <!-- Price display: prominent center/right -->
-            <div class="flex-1 flex flex-col justify-center min-h-0">
-              <p v-if="displayPrice(cat) != null" class="text-xl sm:text-2xl font-bold text-gold tabular-nums truncate" :title="formatPrice(displayPrice(cat))">
-                {{ formatPrice(displayPrice(cat)) }}
-              </p>
-              <p v-else class="text-sm text-[var(--text-secondary)]">
-                {{ cat.price_type_count ?? cat.price_types?.length ?? 0 }} {{ $t('analysis.priceType') }}
-              </p>
-            </div>
-            <!-- Update: compact icon button at bottom -->
-            <router-link
-              :to="`/prices/category/${cat.id}/update`"
-              class="mt-auto flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-medium bg-[var(--bg-hover)] hover:bg-gold/20 hover:text-gold text-[var(--text-secondary)] border border-[var(--border-color)] transition-colors shrink-0"
-              :title="$t('common.update')"
-            >
-              <i class="fas fa-sync-alt text-xs"></i>
-              <span class="hidden sm:inline">{{ $t('common.update') }}</span>
-            </router-link>
-          </div>
+            :category="cat"
+            :editing-price-type-id="editing.priceTypeId"
+            :saving-price-type-id="savingPriceTypeId"
+            @edit-start="onEditStart"
+            @edit-cancel="onEditCancel"
+            @edit-save="onEditSave"
+          />
         </div>
         <p v-if="!categories.length" class="text-center text-[var(--text-secondary)] py-8">
           {{ $t('dashboard.noCategoriesFound') }}
         </p>
       </section>
 
-      <!-- Section 2: Special Offers (VIP) -->
       <section v-if="specialPrices.length">
         <h2 class="text-lg font-bold text-[var(--text-secondary)] uppercase tracking-wider mb-4 flex items-center gap-2">
           <i class="fas fa-star text-gold"></i>
@@ -81,21 +56,21 @@
             </div>
             <!-- Currency pair (truncate) + Price prominent -->
             <div class="flex-1 flex flex-col justify-center min-h-0">
-              <p class="text-xs text-[var(--text-secondary)] truncate mb-0.5">
-                {{ (sp.source_currency?.code ?? sp.source_currency) || '—' }} / {{ (sp.target_currency?.code ?? sp.target_currency) || '—' }}
+              <p class="text-xs text-[var(--text-secondary)] truncate mb-0.5" :title="renderPairSummary(sp)">
+                {{ renderPairSummary(sp) }}
               </p>
-              <p v-if="sp.latest_price != null" class="text-xl sm:text-2xl font-bold text-gold tabular-nums truncate" :title="formatPrice(sp.latest_price)">
-                {{ formatPrice(sp.latest_price) }}
+              <p v-if="extractLatestPrice(sp) != null" class="text-xl sm:text-2xl font-bold text-gold tabular-nums truncate" :title="formatPrice(extractLatestPrice(sp))">
+                {{ formatPrice(extractLatestPrice(sp)) }}
               </p>
               <p v-else class="text-sm text-[var(--text-secondary)]">—</p>
             </div>
             <!-- Update: compact icon button at bottom -->
             <router-link
               :to="`/prices/special/${sp.id}/update`"
-              class="mt-auto flex items-center justify-center gap-1.5 py-2 px-3 rounded-lg text-sm font-medium bg-[var(--bg-hover)] hover:bg-gold/20 hover:text-gold text-[var(--text-secondary)] border border-[var(--border-color)] transition-colors shrink-0"
+              class="mt-auto flex items-center justify-center gap-2 py-2.5 px-3.5 rounded-lg text-sm font-semibold bg-gold/15 hover:bg-gold/25 text-gold border border-gold/60 shadow-sm transition-colors shrink-0"
               :title="$t('common.update')"
             >
-              <i class="fas fa-sync-alt text-xs"></i>
+              <i class="fas fa-sync-alt text-sm"></i>
               <span class="hidden sm:inline">{{ $t('common.update') }}</span>
             </router-link>
           </div>
@@ -107,22 +82,18 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { categoryApi, specialPriceApi } from '@/services/api'
+import { useToast } from 'vue-toastification'
+import i18n from '@/i18n'
+import { categoryApi, specialPriceApi, priceApi, formatDrfError } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
+import CategoryGroup from '@/components/prices/CategoryGroup.vue'
 
 const loading = ref(true)
 const categories = ref([])
 const specialPrices = ref([])
-
-/** First price type's latest_price for display, or null if none. */
-function displayPrice(cat) {
-  const pts = cat?.price_types
-  if (!pts?.length) return null
-  const first = pts[0]
-  const price = first?.latest_price
-  if (price != null) return Number(price)
-  return null
-}
+const editing = ref({ categoryId: null, priceTypeId: null })
+const savingPriceTypeId = ref(null)
+const toast = useToast()
 
 function formatPrice(value) {
   if (value == null || Number.isNaN(value)) return '—'
@@ -133,16 +104,92 @@ function formatPrice(value) {
   return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n)
 }
 
+function normalizeCategoryList(catData) {
+  return Array.isArray(catData)
+    ? catData
+    : (catData?.results ?? []).filter((c) => c && c.id != null)
+}
+
+function normalizeSpecialList(spData) {
+  return Array.isArray(spData) ? spData : (spData?.results ?? [])
+}
+
+function renderPairSummary(sp) {
+  const pairs = Array.isArray(sp?.pairs) ? sp.pairs : []
+  if (!pairs.length) {
+    const src = sp?.source_currency?.code ?? sp?.source_currency ?? '—'
+    const tgt = sp?.target_currency?.code ?? sp?.target_currency ?? '—'
+    return `${src} / ${tgt}`
+  }
+  if (pairs.length === 1) {
+    const type = pairs[0].trade_type === 'sell' ? 'Sell' : 'Buy'
+    return `${pairs[0].name ?? ''} - ${pairs[0].source_currency?.code ?? '—'} / ${pairs[0].target_currency?.code ?? '—'} (${type})`
+  }
+  const type = pairs[0].trade_type === 'sell' ? 'Sell' : 'Buy'
+  return `${pairs[0].name ?? ''} - ${pairs[0].source_currency?.code ?? '—'} / ${pairs[0].target_currency?.code ?? '—'} (${type}) +${pairs.length - 1}`
+}
+
+function extractLatestPrice(sp) {
+  const candidates = Array.isArray(sp?.pairs) ? sp.pairs : []
+  const values = candidates
+    .map((pair) => pair?.latest_price?.price)
+    .filter((value) => value != null)
+    .map((value) => Number(value))
+    .filter((value) => Number.isFinite(value))
+  if (values.length) return values[0]
+  if (sp?.latest_price?.price != null) return Number(sp.latest_price.price)
+  if (sp?.latest_price != null) return Number(sp.latest_price)
+  return null
+}
+
+function onEditStart(payload) {
+  editing.value = payload
+}
+
+function onEditCancel() {
+  editing.value = { categoryId: null, priceTypeId: null }
+}
+
+function updatePriceTypeInCategory(categoryId, priceTypeId, nextPrice) {
+  const category = categories.value.find((item) => item.id === categoryId)
+  if (!category || !Array.isArray(category.price_types)) return
+  category.price_types = category.price_types.map((pt) => {
+    if (pt.id !== priceTypeId) return pt
+    return {
+      ...pt,
+      latest_price: nextPrice,
+      latest_price_at: new Date().toISOString(),
+    }
+  })
+}
+
+async function onEditSave({ categoryId, priceTypeId, value }) {
+  const nextPrice = Number(String(value).replaceAll(',', ''))
+  if (!Number.isFinite(nextPrice)) {
+    toast.error(i18n.global.t('validation.required'))
+    return
+  }
+  savingPriceTypeId.value = priceTypeId
+  try {
+    await priceApi.update(priceTypeId, { price: nextPrice, notes: '' })
+    updatePriceTypeInCategory(categoryId, priceTypeId, nextPrice)
+    onEditCancel()
+    toast.success(i18n.global.t('toast.saveSuccess'))
+  } catch (error) {
+    toast.error(formatDrfError(error?.response?.data))
+  } finally {
+    savingPriceTypeId.value = null
+  }
+}
+
 onMounted(async () => {
   try {
     const [catRes, spRes] = await Promise.all([
       categoryApi.list(),
       specialPriceApi.list(),
     ])
-    const catData = catRes.data
-    categories.value = Array.isArray(catData) ? catData : (catData?.results ?? []).filter((c) => c && c.id != null)
-    const spData = spRes.data
-    specialPrices.value = Array.isArray(spData) ? spData : (spData?.results ?? [])
+    categories.value = normalizeCategoryList(catRes.data)
+    specialPrices.value = normalizeSpecialList(spRes.data)
   } catch {
     categories.value = []
     specialPrices.value = []

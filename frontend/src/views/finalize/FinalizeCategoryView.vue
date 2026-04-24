@@ -197,7 +197,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
-import { finalizeApi, telegramApi } from '@/services/api'
+import { finalizeApi, telegramApi, getApiErrorDetails } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import FloatingInput from '@/components/ui/FloatingInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
@@ -268,8 +268,9 @@ onMounted(async () => {
     categoryPending.value = cat ?? null
     pendingCount.value = cat?.pending_prices?.length ?? 0
     channels.value = chRes.data ?? []
-  } catch {
+  } catch (error) {
     channels.value = []
+    toast.error(getApiErrorDetails(error).message)
   } finally {
     loading.value = false
   }
@@ -320,7 +321,7 @@ async function runStep(idx, fn) {
     return true
   } catch (err) {
     steps[idx].status = 'failed'
-    steps[idx].detail = err?.response?.data?.detail ?? err.message ?? ''
+    steps[idx].detail = getApiErrorDetails(err).message ?? err.message ?? ''
     return false
   }
 }

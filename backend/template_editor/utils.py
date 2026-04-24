@@ -3,7 +3,7 @@ Utility functions for rendering templates with dynamic data.
 """
 import logging
 from pathlib import Path
-from typing import Dict, Any, Tuple
+from typing import Any, Dict, Optional, Tuple
 from PIL import Image, ImageDraw, ImageFont
 from django.conf import settings
 from django.utils.text import slugify
@@ -153,10 +153,12 @@ def draw_text_field(
     max_width: int = None,
     font_filename: str = None,
     weight: str = "normal",
+    stroke_width: Optional[int] = None,
+    shadow: bool = True,
 ) -> None:
     """
-    Draw a single text field on the image (shadow + stroke).
-    Used by render_template and render_price_template.
+    Draw a single text field on the image (optional shadow + stroke).
+    stroke_width=None keeps legacy auto stroke; 0 disables outline.
     """
     font = _get_font(size=size, weight=weight, font_filename=font_filename)
     color_rgb = _parse_color(color)
@@ -171,6 +173,29 @@ def draw_text_field(
     is_rtl = _is_rtl(str(text_value))
     direction = "rtl" if is_rtl else None
     text_to_draw = str(text_value)
+    if stroke_width is None:
+        stroke_eff = max(size // 14, 1)
+    else:
+        stroke_eff = max(0, int(stroke_width))
+
+    def _draw_one_line(px: int, py: int, line: str) -> None:
+        if shadow:
+            shadow_offset = max(size // 18, 1)
+            shadow_pos = (px + shadow_offset, py + shadow_offset)
+            draw.text(shadow_pos, line, font=font, fill=(0, 0, 0, 192), direction=direction)
+        if stroke_eff > 0:
+            draw.text(
+                (px, py),
+                line,
+                font=font,
+                fill=color_rgb,
+                stroke_width=stroke_eff,
+                stroke_fill=(0, 0, 0),
+                direction=direction,
+            )
+        else:
+            draw.text((px, py), line, font=font, fill=color_rgb, direction=direction)
+
     if max_width:
         lines = _wrap_text(text_to_draw, font, max_width, draw)
         try:
@@ -179,33 +204,9 @@ def draw_text_field(
             line_height = font.getsize("Ay")[1]
         for i, line in enumerate(lines):
             line_y = y + i * (line_height + 4)
-            shadow_offset = max(size // 18, 1)
-            shadow_pos = (x + shadow_offset, line_y + shadow_offset)
-            draw.text(shadow_pos, line, font=font, fill=(0, 0, 0, 192), direction=direction)
-            stroke_width = max(size // 14, 1)
-            draw.text(
-                (x, line_y),
-                line,
-                font=font,
-                fill=color_rgb,
-                stroke_width=stroke_width,
-                stroke_fill=(0, 0, 0),
-                direction=direction,
-            )
+            _draw_one_line(x, line_y, line)
     else:
-        shadow_offset = max(size // 18, 1)
-        shadow_pos = (x + shadow_offset, y + shadow_offset)
-        draw.text(shadow_pos, text_to_draw, font=font, fill=(0, 0, 0, 192), direction=direction)
-        stroke_width = max(size // 14, 1)
-        draw.text(
-            (x, y),
-            text_to_draw,
-            font=font,
-            fill=color_rgb,
-            stroke_width=stroke_width,
-            stroke_fill=(0, 0, 0),
-            direction=direction,
-        )
+        _draw_one_line(x, y, text_to_draw)
 
 
 def render_template(template_obj, dynamic_data_dict: Dict[str, Any], config_override: Dict[str, Any] = None) -> Image.Image:

@@ -1,16 +1,12 @@
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
-from rest_framework.parsers import MultiPartParser, FormParser
+from django.db import IntegrityError, transaction
 from django.db.models import Prefetch, Max
-from django.conf import settings
-from django.core.files.storage import default_storage
-from django.utils.text import get_valid_filename
-import os
-import uuid
+from django.shortcuts import get_object_or_404
 
-from core.utils import validate_uploaded_image, MAX_IMAGE_SIZE
+from core.exceptions import error_response
 from .models import Category, Currency, PriceType
 from .serializers import (
     CategorySerializer,
@@ -31,7 +27,7 @@ class CurrencyListAPIView(APIView):
 
 class CategoryViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
-        qs = Category.objects.all()
+        qs = Category.objects.select_related("last_used_template")
         if self.action == "list":
             qs = qs.prefetch_related(
                 Prefetch(
@@ -53,9 +49,10 @@ class CategoryViewSet(viewsets.ModelViewSet):
         category = self.get_object()
         order_ids = request.data.get("order") or []
         if not isinstance(order_ids, list):
-            return Response(
-                {"detail": "Invalid payload. Expected { \"order\": [id, ...] }."},
-                status=status.HTTP_400_BAD_REQUEST,
+            return error_response(
+                "Invalid payload. Expected { \"order\": [id, ...] }.",
+                code="invalid_payload",
+                status_code=status.HTTP_400_BAD_REQUEST,
             )
         # Validate all ids belong to this category
         qs = PriceType.objects.filter(category=category)
@@ -66,37 +63,14 @@ class CategoryViewSet(viewsets.ModelViewSet):
             qs.filter(pk=pt_id).update(order=i)
         return Response({"status": "ok"})
 
-    @action(detail=True, methods=["post"], url_path="telegram-media", parser_classes=[MultiPartParser, FormParser])
+    @action(detail=True, methods=["post"], url_path="telegram-media")
     def upload_telegram_media(self, request, pk=None):
-        """POST /api/categories/<id>/telegram-media/ with multipart file. Returns { "url": "/media/..." }."""
-        category = self.get_object()
-        file_obj = request.FILES.get("file") or request.FILES.get("image")
-        if not file_obj:
-            return Response(
-                {"detail": "No file provided. Use 'file' or 'image' form field."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        try:
-            validate_uploaded_image(file_obj, max_size=MAX_IMAGE_SIZE)
-        except ValueError as e:
-            return Response(
-                {"detail": str(e)},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        # Restrict to images (extension kept for storage naming only; content already validated)
-        name = get_valid_filename(file_obj.name) or "image"
-        ext = os.path.splitext(name)[1].lower()
-        if ext not in (".jpg", ".jpeg", ".png", ".gif", ".webp"):
-            return Response(
-                {"detail": "Only image files (jpg, png, gif, webp) are allowed."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        rel_path = f"telegram_category/{category.pk}/{uuid.uuid4().hex}{ext}"
-        path = default_storage.save(rel_path, file_obj)
-        url = f"{settings.MEDIA_URL.rstrip('/')}/{path}"
-        category.telegram_media_url = url
-        category.save(update_fields=["telegram_media_url", "updated_at"])
-        return Response({"url": url})
+        """Deprecated: media now comes from Template Editor (last_used_template image)."""
+        return error_response(
+            "Telegram media upload is deprecated. Media is inherited from Template Editor.",
+            code="telegram_media_managed_by_template",
+            status_code=status.HTTP_410_GONE,
+        )
 
 
 class PriceTypeViewSet(viewsets.ModelViewSet):
@@ -114,10 +88,32 @@ class PriceTypeViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         category_id = self.kwargs.get("category_pk")
         if category_id:
+            # Ensure nested category exists so we return 404 instead of DB-level FK failures.
+            get_object_or_404(Category, pk=category_id)
             next_order = (
                 PriceType.objects.filter(category_id=category_id).aggregate(Max("order"))["order__max"]
                 or -1
             ) + 1
-            serializer.save(category_id=category_id, order=next_order)
+            try:
+                with transaction.atomic():
+                    serializer.save(category_id=category_id, order=next_order)
+            except IntegrityError as exc:
+                raise serializers.ValidationError(
+                    {
+                        "non_field_errors": [
+                            "A price type with this name or currency pair/trade type already exists in this category."
+                        ]
+                    }
+                ) from exc
         else:
-            serializer.save()
+            try:
+                with transaction.atomic():
+                    serializer.save()
+            except IntegrityError as exc:
+                raise serializers.ValidationError(
+                    {
+                        "non_field_errors": [
+                            "Could not save this price type due to a data conflict."
+                        ]
+                    }
+                ) from exc

@@ -14,6 +14,14 @@
     <form v-else-if="sp" @submit.prevent="handleSubmit" class="card-luxury max-w-md space-y-4">
       <p class="text-[var(--text-secondary)]">{{ sp.name }}</p>
       <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('exchange.currencyPair') }}</label>
+        <select v-model.number="selectedPairId" class="input-luxury" required>
+          <option v-for="pair in sp.pairs || []" :key="pair.id" :value="pair.id">
+            {{ pair.name }} ({{ pair.source_currency?.code }} / {{ pair.target_currency?.code }} - {{ pair.trade_type === 'buy' ? $t('specialPrices.buy') : $t('specialPrices.sell') }})
+          </option>
+        </select>
+      </div>
+      <div>
         <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('specialPrices.price') }}</label>
         <input v-model.number="price" type="number" step="0.01" min="0" class="input-luxury" required />
       </div>
@@ -30,7 +38,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { specialPriceApi } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
@@ -40,6 +48,7 @@ const router = useRouter()
 const id = computed(() => route.params.id)
 const loading = ref(true)
 const sp = ref(null)
+const selectedPairId = ref(null)
 const price = ref('')
 const notes = ref('')
 const submitting = ref(false)
@@ -48,7 +57,13 @@ onMounted(async () => {
   try {
     const { data } = await specialPriceApi.get(id.value)
     sp.value = data
-    if (data?.latest_price?.price) price.value = Number(data.latest_price.price)
+    if (Array.isArray(data?.pairs) && data.pairs.length) {
+      selectedPairId.value = data.pairs[0].id
+      const firstPrice = data.pairs[0]?.latest_price?.price
+      if (firstPrice) price.value = Number(firstPrice)
+    } else if (data?.latest_price?.price) {
+      price.value = Number(data.latest_price.price)
+    }
   } catch {
     sp.value = null
   } finally {
@@ -56,10 +71,21 @@ onMounted(async () => {
   }
 })
 
+watch(selectedPairId, (pairId) => {
+  const pair = sp.value?.pairs?.find((item) => item.id === pairId)
+  const nextPrice = pair?.latest_price?.price
+  price.value = nextPrice != null ? Number(nextPrice) : ''
+})
+
 async function handleSubmit() {
+  if (!selectedPairId.value) return
   submitting.value = true
   try {
-    await specialPriceApi.updatePrice(id.value, { price: price.value, notes: notes.value })
+    await specialPriceApi.updatePrice(id.value, {
+      pair_id: selectedPairId.value,
+      price: price.value,
+      notes: notes.value,
+    })
     router.push('/update')
   } finally {
     submitting.value = false

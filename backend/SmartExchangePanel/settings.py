@@ -88,8 +88,26 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:5173',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+# Required when the SPA runs on another origin/port (e.g. Vite :5173) and proxies API
+# to Django: the browser sends Origin: http://localhost:5173 while Host may be backend:8000.
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'http://localhost:8000',
+    'http://127.0.0.1:8000',
+]
+_csrf_extra = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').strip()
+if _csrf_extra:
+    CSRF_TRUSTED_ORIGINS = list(
+        dict.fromkeys(CSRF_TRUSTED_ORIGINS + [o.strip() for o in _csrf_extra.split(',') if o.strip()])
+    )
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -132,7 +150,7 @@ WSGI_APPLICATION = 'SmartExchangePanel.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': os.environ.get('SQLITE_PATH', str(BASE_DIR / 'db.sqlite3')),
     }
 }
 

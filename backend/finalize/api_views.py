@@ -2,6 +2,7 @@
 DRF API views for finalization flows.
 """
 import logging
+import threading
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Prefetch
@@ -35,6 +36,20 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def _run_fire_and_forget(name, func, *args, **kwargs):
+    def _target():
+        try:
+            func(*args, **kwargs)
+        except Exception:
+            logger.exception("Async task failed: %s", name)
+
+    threading.Thread(target=_target, daemon=True).start()
+
+
+def _schedule_on_commit_async(name, func, *args, **kwargs):
+    transaction.on_commit(lambda: _run_fire_and_forget(name, func, *args, **kwargs))
 
 
 def _get_publication_destinations():
@@ -183,8 +198,28 @@ class FinalizeDashboardAPIView(APIView):
     throttle_classes = [ScopedRateThrottle]
 
     def get(self, request):
-        data = _build_finalize_dashboard_data()
-        return Response(data)
+        try:
+            data = _build_finalize_dashboard_data()
+            return Response(data)
+        except Exception:
+            logger.exception("FinalizeDashboardAPIView.get failed")
+            try:
+                destinations = _get_publication_destinations()
+            except Exception:
+                destinations = [{"id": "telegram", "label": "Telegram Channel", "enabled": True}]
+            return Response(
+                {
+                    "categories": [],
+                    "pending_by_category": [],
+                    "has_pending": False,
+                    "pending_special_prices": [],
+                    "has_pending_special": False,
+                    "publication_destinations": destinations,
+                    "degraded": True,
+                    "detail": "Finalize dashboard could not be loaded. Check server logs or run migrations.",
+                },
+                status=status.HTTP_200_OK,
+            )
 
 
 class FinalizeCategoryAPIView(APIView):
@@ -256,27 +291,7 @@ class FinalizeCategoryAPIView(APIView):
 
         notes_text = notes.strip() if notes else None
 
-        api_sent_successfully = False
-        api_results = None
-        try:
-            api_results = ExternalAPIService.send_finalized_prices(price_items)
-            sent_count = len(api_results.get("sent", []))
-            failed_count = len(api_results.get("failed", []))
-            api_sent_successfully = sent_count > 0 and failed_count == 0
-            log_finalize_event(
-                level="INFO" if failed_count == 0 else "WARNING",
-                message=f"External rates sync for category: {category.name}",
-                details=f"Sent: {sent_count}, Failed: {failed_count}. Success: {api_sent_successfully}",
-                user=request.user,
-            )
-        except Exception as exc:
-            logger.exception("Error sending to external API")
-            log_finalize_event(
-                level="ERROR",
-                message=f"External rates sync failed for category: {category.name}",
-                details=str(exc),
-                user=request.user,
-            )
+        api_sent_successfully = None
 
         publisher = PricePublisherService()
         message_sent = False
@@ -323,6 +338,11 @@ class FinalizeCategoryAPIView(APIView):
                     finalization=finalization,
                     price_history=item["price_history"],
                 )
+            _schedule_on_commit_async(
+                "finalize_category_external_api",
+                ExternalAPIService.send_finalized_prices,
+                price_items,
+            )
 
         total_prices_count = len(price_items)
         new_prices_count = len(pending_prices)
@@ -348,6 +368,7 @@ class FinalizeCategoryAPIView(APIView):
                 "total_prices": total_prices_count,
                 "new_prices": new_prices_count,
                 "api_sent_successfully": api_sent_successfully,
+                "api_sync_queued": True,
                 "telegram_response": publication_response,
             },
             status=status.HTTP_201_CREATED,
@@ -424,25 +445,10 @@ class FinalizeSpecialPriceAPIView(APIView):
                 telegram_response=publication_response or None,
                 notes=notes,
             )
-
-        try:
-            api_results = ExternalAPIService.send_finalized_special_prices(
-                [(special_price_type, special_price_history)]
-            )
-            sent_count = len(api_results.get("sent", []))
-            failed_count = len(api_results.get("failed", []))
-            log_finalize_event(
-                level="INFO" if failed_count == 0 else "WARNING",
-                message=f"External rates sync for special price: {special_price_type.name}",
-                details=f"Sent: {sent_count}, Failed: {failed_count}",
-                user=request.user,
-            )
-        except Exception as exc:
-            log_finalize_event(
-                level="ERROR",
-                message=f"External rates sync failed for special price: {special_price_type.name}",
-                details=str(exc),
-                user=request.user,
+            _schedule_on_commit_async(
+                "finalize_special_external_api",
+                ExternalAPIService.send_finalized_special_prices,
+                [(special_price_type, special_price_history)],
             )
 
         log_finalize_event(
@@ -556,12 +562,11 @@ class FinalizeAllAPIView(APIView):
                         telegram_response=publication_response or None,
                         notes=notes,
                     )
-                try:
-                    ExternalAPIService.send_finalized_special_prices(
-                        [(special_price_type, special_price_history)]
+                    _schedule_on_commit_async(
+                        "finalize_all_special_external_api",
+                        ExternalAPIService.send_finalized_special_prices,
+                        [(special_price_type, special_price_history)],
                     )
-                except Exception:
-                    pass
                 log_finalize_event(
                     level="INFO" if message_sent else "WARNING",
                     message=f"Special price finalized (all): {special_price_type.name}",
@@ -579,7 +584,9 @@ class FinalizeAllAPIView(APIView):
                 })
 
         if is_instagram_configured() and (category_ids or special_price_history_ids):
-            enqueue_post_finalize_to_instagram(
+            _schedule_on_commit_async(
+                "finalize_all_instagram_enqueue",
+                enqueue_post_finalize_to_instagram,
                 category_ids=category_ids,
                 special_price_history_ids=special_price_history_ids,
                 theme="dark",
@@ -635,13 +642,9 @@ class FinalizeAllAPIView(APIView):
 
         notes_text = notes.strip() if notes else None
 
-        try:
-            ExternalAPIService.send_finalized_prices(price_items)
-        except Exception as exc:
-            logger.exception("Finalize all: external API failed for category %s", category.id)
-
         publisher = PricePublisherService()
         message_sent = False
+        image_caption = None
         publication_response = ""
         try:
             publication = publisher.publish_category_prices(
@@ -651,6 +654,7 @@ class FinalizeAllAPIView(APIView):
                 notes=notes_text,
             )
             message_sent = publication.success
+            image_caption = publication.caption
             publication_response = publication.response
         except PricePublicationError as exc:
             publication_response = str(exc)
@@ -669,7 +673,7 @@ class FinalizeAllAPIView(APIView):
                 channel=channel if message_sent else None,
                 finalized_by=request.user,
                 message_sent=message_sent,
-                image_caption=None,
+                image_caption=image_caption if message_sent else None,
                 telegram_response=publication_response or None,
                 notes=notes,
             )
@@ -678,6 +682,11 @@ class FinalizeAllAPIView(APIView):
                     finalization=finalization,
                     price_history=item["price_history"],
                 )
+            _schedule_on_commit_async(
+                "finalize_all_category_external_api",
+                ExternalAPIService.send_finalized_prices,
+                price_items,
+            )
 
         log_finalize_event(
             level="INFO" if message_sent else "WARNING",
