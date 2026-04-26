@@ -222,13 +222,26 @@ EXTERNAL_API_KEY = os.environ.get(
 )
 
 # Security settings
+# HTTP-only reverse proxies (e.g. Dokploy *.traefik.me preview URLs): set
+# DJANGO_USE_HTTP_BEHIND_PROXY=true so Django does not force HTTPS redirects
+# or Secure-only cookies (which break plain-HTTP preview domains).
+_use_http_behind_proxy = os.environ.get('DJANGO_USE_HTTP_BEHIND_PROXY', '').lower() in ('true', '1', 'yes')
+
 if not DEBUG:
-    SECURE_SSL_REDIRECT = True
-    CSRF_COOKIE_SECURE = True
-    SESSION_COOKIE_SECURE = True
-    SECURE_HSTS_SECONDS = 31536000
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
+    if _use_http_behind_proxy:
+        SECURE_SSL_REDIRECT = False
+        CSRF_COOKIE_SECURE = False
+        SESSION_COOKIE_SECURE = False
+        SECURE_HSTS_SECONDS = 0
+        SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+        SECURE_HSTS_PRELOAD = False
+    else:
+        SECURE_SSL_REDIRECT = True
+        CSRF_COOKIE_SECURE = True
+        SESSION_COOKIE_SECURE = True
+        SECURE_HSTS_SECONDS = 31536000
+        SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+        SECURE_HSTS_PRELOAD = True
     # Additional security headers
     SECURE_CONTENT_TYPE_NOSNIFF = True
     SECURE_BROWSER_XSS_FILTER = True

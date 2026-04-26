@@ -15,6 +15,7 @@ services:
              exec supervisord -c /etc/supervisor/conf.d/supervisord.conf"
     environment:
       DJANGO_DEBUG: "False"
+      DJANGO_USE_HTTP_BEHIND_PROXY: "true"
       DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,smartexchange-application-o0bso2-3d625a-204-168-142-183.traefik.me"
       SQLITE_PATH: "/app/backend/data/db.sqlite3"
       # Dev: reset default admin password on each backend start so admin/admin always works
