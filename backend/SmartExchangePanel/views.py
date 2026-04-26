@@ -14,7 +14,11 @@ def handler404(request, exception):
     Custom 404 error handler.
     This view is automatically called by Django when a 404 error occurs.
     """
-    return render(request, '404.html', status=404)
+    try:
+        return render(request, '404.html', status=404)
+    except Exception:
+        # Never turn a not-found into 500 if the template has issues.
+        return HttpResponseNotFound("404 page not found")
 
 
 def favicon_view(request):
