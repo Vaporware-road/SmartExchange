@@ -332,6 +332,7 @@ export const templateEditorApi = {
   create: (data) => api.post('/template-editor/templates/', data),
   update: (id, data) => api.put(`/template-editor/templates/${id}/`, data),
   patch: (id, data) => api.patch(`/template-editor/templates/${id}/`, data),
+  delete: (id) => api.delete(`/template-editor/templates/${id}/`),
   updateConfig: (id, config) =>
     api.put(`/template-editor/templates/${id}/config/`, { config }),
   updateConfigJson: (id, body) =>

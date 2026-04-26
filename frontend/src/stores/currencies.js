@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 import { categoryApi } from '@/services/api'
 
 const CANONICAL_CODES = [
-  'USD', 'EUR', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', 'TRY',
+  'USD', 'USDT', 'BTC', 'ETH', 'BNB', 'EUR', 'GBP', 'AUD', 'CAD', 'CHF', 'CNY', 'TRY',
   'IRR', 'IRT', 'AED', 'JPY', 'RUB', 'IQD', 'XAU',
 ]
 

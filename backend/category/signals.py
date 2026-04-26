@@ -20,6 +20,9 @@ def create_default_currencies_on_startup(sender, **kwargs):
     default_currencies = [
         {'code': 'USD', 'name': 'US Dollar', 'symbol': '$'},
         {'code': 'USDT', 'name': 'Tether', 'symbol': 'USDT'},
+        {'code': 'BTC', 'name': 'Bitcoin', 'symbol': 'BTC'},
+        {'code': 'ETH', 'name': 'Ethereum', 'symbol': 'ETH'},
+        {'code': 'BNB', 'name': 'BNB', 'symbol': 'BNB'},
         {'code': 'EUR', 'name': 'Euro', 'symbol': 'EUR'},
         {'code': 'GBP', 'name': 'British Pound', 'symbol': 'GBP'},
         {'code': 'AUD', 'name': 'Australian Dollar', 'symbol': 'AUD'},

@@ -31,7 +31,7 @@ services:
       - static_data:/app/backend/public/staticfiles
       - frontend_node_modules:/app/frontend/node_modules
     ports:
-      - "9000:8000"
+      - "18000:8000"
       - "5173:5173"
 
 volumes:

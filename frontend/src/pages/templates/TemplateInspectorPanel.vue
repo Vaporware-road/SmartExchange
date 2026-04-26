@@ -74,6 +74,10 @@
           placeholder="e.g. price__usdt-buy or date_fa"
           @blur="refitSelectedAfterTick"
         />
+        <p v-if="linkedPriceTypeId != null" class="text-[10px] text-[var(--text-secondary)]">
+          Stable link: <span class="font-mono text-[var(--text-primary)]">price_type__{{ linkedPriceTypeId }}</span>
+          (resolves before binding key)
+        </p>
         <p class="text-[10px] text-[var(--text-secondary)]">
           When set, published image uses this key from live prices / dates instead of static content.
         </p>
@@ -185,40 +189,6 @@
         >
           Open media library
         </router-link>
-      </div>
-
-      <div v-if="activeTab === 'appearance' && w.type === 'price_board'" class="space-y-3">
-        <div class="space-y-2">
-          <label class="block text-xs text-[var(--text-secondary)]">Title</label>
-          <input v-model="styleTitle" type="text" class="input-luxury w-full text-sm" />
-        </div>
-        <div class="space-y-2">
-          <label class="block text-xs text-[var(--text-secondary)]">Columns</label>
-          <input v-model.number="styleColumns" type="number" min="1" max="4" class="input-luxury w-full text-sm" />
-        </div>
-        <p class="text-xs font-semibold text-[var(--text-primary)]">Colors (PNG)</p>
-        <div class="grid grid-cols-2 gap-2">
-          <div class="space-y-1">
-            <label class="text-[10px] text-[var(--text-secondary)]">Header bg</label>
-            <input v-model="styleHeaderBg" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] text-[var(--text-secondary)]">Header text</label>
-            <input v-model="styleHeaderColor" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] text-[var(--text-secondary)]">Row bg</label>
-            <input v-model="styleRowBg" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] text-[var(--text-secondary)]">Price</label>
-            <input v-model="stylePriceColor" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
-          </div>
-          <div class="space-y-1">
-            <label class="text-[10px] text-[var(--text-secondary)]">Label</label>
-            <input v-model="styleLabelColor" type="color" class="h-9 w-full cursor-pointer rounded border border-[var(--border-card)]" />
-          </div>
-        </div>
       </div>
 
       <div v-if="activeTab === 'appearance'" class="space-y-2">
@@ -373,18 +343,13 @@ async function onImageFile(ev) {
   }
 }
 
-const styleTitle = computed({
-  get() {
-    const sw = w.value
-    if (!sw) return ''
-    return sw.style?.title ?? ''
-  },
-  set(v) {
-    const sw = w.value
-    if (!sw) return
-    if (!sw.style || typeof sw.style !== 'object') sw.style = {}
-    sw.style.title = v
-  },
+const linkedPriceTypeId = computed(() => {
+  const sw = w.value
+  if (!sw || (sw.type !== 'text' && sw.type !== 'marquee')) return null
+  const raw = sw.style?.priceTypeId ?? sw.style?.price_type_id
+  if (raw == null || raw === '') return null
+  const n = Number(raw)
+  return Number.isFinite(n) ? n : null
 })
 
 const bindingKey = computed({
@@ -397,13 +362,36 @@ const bindingKey = computed({
     const sw = w.value
     if (!sw) return
     if (!sw.style || typeof sw.style !== 'object') sw.style = {}
+    const oldKey = String(sw.style.bindingKey || sw.style.binding_key || '').trim()
+    const oldPt = linkedPriceTypeId.value
+    const oldIdPreview =
+      oldPt != null ? String(te.priceBindingPreviewMap?.value?.[`price_type__${oldPt}`]?.value || '').trim() : ''
+    const oldPreview = oldKey ? String(te.priceBindingPreviewMap?.value?.[oldKey]?.value || '').trim() : ''
+    const contentNow = sw?.content != null ? String(sw.content).trim() : ''
+    const sampleLike = (
+      !contentNow ||
+      /^sample text$/i.test(contentNow) ||
+      /^text$/i.test(contentNow) ||
+      /^\[.*\]$/.test(contentNow)
+    )
     const s = String(v || '').trim()
     if (s) {
       sw.style.bindingKey = s
       delete sw.style.binding_key
+      delete sw.style.priceTypeId
+      delete sw.style.price_type_id
+      if (sampleLike) {
+        const nextPreview = String(te.priceBindingPreviewMap?.value?.[s]?.value || '').trim()
+        sw.content = nextPreview || oldPreview || oldIdPreview || '123,456'
+      }
     } else {
       delete sw.style.bindingKey
       delete sw.style.binding_key
+      delete sw.style.priceTypeId
+      delete sw.style.price_type_id
+      if (sampleLike) {
+        sw.content = oldPreview || oldIdPreview || '123,456'
+      }
     }
   },
 })
@@ -411,9 +399,17 @@ const bindingKey = computed({
 const bindingPreviewInfo = computed(() => {
   const sw = w.value
   if (!sw || (sw.type !== 'text' && sw.type !== 'marquee')) return null
-  const key = String(sw.style?.bindingKey || sw.style?.binding_key || '').trim()
-  if (!key) return null
-  const row = te.priceBindingPreviewMap?.value?.[key]
+  const pt = linkedPriceTypeId.value
+  let row = null
+  if (pt != null) {
+    row = te.priceBindingPreviewMap?.value?.[`price_type__${pt}`] || null
+  }
+  if (!row) {
+    const key = String(sw.style?.bindingKey || sw.style?.binding_key || '').trim()
+    if (!key) return null
+    row = te.priceBindingPreviewMap?.value?.[key]
+  }
+  if (!row) return null
   const source = String(row?.source || '').trim()
   const sourceLabel = source === 'finalized'
     ? 'Latest finalized'
@@ -445,20 +441,6 @@ const dateKey = computed({
     const s = String(v || '').trim()
     sw.style.dateKey = allowed.includes(s) ? s : fallback
     delete sw.style.date_key
-  },
-})
-
-const styleColumns = computed({
-  get() {
-    const sw = w.value
-    if (!sw) return 2
-    return Number(sw.style?.columns) || 2
-  },
-  set(v) {
-    const sw = w.value
-    if (!sw) return
-    if (!sw.style || typeof sw.style !== 'object') sw.style = {}
-    sw.style.columns = Math.min(4, Math.max(1, Number(v) || 1))
   },
 })
 
@@ -632,24 +614,4 @@ const styleOpacity = computed({
   },
 })
 
-function colorField(key, fallback) {
-  return computed({
-    get() {
-      const c = w.value?.style?.[key]
-      if (typeof c === 'string' && /^#[0-9A-Fa-f]{3,8}$/i.test(c)) return c
-      return fallback
-    },
-    set(v) {
-      const st = ensureStyle()
-      if (!st) return
-      st[key] = String(v || fallback)
-    },
-  })
-}
-
-const styleHeaderBg = colorField('headerBg', '#1e293b')
-const styleHeaderColor = colorField('headerColor', '#e2e8f0')
-const styleRowBg = colorField('rowBg', '#334155')
-const stylePriceColor = colorField('priceColor', '#d4af37')
-const styleLabelColor = colorField('labelColor', '#f1f5f9')
 </script>

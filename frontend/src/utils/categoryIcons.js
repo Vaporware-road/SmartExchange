@@ -14,6 +14,9 @@ import rubIcon from '@/assets/currency-icons/rub.svg'
 import usdtIcon from '@/assets/currency-icons/usdt.svg'
 import xauIcon from '@/assets/currency-icons/xau.svg'
 import irrIcon from '@/assets/currency-icons/irr.svg'
+import btcIcon from '@/assets/currency-icons/btc.svg'
+import ethIcon from '@/assets/currency-icons/eth.svg'
+import bnbIcon from '@/assets/currency-icons/bnb.svg'
 
 const iconByCode = {
   USD: usdIcon,
@@ -30,6 +33,9 @@ const iconByCode = {
   TRY: tryIcon,
   RUB: rubIcon,
   USDT: usdtIcon,
+  BTC: btcIcon,
+  ETH: ethIcon,
+  BNB: bnbIcon,
   XAU: xauIcon,
   IRR: irrIcon,
   IRT: irrIcon,

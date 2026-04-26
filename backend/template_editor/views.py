@@ -154,6 +154,16 @@ class PreviewView(LoginRequiredMixin, View):
                     if not isinstance(w, dict):
                         continue
                     st = w.get('style') if isinstance(w.get('style'), dict) else {}
+                    pt_raw = st.get('priceTypeId') or st.get('price_type_id')
+                    if pt_raw not in (None, ''):
+                        try:
+                            pt_key = f"price_type__{int(pt_raw)}"
+                            if pt_key not in sample_data:
+                                from .variables import get_default_sample_value
+
+                                sample_data[pt_key] = get_default_sample_value(pt_key)
+                        except (TypeError, ValueError):
+                            pass
                     for key in (
                         w.get('bindingKey'),
                         w.get('binding_key'),

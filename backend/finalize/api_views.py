@@ -6,6 +6,7 @@ import threading
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Prefetch
+from django.db.utils import OperationalError
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
@@ -36,6 +37,11 @@ from .serializers import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Omit from SELECT so older DBs without these columns still load the finalize dashboard.
+# Round-robin still works after migrate (column then exists); until then values default in memory.
+_DASHBOARD_CATEGORY_DEFER = ("last_used_template",)
+_DASHBOARD_SPECIAL_TYPE_DEFER = ("last_used_template",)
 
 
 def _run_fire_and_forget(name, func, *args, **kwargs):
@@ -78,14 +84,22 @@ def _get_publication_destinations():
 
 def _build_finalize_dashboard_data():
     """Build dashboard data: categories with pending prices and pending special prices."""
-    categories = Category.objects.prefetch_related(
-        Prefetch(
-            "price_types",
-            queryset=PriceType.objects.prefetch_related("price_histories").select_related(
-                "source_currency", "target_currency"
-            ),
+    # Separate summary query avoids edge cases after iterating the prefetched queryset.
+    category_summaries = list(
+        Category.objects.order_by("name").values("id", "name", "slug", "description")
+    )
+    categories = (
+        Category.objects.defer(*_DASHBOARD_CATEGORY_DEFER)
+        .prefetch_related(
+            Prefetch(
+                "price_types",
+                queryset=PriceType.objects.prefetch_related("price_histories").select_related(
+                    "source_currency", "target_currency"
+                ),
+            )
         )
-    ).all()
+        .order_by("name")
+    )
 
     pending_by_category = []
     for category in categories:
@@ -94,15 +108,34 @@ def _build_finalize_dashboard_data():
         ).order_by("-finalized_at").first()
 
         if latest_finalization:
-            finalized_history_ids = set(
-                latest_finalization.finalized_prices.values_list("price_history_id", flat=True)
-            )
-            finalized_price_map = {
-                fph.price_history.price_type_id: fph.price_history
+            try:
+                finalized_history_ids = set(
+                    latest_finalization.finalized_prices.values_list(
+                        "price_history_id", flat=True
+                    )
+                )
+                finalized_price_map = {}
                 for fph in latest_finalization.finalized_prices.select_related(
                     "price_history__price_type"
+                ):
+                    try:
+                        ph = fph.price_history
+                    except Exception:
+                        logger.warning(
+                            "Skipping finalized row with missing price_history "
+                            "(finalized_price_history_id=%s)",
+                            getattr(fph, "pk", None),
+                        )
+                        continue
+                    if ph is not None and getattr(ph, "price_type_id", None):
+                        finalized_price_map[ph.price_type_id] = ph
+            except Exception:
+                logger.exception(
+                    "Corrupt finalization data for category_id=%s; treating as no prior finalization",
+                    getattr(category, "pk", None),
                 )
-            }
+                finalized_history_ids = set()
+                finalized_price_map = {}
         else:
             finalized_history_ids = set()
             finalized_price_map = {}
@@ -141,12 +174,17 @@ def _build_finalize_dashboard_data():
                 }
             )
 
-    special_price_types = SpecialPriceType.objects.prefetch_related(
-        Prefetch(
-            "special_price_histories",
-            queryset=SpecialPriceHistory.objects.order_by("-created_at"),
+    special_price_types = (
+        SpecialPriceType.objects.defer(*_DASHBOARD_SPECIAL_TYPE_DEFER)
+        .prefetch_related(
+            Prefetch(
+                "special_price_histories",
+                queryset=SpecialPriceHistory.objects.order_by("-created_at"),
+            )
         )
-    ).select_related("source_currency", "target_currency").all()
+        .select_related("source_currency", "target_currency")
+        .order_by("name")
+    )
 
     pending_special_prices = []
     for special_price_type in special_price_types:
@@ -166,7 +204,16 @@ def _build_finalize_dashboard_data():
                 )
                 previous_price = None
                 if prev_finalization and prev_finalization.special_price_history_id:
-                    previous_price = str(prev_finalization.special_price_history.price)
+                    try:
+                        previous_price = str(
+                            prev_finalization.special_price_history.price
+                        )
+                    except Exception:
+                        logger.warning(
+                            "Skipping previous special price (special_price_finalization_id=%s)",
+                            getattr(prev_finalization, "pk", None),
+                        )
+                        previous_price = None
                 pending_special_prices.append(
                     {
                         "special_price_type_id": special_price_type.id,
@@ -179,9 +226,7 @@ def _build_finalize_dashboard_data():
                 )
 
     return {
-        "categories": list(
-            categories.values("id", "name", "slug", "description")
-        ),
+        "categories": category_summaries,
         "pending_by_category": pending_by_category,
         "has_pending": len(pending_by_category) > 0,
         "pending_special_prices": pending_special_prices,
@@ -201,25 +246,34 @@ class FinalizeDashboardAPIView(APIView):
         try:
             data = _build_finalize_dashboard_data()
             return Response(data)
-        except Exception:
+        except Exception as exc:
             logger.exception("FinalizeDashboardAPIView.get failed")
             try:
                 destinations = _get_publication_destinations()
             except Exception:
                 destinations = [{"id": "telegram", "label": "Telegram Channel", "enabled": True}]
-            return Response(
-                {
-                    "categories": [],
-                    "pending_by_category": [],
-                    "has_pending": False,
-                    "pending_special_prices": [],
-                    "has_pending_special": False,
-                    "publication_destinations": destinations,
-                    "degraded": True,
-                    "detail": "Finalize dashboard could not be loaded. Check server logs or run migrations.",
-                },
-                status=status.HTTP_200_OK,
-            )
+            if isinstance(exc, OperationalError):
+                detail = (
+                    "Database schema mismatch (often fixed by: python manage.py migrate). "
+                    "See server logs for the exact SQL error."
+                )
+            else:
+                detail = (
+                    "Finalize dashboard could not be loaded. Check server logs or run migrations."
+                )
+            payload = {
+                "categories": [],
+                "pending_by_category": [],
+                "has_pending": False,
+                "pending_special_prices": [],
+                "has_pending_special": False,
+                "publication_destinations": destinations,
+                "degraded": True,
+                "detail": detail,
+            }
+            if settings.DEBUG:
+                payload["debug_exception"] = repr(exc)
+            return Response(payload, status=status.HTTP_200_OK)
 
 
 class FinalizeCategoryAPIView(APIView):
@@ -230,7 +284,9 @@ class FinalizeCategoryAPIView(APIView):
     throttle_classes = [ScopedRateThrottle]
 
     def post(self, request, category_id):
-        category = get_object_or_404(Category, id=category_id)
+        category = get_object_or_404(
+            Category.objects.defer(*_DASHBOARD_CATEGORY_DEFER), id=category_id
+        )
         channels = TelegramChannel.objects.filter(is_active=True).select_related("bot")
 
         serializer = FinalizeCategoryRequestSerializer(data=request.data)
@@ -297,6 +353,8 @@ class FinalizeCategoryAPIView(APIView):
         message_sent = False
         image_caption = None
         publication_response = ""
+        publish_path = "unknown"
+        render_fallback_reason = None
 
         try:
             publication = publisher.publish_category_prices(
@@ -308,6 +366,8 @@ class FinalizeCategoryAPIView(APIView):
             message_sent = publication.success
             image_caption = publication.caption
             publication_response = publication.response
+            publish_path = publication.publish_path
+            render_fallback_reason = publication.render_fallback_reason
         except PricePublicationError as exc:
             publication_response = str(exc)
         except Exception as exc:
@@ -319,6 +379,8 @@ class FinalizeCategoryAPIView(APIView):
                 {
                     "detail": "Telegram publication failed. Finalization was not saved (strict mode).",
                     "telegram_response": publication_response,
+                    "publish_path": publish_path,
+                    "render_fallback_reason": render_fallback_reason,
                 },
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
@@ -349,7 +411,10 @@ class FinalizeCategoryAPIView(APIView):
         log_finalize_event(
             level="INFO" if message_sent else "WARNING",
             message=f"Category finalized: {category.name}",
-            details=f"Total: {total_prices_count}, New: {new_prices_count}. Telegram sent: {message_sent}",
+            details=(
+                f"Total: {total_prices_count}, New: {new_prices_count}. "
+                f"Telegram sent: {message_sent}. path={publish_path}, fallback={render_fallback_reason or 'none'}"
+            ),
             user=request.user,
         )
         if message_sent:
@@ -370,6 +435,8 @@ class FinalizeCategoryAPIView(APIView):
                 "api_sent_successfully": api_sent_successfully,
                 "api_sync_queued": True,
                 "telegram_response": publication_response,
+                "publish_path": publish_path,
+                "render_fallback_reason": render_fallback_reason,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -384,7 +451,10 @@ class FinalizeSpecialPriceAPIView(APIView):
 
     def post(self, request, special_price_history_id):
         special_price_history = get_object_or_404(
-            SpecialPriceHistory, id=special_price_history_id
+            SpecialPriceHistory.objects.select_related("special_price_type").defer(
+                "special_price_type__last_used_template"
+            ),
+            id=special_price_history_id,
         )
         special_price_type = special_price_history.special_price_type
 
@@ -409,6 +479,8 @@ class FinalizeSpecialPriceAPIView(APIView):
         message_sent = False
         image_caption = None
         publication_response = ""
+        publish_path = "unknown"
+        render_fallback_reason = None
 
         try:
             publication = publisher.publish_special_price(
@@ -420,6 +492,8 @@ class FinalizeSpecialPriceAPIView(APIView):
             message_sent = publication.success
             image_caption = publication.caption
             publication_response = publication.response
+            publish_path = publication.publish_path
+            render_fallback_reason = publication.render_fallback_reason
         except PricePublicationError as exc:
             publication_response = str(exc)
         except Exception as exc:
@@ -431,6 +505,8 @@ class FinalizeSpecialPriceAPIView(APIView):
                 {
                     "detail": "Telegram publication failed. Finalization was not saved (strict mode).",
                     "telegram_response": publication_response,
+                    "publish_path": publish_path,
+                    "render_fallback_reason": render_fallback_reason,
                 },
                 status=status.HTTP_503_SERVICE_UNAVAILABLE,
             )
@@ -454,7 +530,10 @@ class FinalizeSpecialPriceAPIView(APIView):
         log_finalize_event(
             level="INFO" if message_sent else "WARNING",
             message=f"Special price finalized: {special_price_type.name}",
-            details=f"Price: {special_price_history.price}. Telegram sent: {message_sent}",
+            details=(
+                f"Price: {special_price_history.price}. Telegram sent: {message_sent}. "
+                f"path={publish_path}, fallback={render_fallback_reason or 'none'}"
+            ),
             user=request.user,
         )
 
@@ -464,6 +543,8 @@ class FinalizeSpecialPriceAPIView(APIView):
                 "finalization_id": finalization.id,
                 "message_sent": message_sent,
                 "telegram_response": publication_response,
+                "publish_path": publish_path,
+                "render_fallback_reason": render_fallback_reason,
             },
             status=status.HTTP_201_CREATED,
         )
@@ -496,7 +577,9 @@ class FinalizeAllAPIView(APIView):
 
         for cat_id in category_ids:
             try:
-                category = get_object_or_404(Category, id=cat_id)
+                category = get_object_or_404(
+                    Category.objects.defer(*_DASHBOARD_CATEGORY_DEFER), id=cat_id
+                )
                 self._finalize_one_category(request, category, channel, notes)
                 results.append({"id": cat_id, "type": "category", "success": True})
             except Exception as exc:
@@ -511,7 +594,10 @@ class FinalizeAllAPIView(APIView):
         for sp_id in special_price_history_ids:
             try:
                 special_price_history = get_object_or_404(
-                    SpecialPriceHistory, id=sp_id
+                    SpecialPriceHistory.objects.select_related("special_price_type").defer(
+                        "special_price_type__last_used_template"
+                    ),
+                    id=sp_id,
                 )
                 special_price_type = special_price_history.special_price_type
                 if SpecialPriceFinalization.objects.filter(
@@ -529,6 +615,8 @@ class FinalizeAllAPIView(APIView):
                 message_sent = False
                 image_caption = None
                 publication_response = ""
+                publish_path = "unknown"
+                render_fallback_reason = None
                 try:
                     publication = publisher.publish_special_price(
                         special_price_type=special_price_type,
@@ -539,6 +627,8 @@ class FinalizeAllAPIView(APIView):
                     message_sent = publication.success
                     image_caption = publication.caption
                     publication_response = publication.response
+                    publish_path = publication.publish_path
+                    render_fallback_reason = publication.render_fallback_reason
                 except PricePublicationError as exc:
                     publication_response = str(exc)
                 except Exception as exc:
@@ -573,7 +663,15 @@ class FinalizeAllAPIView(APIView):
                     details=f"Telegram sent: {message_sent}",
                     user=request.user,
                 )
-                results.append({"id": sp_id, "type": "special", "success": True})
+                results.append({
+                    "id": sp_id,
+                    "type": "special",
+                    "success": True,
+                    "message_sent": message_sent,
+                    "telegram_response": publication_response,
+                    "publish_path": publish_path,
+                    "render_fallback_reason": render_fallback_reason,
+                })
             except Exception as exc:
                 logger.exception("Finalize all: special price %s failed", sp_id)
                 results.append({
@@ -646,6 +744,8 @@ class FinalizeAllAPIView(APIView):
         message_sent = False
         image_caption = None
         publication_response = ""
+        publish_path = "unknown"
+        render_fallback_reason = None
         try:
             publication = publisher.publish_category_prices(
                 category=category,
@@ -656,6 +756,8 @@ class FinalizeAllAPIView(APIView):
             message_sent = publication.success
             image_caption = publication.caption
             publication_response = publication.response
+            publish_path = publication.publish_path
+            render_fallback_reason = publication.render_fallback_reason
         except PricePublicationError as exc:
             publication_response = str(exc)
         except Exception as exc:
@@ -691,6 +793,9 @@ class FinalizeAllAPIView(APIView):
         log_finalize_event(
             level="INFO" if message_sent else "WARNING",
             message=f"Category finalized (all): {category.name}",
-            details=f"New prices: {len(pending_prices)}. Telegram sent: {message_sent}",
+            details=(
+                f"New prices: {len(pending_prices)}. Telegram sent: {message_sent}. "
+                f"path={publish_path}, fallback={render_fallback_reason or 'none'}"
+            ),
             user=request.user,
         )

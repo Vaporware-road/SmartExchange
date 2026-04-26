@@ -1,10 +1,18 @@
 from django.test import TestCase, override_settings
+from rest_framework.test import APIRequestFactory, force_authenticate
+from rest_framework.exceptions import ValidationError as DRFValidationError
 from unittest.mock import patch, MagicMock
 from decimal import Decimal
 
+from accounts.models import CustomUser
 from category.models import Category, Currency, PriceType
 from change_price.models import PriceHistory
+from finalize.api_views import FinalizeCategoryAPIView
 from finalize.services import ExternalAPIService
+from price_publisher.services.publisher import PricePublisherService, PublicationResult
+from telegram_app.models import TelegramBot, TelegramChannel
+from template_editor.models import Template
+from template_editor.api_views import _validate_telegram_buttons_json
 
 
 @override_settings(
@@ -234,3 +242,99 @@ class ExternalAPIServiceTest(TestCase):
         self.assertEqual(results["sent"][0]["currency"], "GBP_BUY")
         self.assertEqual(results["sent"][0]["rate"], 163000.0)
         self.assertEqual(mock_post.call_count, 1, "Only GBP account sent")
+
+
+class PublisherTemplateSelectionTest(TestCase):
+    def setUp(self):
+        self.category_a = Category.objects.create(name="یورو")
+        self.category_b = Category.objects.create(name="تتر")
+        self.template_a = Template.objects.create(
+            name="eur-template",
+            category=self.category_a,
+            config_json={"widgets": [{"type": "text", "x": 0, "y": 0, "width": 1, "height": 1}]},
+        )
+        self.template_b = Template.objects.create(
+            name="usdt-template",
+            category=self.category_b,
+            config_json={"widgets": [{"type": "text", "x": 0, "y": 0, "width": 1, "height": 1}]},
+        )
+        self.service = PricePublisherService()
+
+    def test_ignores_pinned_template_from_other_category(self):
+        self.category_a.last_used_template = self.template_b
+        self.category_a.save(update_fields=["last_used_template", "updated_at"])
+
+        selected = self.service._select_next_template_editor_for_category(self.category_a)
+
+        self.assertEqual(selected.category_id, self.category_a.id)
+        self.assertEqual(selected.id, self.template_a.id)
+
+
+class FinalizeCategorySoftFeedbackTest(TestCase):
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.user = CustomUser.objects.create_user(
+            username="manager1",
+            password="x",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.bot = TelegramBot.objects.create(name="bot", token="token")
+        self.channel = TelegramChannel.objects.create(
+            bot=self.bot, name="main", chat_id="@channel"
+        )
+        self.category = Category.objects.create(name="پوند")
+        self.irr, _ = Currency.objects.get_or_create(
+            code="IRR", defaults={"name": "Rial"}
+        )
+        self.gbp, _ = Currency.objects.get_or_create(
+            code="GBP", defaults={"name": "Pound"}
+        )
+        self.price_type = PriceType.objects.create(
+            category=self.category,
+            name="خرید نقدی",
+            source_currency=self.gbp,
+            target_currency=self.irr,
+            trade_type="buy",
+        )
+        self.history = PriceHistory.objects.create(
+            price_type=self.price_type,
+            price=Decimal("12345"),
+        )
+
+    @patch("finalize.api_views.PricePublisherService.publish_category_prices")
+    def test_response_contains_publish_debug_fields_in_soft_mode(self, mock_publish):
+        mock_publish.return_value = PublicationResult(
+            success=False,
+            response="Telegram error: chat not found",
+            caption="",
+            publish_path="category_default_renderer",
+            render_fallback_reason="template_render_failed",
+        )
+
+        request = self.factory.post(
+            f"/api/finalize/category/{self.category.id}/",
+            {"channel_id": self.channel.id, "notes": ""},
+            format="json",
+        )
+        force_authenticate(request, user=self.user)
+
+        response = FinalizeCategoryAPIView.as_view()(request, category_id=self.category.id)
+
+        self.assertEqual(response.status_code, 201)
+        self.assertFalse(response.data["message_sent"])
+        self.assertEqual(response.data["publish_path"], "category_default_renderer")
+        self.assertEqual(response.data["render_fallback_reason"], "template_render_failed")
+        self.assertIn("Telegram error", response.data["telegram_response"])
+
+
+class TelegramButtonsValidationTest(TestCase):
+    def test_rejects_invalid_button_url(self):
+        with self.assertRaises(DRFValidationError):
+            _validate_telegram_buttons_json(
+                [[{"text": "bad", "url": "javascript:alert(1)"}]]
+            )
+
+    def test_accepts_valid_buttons(self):
+        _validate_telegram_buttons_json(
+            [[{"text": "site", "url": "https://example.com"}]]
+        )

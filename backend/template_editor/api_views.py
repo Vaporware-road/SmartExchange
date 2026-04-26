@@ -5,6 +5,7 @@ import logging
 import os
 import uuid
 from pathlib import Path
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.files.storage import default_storage
@@ -63,6 +64,37 @@ def _safe_sync_widgets(template, user):
         raise DRFValidationError(
             f"Widget sync failed: {exc}"
         ) from exc
+
+
+def _validate_telegram_buttons_json(raw):
+    if raw is None:
+        return
+    if not isinstance(raw, list):
+        raise DRFValidationError({"telegram_buttons_json": "Must be a JSON array."})
+
+    def _validate_button(btn, key_prefix):
+        if not isinstance(btn, dict):
+            raise DRFValidationError({key_prefix: "Each button must be an object."})
+        text = btn.get("text") or btn.get("label")
+        url = btn.get("url")
+        if not text or not str(text).strip():
+            raise DRFValidationError({f"{key_prefix}.text": "Button text is required."})
+        if not url or not str(url).strip():
+            raise DRFValidationError({f"{key_prefix}.url": "Button url is required."})
+        parsed = urlparse(str(url).strip())
+        if parsed.scheme not in ("http", "https") or not parsed.netloc:
+            raise DRFValidationError({f"{key_prefix}.url": "Button url must be a valid http(s) URL."})
+
+    for idx, item in enumerate(raw):
+        if isinstance(item, list):
+            if not item:
+                raise DRFValidationError(
+                    {f"telegram_buttons_json[{idx}]": "Button row cannot be empty."}
+                )
+            for b_idx, btn in enumerate(item):
+                _validate_button(btn, f"telegram_buttons_json[{idx}][{b_idx}]")
+        else:
+            _validate_button(item, f"telegram_buttons_json[{idx}]")
 
 
 class TemplateViewSet(ModelViewSet):
@@ -196,15 +228,24 @@ class TemplateConfigUpdateAPIView(APIView):
             template.telegram_caption_template = "" if v is None else str(v)
         if "telegram_buttons_json" in request.data:
             tb = request.data.get("telegram_buttons_json")
-            if tb is not None and not isinstance(tb, list):
+            if isinstance(tb, list):
+                try:
+                    _validate_telegram_buttons_json(tb)
+                except DRFValidationError as exc:
+                    return error_response(
+                        "Telegram buttons are invalid.",
+                        code="template_telegram_buttons_invalid",
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        errors=exc.detail if isinstance(exc.detail, dict) else None,
+                    )
+                template.telegram_buttons_json = tb
+            elif tb is not None:
                 return error_response(
                     "Telegram buttons must be a JSON array.",
                     code="template_telegram_buttons_invalid",
                     status_code=status.HTTP_400_BAD_REQUEST,
                     errors={"telegram_buttons_json": "Must be a JSON array."},
                 )
-            if isinstance(tb, list):
-                template.telegram_buttons_json = tb
 
         template.save()
         try:

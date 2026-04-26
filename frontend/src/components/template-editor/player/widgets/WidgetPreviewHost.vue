@@ -9,7 +9,6 @@
 import { computed } from 'vue'
 import TextWidgetPreview from './TextWidgetPreview.vue'
 import ImageWidgetPreview from './ImageWidgetPreview.vue'
-import PriceBoardWidget from './PriceBoardWidget.vue'
 
 const props = defineProps({
   widget: { type: Object, required: true },
@@ -26,8 +25,6 @@ const comp = computed(() => {
     case 'image':
     case 'video':
       return ImageWidgetPreview
-    case 'price_board':
-      return PriceBoardWidget
     default:
       return TextWidgetPreview
   }

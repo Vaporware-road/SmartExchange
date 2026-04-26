@@ -279,7 +279,7 @@ function clampWidgetToCanvas(w) {
 
 const TEXT_LIKE_WIDGETS = new Set(['text', 'marquee', 'date', 'clock', 'weekday'])
 
-/** Editor-only frame: text-like widgets show raw text; image/price_board keep a light frame. */
+/** Editor-only frame: text-like widgets show raw text; image keeps a light frame. */
 function widgetInnerChromeClass(type) {
   if (TEXT_LIKE_WIDGETS.has(type)) {
     return 'h-full min-h-0 w-full min-w-0 overflow-hidden rounded-none bg-transparent'
@@ -304,7 +304,6 @@ function defaultName(type) {
   const map = {
     text: 'Text',
     image: 'Image',
-    price_board: 'Price board',
     date: 'Date',
     weekday: 'Weekday',
     clock: 'Clock',
@@ -349,21 +348,6 @@ function addWidget(type, extra = null) {
   } else if (type === 'image') {
     base.width = Math.min(480, cw * 0.35)
     base.height = Math.min(320, ch * 0.35)
-  } else if (type === 'price_board') {
-    base.width = Math.min(720, cw * 0.55)
-    base.height = Math.min(420, ch * 0.45)
-    base.style = {
-      title: 'Exchange rates',
-      columns: 2,
-      panelBg: 'rgba(15,23,42,0.95)',
-      borderColor: 'rgba(212,175,55,0.45)',
-      rowBg: 'rgba(30,41,59,0.95)',
-      mockRows: [
-        { label: 'USDT', price: '58,200', trend: 'up' },
-        { label: 'EUR', price: '72,400', trend: 'down' },
-        { label: 'GBP', price: '84,100', trend: 'up' },
-      ],
-    }
   } else if (type === 'date') {
     base.width = 280
     base.height = 72
@@ -411,11 +395,17 @@ async function loadPriceBindingPreviewValues() {
     for (const row of rows) {
       const key = String(row?.key || '').trim()
       if (!key) continue
-      mapped[key] = {
+      const entry = {
         value: row?.previous_price != null ? String(row.previous_price) : '',
         source: row?.source || 'none',
         hasValue: Boolean(row?.has_value),
         label: row?.label || key,
+        bindingKey: key,
+      }
+      mapped[key] = entry
+      const ptid = row?.price_type_id
+      if (ptid != null && ptid !== '') {
+        mapped[`price_type__${ptid}`] = entry
       }
     }
     priceBindingPreviewMap.value = mapped
@@ -603,6 +593,7 @@ async function save() {
       canvas_height: canvasH.value,
     })
     template.value = templatesStore.current
+    await loadPriceBindingPreviewValues()
     lastSavedAt.value = new Date()
     saveState.value = 'saved'
     const categoryLabel = template.value?.category_name || (template.value?.category ? `#${template.value.category}` : 'No category')

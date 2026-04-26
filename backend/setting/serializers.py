@@ -5,7 +5,7 @@ from .models import SiteSettings, Log
 from telegram_app.models import TelegramBot, TelegramChannel
 
 CANONICAL_BASE_CURRENCIES = {
-    "USD", "EUR", "GBP", "AUD", "CAD", "CHF", "CNY", "TRY",
+    "USD", "USDT", "BTC", "ETH", "BNB", "EUR", "GBP", "AUD", "CAD", "CHF", "CNY", "TRY",
     "IRR", "IRT", "AED", "JPY", "RUB", "IQD", "XAU",
 }
 UPLOAD_FORMAT_CHOICES = {"PNG", "JPG", "SVG", "GIF", "WEBP", "JPEG"}

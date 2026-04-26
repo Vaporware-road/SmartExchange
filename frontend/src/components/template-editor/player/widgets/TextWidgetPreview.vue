@@ -24,14 +24,32 @@ const props = defineProps({
 const te = useTemplateEditorInjected()
 
 const display = computed(() => {
+  const PRICE_PLACEHOLDER = '123,456'
   const w = props.widget
+  const ptRaw = w?.style?.priceTypeId ?? w?.style?.price_type_id
+  if (ptRaw != null && String(ptRaw).trim() !== '') {
+    const idKey = `price_type__${String(ptRaw).trim()}`
+    const resolved = te.priceBindingPreviewMap?.value?.[idKey]
+    const fromPreview = resolved?.value != null ? String(resolved.value).trim() : ''
+    if (fromPreview) return fromPreview
+    const bk = w?.style?.bindingKey || w?.style?.binding_key
+    if (bk) {
+      const byKey = te.priceBindingPreviewMap?.value?.[String(bk).trim()]
+      const fromKey = byKey?.value != null ? String(byKey.value).trim() : ''
+      if (fromKey) return fromKey
+    }
+    const fallback = w?.content != null ? String(w.content).trim() : ''
+    if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) return fallback
+    return PRICE_PLACEHOLDER
+  }
   const bk = w?.style?.bindingKey || w?.style?.binding_key
   if (bk) {
     const resolved = te.priceBindingPreviewMap?.value?.[String(bk).trim()]
     const fromPreview = resolved?.value != null ? String(resolved.value).trim() : ''
     if (fromPreview) return fromPreview
     const fallback = w?.content != null ? String(w.content).trim() : ''
-    return fallback || `[${bk}]`
+    if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) return fallback
+    return PRICE_PLACEHOLDER
   }
   const t = w?.type
   if (t === 'date' || t === 'weekday') {
@@ -39,8 +57,11 @@ const display = computed(() => {
   }
   if (t === 'clock') return '14:30'
   const c = w?.content
-  if (c && String(c).trim()) return String(c)
-  return 'Text'
+  if (c && String(c).trim()) {
+    const normalized = String(c).trim()
+    if (!/^sample text$/i.test(normalized) && !/^text$/i.test(normalized)) return normalized
+  }
+  return PRICE_PLACEHOLDER
 })
 
 const align = computed(() => {

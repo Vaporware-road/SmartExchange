@@ -52,6 +52,17 @@ from template_editor.render import render_price_template
 logger = logging.getLogger(__name__)
 
 
+def _safe_last_used_template_id(instance) -> Optional[int]:
+    """Read ``last_used_template_id`` without crashing if the DB column is missing (pre-migrate)."""
+    if instance is None:
+        return None
+    try:
+        rid = instance.last_used_template_id
+    except Exception:
+        return None
+    return rid if rid is not None else None
+
+
 class PricePublicationError(RuntimeError):
     """Raised when the price publishing pipeline fails."""
 
@@ -217,6 +228,8 @@ class PublicationResult:
     success: bool
     response: str
     caption: Optional[str]
+    publish_path: str = "unknown"
+    render_fallback_reason: Optional[str] = None
 
 
 class PricePublisherService:
@@ -270,7 +283,7 @@ class PricePublisherService:
         template = self._get_template_for_category(category)
         template_assets = self._build_template_assets(template)
 
-        image, te_template_used = self._render_category_image(
+        image, te_template_used, publish_path, fallback_reason = self._render_category_image(
             category=category,
             price_items=price_items,
             category_name=category.name,
@@ -290,6 +303,8 @@ class PricePublisherService:
             image=image,
             caption=caption,
             buttons=buttons,
+            publish_path=publish_path,
+            render_fallback_reason=fallback_reason,
         )
 
     def publish_special_price(
@@ -322,6 +337,7 @@ class PricePublisherService:
                     image=image,
                     caption=caption,
                     buttons=buttons,
+                    publish_path="special_template_editor",
                 )
             if not te_template:
                 logger.warning(
@@ -377,6 +393,7 @@ class PricePublisherService:
             image=image,
             caption=caption,
             buttons=_build_legacy_final_buttons(),
+            publish_path="special_legacy_renderer" if custom_offer else "special_default_renderer",
         )
 
     # ------------------------------------------------------------------
@@ -398,13 +415,26 @@ class PricePublisherService:
         return bool(te_template.image)
 
     def _select_next_template_editor_for_category(self, category):
-        """Round-robin among active templates for this category; fallback to any category template."""
+        """Pick category template with priority: pinned on category -> active round-robin -> latest for category."""
         from template_editor.models import Template
 
         if not category:
             return Template.objects.filter(
                 category__isnull=True, special_price_type__isnull=True
             ).order_by("-updated_at").first()
+
+        # Honor pinned template only when it belongs to the same category.
+        pinned_id = _safe_last_used_template_id(category)
+        if pinned_id:
+            pinned = Template.objects.filter(pk=pinned_id, category=category).first()
+            if pinned:
+                return pinned
+            logger.warning(
+                "Ignoring pinned template that does not belong to category "
+                "(category_id=%s, pinned_template_id=%s)",
+                getattr(category, "id", None),
+                pinned_id,
+            )
 
         active = list(
             Template.objects.filter(category=category, is_active=True).order_by(
@@ -422,7 +452,7 @@ class PricePublisherService:
         with_widgets = [t for t in active if self._template_widget_count(t) > 0]
         pool = with_widgets if with_widgets else active
         ids = [t.pk for t in pool]
-        last_id = getattr(category, "last_used_template_id", None)
+        last_id = _safe_last_used_template_id(category)
         if last_id not in ids:
             return pool[0]
         idx = ids.index(last_id)
@@ -516,8 +546,8 @@ class PricePublisherService:
         notes: Optional[str],
         timestamp,
         template_assets: Optional[TemplateAssets],
-    ):
-        """Returns (RenderedPriceImage, template_editor.Template | None)."""
+    ) -> tuple[RenderedPriceImage, object | None, str, str | None]:
+        """Returns (RenderedPriceImage, template_editor.Template | None, publish_path, fallback_reason)."""
         # Always prefer template_editor Template for finalize publication.
         te_template = self._select_next_template_editor_for_category(category)
         try:
@@ -533,24 +563,27 @@ class PricePublisherService:
                 pil_image = render_price_template(te_template, usage_type, dynamic_data)
                 if getattr(te_template, "is_active", True):
                     self._mark_category_template_used(category, te_template)
-                return self._pil_image_to_rendered(pil_image), te_template
+                return self._pil_image_to_rendered(pil_image), te_template, "category_template_editor", None
             if not te_template:
                 logger.warning(
                     "template_editor category fallback: no template category_id=%s",
                     getattr(category, "id", None),
                 )
+                fallback_reason = "no_template"
             else:
                 logger.warning(
                     "template_editor category fallback: ineligible template_id=%s category_id=%s",
                     getattr(te_template, "id", None),
                     getattr(category, "id", None),
                 )
+                fallback_reason = "ineligible_template"
         except Exception:
             logger.exception(
                 "template_editor category fallback: render failed category_id=%s template_id=%s",
                 getattr(category, "id", None),
                 getattr(te_template, "id", None) if te_template else None,
             )
+            fallback_reason = "template_render_failed"
 
         if supports_tether_category(category):
             try:
@@ -561,6 +594,8 @@ class PricePublisherService:
                         timestamp=timestamp,
                     ),
                     None,
+                    "category_tether_renderer",
+                    fallback_reason,
                 )
             except FileNotFoundError as exc:
                 raise PricePublicationError(str(exc)) from exc
@@ -574,6 +609,8 @@ class PricePublisherService:
                         timestamp=timestamp,
                     ),
                     None,
+                    "category_legacy_renderer",
+                    fallback_reason,
                 )
             except FileNotFoundError as exc:
                 raise PricePublicationError(str(exc)) from exc
@@ -588,6 +625,8 @@ class PricePublisherService:
                     template_assets=template_assets,
                 ),
                 None,
+                "category_default_renderer",
+                fallback_reason,
             )
         except PriceImageRenderingError as exc:  # pragma: no cover - delegated
             raise PricePublicationError(str(exc)) from exc
@@ -617,7 +656,7 @@ class PricePublisherService:
             with_widgets = [t for t in active if self._template_widget_count(t) > 0]
             pool = with_widgets if with_widgets else active
             ids = [t.pk for t in pool]
-            last_id = getattr(special_price_type, "last_used_template_id", None)
+            last_id = _safe_last_used_template_id(special_price_type)
             if last_id not in ids:
                 return pool[0]
             idx = ids.index(last_id)
@@ -669,6 +708,8 @@ class PricePublisherService:
         image: RenderedPriceImage,
         caption: Optional[str],
         buttons: Optional[list[list[dict]]] = None,
+        publish_path: str = "unknown",
+        render_fallback_reason: Optional[str] = None,
     ) -> PublicationResult:
         stream = self._prepare_stream(image.stream, fallback_name="prices.png")
 
@@ -680,7 +721,13 @@ class PricePublisherService:
             buttons=buttons,
         )
 
-        return PublicationResult(success=success, response=response, caption=caption)
+        return PublicationResult(
+            success=success,
+            response=response,
+            caption=caption,
+            publish_path=publish_path,
+            render_fallback_reason=render_fallback_reason,
+        )
 
     @staticmethod
     def _build_pricetype_subtitle(price_type) -> str:

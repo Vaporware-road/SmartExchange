@@ -68,7 +68,7 @@
         <div v-show="open.prices" class="max-h-48 space-y-1 overflow-y-auto border-t border-[var(--border-card)] px-2 pb-2 pt-1">
           <button
             v-for="row in priceBindings"
-            :key="row.key"
+            :key="`${row.key}-${row.price_type_id ?? ''}`"
             type="button"
             class="btn-luxury-outline flex w-full flex-col items-start gap-0.5 py-2 text-left text-xs"
             @click="addPriceBinding(row)"
@@ -167,18 +167,11 @@ const sections = [
     icon: 'fa-photo-video',
     widgets: [{ type: 'image', label: 'Image', icon: 'fa-image', hint: 'Static logo or photo', thumbClass: 'bg-[linear-gradient(135deg,rgba(59,130,246,0.35),rgba(16,185,129,0.3))]', extra: null }],
   },
-  {
-    id: 'exchange',
-    title: 'Exchange',
-    icon: 'fa-chart-line',
-    widgets: [{ type: 'price_board', label: 'Price board', icon: 'fa-coins', hint: 'Rates panel widget', thumbClass: 'bg-[linear-gradient(180deg,rgba(15,23,42,0.55),rgba(30,41,59,0.7))]', extra: null }],
-  },
 ]
 
 const open = reactive({
   text_time: false,
   media: false,
-  exchange: false,
   prices: false,
   media_lib: false,
 })
@@ -203,7 +196,11 @@ async function loadPriceBindings() {
     const list = Array.isArray(data) ? data : []
     priceBindings.value = list
       .filter((v) => v.key && String(v.key).startsWith('price__'))
-      .map((v) => ({ key: v.key, description: v.description || v.key }))
+      .map((v) => ({
+        key: v.key,
+        description: v.description || v.key,
+        price_type_id: v.price_type_id,
+      }))
   } catch {
     priceBindings.value = []
   }
@@ -226,15 +223,28 @@ function addPriceBinding(row) {
   const cw = te.canvasWidth?.value ?? 1920
   const ch = te.canvasHeight?.value ?? 1080
   const fs = Math.min(96, Math.max(28, Math.round(ch * 0.09)))
-  te.addWidget('text', {
-    name: row.description || row.key,
-    style: {
-      bindingKey: row.key,
-      fontSize: fs,
+  const idKey = row.price_type_id != null ? `price_type__${row.price_type_id}` : ''
+  const previewValue =
+    (idKey && te.priceBindingPreviewMap?.value?.[idKey]?.value) ||
+    te.priceBindingPreviewMap?.value?.[row.key]?.value
+  const fallbackPrice = String(previewValue || '').trim() || '123,456'
+  const style = {
+    bindingKey: row.key,
+    fontSize: fs,
       color: '#0f172a',
       align: 'center',
-    },
-    content: row.description || row.key,
+      fontWeight: 'normal',
+      plainText: true,
+    textShadow: false,
+    textOutline: false,
+  }
+  if (row.price_type_id != null && row.price_type_id !== '') {
+    style.priceTypeId = row.price_type_id
+  }
+  te.addWidget('text', {
+    name: row.description || row.key,
+    style,
+    content: fallbackPrice,
     width: Math.min(cw * 0.85, 900),
     height: Math.min(ch * 0.14, fs + 36),
     x: cw * 0.075,

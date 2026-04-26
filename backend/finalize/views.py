@@ -36,9 +36,10 @@ def sort_gbp_price_types(price_types):
     price_types_list = list(price_types)
     
     def get_sort_key(price_type):
-        name_lower = price_type.name.lower()
+        name_lower = (price_type.name or "").lower()
         slug_lower = (price_type.slug or "").lower()
-        trade_type = price_type.trade_type.lower()
+        raw_trade = getattr(price_type, "trade_type", None) or ""
+        trade_type = raw_trade.lower() if isinstance(raw_trade, str) else ""
         
         # Lira and Dirham always last
         if 'لیر' in price_type.name or slug_lower == 'lira':
@@ -81,14 +82,18 @@ def finalize_dashboard(request):
     - Special prices that are pending finalization
     """
     # Get all categories with their price types
-    categories = Category.objects.prefetch_related(
-        Prefetch(
-            'price_types',
-            queryset=PriceType.objects.prefetch_related('price_histories').select_related(
-                'source_currency', 'target_currency'
+    categories = (
+        Category.objects.defer('last_used_template')
+        .prefetch_related(
+            Prefetch(
+                'price_types',
+                queryset=PriceType.objects.prefetch_related('price_histories').select_related(
+                    'source_currency', 'target_currency'
+                )
             )
         )
-    ).all()
+        .order_by('name')
+    )
     
     # Find prices that are not finalized yet
     # A price is not finalized if there's a PriceHistory entry that doesn't have a FinalizedPriceHistory
@@ -136,12 +141,17 @@ def finalize_dashboard(request):
     
     # Get pending special prices
     # A special price is pending if it doesn't have a finalization record
-    special_price_types = SpecialPriceType.objects.prefetch_related(
-        Prefetch(
-            'special_price_histories',
-            queryset=SpecialPriceHistory.objects.order_by('-created_at')
+    special_price_types = (
+        SpecialPriceType.objects.defer('last_used_template')
+        .prefetch_related(
+            Prefetch(
+                'special_price_histories',
+                queryset=SpecialPriceHistory.objects.order_by('-created_at')
+            )
         )
-    ).select_related('source_currency', 'target_currency').all()
+        .select_related('source_currency', 'target_currency')
+        .order_by('name')
+    )
     
     pending_special_prices = []
     for special_price_type in special_price_types:

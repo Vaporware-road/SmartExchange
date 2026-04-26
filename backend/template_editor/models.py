@@ -46,7 +46,6 @@ class Widget(models.Model):
         ("album", _("Album")),
         ("webview", _("Webview")),
         ("chart", _("Chart")),
-        ("price_board", _("Price board")),
     ]
 
     layer = models.ForeignKey(

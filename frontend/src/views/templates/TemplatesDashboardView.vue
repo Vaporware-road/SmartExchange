@@ -106,6 +106,15 @@
           >
             <i class="fas fa-edit"></i> Editor
           </router-link>
+          <button
+            type="button"
+            class="btn-luxury-outline text-sm py-2 w-full sm:w-auto !border-rose-500/50 !text-rose-400 hover:!bg-rose-500/10"
+            :disabled="deletingId === t.id"
+            @click="deleteTemplate(t)"
+          >
+            <i class="fas fa-trash"></i>
+            {{ deletingId === t.id ? 'Deleting...' : 'Delete' }}
+          </button>
         </div>
       </div>
     </div>
@@ -114,11 +123,14 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { templateEditorApi } from '@/services/api'
+import { useToast } from 'vue-toastification'
+import { getApiErrorDetails, templateEditorApi } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 
 const loading = ref(true)
 const templates = ref([])
+const deletingId = ref(null)
+const toast = useToast()
 
 /** Extract up to 5 variable_key values from config (themes or legacy fields) for preview. */
 function getPreviewVariableKeys(template) {
@@ -160,6 +172,26 @@ function getTemplateBadgeLabel(template) {
 /** Telegram bubble background: subtle green/blue tint (sent message style). */
 const telegramBubbleClass =
   'bg-[#2AABEE]/20 dark:bg-[#229ED9]/25 border border-[var(--glass-border)]'
+
+async function deleteTemplate(template) {
+  if (!template?.id || deletingId.value != null) return
+  const name = String(template?.name ?? '').trim() || `Template #${template.id}`
+  const confirmed = window.confirm(
+    `Are you sure you want to delete "${name}"?\nThis action cannot be undone.`
+  )
+  if (!confirmed) return
+
+  deletingId.value = template.id
+  try {
+    await templateEditorApi.delete(template.id)
+    templates.value = templates.value.filter((t) => t.id !== template.id)
+    toast.success('Template deleted successfully.')
+  } catch (error) {
+    toast.error(getApiErrorDetails(error).message)
+  } finally {
+    deletingId.value = null
+  }
+}
 
 onMounted(async () => {
   try {

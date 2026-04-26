@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import io
 import logging
+import re
 from numbers import Real
 from pathlib import Path
 from typing import Any, Dict, List, Optional
@@ -22,6 +23,65 @@ from .variables import get_default_sample_value
 logger = logging.getLogger(__name__)
 
 
+def _looks_like_placeholder_text(value: Any) -> bool:
+    s = str(value or "").strip()
+    if not s:
+        return True
+    lowered = s.lower()
+    if lowered in {"sample text", "text"}:
+        return True
+    if s.startswith("[") and s.endswith("]"):
+        return True
+    return False
+
+
+_PRICE_KEY_EXACT = {"price"}
+_PRICE_KEY_PREFIXES = (
+    "price__",
+    "price_type__",
+    "price_buy__",
+    "price_sell__",
+    "price_buy_",
+    "price_sell_",
+    "tether_buy_",
+    "tether_sell_",
+)
+_DIGIT_RE = re.compile(r"\d")
+_ALPHA_RE = re.compile(r"[A-Za-z\u0600-\u06FF]")
+
+
+def _is_price_like_key(key: str) -> bool:
+    k = str(key or "").strip().lower()
+    if not k:
+        return False
+    if k in _PRICE_KEY_EXACT:
+        return True
+    return k.startswith(_PRICE_KEY_PREFIXES)
+
+
+def _is_probable_price_text(value: Any) -> bool:
+    s = str(value or "").strip()
+    if not s:
+        return False
+    # Price text must include digits and should not include letters/month names.
+    if not _DIGIT_RE.search(s):
+        return False
+    if _ALPHA_RE.search(s):
+        return False
+    return True
+
+
+def _fallback_price_text(dynamic_data: Dict[str, Any]) -> str:
+    # Prefer any available live price token before hard fallback.
+    for key, raw in (dynamic_data or {}).items():
+        if not _is_price_like_key(str(key or "")):
+            continue
+        text = _format_widget_value(raw).strip()
+        if text and _is_probable_price_text(text):
+            return text
+    return "123,456"
+
+
 def _format_widget_value(value: Any) -> str:
     if value is None:
         return ""
@@ -35,26 +95,26 @@ def _format_widget_value(value: Any) -> str:
 
 
 def _text_fx_from_style(style: Dict[str, Any]) -> tuple[str, Optional[int], bool]:
-    """Resolve PIL text weight, stroke width (None=legacy auto), and shadow flag from widget style."""
+    """Resolve PIL text weight, stroke width, and shadow flag from widget style."""
     fw = style.get("fontWeight") or style.get("weight") or "normal"
     s = str(fw).strip().lower()
     weight = "bold" if s in ("bold", "700", "800", "900") else "normal"
     if style.get("plainText") is True or style.get("plain_text") is True:
         return weight, 0, False
     ts = style.get("textShadow")
-    if ts is False or ts == 0 or str(ts).lower() == "false":
-        use_shadow = False
-    else:
-        use_shadow = True
+    # Keep output readable by default: no shadow unless explicitly enabled.
+    use_shadow = ts is True or str(ts).lower() == "true"
     sw = style.get("textStrokeWidth")
     if sw is not None:
         try:
             return weight, max(0, int(sw)), use_shadow
         except (TypeError, ValueError):
             pass
-    if style.get("textOutline") is False or style.get("text_outline") is False:
-        return weight, 0, use_shadow
-    return weight, None, use_shadow
+    # Keep output readable by default: no outline unless explicitly enabled.
+    outline_enabled = style.get("textOutline") is True or style.get("text_outline") is True
+    if outline_enabled:
+        return weight, None, use_shadow
+    return weight, 0, use_shadow
 
 
 def _pct_to_fraction(raw: Any) -> float:
@@ -82,24 +142,61 @@ def _logical_to_actual(
     return int(round(px_design * scale))
 
 
+def _price_bind_fallback(binding: str, dynamic_data: Dict[str, Any], w: Dict[str, Any], *, treat_as_price: bool) -> str:
+    """When primary dynamic key(s) missed, mirror legacy binding fallbacks."""
+    fallback_content = w.get("content")
+    if (
+        fallback_content is not None
+        and str(fallback_content).strip()
+        and not _looks_like_placeholder_text(fallback_content)
+    ):
+        return str(fallback_content).strip()
+    b = str(binding).strip().lower()
+    if treat_as_price or (b and _is_price_like_key(b)):
+        return _fallback_price_text(dynamic_data)
+    if not b:
+        return _fallback_price_text(dynamic_data) if treat_as_price else ""
+    sample = get_default_sample_value(str(binding).strip())
+    sample_text = _format_widget_value(sample).strip()
+    if _looks_like_placeholder_text(sample_text):
+        return _fallback_price_text(dynamic_data)
+    return sample_text
+
+
 def _widget_text_value(w: Dict[str, Any], dynamic_data: Dict[str, Any]) -> str:
     style = w.get("style") if isinstance(w.get("style"), dict) else {}
-    binding = (
+    binding_raw = (
         w.get("bindingKey")
         or w.get("binding_key")
         or style.get("bindingKey")
         or style.get("binding_key")
     )
+    binding = str(binding_raw).strip() if binding_raw else ""
     wtype = (w.get("type") or "text").strip()
-    if binding:
-        val = dynamic_data.get(str(binding).strip())
+
+    raw_ptid = style.get("priceTypeId") or style.get("price_type_id")
+    pt_key = None
+    if raw_ptid not in (None, ""):
+        try:
+            pt_key = f"price_type__{int(raw_ptid)}"
+        except (TypeError, ValueError):
+            pt_key = None
+
+    if pt_key:
+        val = dynamic_data.get(pt_key)
         if val is not None and str(val).strip():
             return _format_widget_value(val).strip()
-        fallback_content = w.get("content")
-        if fallback_content is not None and str(fallback_content).strip():
-            return str(fallback_content).strip()
-        sample = get_default_sample_value(str(binding).strip())
-        return _format_widget_value(sample).strip()
+        if binding:
+            val = dynamic_data.get(binding)
+            if val is not None and str(val).strip():
+                return _format_widget_value(val).strip()
+        return _price_bind_fallback(binding, dynamic_data, w, treat_as_price=True)
+
+    if binding:
+        val = dynamic_data.get(binding)
+        if val is not None and str(val).strip():
+            return _format_widget_value(val).strip()
+        return _price_bind_fallback(binding, dynamic_data, w, treat_as_price=False)
     if wtype in ("date", "weekday"):
         key = style.get("dateKey") or style.get("date_key") or "date_fa"
         return _format_widget_value(dynamic_data.get(key) or get_default_sample_value(key)).strip()
@@ -152,95 +249,6 @@ def _paste_scaled_image(
         a = a.point(lambda p: int(round(p * op)))
         resized = Image.merge("RGBA", (r, g, b, a))
     base.paste(resized, (x0, y0), resized)
-
-
-def _draw_price_board(
-    draw: ImageDraw.ImageDraw,
-    x: int,
-    y: int,
-    w: int,
-    h: int,
-    style: Dict[str, Any],
-    dynamic_data: Dict[str, Any],
-) -> None:
-    title = (style.get("title") or "Prices").strip()
-    rows_raw = style.get("rows") if isinstance(style.get("rows"), list) else None
-    if not rows_raw:
-        rows_raw = style.get("mockRows") if isinstance(style.get("mockRows"), list) else []
-    try:
-        cols = max(1, min(4, int(style.get("columns") or 1)))
-    except (TypeError, ValueError):
-        cols = 1
-    pad = max(4, min(16, w // 40))
-    header_h = max(22, min(48, h // 8))
-    body_h = h - header_h - pad * 2
-    if body_h < 20:
-        body_h = 20
-    # header background
-    draw.rectangle([x, y, x + w, y + header_h], fill=_parse_color(style.get("headerBg") or style.get("panelBg") or "#1e293b"))
-    font_size = max(12, min(22, header_h - 8))
-    hw, hstroke, hshadow = _text_fx_from_style(style)
-    draw_text_field(
-        draw,
-        x + pad,
-        y + max(2, (header_h - font_size) // 2),
-        title,
-        size=font_size,
-        color=style.get("headerColor") or "#e2e8f0",
-        align="left",
-        max_width=w - 2 * pad,
-        weight=hw,
-        stroke_width=hstroke,
-        shadow=hshadow,
-    )
-    row_y = y + header_h + pad
-    row_h = max(18, int((body_h - pad) / max(1, len(rows_raw) or 1)))
-    for i, row in enumerate(rows_raw[:20]):
-        if not isinstance(row, dict):
-            continue
-        label = str(row.get("label") or "")
-        bk = row.get("bindingKey") or row.get("binding_key")
-        price = str(row.get("price") or "").strip()
-        if bk:
-            val = dynamic_data.get(str(bk).strip())
-            if val is not None and str(val).strip():
-                price = format_price_display(val)
-        ry0 = row_y + i * (row_h + 2)
-        draw.rectangle(
-            [x + pad, ry0, x + w - pad, ry0 + row_h],
-            fill=_parse_color(style.get("rowBg") or "#334155"),
-        )
-        fs = max(11, min(18, row_h - 6))
-        rw, rstroke, rshadow = _text_fx_from_style(style)
-        label_color = style.get("labelColor") or style.get("label_color") or "#f1f5f9"
-        if label:
-            draw_text_field(
-                draw,
-                x + pad * 2,
-                ry0 + 2,
-                label,
-                size=fs,
-                color=label_color,
-                align="left",
-                max_width=w // 2,
-                weight=rw,
-                stroke_width=rstroke,
-                shadow=rshadow,
-            )
-        if price:
-            draw_text_field(
-                draw,
-                x + w // 2,
-                ry0 + 2,
-                price,
-                size=fs,
-                color=style.get("priceColor") or "#d4af37",
-                align="right",
-                max_width=w // 2 - pad * 2,
-                weight=rw,
-                stroke_width=rstroke,
-                shadow=rshadow,
-            )
 
 
 def render_template_from_config_json(
@@ -338,7 +346,6 @@ def render_template_from_config_json(
             continue
 
         if wtype == "price_board":
-            _draw_price_board(draw, x, y, ww, hh, style, dynamic_data)
             continue
 
         text_val = _widget_text_value(w, dynamic_data)

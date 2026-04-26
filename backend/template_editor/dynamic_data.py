@@ -192,6 +192,9 @@ def build_dynamic_data_for_category_board(
     for price_type, price_history in price_items:
         price = getattr(price_history, "price", None) or getattr(price_history, "value", None)
         formatted = _format_price(price)
+        pt_pk = getattr(price_type, "pk", None) or getattr(price_type, "id", None)
+        if pt_pk is not None:
+            data[f"price_type__{int(pt_pk)}"] = formatted
         bk = _slug_binding_key(price_type)
         if bk:
             data[bk] = formatted
@@ -219,6 +222,9 @@ def build_dynamic_data_for_tether_board(
     for price_type, price_history in price_items:
         price = getattr(price_history, "price", None) or getattr(price_history, "value", None)
         formatted = _format_price(price)
+        pt_pk = getattr(price_type, "pk", None) or getattr(price_type, "id", None)
+        if pt_pk is not None:
+            data[f"price_type__{int(pt_pk)}"] = formatted
         bk = _slug_binding_key(price_type)
         if bk:
             data[bk] = formatted
@@ -244,6 +250,9 @@ def build_dynamic_data_for_special_offer(
     data["pair_name"] = getattr(special_price_type, "name", "") or ""
     price = getattr(price_history, "price", None) or getattr(price_history, "value", None)
     data["price"] = _format_price(price)
+    sp_pk = getattr(special_price_type, "pk", None) or getattr(special_price_type, "id", None)
+    if sp_pk is not None:
+        data[f"price_type__{int(sp_pk)}"] = data["price"]
     sp_slug = getattr(special_price_type, "slug", None) or ""
     sp_slug = str(sp_slug).strip()
     if sp_slug:

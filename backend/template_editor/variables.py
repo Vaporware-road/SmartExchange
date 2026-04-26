@@ -112,6 +112,7 @@ def extend_variable_catalog_with_category(category_id: int) -> List[Dict[str, An
                     "type": VAR_TYPE_NUMBER,
                     "description": pt.name,
                     "group": "prices",
+                    "price_type_id": pt.id,
                 }
             )
             seen.add(k)
@@ -122,6 +123,8 @@ def get_default_sample_value(key: str) -> str:
     """Return a sample string for preview when no dynamic_data is provided."""
     k = str(key or "").strip()
     if k.startswith("price__"):
+        return "1,234.56"
+    if k.startswith("price_type__"):
         return "1,234.56"
     if k in _DATE_SAMPLE_VALUES:
         return _DATE_SAMPLE_VALUES[k]

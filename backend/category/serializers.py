@@ -3,6 +3,21 @@ from rest_framework import serializers
 from .models import Category, Currency, PriceType
 
 
+def _resolve_preview_template(category_obj):
+    template = getattr(category_obj, "last_used_template", None)
+    if template and getattr(template, "image", None):
+        return template
+    # Fallback for newly saved templates before finalize/publish sets last_used_template.
+    from template_editor.models import Template
+
+    return (
+        Template.objects.filter(category=category_obj, is_active=True)
+        .exclude(image="")
+        .order_by("-updated_at", "-id")
+        .first()
+    )
+
+
 class CurrencySerializer(serializers.ModelSerializer):
     class Meta:
         model = Currency
@@ -129,7 +144,7 @@ class PriceTypeExplorerSerializer(serializers.ModelSerializer):
 
 class CategorySerializer(serializers.ModelSerializer):
     price_types = PriceTypeSerializer(many=True, read_only=True)
-    last_used_template = serializers.IntegerField(source="last_used_template_id", read_only=True)
+    last_used_template = serializers.SerializerMethodField()
     template_media_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -142,8 +157,12 @@ class CategorySerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ["id", "slug", "created_at", "updated_at"]
 
+    def get_last_used_template(self, obj):
+        template = _resolve_preview_template(obj)
+        return getattr(template, "id", None)
+
     def get_template_media_url(self, obj):
-        template = getattr(obj, "last_used_template", None)
+        template = _resolve_preview_template(obj)
         if not template or not getattr(template, "image", None):
             return ""
         try:
@@ -154,7 +173,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
 class CategoryListSerializer(serializers.ModelSerializer):
     price_type_count = serializers.IntegerField(read_only=True)
-    last_used_template = serializers.IntegerField(source="last_used_template_id", read_only=True)
+    last_used_template = serializers.SerializerMethodField()
     template_media_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -167,8 +186,12 @@ class CategoryListSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+    def get_last_used_template(self, obj):
+        template = _resolve_preview_template(obj)
+        return getattr(template, "id", None)
+
     def get_template_media_url(self, obj):
-        template = getattr(obj, "last_used_template", None)
+        template = _resolve_preview_template(obj)
         if not template or not getattr(template, "image", None):
             return ""
         try:
@@ -181,7 +204,7 @@ class CategoryExplorerSerializer(serializers.ModelSerializer):
     """List with nested price_types and latest_price for Explorer UI."""
     price_types = PriceTypeExplorerSerializer(many=True, read_only=True)
     price_type_count = serializers.SerializerMethodField()
-    last_used_template = serializers.IntegerField(source="last_used_template_id", read_only=True)
+    last_used_template = serializers.SerializerMethodField()
     template_media_url = serializers.SerializerMethodField()
 
     class Meta:
@@ -200,8 +223,12 @@ class CategoryExplorerSerializer(serializers.ModelSerializer):
             return len(pts)
         return getattr(obj, "price_type_count", 0)
 
+    def get_last_used_template(self, obj):
+        template = _resolve_preview_template(obj)
+        return getattr(template, "id", None)
+
     def get_template_media_url(self, obj):
-        template = getattr(obj, "last_used_template", None)
+        template = _resolve_preview_template(obj)
         if not template or not getattr(template, "image", None):
             return ""
         try:

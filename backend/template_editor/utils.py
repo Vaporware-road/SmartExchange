@@ -179,22 +179,30 @@ def draw_text_field(
         stroke_eff = max(0, int(stroke_width))
 
     def _draw_one_line(px: int, py: int, line: str) -> None:
+        def _safe_draw_text(position, *, fill, with_stroke=False):
+            kwargs = {"font": font, "fill": fill}
+            if with_stroke and stroke_eff > 0:
+                kwargs["stroke_width"] = stroke_eff
+                kwargs["stroke_fill"] = (0, 0, 0)
+            if direction:
+                kwargs["direction"] = direction
+            try:
+                draw.text(position, line, **kwargs)
+            except KeyError as exc:
+                # Pillow without libraqm cannot draw text with RTL direction.
+                if "libraqm" not in str(exc).lower() or "direction" not in kwargs:
+                    raise
+                kwargs.pop("direction", None)
+                draw.text(position, line, **kwargs)
+
         if shadow:
             shadow_offset = max(size // 18, 1)
             shadow_pos = (px + shadow_offset, py + shadow_offset)
-            draw.text(shadow_pos, line, font=font, fill=(0, 0, 0, 192), direction=direction)
+            _safe_draw_text(shadow_pos, fill=(0, 0, 0, 192))
         if stroke_eff > 0:
-            draw.text(
-                (px, py),
-                line,
-                font=font,
-                fill=color_rgb,
-                stroke_width=stroke_eff,
-                stroke_fill=(0, 0, 0),
-                direction=direction,
-            )
+            _safe_draw_text((px, py), fill=color_rgb, with_stroke=True)
         else:
-            draw.text((px, py), line, font=font, fill=color_rgb, direction=direction)
+            _safe_draw_text((px, py), fill=color_rgb)
 
     if max_width:
         lines = _wrap_text(text_to_draw, font, max_width, draw)
