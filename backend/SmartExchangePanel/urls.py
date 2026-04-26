@@ -39,6 +39,7 @@ urlpatterns = [
     re_path(r'^(?!api/|admin/|media/|static/|instagram-hub/).*$', views.SPAView.as_view(), name='spa'),
 ]
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+# This single-container deployment serves static/media via Django directly.
+# Keep these routes enabled even when DEBUG=False.
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

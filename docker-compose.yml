@@ -11,6 +11,7 @@ services:
       sh -c "mkdir -p /app/backend/data /app/backend/public/media /app/backend/public/staticfiles &&
              cd /app/backend &&
              python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
              python manage.py ensure_default_admin &&
              exec supervisord -c /etc/supervisor/conf.d/supervisord.conf"
     environment:
