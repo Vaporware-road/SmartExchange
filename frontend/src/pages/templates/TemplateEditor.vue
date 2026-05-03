@@ -125,7 +125,7 @@
               <Moveable
                 v-if="moveableTarget"
                 :key="selectedId || 'none'"
-                class="pointer-events-auto"
+                class="template-editor-moveable"
                 :target="moveableTarget"
                 :pass-drag-area="true"
                 :draggable="true"
@@ -203,6 +203,7 @@ const backgroundColor = ref('#ffffff')
 const widgets = ref([])
 const selectedId = ref(null)
 const priceBindingPreviewMap = ref({})
+const categoryPriceTypes = ref([])
 
 const viewportRef = ref(null)
 const canvasRootRef = ref(null)
@@ -311,6 +312,23 @@ function defaultName(type) {
   return map[type] || type
 }
 
+/** Date / weekday / clock: scale box + font from canvas size so large banners stay readable (library adds only). */
+function scaledDateLikePlacement(cw, ch) {
+  const w = Math.max(1, Number(cw) || 1920)
+  const h = Math.max(1, Number(ch) || 1080)
+  const short = Math.min(w, h)
+  const fontSize = Math.round(Math.min(96, Math.max(20, short * 0.032)))
+  const boxW = Math.round(Math.min(w * 0.82, Math.max(280, w * 0.38)))
+  const boxH = Math.round(Math.min(h * 0.12, Math.max(48, fontSize * 2.35)))
+  return {
+    x: Math.round(Math.max(0, (w - boxW) / 2)),
+    y: Math.round(Math.max(0, h * 0.06)),
+    width: boxW,
+    height: boxH,
+    fontSize,
+  }
+}
+
 function addWidget(type, extra = null) {
   const cw = canvasW.value
   const ch = canvasH.value
@@ -343,36 +361,55 @@ function addWidget(type, extra = null) {
   if (type === 'text' || type === 'marquee') {
     base.width = Math.min(640, cw * 0.45)
     base.height = Math.min(120, ch * 0.12)
-    base.content = 'Sample text'
-    base.style = { fontSize: 28 }
+    if (!String(base.content || '').trim()) {
+      base.content = 'Sample text'
+    }
+    base.style = {
+      fontSize: 28,
+      ...(base.style && typeof base.style === 'object' ? base.style : {}),
+    }
   } else if (type === 'image') {
     base.width = Math.min(480, cw * 0.35)
     base.height = Math.min(320, ch * 0.35)
   } else if (type === 'date') {
-    base.width = 280
-    base.height = 72
+    const m = scaledDateLikePlacement(cw, ch)
+    base.x = m.x
+    base.y = m.y
+    base.width = m.width
+    base.height = m.height
     base.content = ''
     base.style = {
       ...base.style,
-      fontSize: base.style.fontSize ?? 26,
+      fontSize: m.fontSize,
       dateKey: base.style.dateKey || base.style.date_key || 'date_fa',
     }
     delete base.style.date_key
   } else if (type === 'weekday') {
-    base.width = 280
-    base.height = 72
+    const m = scaledDateLikePlacement(cw, ch)
+    base.x = m.x
+    base.y = m.y
+    base.width = m.width
+    base.height = m.height
     base.content = ''
     base.style = {
       ...base.style,
-      fontSize: base.style.fontSize ?? 26,
+      fontSize: m.fontSize,
       dateKey: base.style.dateKey || base.style.date_key || 'farsi_weekday',
     }
     delete base.style.date_key
   } else if (type === 'clock') {
-    base.width = 280
-    base.height = 72
-    base.content = '12:00'
-    base.style = { fontSize: 26 }
+    const m = scaledDateLikePlacement(cw, ch)
+    base.x = m.x
+    base.y = m.y
+    base.width = m.width
+    base.height = m.height
+    if (!String(base.content || '').trim()) {
+      base.content = '12:00'
+    }
+    base.style = {
+      fontSize: m.fontSize,
+      ...(base.style && typeof base.style === 'object' ? base.style : {}),
+    }
   }
   widgets.value.push(base)
   clampWidgetToCanvas(base)
@@ -411,6 +448,20 @@ async function loadPriceBindingPreviewValues() {
     priceBindingPreviewMap.value = mapped
   } catch {
     priceBindingPreviewMap.value = {}
+  }
+}
+
+async function loadCategoryPriceTypes() {
+  const categoryId = template.value?.category
+  if (categoryId == null || categoryId === '') {
+    categoryPriceTypes.value = []
+    return
+  }
+  try {
+    const { data } = await templateEditorApi.categoryPriceTypes({ category: categoryId })
+    categoryPriceTypes.value = Array.isArray(data) ? data : []
+  } catch {
+    categoryPriceTypes.value = []
   }
 }
 
@@ -593,7 +644,7 @@ async function save() {
       canvas_height: canvasH.value,
     })
     template.value = templatesStore.current
-    await loadPriceBindingPreviewValues()
+    await Promise.all([loadPriceBindingPreviewValues(), loadCategoryPriceTypes()])
     lastSavedAt.value = new Date()
     saveState.value = 'saved'
     const categoryLabel = template.value?.category_name || (template.value?.category ? `#${template.value.category}` : 'No category')
@@ -690,6 +741,7 @@ watch(
   () => template.value?.category,
   () => {
     loadPriceBindingPreviewValues()
+    loadCategoryPriceTypes()
   }
 )
 
@@ -706,6 +758,7 @@ provideTemplateEditor({
   refitSelectedWidget: refitSelectedTextWidget,
   template,
   priceBindingPreviewMap,
+  categoryPriceTypes,
   backgroundColor,
   saveState,
 })
@@ -725,7 +778,7 @@ onMounted(async () => {
     const cj = data.config_json && typeof data.config_json === 'object' ? data.config_json : {}
     backgroundColor.value = cj.backgroundColor || '#ffffff'
     loadWidgetsFromConfigJson(cj)
-    await loadPriceBindingPreviewValues()
+    await Promise.all([loadPriceBindingPreviewValues(), loadCategoryPriceTypes()])
     nextTick(() => {
       fitZoom()
       refitAllTextWidgets()
@@ -756,3 +809,14 @@ onBeforeUnmount(() => {
   widgetEls.clear()
 })
 </script>
+
+<style scoped>
+/*
+ * Moveable sits after the canvas in DOM order (always painted on top). Forcing pointer-events:auto on it
+ * made the whole layer capture clicks so widgets underneath could not be selected.
+ * Root ignores hits; interactive descendants (handles/lines) still receive events per Moveable CSS.
+ */
+.template-editor-moveable {
+  pointer-events: none;
+}
+</style>

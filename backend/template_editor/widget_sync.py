@@ -81,7 +81,7 @@ def _sync_widgets_from_config(template, user=None) -> None:
     Persist widgets from template.config_json into Layer + Widget rows.
     Rewrites unstable client ids in template.config_json when needed.
     """
-    from .models import Widget
+    from .models import Widget, TemplateWidgetBinding
 
     raw = template.config_json if isinstance(template.config_json, dict) else {}
     widgets_data = raw.get("widgets")
@@ -136,9 +136,35 @@ def _sync_widgets_from_config(template, user=None) -> None:
                 widget_uuid=wid,
                 defaults={**defaults, "layer": layer},
             )
+            style = style if isinstance(style, dict) else {}
+            raw_price_type_id = style.get("priceTypeId") or style.get("price_type_id")
+            if raw_price_type_id not in (None, ""):
+                try:
+                    ptid = int(raw_price_type_id)
+                except (TypeError, ValueError):
+                    ptid = None
+                if ptid is not None:
+                    TemplateWidgetBinding.objects.update_or_create(
+                        template=template,
+                        widget_uuid=wid,
+                        defaults={"price_type_id": ptid},
+                    )
+                else:
+                    TemplateWidgetBinding.objects.filter(
+                        template=template,
+                        widget_uuid=wid,
+                    ).delete()
+            else:
+                TemplateWidgetBinding.objects.filter(
+                    template=template,
+                    widget_uuid=wid,
+                ).delete()
             seen.add(wid)
 
         Widget.objects.filter(layer=layer).exclude(widget_uuid__in=seen).delete()
+        TemplateWidgetBinding.objects.filter(template=template).exclude(
+            widget_uuid__in=seen
+        ).delete()
 
     if config_changed:
         template.config_json = raw

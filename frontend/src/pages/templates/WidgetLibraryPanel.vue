@@ -149,16 +149,16 @@ const sections = [
     widgets: [
       { type: 'text', label: 'Text', icon: 'fa-pen-nib', hint: 'Headline or note', thumbClass: 'bg-gradient-to-r from-slate-300/60 to-transparent', extra: null },
       { type: 'marquee', label: 'Marquee', icon: 'fa-wave-square', hint: 'Ticker style line', thumbClass: 'bg-[repeating-linear-gradient(90deg,rgba(148,163,184,0.45)_0,rgba(148,163,184,0.45)_8px,transparent_8px,transparent_14px)]', extra: null },
-      { type: 'date', label: 'Date', icon: 'fa-calendar-alt', hint: 'Localized date', thumbClass: 'bg-gradient-to-b from-slate-300/50 to-transparent', extra: { style: { dateKey: 'date_fa', fontSize: 26 } } },
+      { type: 'date', label: 'Date', icon: 'fa-calendar-alt', hint: 'Localized date', thumbClass: 'bg-gradient-to-b from-slate-300/50 to-transparent', extra: { style: { dateKey: 'date_fa' } } },
       {
         type: 'weekday',
         label: 'Weekday',
         icon: 'fa-calendar-day',
         hint: 'Day of week',
         thumbClass: 'bg-gradient-to-br from-slate-300/45 to-transparent',
-        extra: { style: { dateKey: 'farsi_weekday', fontSize: 26 } },
+        extra: { style: { dateKey: 'farsi_weekday' } },
       },
-      { type: 'clock', label: 'Clock', icon: 'fa-clock', hint: 'Live server time', thumbClass: 'bg-[radial-gradient(circle_at_50%_50%,rgba(148,163,184,0.45),transparent_65%)]', extra: { style: { fontSize: 26 } } },
+      { type: 'clock', label: 'Clock', icon: 'fa-clock', hint: 'Live server time', thumbClass: 'bg-[radial-gradient(circle_at_50%_50%,rgba(148,163,184,0.45),transparent_65%)]', extra: null },
     ],
   },
   {

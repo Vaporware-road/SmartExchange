@@ -2,7 +2,6 @@
 DRF API views for finalization flows.
 """
 import logging
-import threading
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Prefetch
@@ -13,22 +12,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.throttling import ScopedRateThrottle
+from celery.exceptions import TimeoutError as CeleryTimeoutError
 
 from accounts.permissions import IsSuperAdminOrManagement
 from category.models import Category, PriceType
 from special_price.models import SpecialPriceType, SpecialPriceHistory
 from telegram_app.models import TelegramChannel
-from price_publisher.services.publisher import (
-    PricePublicationError,
-    PricePublisherService,
-)
+from price_publisher.tasks import publish_category_prices_task, publish_special_price_task
 from setting.utils import log_finalize_event, log_telegram_event
 
 from instagram_hub.services.instagram_config import is_instagram_configured
-from instagram_hub.tasks import enqueue_post_finalize_to_instagram
+from instagram_hub.tasks import post_finalize_to_instagram_task
 
 from .models import Finalization, FinalizedPriceHistory, SpecialPriceFinalization
-from .services import ExternalAPIService
+from .tasks import send_finalized_prices_task, send_finalized_special_prices_task
 from .views import sort_gbp_price_types
 from .serializers import (
     FinalizeCategoryRequestSerializer,
@@ -44,18 +41,37 @@ _DASHBOARD_CATEGORY_DEFER = ("last_used_template",)
 _DASHBOARD_SPECIAL_TYPE_DEFER = ("last_used_template",)
 
 
-def _run_fire_and_forget(name, func, *args, **kwargs):
-    def _target():
-        try:
-            func(*args, **kwargs)
-        except Exception:
-            logger.exception("Async task failed: %s", name)
-
-    threading.Thread(target=_target, daemon=True).start()
-
-
-def _schedule_on_commit_async(name, func, *args, **kwargs):
-    transaction.on_commit(lambda: _run_fire_and_forget(name, func, *args, **kwargs))
+def _wait_for_publication_task(async_result):
+    timeout_seconds = max(1, int(getattr(settings, "FINALIZE_TASK_WAIT_TIMEOUT", 75)))
+    try:
+        payload = async_result.get(timeout=timeout_seconds)
+        if isinstance(payload, dict):
+            return payload
+        return {
+            "success": False,
+            "response": f"Invalid task response: {type(payload).__name__}",
+            "caption": None,
+            "publish_path": "unknown",
+            "render_fallback_reason": "invalid_task_response",
+        }
+    except CeleryTimeoutError:
+        logger.exception("Publication task timeout task_id=%s", async_result.id)
+        return {
+            "success": False,
+            "response": f"Publication timed out after {timeout_seconds}s",
+            "caption": None,
+            "publish_path": "worker_timeout",
+            "render_fallback_reason": "task_timeout",
+        }
+    except Exception as exc:
+        logger.exception("Publication task failed task_id=%s", async_result.id)
+        return {
+            "success": False,
+            "response": str(exc),
+            "caption": None,
+            "publish_path": "worker_error",
+            "render_fallback_reason": "task_error",
+        }
 
 
 def _get_publication_destinations():
@@ -349,29 +365,32 @@ class FinalizeCategoryAPIView(APIView):
 
         api_sent_successfully = None
 
-        publisher = PricePublisherService()
-        message_sent = False
-        image_caption = None
-        publication_response = ""
-        publish_path = "unknown"
-        render_fallback_reason = None
+        publish_async = publish_category_prices_task.apply_async(
+            kwargs={
+                "category_id": category.id,
+                "channel_id": channel.id,
+                "notes": notes_text,
+                "price_history_ids": [price_history.id for _, price_history in price_items],
+            }
+        )
+        publication = _wait_for_publication_task(publish_async)
+        message_sent = bool(publication.get("success"))
+        image_caption = publication.get("caption")
+        template_id = publication.get("template_id")
+        publication_response = publication.get("response", "")
+        publish_path = publication.get("publish_path", "unknown")
+        render_fallback_reason = publication.get("render_fallback_reason")
 
-        try:
-            publication = publisher.publish_category_prices(
-                category=category,
-                price_items=price_items,
-                channel=channel,
-                notes=notes_text,
+        if render_fallback_reason == "template_missing_or_invalid":
+            return Response(
+                {
+                    "detail": "Publish blocked: category template is missing or invalid.",
+                    "telegram_response": publication_response,
+                    "publish_path": publish_path,
+                    "render_fallback_reason": render_fallback_reason,
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
-            message_sent = publication.success
-            image_caption = publication.caption
-            publication_response = publication.response
-            publish_path = publication.publish_path
-            render_fallback_reason = publication.render_fallback_reason
-        except PricePublicationError as exc:
-            publication_response = str(exc)
-        except Exception as exc:
-            publication_response = str(exc)
 
         strict = getattr(settings, "FINALIZE_STRICT_TELEGRAM", False)
         if strict and not message_sent:
@@ -400,10 +419,10 @@ class FinalizeCategoryAPIView(APIView):
                     finalization=finalization,
                     price_history=item["price_history"],
                 )
-            _schedule_on_commit_async(
-                "finalize_category_external_api",
-                ExternalAPIService.send_finalized_prices,
-                price_items,
+            transaction.on_commit(
+                lambda: send_finalized_prices_task.delay(
+                    price_history_ids=[price_history.id for _, price_history in price_items]
+                )
             )
 
         total_prices_count = len(price_items)
@@ -411,17 +430,30 @@ class FinalizeCategoryAPIView(APIView):
         log_finalize_event(
             level="INFO" if message_sent else "WARNING",
             message=f"Category finalized: {category.name}",
-            details=(
-                f"Total: {total_prices_count}, New: {new_prices_count}. "
-                f"Telegram sent: {message_sent}. path={publish_path}, fallback={render_fallback_reason or 'none'}"
-            ),
+            details={
+                "event": "finalize_category",
+                "category_id": category.id,
+                "category_name": category.name,
+                "finalization_id": finalization.id,
+                "total_prices": total_prices_count,
+                "new_prices": new_prices_count,
+                "message_sent": message_sent,
+                "publish_path": publish_path,
+                "render_fallback_reason": render_fallback_reason,
+            },
             user=request.user,
         )
         if message_sent:
             log_telegram_event(
                 level="INFO",
                 message="Category prices published to Telegram",
-                details=f"Category: {category.name}, Channel: {channel.name}",
+                details={
+                    "event": "finalize_category_telegram_publish",
+                    "category_id": category.id,
+                    "category_name": category.name,
+                    "channel_id": channel.id,
+                    "channel_name": channel.name,
+                },
                 user=request.user,
             )
 
@@ -435,6 +467,7 @@ class FinalizeCategoryAPIView(APIView):
                 "api_sent_successfully": api_sent_successfully,
                 "api_sync_queued": True,
                 "telegram_response": publication_response,
+                "template_id": template_id,
                 "publish_path": publish_path,
                 "render_fallback_reason": render_fallback_reason,
             },
@@ -475,29 +508,20 @@ class FinalizeSpecialPriceAPIView(APIView):
         channel = get_object_or_404(TelegramChannel, id=channel_id, is_active=True)
         notes_text = notes.strip() if notes else None
 
-        publisher = PricePublisherService()
-        message_sent = False
-        image_caption = None
-        publication_response = ""
-        publish_path = "unknown"
-        render_fallback_reason = None
-
-        try:
-            publication = publisher.publish_special_price(
-                special_price_type=special_price_type,
-                price_history=special_price_history,
-                channel=channel,
-                notes=notes_text,
-            )
-            message_sent = publication.success
-            image_caption = publication.caption
-            publication_response = publication.response
-            publish_path = publication.publish_path
-            render_fallback_reason = publication.render_fallback_reason
-        except PricePublicationError as exc:
-            publication_response = str(exc)
-        except Exception as exc:
-            publication_response = str(exc)
+        publish_async = publish_special_price_task.apply_async(
+            kwargs={
+                "special_price_history_id": special_price_history.id,
+                "channel_id": channel.id,
+                "notes": notes_text,
+            }
+        )
+        publication = _wait_for_publication_task(publish_async)
+        message_sent = bool(publication.get("success"))
+        image_caption = publication.get("caption")
+        template_id = publication.get("template_id")
+        publication_response = publication.get("response", "")
+        publish_path = publication.get("publish_path", "unknown")
+        render_fallback_reason = publication.get("render_fallback_reason")
 
         strict = getattr(settings, "FINALIZE_STRICT_TELEGRAM", False)
         if strict and not message_sent:
@@ -521,19 +545,25 @@ class FinalizeSpecialPriceAPIView(APIView):
                 telegram_response=publication_response or None,
                 notes=notes,
             )
-            _schedule_on_commit_async(
-                "finalize_special_external_api",
-                ExternalAPIService.send_finalized_special_prices,
-                [(special_price_type, special_price_history)],
+            transaction.on_commit(
+                lambda: send_finalized_special_prices_task.delay(
+                    special_price_history_ids=[special_price_history.id]
+                )
             )
 
         log_finalize_event(
             level="INFO" if message_sent else "WARNING",
             message=f"Special price finalized: {special_price_type.name}",
-            details=(
-                f"Price: {special_price_history.price}. Telegram sent: {message_sent}. "
-                f"path={publish_path}, fallback={render_fallback_reason or 'none'}"
-            ),
+            details={
+                "event": "finalize_special_price",
+                "special_price_type_id": special_price_type.id,
+                "special_price_history_id": special_price_history.id,
+                "price": str(special_price_history.price),
+                "finalization_id": finalization.id,
+                "message_sent": message_sent,
+                "publish_path": publish_path,
+                "render_fallback_reason": render_fallback_reason,
+            },
             user=request.user,
         )
 
@@ -543,6 +573,7 @@ class FinalizeSpecialPriceAPIView(APIView):
                 "finalization_id": finalization.id,
                 "message_sent": message_sent,
                 "telegram_response": publication_response,
+                "template_id": template_id,
                 "publish_path": publish_path,
                 "render_fallback_reason": render_fallback_reason,
             },
@@ -611,28 +642,19 @@ class FinalizeAllAPIView(APIView):
                     })
                     continue
                 notes_text = notes.strip() if notes else None
-                publisher = PricePublisherService()
-                message_sent = False
-                image_caption = None
-                publication_response = ""
-                publish_path = "unknown"
-                render_fallback_reason = None
-                try:
-                    publication = publisher.publish_special_price(
-                        special_price_type=special_price_type,
-                        price_history=special_price_history,
-                        channel=channel,
-                        notes=notes_text,
-                    )
-                    message_sent = publication.success
-                    image_caption = publication.caption
-                    publication_response = publication.response
-                    publish_path = publication.publish_path
-                    render_fallback_reason = publication.render_fallback_reason
-                except PricePublicationError as exc:
-                    publication_response = str(exc)
-                except Exception as exc:
-                    publication_response = str(exc)
+                publish_async = publish_special_price_task.apply_async(
+                    kwargs={
+                        "special_price_history_id": special_price_history.id,
+                        "channel_id": channel.id,
+                        "notes": notes_text,
+                    }
+                )
+                publication = _wait_for_publication_task(publish_async)
+                message_sent = bool(publication.get("success"))
+                image_caption = publication.get("caption")
+                publication_response = publication.get("response", "")
+                publish_path = publication.get("publish_path", "unknown")
+                render_fallback_reason = publication.get("render_fallback_reason")
                 strict = getattr(settings, "FINALIZE_STRICT_TELEGRAM", False)
                 if strict and not message_sent:
                     results.append({
@@ -652,15 +674,23 @@ class FinalizeAllAPIView(APIView):
                         telegram_response=publication_response or None,
                         notes=notes,
                     )
-                    _schedule_on_commit_async(
-                        "finalize_all_special_external_api",
-                        ExternalAPIService.send_finalized_special_prices,
-                        [(special_price_type, special_price_history)],
+                    transaction.on_commit(
+                        lambda: send_finalized_special_prices_task.delay(
+                            special_price_history_ids=[special_price_history.id]
+                        )
                     )
                 log_finalize_event(
                     level="INFO" if message_sent else "WARNING",
                     message=f"Special price finalized (all): {special_price_type.name}",
-                    details=f"Telegram sent: {message_sent}",
+                    details={
+                        "event": "finalize_special_price_bulk",
+                        "special_price_type_id": special_price_type.id,
+                        "special_price_history_id": special_price_history.id,
+                        "finalization_id": finalization.id,
+                        "message_sent": message_sent,
+                        "publish_path": publish_path,
+                        "render_fallback_reason": render_fallback_reason,
+                    },
                     user=request.user,
                 )
                 results.append({
@@ -682,12 +712,12 @@ class FinalizeAllAPIView(APIView):
                 })
 
         if is_instagram_configured() and (category_ids or special_price_history_ids):
-            _schedule_on_commit_async(
-                "finalize_all_instagram_enqueue",
-                enqueue_post_finalize_to_instagram,
-                category_ids=category_ids,
-                special_price_history_ids=special_price_history_ids,
-                theme="dark",
+            transaction.on_commit(
+                lambda: post_finalize_to_instagram_task.delay(
+                    category_ids=category_ids,
+                    special_price_history_ids=special_price_history_ids,
+                    theme="dark",
+                )
             )
 
         return Response({"results": results}, status=status.HTTP_200_OK)
@@ -740,28 +770,21 @@ class FinalizeAllAPIView(APIView):
 
         notes_text = notes.strip() if notes else None
 
-        publisher = PricePublisherService()
-        message_sent = False
-        image_caption = None
-        publication_response = ""
-        publish_path = "unknown"
-        render_fallback_reason = None
-        try:
-            publication = publisher.publish_category_prices(
-                category=category,
-                price_items=price_items,
-                channel=channel,
-                notes=notes_text,
-            )
-            message_sent = publication.success
-            image_caption = publication.caption
-            publication_response = publication.response
-            publish_path = publication.publish_path
-            render_fallback_reason = publication.render_fallback_reason
-        except PricePublicationError as exc:
-            publication_response = str(exc)
-        except Exception as exc:
-            publication_response = str(exc)
+        publish_async = publish_category_prices_task.apply_async(
+            kwargs={
+                "category_id": category.id,
+                "channel_id": channel.id,
+                "notes": notes_text,
+                "price_history_ids": [price_history.id for _, price_history in price_items],
+            }
+        )
+        publication = _wait_for_publication_task(publish_async)
+        message_sent = bool(publication.get("success"))
+        image_caption = publication.get("caption")
+        template_id = publication.get("template_id")
+        publication_response = publication.get("response", "")
+        publish_path = publication.get("publish_path", "unknown")
+        render_fallback_reason = publication.get("render_fallback_reason")
 
         strict = getattr(settings, "FINALIZE_STRICT_TELEGRAM", False)
         if strict and not message_sent:
@@ -784,18 +807,25 @@ class FinalizeAllAPIView(APIView):
                     finalization=finalization,
                     price_history=item["price_history"],
                 )
-            _schedule_on_commit_async(
-                "finalize_all_category_external_api",
-                ExternalAPIService.send_finalized_prices,
-                price_items,
+            transaction.on_commit(
+                lambda: send_finalized_prices_task.delay(
+                    price_history_ids=[price_history.id for _, price_history in price_items]
+                )
             )
 
         log_finalize_event(
             level="INFO" if message_sent else "WARNING",
             message=f"Category finalized (all): {category.name}",
-            details=(
-                f"New prices: {len(pending_prices)}. Telegram sent: {message_sent}. "
-                f"path={publish_path}, fallback={render_fallback_reason or 'none'}"
-            ),
+            details={
+                "event": "finalize_category_bulk",
+                "category_id": category.id,
+                "category_name": category.name,
+                "finalization_id": finalization.id,
+                "new_prices": len(pending_prices),
+                "message_sent": message_sent,
+                "publish_path": publish_path,
+                "template_id": template_id,
+                "render_fallback_reason": render_fallback_reason,
+            },
             user=request.user,
         )

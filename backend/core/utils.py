@@ -69,6 +69,13 @@ def validate_uploaded_image(file_obj, max_size=MAX_IMAGE_SIZE, allowed_extension
             )
 
 
+def to_persian_digits(text) -> str:
+    """Replace Western digits 0-9 with Persian digits (commas/decimals unchanged)."""
+    if text is None:
+        return ""
+    return str(text).translate(str.maketrans("0123456789", "۰۱۲۳۴۵۶۷۸۹"))
+
+
 def format_price_display(price) -> str:
     """
     Format a numeric price with thousands separators.

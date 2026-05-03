@@ -6,6 +6,7 @@ import os
 import shutil
 from pathlib import Path
 
+from django.db.models import Q
 from django.db.utils import OperationalError, ProgrammingError
 from django.conf import settings
 from django.core.cache import cache
@@ -71,6 +72,8 @@ def _public_site_settings_fallback():
         "linkedin_link": "",
         "auto_post_on_update": False,
         "use_template_editor_for_boards": False,
+        "ui_font_filename_rtl": "",
+        "ui_font_filename_ltr": "",
     }
 
 
@@ -153,7 +156,9 @@ class LogListAPIView(APIView):
         if source:
             qs = qs.filter(source=source)
         if search:
-            qs = qs.filter(message__icontains=search)
+            qs = qs.filter(
+                Q(message__icontains=search) | Q(details__icontains=search)
+            )
 
         paginator = PageNumberPagination()
         paginator.page_size = 50

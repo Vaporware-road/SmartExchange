@@ -105,7 +105,15 @@ class SendMessageAPIView(APIView):
                 log_telegram_event(
                     level="INFO",
                     message="Message sent via API",
-                    details=f"Bot: {bot.name}, Channel: {channel.name}, Length: {len(message)}",
+                    details={
+                        "event": "api_send_message",
+                        "bot_id": bot.id,
+                        "bot_name": bot.name,
+                        "channel_id": channel.id,
+                        "channel_name": channel.name,
+                        "chat_id": str(channel.chat_id),
+                        "message_length": len(message),
+                    },
                     user=request.user,
                 )
                 return Response({"success": True, "detail": response})
@@ -117,7 +125,12 @@ class SendMessageAPIView(APIView):
             log_telegram_event(
                 level="ERROR",
                 message="Exception sending message via API",
-                details=str(e),
+                details={
+                    "event": "api_send_message_error",
+                    "bot_id": bot.id,
+                    "channel_id": channel.id,
+                    "error": str(e),
+                },
                 user=request.user,
             )
             return error_response(
@@ -252,7 +265,13 @@ class TelegramBotViewSet(ModelViewSet):
             log_telegram_event(
                 level="INFO",
                 message="Bot test-connection executed",
-                details=f"Bot: {bot.name}, Chat: {chat_id}, Success: {success}",
+                details={
+                    "event": "bot_test_connection",
+                    "bot_id": bot.id,
+                    "bot_name": bot.name,
+                    "chat_id": str(chat_id),
+                    "success": success,
+                },
                 user=request.user,
             )
             if success:
@@ -265,7 +284,11 @@ class TelegramBotViewSet(ModelViewSet):
             log_telegram_event(
                 level="ERROR",
                 message="Exception in bot test-connection",
-                details=str(exc),
+                details={
+                    "event": "bot_test_connection_error",
+                    "bot_id": bot.id,
+                    "error": str(exc),
+                },
                 user=request.user,
             )
             return error_response(

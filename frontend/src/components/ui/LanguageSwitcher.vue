@@ -15,7 +15,7 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { setLocale } from '@/i18n'
 
-const { locale } = useI18n()
+const { locale } = useI18n({ useScope: 'global' })
 
 const currentLabel = computed(() => locale.value === 'fa' ? 'FA' : 'EN')
 const nextLabel = computed(() => locale.value === 'fa' ? 'English' : 'فارسی')

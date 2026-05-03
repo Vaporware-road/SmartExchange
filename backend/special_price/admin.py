@@ -1,16 +1,11 @@
-import io
 from decimal import Decimal
 
 from django.contrib import admin, messages
 from django.db.models import F, Window
 from django.db.models.functions import Lag
-from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
-
-from template_editor.models import Template
-from template_editor.utils import render_template
 
 from .models import SpecialPriceHistory, SpecialPricePair, SpecialPriceType
 
@@ -141,35 +136,12 @@ class SpecialPriceHistoryAdmin(admin.ModelAdmin):
     previous_price_display.short_description = _("Previous price")
 
     def preview_with_template(self, request, queryset):
-        if not queryset.exists():
-            self.message_user(request, _("Select at least one record."), level=messages.WARNING)
-            return None
-        type_ids = queryset.values_list('special_price_type_id', flat=True).distinct()
-        if type_ids.count() > 1:
-            self.message_user(
-                request,
-                _("Select records for a single special price type."),
-                level=messages.WARNING,
-            )
-            return None
-        special_type_id = type_ids.first()
-        template = Template.objects.filter(special_price_type_id=special_type_id).order_by('-updated_at').first()
-        if not template:
-            self.message_user(
-                request,
-                _("No template is linked to this special price type."),
-                level=messages.WARNING,
-            )
-            return None
-
-        payload = self._build_payload(template, queryset.first())
-        image = render_template(template, payload)
-        buffer = io.BytesIO()
-        image.save(buffer, format="PNG")
-        buffer.seek(0)
-        response = HttpResponse(buffer.read(), content_type="image/png")
-        response["Content-Disposition"] = 'attachment; filename="special-price-preview.png"'
-        return response
+        self.message_user(
+            request,
+            _("Special-price template previews are disabled after template contract cutover."),
+            level=messages.WARNING,
+        )
+        return None
 
     preview_with_template.short_description = _("Preview template with selected price")
 

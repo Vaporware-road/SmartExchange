@@ -33,9 +33,19 @@ urlpatterns = [
         name="api-template-editor-fonts",
     ),
     path(
+        "fonts/<str:filename>/",
+        api_views.TemplateFontDeleteAPIView.as_view(),
+        name="api-template-editor-font-delete",
+    ),
+    path(
         "price-bindings-preview/",
         api_views.TemplatePriceBindingsPreviewAPIView.as_view(),
         name="api-template-editor-price-bindings-preview",
+    ),
+    path(
+        "category-price-types/",
+        api_views.TemplateCategoryPriceTypesAPIView.as_view(),
+        name="api-template-editor-category-price-types",
     ),
     path("", include(router.urls)),
 ]

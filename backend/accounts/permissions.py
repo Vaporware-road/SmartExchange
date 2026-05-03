@@ -26,6 +26,13 @@ from rest_framework import permissions
 
 logger = logging.getLogger(__name__)
 
+def _normalize_role(role):
+    """Normalize legacy role variants (e.g. superadmin) to canonical names."""
+    key = str(role or "").strip().lower().replace("-", "_")
+    if key == "superadmin":
+        return "super_admin"
+    return key
+
 
 class IsSuperAdmin(permissions.BasePermission):
     """
@@ -41,7 +48,9 @@ class IsSuperAdmin(permissions.BasePermission):
                 getattr(request.user, "is_authenticated", False) if request.user else False,
             )
             return False
-        role = getattr(request.user, "role", None)
+        if getattr(request.user, "is_superuser", False):
+            return True
+        role = _normalize_role(getattr(request.user, "role", None))
         allowed = role == "super_admin"
         logger.info(
             "IsSuperAdmin: user=%s role=%r allowed=%s",
@@ -67,7 +76,9 @@ class IsSuperAdminOrManagement(permissions.BasePermission):
                 getattr(request.user, "is_authenticated", False) if request.user else False,
             )
             return False
-        role = getattr(request.user, "role", None)
+        if getattr(request.user, "is_superuser", False):
+            return True
+        role = _normalize_role(getattr(request.user, "role", None))
         allowed = role in ("super_admin", "management")
         logger.info(
             "IsSuperAdminOrManagement: user=%s role=%r allowed=%s",
@@ -95,7 +106,7 @@ class IsSuperAdminOrManagementOrEmployee(permissions.BasePermission):
             return False
         if getattr(request.user, "is_superuser", False):
             return True
-        role = getattr(request.user, "role", None)
+        role = _normalize_role(getattr(request.user, "role", None))
         allowed = role in ("super_admin", "management", "employee")
         logger.info(
             "IsSuperAdminOrManagementOrEmployee: user=%s role=%r allowed=%s",

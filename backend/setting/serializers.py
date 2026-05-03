@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.utils import validate_uploaded_image, MAX_IMAGE_SIZE
+from template_editor.utils import get_available_fonts
 from .models import SiteSettings, Log
 from telegram_app.models import TelegramBot, TelegramChannel
 
@@ -33,6 +34,8 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "linkedin_link",
             "auto_post_on_update",
             "use_template_editor_for_boards",
+            "ui_font_filename_rtl",
+            "ui_font_filename_ltr",
         ]
 
     def validate_base_currency_code(self, value):
@@ -56,6 +59,21 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             except ValueError as e:
                 raise serializers.ValidationError(str(e))
         return value
+
+    def _validate_ui_font_filename(self, value):
+        s = str(value or "").strip()
+        if not s:
+            return ""
+        allowed = {fn for fn, _ in get_available_fonts()}
+        if s not in allowed:
+            raise serializers.ValidationError("Font file is not available on the server.")
+        return s
+
+    def validate_ui_font_filename_rtl(self, value):
+        return self._validate_ui_font_filename(value)
+
+    def validate_ui_font_filename_ltr(self, value):
+        return self._validate_ui_font_filename(value)
 
 
 class TelegramBotSerializer(serializers.ModelSerializer):

@@ -35,15 +35,22 @@ export const PERMISSIONS = {
   adminManagement: ADMIN_MANAGEMENT_ROLES,
 }
 
+function normalizeRole(role) {
+  const key = String(role ?? '').trim().toLowerCase().replaceAll('-', '_')
+  if (key === 'superadmin') return ROLES.SUPER_ADMIN
+  return key
+}
+
 /**
  * @param {string|null} role
  * @param {string} permission - key of PERMISSIONS
  * @returns {boolean}
  */
 export function can(role, permission) {
-  if (!role) return false
+  const normalizedRole = normalizeRole(role)
+  if (!normalizedRole) return false
   const allowed = PERMISSIONS[permission]
-  return Array.isArray(allowed) && allowed.includes(role)
+  return Array.isArray(allowed) && allowed.includes(normalizedRole)
 }
 
 export default { ROLES, PERMISSIONS, ALL_PANEL_ROLES, can }

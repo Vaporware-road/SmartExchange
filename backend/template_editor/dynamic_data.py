@@ -90,7 +90,10 @@ def _match_tether_key(price_type) -> Optional[str]:
 
 
 def _dates_from_timestamp(timestamp) -> Dict[str, str]:
-    now = timezone.localtime(timestamp) if timestamp else timezone.localtime()
+    # Always use current local time at render-time for date/clock widgets.
+    # We intentionally ignore the incoming price-history timestamp so templates
+    # show "today" consistently in preview and final publication.
+    now = timezone.localtime()
     jd = jdatetime.date.fromgregorian(date=now.date())
     farsi_date = f"{jd.day} {_farsi_month(jd.month)} {jd.year}"
     farsi_date = farsi_date.translate(PERSIAN_DIGITS)
@@ -241,6 +244,7 @@ def build_dynamic_data_for_tether_board(
 def build_dynamic_data_for_special_offer(
     special_price_type,
     price_history,
+    category_price_type=None,
 ) -> Dict[str, str]:
     """Build dynamic_data for special_offer usage."""
     data = {}
@@ -253,6 +257,14 @@ def build_dynamic_data_for_special_offer(
     sp_pk = getattr(special_price_type, "pk", None) or getattr(special_price_type, "id", None)
     if sp_pk is not None:
         data[f"price_type__{int(sp_pk)}"] = data["price"]
+    if category_price_type is not None:
+        cat_pt_pk = getattr(category_price_type, "pk", None) or getattr(category_price_type, "id", None)
+        if cat_pt_pk is not None:
+            data[f"price_type__{int(cat_pt_pk)}"] = data["price"]
+        cat_slug = str(getattr(category_price_type, "slug", "") or "").strip()
+        if cat_slug:
+            data[f"price__{cat_slug}"] = data["price"]
+        _register_caption_price_tokens(category_price_type, data["price"], data)
     sp_slug = getattr(special_price_type, "slug", None) or ""
     sp_slug = str(sp_slug).strip()
     if sp_slug:

@@ -162,11 +162,11 @@ function getPreviewVariableKeys(template) {
   return ['$PRICE']
 }
 
-/** Badge label: category_name, special_price_type_name, or Default. */
+/** Badge label: category_name or fallback id label. */
 function getTemplateBadgeLabel(template) {
   if (template?.category_name) return template.category_name
-  if (template?.special_price_type_name) return template.special_price_type_name
-  return 'Default'
+  if (template?.category) return `Category #${template.category}`
+  return 'Unassigned'
 }
 
 /** Telegram bubble background: subtle green/blue tint (sent message style). */

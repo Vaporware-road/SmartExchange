@@ -101,7 +101,7 @@ class PriceTypeViewSet(viewsets.ModelViewSet):
                 raise serializers.ValidationError(
                     {
                         "non_field_errors": [
-                            "A price type with this name or currency pair/trade type already exists in this category."
+                            "A price type with this name already exists in this category."
                         ]
                     }
                 ) from exc

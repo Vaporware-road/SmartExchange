@@ -71,11 +71,11 @@ class TemplateAdmin(admin.ModelAdmin):
         "preview_link",
     )
     list_display_links = ("thumbnail_tag", "name")
-    list_filter = ("category", "special_price_type", "is_active", "created_at", "updated_at")
-    search_fields = ("name", "category__name", "special_price_type__name")
+    list_filter = ("category", "is_active", "created_at", "updated_at")
+    search_fields = ("name", "category__name")
     readonly_fields = ("created_at", "updated_at", "rendered_config", "live_preview", "field_overview")
     ordering = ("-updated_at",)
-    autocomplete_fields = ("category", "special_price_type")
+    autocomplete_fields = ("category",)
     list_per_page = 25
     actions = ("duplicate_templates", "export_template_config", "import_template_config_action")
 
@@ -84,8 +84,8 @@ class TemplateAdmin(admin.ModelAdmin):
         (
             _("Assignment"),
             {
-                "fields": ("category", "special_price_type"),
-                "description": _("Link the template to either a category or a special price type."),
+                "fields": ("category",),
+                "description": _("Link the template to a category."),
             },
         ),
         (
@@ -106,7 +106,7 @@ class TemplateAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.select_related("category", "special_price_type")
+        return qs.select_related("category")
 
     # ------------------------------------------------------------------
     # List & detail helpers
@@ -128,12 +128,6 @@ class TemplateAdmin(admin.ModelAdmin):
                 '<span style="{}background:#e8f5e9;color:#2e7d32;">{}</span>',
                 BADGE_BASE_STYLE,
                 obj.category.name,
-            )
-        if obj.special_price_type:
-            return format_html(
-                '<span style="{}background:#f3e5f5;color:#6a1b9a;">{}</span>',
-                BADGE_BASE_STYLE,
-                obj.special_price_type.name,
             )
         return _("Unassigned")
 
@@ -228,7 +222,6 @@ class TemplateAdmin(admin.ModelAdmin):
             duplicate = Template(
                 name=new_name,
                 category=template.category,
-                special_price_type=template.special_price_type,
                 config=copy.deepcopy(template.config),
             )
             if template.image:

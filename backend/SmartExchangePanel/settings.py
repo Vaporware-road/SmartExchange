@@ -49,7 +49,6 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
         'accounts.auth.JWTAuthenticationWithTokenVersion',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
@@ -257,24 +256,83 @@ else:
     SECURE_BROWSER_XSS_FILTER = True
     X_FRAME_OPTIONS = 'DENY'
 
-# RBAC debug: log permission checks (user/role) when DEBUG is True
+# Application logs: console (human-readable) + rotating JSON file for aggregation (Loki/ELK).
+LOGS_DIR = BASE_DIR / 'logs'
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
     'formatters': {
         'simple': {'format': '%(levelname)s %(name)s: %(message)s'},
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'fmt': '%(asctime)s %(name)s %(levelname)s %(message)s',
+        },
     },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
             'formatter': 'simple',
         },
+        'file_json': {
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': str(LOGS_DIR / 'app.json.log'),
+            'maxBytes': 10 * 1024 * 1024,
+            'backupCount': 5,
+            'formatter': 'json',
+            'encoding': 'utf-8',
+        },
+    },
+    'root': {
+        'handlers': ['console', 'file_json'],
+        'level': 'INFO',
     },
     'loggers': {
+        # RBAC debug: console only (avoid duplicate structured noise in app.json.log).
         'accounts.permissions': {
             'level': 'INFO',
             'handlers': ['console'],
             'propagate': False,
         },
+        'django.server': {
+            'level': 'INFO',
+            'handlers': ['console', 'file_json'],
+            'propagate': False,
+        },
+        'django.request': {
+            'level': 'WARNING',
+            'handlers': ['console', 'file_json'],
+            'propagate': False,
+        },
+        # Quiet SQL in logs unless troubleshooting.
+        'django.db.backends': {
+            'level': 'WARNING',
+            'handlers': ['console'],
+            'propagate': False,
+        },
+        'finalize': {
+            'level': 'INFO',
+            'handlers': ['console', 'file_json'],
+            'propagate': False,
+        },
+        'telegram_app': {
+            'level': 'INFO',
+            'handlers': ['console', 'file_json'],
+            'propagate': False,
+        },
     },
 }
+
+# Celery configuration
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND", CELERY_BROKER_URL)
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_ENABLE_UTC = USE_TZ
+CELERY_TASK_TIME_LIMIT = int(os.environ.get("CELERY_TASK_TIME_LIMIT", "120"))
+CELERY_TASK_SOFT_TIME_LIMIT = int(os.environ.get("CELERY_TASK_SOFT_TIME_LIMIT", "90"))
+CELERY_RESULT_EXPIRES = int(os.environ.get("CELERY_RESULT_EXPIRES", "3600"))
+FINALIZE_TASK_WAIT_TIMEOUT = int(os.environ.get("FINALIZE_TASK_WAIT_TIMEOUT", "75"))

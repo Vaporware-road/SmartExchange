@@ -37,6 +37,7 @@ api.interceptors.response.use(
     const status = error.response?.status
 
     const requestUrl = error.config?.url ?? ''
+    const isAuthRequest = requestUrl.includes('/auth/')
     const isAuthCheck = requestUrl.includes('/auth/me')
     const isPublicBootstrapRequest =
       isAuthCheck || requestUrl.includes('/settings/site/')
@@ -44,10 +45,14 @@ api.interceptors.response.use(
 
     if (status === 401) {
       const url = error.config?.url ?? ''
-      // Do not hard-redirect on session check; avoids loops on the login page.
-      if (!url.includes('/auth/me')) {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      const isSessionCheck = url.includes('/auth/me')
+      const onPublicRoute = router.currentRoute?.value?.meta?.public === true
+      // Never force a full reload to /login while already on a public route (login, landing, …).
+      // Otherwise a stale Bearer token + e.g. GET /template-editor/fonts/ after site settings
+      // triggers 401 → location.href → infinite refresh loop.
+      if (!isSessionCheck && !onPublicRoute) {
         window.location.href = '/login'
       }
       return Promise.reject(error)
@@ -67,11 +72,13 @@ api.interceptors.response.use(
     } else if (status >= 500) {
       const skipServerErrorRedirect =
         error.config?.skipGlobalErrorRedirect === true ||
-        requestUrl.includes('/analysis/dashboard')
+        requestUrl.includes('/analysis/dashboard') ||
+        isAuthRequest
       const logId = error.response?.data?.log_id ?? error.response?.data?.error_id ?? error.response?.data?.request_id
       const currentName = router.currentRoute?.value?.name
       if (
         !skipServerErrorRedirect &&
+        currentName !== 'login' &&
         currentName !== 'error-500' &&
         currentName !== 'not-found'
       ) {
@@ -347,7 +354,11 @@ export const templateEditorApi = {
     })
   },
   fonts: () => api.get('/template-editor/fonts/'),
+  uploadFont: (formData) => api.post('/template-editor/fonts/', formData),
+  deleteFont: (filename) =>
+    api.delete(`/template-editor/fonts/${encodeURIComponent(filename)}/`),
   priceBindingsPreview: (params = {}) => api.get('/template-editor/price-bindings-preview/', { params }),
+  categoryPriceTypes: (params = {}) => api.get('/template-editor/category-price-types/', { params }),
 }
 
 export default api

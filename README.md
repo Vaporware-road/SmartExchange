@@ -1,497 +1,351 @@
 # SmartExchange Panel
 
-A full-stack **price management and publishing system** for currency exchange operations. Manage exchange rates, track history, generate branded price images, and publish them to Telegram channels—with an optional **landing page** and a separate **Request Management System (Iraniu)** in the same repository.
+SmartExchange Panel is a full-stack exchange operations platform:
+
+- Manage regular and special prices
+- Review/finalize changes before publishing
+- Render branded images
+- Publish to Telegram channels
+- Analyze activity and trends
+- Manage templates, settings, users, and optional Instagram integration
+
+This repository also contains another Django app at `backend/Request-Manage-System/`. That app is separate and has its own documentation.
 
 ---
 
 ## Table of Contents
 
-- [What This Project Is](#what-this-project-is)
-- [Features](#features)
-- [Architecture & Tech Stack](#architecture--tech-stack)
-- [Project Structure](#project-structure)
-- [Prerequisites](#prerequisites)
-- [Installation & Setup](#installation--setup)
-- [Running the Application](#running-the-application)
-- [Configuration](#configuration)
-- [Usage Overview](#usage-overview)
-- [API Reference](#api-reference)
-- [Security](#security)
+- [Current Architecture](#current-architecture)
+- [Tech Stack](#tech-stack)
+- [Repository Layout](#repository-layout)
+- [Quick Start (Docker)](#quick-start-docker)
+- [Quick Start (Local Development)](#quick-start-local-development)
+- [Environment Variables](#environment-variables)
+- [Main Functional Areas](#main-functional-areas)
+- [API Overview](#api-overview)
+- [Production Notes](#production-notes)
 - [Troubleshooting](#troubleshooting)
-- [Related Documentation](#related-documentation)
-- [License & Support](#license--support)
+- [Related Docs](#related-docs)
 
 ---
 
-## What This Project Is
+## Current Architecture
 
-**SmartExchange Panel** provides:
+The project runs as:
 
-1. **Price management** — Categories, price types (currency pairs, buy/sell), regular and special prices, full history.
-2. **Finalization workflow** — Review and finalize prices before publication, with approval tracking.
-3. **Image rendering** — Generate branded price images from configurable templates (backgrounds, logos, watermarks).
-4. **Telegram publishing** — Publish price updates to one or more Telegram channels via configured bots.
-5. **Analytics** — Dashboards, charts, trends, top movers, finalization stats.
-6. **Template editor** — Visual drag-and-drop editor for price templates (and a standalone template-editor app under `/template-editor/`).
-7. **Landing page** — Marketing site at `/landingpage/` (mr. sarafi | آقای صرافی) with EN/FA and RTL.
-8. **Instagram Hub** — OAuth and publishing integration for Instagram (optional).
+- **Frontend:** Vue 3 SPA in `frontend/`
+- **Backend:** Django API + SPA host in `backend/`
+- **Database:** SQLite by default (`backend/data/db.sqlite3` in Docker mode)
+- **Queue/Broker:** Celery workers with Redis broker/result backend
+- **Static/Media:** Django static + media folders/volumes
 
-The repository also includes **Request-Manage-System (Iraniu)**, a separate Django application for ad request management (AI moderation, Telegram notifications). It has its own README under `backend/Request-Manage-System/README.md`.
+Frontend behavior:
 
----
-
-## Features
-
-### Core
-
-- **Category-based price management** — Organize currency pairs and price types into categories.
-- **Dual price system** — Regular (category) prices and special/promotional prices.
-- **Price history** — Full audit trail of changes with timestamps and notes.
-- **Currency pairs** — Multiple currencies with buy/sell trade types.
-- **Finalization workflow** — Review, approve, and finalize before publishing.
-
-### Publishing & Automation
-
-- **Telegram publishing** — Publish to multiple channels; multiple bots supported.
-- **Custom image rendering** — Branded images from templates (Pillow-based).
-- **Templates** — Default, category-specific, and special-price templates; backgrounds, logos, watermarks.
-- **Visual template editor** — Drag-and-drop layout and styling.
-- **Multi-channel** — Manage several Telegram bots and channels.
-
-### Analytics & Reporting
-
-- **Analytics dashboard** — Real-time charts, trends, volatility, category summaries, top movers, finalization stats.
-- **Historical data** — e.g. 30-day price history.
-- **Performance** — Publication success and channel activity.
-
-### User & Security
-
-- **Roles** — Management, Employee, Developer (and super_admin for users/settings).
-- **Auth** — Custom user model, JWT + session auth, login required for panel.
-- **Activity & audit** — Logging and who finalized what and when.
-
-### Other
-
-- **Settings** — Centralized site/config management.
-- **Log viewer** — Filter logs by level and source.
-- **Persian calendar** — jdatetime support.
-- **Responsive UI** — Vue 3 SPA with Tailwind; PWA support.
+- In local dev, Vite serves the app and proxies `/api` and `/media` to Django.
+- In production-style mode, `npm run build` outputs to `backend/static/vue/`, and Django serves the built SPA.
 
 ---
 
-## Architecture & Tech Stack
+## Tech Stack
 
-| Layer        | Technology |
-|-------------|------------|
-| **Frontend** | Vue 3, Vite, Vue Router, Pinia, Tailwind CSS, Chart.js, vue-i18n, PWA (vite-plugin-pwa) |
-| **Backend**  | Django 5.2+, Django REST Framework, Simple JWT |
-| **Database** | SQLite (default; PostgreSQL-ready) |
-| **Image**    | Pillow (PIL) |
-| **Telegram** | python-telegram-bot, Pyrogram (as used by apps) |
-| **API**      | REST under `/api/`; JSON; session + JWT |
-
-The **frontend** is a single-page application (SPA). All non-API routes are served by Django with the same `index.html`; the Vue app handles routing. The frontend can be developed with Vite's dev server (proxying `/api` and `/media` to Django) or served after building into `backend/static/vue/`.
+- **Frontend:** Vue 3, Vite 6, Vue Router, Pinia, vue-i18n, Tailwind, Chart.js
+- **Backend:** Django 5.2+, DRF, SimpleJWT
+- **Image rendering:** Pillow
+- **Messaging:** Telegram integrations (bot/channel management and publishing)
+- **Optional integrations:** Instagram Hub
 
 ---
 
-## Project Structure
+## Repository Layout
 
-```
+```text
 SmartExchangePanel/
-├── README.md                    # This file
-├── frontend/                    # Vue 3 SPA
-│   ├── index.html
+├── frontend/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── layouts/
+│   │   ├── router/
+│   │   ├── services/
+│   │   ├── stores/
+│   │   └── views/
 │   ├── package.json
-│   ├── vite.config.js           # Builds to ../backend/static/vue/
-│   └── src/
-│       ├── assets/
-│       ├── components/          # layout/, ui/
-│       ├── layouts/
-│       ├── router/
-│       ├── services/            # API client
-│       ├── stores/              # Pinia: auth, theme, siteSettings
-│       └── views/               # auth, dashboard, prices, finalize, categories, settings, analysis, telegram, templates, instagram
-│
-└── backend/                     # Django project root
-    ├── manage.py                # DJANGO_SETTINGS_MODULE=SarafiPardis.settings
-    ├── requirements.txt
-    ├── SarafiPardis/            # Main Django project
-    │   ├── settings.py
-    │   ├── urls.py              # API, landing, template-editor, instagram-hub, SPA catch-all
-    │   ├── api_urls.py          # Mounts all app APIs under /api/
-    │   └── views.py             # SPAView, 404, favicon
-    ├── core/                    # Shared utilities (e.g. DRF exception handler)
-    │   └── exceptions.py
-    ├── accounts/                # Auth, users, roles, JWT, activity log
-    ├── category/                # Currency, Category, PriceType
-    ├── change_price/            # Price updates, bulk update, PriceHistory
-    ├── special_price/           # SpecialPriceType, SpecialPriceHistory
-    ├── finalize/                # Finalization, SpecialPriceFinalization, publishing
-    ├── price_publisher/         # Templates, image rendering, Telegram publishing
-    ├── template_editor/         # Visual template editor (standalone + API)
-    ├── analysis/                # Dashboard API, pricing API, charts
-    ├── telegram_app/            # Bots, channels, sending
-    ├── setting/                 # Site settings, logs
-    ├── dashboard/               # Dashboard API
-    ├── landing/                 # Landing page (mr. sarafi)
-    ├── instagram_hub/           # Instagram OAuth & hub
-    ├── static/                  # Static assets (fonts, etc.); Vue build output → static/vue/
-    ├── templates/               # Django templates (e.g. 404)
-    └── public/
-        ├── staticfiles/         # collectstatic output
-        └── media/               # Uploaded files
-    └── Request-Manage-System/   # Separate app (Iraniu) — see its README
+│   └── vite.config.js
+├── backend/
+│   ├── SmartExchangePanel/        # Django project settings/urls
+│   ├── accounts/
+│   ├── analysis/
+│   ├── category/
+│   ├── change_price/
+│   ├── dashboard/
+│   ├── finalize/
+│   ├── instagram_hub/
+│   ├── price_publisher/
+│   ├── setting/
+│   ├── special_price/
+│   ├── telegram_app/
+│   ├── template_editor/
+│   ├── manage.py
+│   └── requirements.txt
+├── scripts/
+│   └── ensure-default-admin.ps1
+├── docker-compose.yml
+└── .env.docker.example
 ```
 
 ---
 
-## Prerequisites
+## Quick Start (Docker)
 
-- **Python 3.10–3.12** (recommended; use a **venv** and `pip install -r backend/requirements.txt`. Avoid running `manage.py` with a random global `python` that does not have project dependencies — you will see errors like `No module named 'pytz'`.)
-- **Node.js 18+** (for frontend dev and build)
-- **pip** and a **virtual environment** (required for local backend commands)
-- **Docker + Docker Compose** (recommended for easiest setup)
+Recommended for fastest setup.
 
----
-
-## Installation & Setup
-
-### 1. Clone the repository
+### 1) Configure env
 
 ```bash
-git clone <repository-url>
-cd SmartExchangePanel
+cp .env.docker.example .env.docker
 ```
 
-### 2. Backend: virtualenv and dependencies
+Edit `.env.docker` for your host/domain when needed.
 
-```bash
-cd backend
-python -m venv venv
-# Windows:
-#   venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
-
-pip install -r requirements.txt
-```
-
-**Windows (PowerShell):** from repo root, `cd backend` only once (not `backend\backend`). After `venv` exists, prefer the venv interpreter explicitly:
-
-```powershell
-cd C:\Work\Project\SmartExchangePanel\backend
-.\venv\Scripts\python.exe manage.py migrate
-.\venv\Scripts\python.exe manage.py ensure_default_admin
-```
-
-Or from repo root:
-
-```powershell
-.\scripts\ensure-default-admin.ps1
-```
-
-### 3. Backend: environment (optional but recommended)
-
-Create a `.env` in `backend/` or set:
-
-- **`DJANGO_SECRET_KEY`** — Secret key (e.g. generate with `python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'`).
-- **`DJANGO_DEBUG`** — `True` for dev, `False` in production.
-- **`DJANGO_ALLOWED_HOSTS`** — Comma-separated hosts (e.g. `localhost,127.0.0.1,panel.example.com`).
-- **`FINALIZE_STRICT_TELEGRAM`** — If `True`, finalization is rolled back when Telegram publish fails.
-- **`EXTERNAL_API_URL`** / **`EXTERNAL_API_KEY`** — If you use the external rates API.
-- **`INSTAGRAM_BASE_URL`** — Public base URL for media (for Instagram).
-
-Settings read these via `os.environ.get(...)`.
-
-### 4. Backend: database and superuser
-
-```bash
-# From backend/
-python manage.py migrate
-python manage.py createsuperuser
-```
-
-### 5. Backend: static files (for production-style serving)
-
-```bash
-python manage.py collectstatic --noinput
-```
-
-### 6. Frontend: dependencies and build
-
-```bash
-cd ../frontend
-npm install
-npm run build
-```
-
-This writes the SPA into `backend/static/vue/` so Django can serve it.
-
----
-
-## Running the Application
-
-### Option 0: Docker (single container + hot reload)
-
-From repository root:
+### 2) Start
 
 ```bash
 docker compose up --build
 ```
 
-Then open:
+Current port mapping from `docker-compose.yml`:
 
-- **http://localhost:5173** (frontend with HMR)
-- **http://localhost:8000** (backend API/Admin)
+- **Frontend (Vite in container):** `http://localhost:5190`
+- **Backend (Django in container):** `http://localhost:18000`
+- **Redis broker:** `redis://localhost:6379`
 
-Useful commands:
+### 3) Default admin
+
+Container startup runs migrations and seeds/updates default admin:
+
+- Username: `admin`
+- Password: `admin`
+
+Stop commands:
 
 ```bash
-# View logs
-docker compose logs -f app
-
-# Stop containers
 docker compose down
-
-# Stop and remove Docker volumes (media + collected static; SQLite file lives on disk under backend/data/)
 docker compose down -v
 ```
 
-Default login (created automatically on backend startup in Docker):
+---
 
-- **Username:** `admin`
-- **Password:** `admin`
-- **Role:** `super_admin` (full panel access, including user management and site settings)
+## Quick Start (Local Development)
 
-To create another superuser manually:
+Use this if you do not want Docker.
+
+## Backend
 
 ```bash
-docker compose exec app python manage.py createsuperuser
+cd backend
+python -m venv venv
 ```
 
-To seed the same default user without Docker (from `backend/` after migrate), use the venv’s Python (not a global interpreter):
+Activate venv:
+
+- Windows PowerShell: `.\venv\Scripts\activate`
+- Linux/macOS: `source venv/bin/activate`
+
+Install deps and run:
 
 ```bash
-# Linux/macOS (venv activated)
+pip install -r requirements.txt
+python manage.py migrate
 python manage.py ensure_default_admin
-```
-
-```powershell
-# Windows (explicit venv path)
-.\venv\Scripts\python.exe manage.py ensure_default_admin
-```
-
-Optional env vars: `DEFAULT_ADMIN_USERNAME`, `DEFAULT_ADMIN_PASSWORD`, `DEFAULT_ADMIN_SYNC_PASSWORD` (when `true`, existing default user’s password is reset on each `ensure_default_admin` run — enabled in `docker-compose` for local dev).
-
-Notes for Docker mode:
-
-- A single `app` container runs both Django (`:8000`) and Vite (`:5173`) from one entrypoint script (no extra process manager package).
-- Frontend runs with Vite HMR inside Docker (`CHOKIDAR_USEPOLLING` / `WATCHPACK_POLLING` help file watching on Windows).
-- Backend runs with Django `runserver` auto-reload; code is bind-mounted from `./backend`.
-- `migrate` and default admin seed (`ensure_default_admin`) run automatically at startup.
-- SQLite remains SQLite. The database file is stored at **`backend/data/db.sqlite3` on your machine** (bind-mounted into the container via `SQLITE_PATH=/app/backend/data/db.sqlite3`), so panel changes are written to that file directly.
-- Uploaded media and collected static files stay in Docker volumes (`media_data`, `static_data`).
-
-### Option A: Backend only (serves built SPA)
-
-After building the frontend once:
-
-```bash
-cd backend
-source venv/bin/activate   # or venv\Scripts\activate on Windows
 python manage.py runserver
 ```
 
-Open **http://127.0.0.1:8000**. The SPA is served for all non-API routes.
+Backend URL: `http://127.0.0.1:8000`
 
-### Option B: Frontend dev server + backend (recommended for development)
-
-**Terminal 1 — Django:**
+In additional terminals (required for finalize/telegram background execution):
 
 ```bash
-cd backend
-source venv/bin/activate
-python manage.py runserver
+celery -A SmartExchangePanel worker --loglevel=INFO
+celery -A SmartExchangePanel beat --loglevel=INFO
 ```
 
-**Terminal 2 — Vite:**
+## Frontend
+
+In a second terminal:
 
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
 
-Vite runs on **http://localhost:3000** (see `vite.config.js`) and proxies `/api` and `/media` to `http://127.0.0.1:8000`. Use the Vite URL for development.
+Frontend dev URL (from `vite.config.js`): `http://localhost:3000`
 
-### CORS
-
-Backend allows credentials and origins for `http://localhost:5173`, `http://127.0.0.1:5173`, `http://localhost:3000`, `http://127.0.0.1:3000`. Adjust `CORS_ALLOWED_ORIGINS` in `SarafiPardis/settings.py` if you use another origin.
+Proxy target defaults to `http://127.0.0.1:8000` unless `VITE_API_PROXY_TARGET` is set.
 
 ---
 
-## Configuration
+## Environment Variables
 
-### Telegram
+## Docker env file (`.env.docker`)
 
-1. Create bots via [@BotFather](https://t.me/botfather).
-2. In the panel: **Telegram** (or admin) → add bots and channels.
-3. Configure which channels receive which finalizations.
+Key values used in deployment:
 
-### Templates
+- `DJANGO_SECRET_KEY`
+- `DJANGO_DEBUG`
+- `DJANGO_USE_HTTP_BEHIND_PROXY`
+- `DJANGO_ALLOWED_HOSTS`
+- `DJANGO_CSRF_TRUSTED_ORIGINS`
+- `FINALIZE_STRICT_TELEGRAM`
+- `INSTAGRAM_BASE_URL`
+- `EXTERNAL_API_URL`
+- `EXTERNAL_API_KEY`
+- `CELERY_BROKER_URL`
+- `CELERY_RESULT_BACKEND`
+- `CELERY_TASK_TIME_LIMIT`
+- `CELERY_TASK_SOFT_TIME_LIMIT`
+- `FINALIZE_TASK_WAIT_TIMEOUT`
+- `DEFAULT_ADMIN_USERNAME`
+- `DEFAULT_ADMIN_PASSWORD`
+- `DEFAULT_ADMIN_SYNC_PASSWORD` (optional; avoid `true` in production)
 
-1. Upload backgrounds/logos/watermarks via admin or settings.
-2. Create category-specific or special-price templates.
-3. Use **Template editor** (UI or `/template-editor/`) for layout and styling.
+See `.env.docker.example` for a template.
 
-### User roles
+## Runtime env used by compose
 
-- **Management** — Full access (including finalize, settings).
-- **Employee** — Standard operations.
-- **Developer** — Technical access.
-- **Super admin** — User management and sensitive settings.
+`docker-compose.yml` also sets:
 
----
-
-## Usage Overview
-
-### Price workflow
-
-1. **Categories & price types** — Create categories and define price types (currency pairs, buy/sell).
-2. **Update prices** — Use "Price hub" / bulk update by category or single price updates.
-3. **Finalize** — In **Finalize**, select prices, choose channel, add notes, and finalize.
-4. **Publish** — System renders the image and publishes to the selected Telegram channel(s).
-
-### Special prices
-
-- Define special price types independently.
-- Update and finalize them separately; they can use their own templates.
-
-### Analytics
-
-- Open **Analysis** for trends, category summaries, top movers, finalization stats, and historical data.
-
-### Template editing
-
-- Use the **Template editor** to position and style text/image elements and preview before saving.
+- `SQLITE_PATH=/app/backend/data/db.sqlite3`
+- `VITE_API_PROXY_TARGET=http://127.0.0.1:8000`
+- polling options for file-watch stability on Windows
+- dedicated `celery-worker` and `celery-beat` services
 
 ---
 
-## API Reference
+## Main Functional Areas
 
-All panel APIs are under **`/api/`** and use the same REST conventions. Authentication: **Session** or **JWT** (e.g. `Authorization: Bearer <access_token>`). Login: `POST /api/auth/login/`; refresh: `POST /api/auth/token/refresh/`.
+- **Auth & User management:** login/logout/me, role-based access, activity logs
+- **Price management:** categories, price types, regular prices, history
+- **Special prices:** separate flow and history
+- **Finalize pipeline:** confirm and publish final values
+- **Telegram:** bots/channels, manual sending, automation settings
+- **Template editor:** visual configuration and media tools
+- **Settings:** site branding/settings, logs, upload policy
+- **Analysis:** dashboard + pricing endpoints
+- **Instagram Hub (optional):** config/status/preview flow
 
-### Main API prefixes (under `/api/`)
+---
 
-| Prefix | Purpose |
-|--------|--------|
-| `auth/` | Login, logout, me, token refresh, users, activity |
-| `dashboard/` | Dashboard data |
-| `categories/` | Categories and price types |
-| `prices/` | Price list, detail, update, bulk update, history |
-| `special-prices/` | Special price types and updates |
-| `finalize/` | Finalization actions |
-| `telegram/` | Bots and channels |
-| `settings/` | Site settings |
-| `analysis/` | Analytics dashboard and **pricing data** |
-| `templates/` | Price templates (publisher) |
-| `template-editor/` | Template editor API |
-| `instagram-hub/` | Instagram hub |
+## API Overview
 
-### Public pricing data (read-only)
+Base prefix: `/api/`
 
-Suitable for dashboards, bots, or external systems:
+Common groups:
 
-- **URL:** `GET /api/analysis/pricing/`
-- **Auth:** Configurable (often unauthenticated for public feed).
-- **Response:** JSON with `generated_at` and `categories`. Each category has `id`, `name`, `slug`, `description`, and `items`. Regular items include `latest_price`, `latest_price_timestamp`; special-price items include `latest_special_price`, `latest_special_price_timestamp`. Special prices only include items updated in the last 6 hours.
+- `/api/auth/`
+- `/api/dashboard/`
+- `/api/categories/`
+- `/api/prices/`
+- `/api/special-prices/`
+- `/api/finalize/`
+- `/api/telegram/`
+- `/api/settings/`
+- `/api/analysis/`
+- `/api/templates/`
+- `/api/template-editor/`
+- `/api/instagram-hub/`
 
-Example response shape:
+Auth model:
+
+- Login: `POST /api/auth/login/`
+- Me: `GET /api/auth/me/`
+- Logout: `POST /api/auth/logout/`
+- JWT refresh: `POST /api/auth/token/refresh/`
+
+Error format:
 
 ```json
 {
-  "generated_at": "2025-01-01T12:00:00Z",
-  "categories": [
-    {
-      "id": 1,
-      "name": "Cash",
-      "slug": "cash",
-      "description": "Cash exchange prices",
-      "items": [
-        {
-          "id": 10,
-          "name": "USD / IRR Buy",
-          "pair": "USD/IRR",
-          "trade_type": "Buy",
-          "latest_price": "123456.78",
-          "latest_price_timestamp": "2025-01-01T11:55:00Z"
-        }
-      ]
-    },
-    {
-      "id": null,
-      "name": "Special Prices",
-      "slug": "special-prices",
-      "items": []
-    }
-  ]
+  "error": true,
+  "message": "Human readable message",
+  "code": "validation_error"
 }
 ```
 
-### Error format
-
-API errors use a common shape: `{ "error": true, "message": "...", "code": "..." }` (e.g. `validation_error`, `permission_denied`, `authentication_failed`, `not_found`, `server_error`).
-
 ---
 
-## Security
+## Production Notes
 
-- **Authentication** — All panel views require login (enforced by middleware); public routes (e.g. login, landing) are excluded.
-- **Authorization** — Role-based access; finalize and settings restricted to appropriate roles.
-- **CSRF** — Enabled for browser requests.
-- **CORS** — Configured for known frontend origins.
-- **Production** — Use `DEBUG=False`, strong `SECRET_KEY`, correct `ALLOWED_HOSTS`, and HTTPS (settings enable secure cookies and HSTS when not DEBUG).
-- **Secrets** — Prefer environment variables or a secrets manager; do not commit real keys.
+- Set `DJANGO_DEBUG=False`
+- Set strict `DJANGO_ALLOWED_HOSTS`
+- Set correct `DJANGO_CSRF_TRUSTED_ORIGINS`
+- Use strong `DJANGO_SECRET_KEY`
+- Disable automatic password re-sync for default admin (`DEFAULT_ADMIN_SYNC_PASSWORD=false`)
+- Serve behind HTTPS in real deployments
+
+Frontend build note:
+
+- `npm run build` uses `vite-plugin-pwa`.
+- If build fails with Workbox max-size errors, reduce icon asset sizes (`pwa-192x192.png`, `pwa-512x512.png`, `apple-touch-icon.png`) or adjust PWA workbox config.
 
 ---
 
 ## Troubleshooting
 
-### "Vue app not built"
+## `ERR_CONNECTION_REFUSED` on frontend URL
 
-- Run `cd frontend && npm run build`. Ensure `backend/static/vue/index.html` exists.
+No server is listening on that port. Start the frontend process:
 
-### Telegram publishing fails
+- Docker mode: `docker compose up`
+- Local mode: `cd frontend && npm run dev`
 
-- Check bot token and that the bot can post in the channel; verify channel/chat IDs.
+## Frontend says port 3000 but not reachable
 
-### Image rendering errors
+Check if Vite is actually running and if another process already occupies 3000.
 
-- Ensure template assets (backgrounds, fonts) exist and paths in settings are correct (e.g. `TEMPLATE_EDITOR_DEFAULT_FONT`, `PRICE_RENDERER_FONT_ROOT`). Check Pillow is installed.
+## Login shows generic 500 page
 
-### Database errors
+Check backend/container logs immediately:
 
-- Run `python manage.py migrate` from `backend/`. If you use PostgreSQL, set `DATABASES` in settings accordingly.
+```bash
+docker logs --tail 300 smart-exchange-app-1
+```
 
-### 401/403 on API from frontend
+Also test API directly:
 
-- Confirm credentials (session cookie or JWT) and that the user has the required role; check CORS and `credentials: true` if using a separate dev origin.
+```bash
+curl -i http://localhost:18000/api/settings/site/
+curl -i http://localhost:18000/api/auth/me/
+```
+
+## UI language does not switch to Persian
+
+- Ensure frontend is rebuilt/restarted after i18n changes.
+- Hard refresh browser (and clear service worker cache if needed).
+
+## API proxy errors like `ECONNREFUSED 127.0.0.1:8000`
+
+Backend is not running or proxy target is wrong.
+
+- Local: start Django on `127.0.0.1:8000`
+- Docker: make sure compose app is healthy and mapped ports are used correctly
+
+## Build fails due to PWA icon size
+
+Optimize oversized PNG icons or update Vite PWA Workbox limits.
 
 ---
 
-## Related Documentation
+## Related Docs
 
-- **Frontend:** `frontend/README.md` — Vue app structure and scripts.
-- **Landing:** `backend/landing/README.md` — Landing page structure and Django integration.
-- **Template editor:** `backend/template_editor/README.md` — Template manager and visual editor usage.
-- **Request-Manage-System (Iraniu):** `backend/Request-Manage-System/README.md` — Ad request flow, AI moderation, Telegram bots, runbots, and configuration.
-
----
-
-## License & Support
-
-- **License:** See repository or project license file.
-- **Support:** Configure contact details under **Settings → Site Settings** (e.g. support phone, email). Production and admin URLs are configured in deployment settings.
+- `frontend/README.md`
+- `backend/template_editor/README.md`
+- `backend/landing/README.md`
+- `backend/Request-Manage-System/README.md`
 
 ---
 
-**SmartExchange Panel** — Price management, finalization, and Telegram publishing for currency exchange operations.
+If you want, this README can also be split into:
+
+- `README.md` (quick start + operations)
+- `docs/deployment.md` (prod-specific guide)
+- `docs/dev.md` (contributor workflow)

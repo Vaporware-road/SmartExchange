@@ -87,10 +87,6 @@ class PriceType(models.Model):
         ordering = ['order', 'id']
         constraints = [
             models.UniqueConstraint(fields=['category', 'name'], name='unique_category_pricetype_name'),
-            models.UniqueConstraint(
-                fields=['category', 'source_currency', 'target_currency', 'trade_type'],
-                name='unique_category_currency_pair_trade',
-            ),
         ]
 
     def save(self, *args, **kwargs):
@@ -124,28 +120,30 @@ def validate_category_buy_sell_spread(category, prices_map=None):
     for pt in price_types:
         key = (pt.source_currency_id, pt.target_currency_id)
         if key not in pair_to_types:
-            pair_to_types[key] = {}
+            pair_to_types[key] = {"buy": [], "sell": []}
         if prices_map is not None:
             price = prices_map.get(pt.id) or prices_map.get(str(pt.id))
             if price is not None:
-                pair_to_types[key][pt.trade_type] = (pt, Decimal(str(price)))
+                pair_to_types[key][pt.trade_type].append((pt, Decimal(str(price))))
             else:
                 latest = pt.price_histories.first()
-                pair_to_types[key][pt.trade_type] = (pt, latest.price if latest else None)
+                pair_to_types[key][pt.trade_type].append((pt, latest.price if latest else None))
         else:
             latest = pt.price_histories.first()
-            pair_to_types[key][pt.trade_type] = (pt, latest.price if latest else None)
+            pair_to_types[key][pt.trade_type].append((pt, latest.price if latest else None))
     for key, by_trade in pair_to_types.items():
-        buy_data = by_trade.get("buy")
-        sell_data = by_trade.get("sell")
+        buy_data = by_trade.get("buy") or []
+        sell_data = by_trade.get("sell") or []
         if not buy_data or not sell_data:
             continue
-        _, buy_price = buy_data
-        _, sell_price = sell_data
-        if buy_price is None or sell_price is None:
+        buy_prices = [price for _, price in buy_data if price is not None]
+        sell_prices = [price for _, price in sell_data if price is not None]
+        if not buy_prices or not sell_prices:
             continue
-        if sell_price < buy_price:
+        highest_buy = max(buy_prices)
+        lowest_sell = min(sell_prices)
+        if lowest_sell < highest_buy:
             raise ValidationError(
                 "Sell price (%s) cannot be lower than buy price (%s) for the same currency pair in category \"%s\"."
-                % (sell_price, buy_price, category.name)
+                % (lowest_sell, highest_buy, category.name)
             )

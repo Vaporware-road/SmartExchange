@@ -22,14 +22,7 @@ from price_publisher.services.image_renderer import (
     RenderedPriceImage,
     TemplateAssets,
 )
-from price_publisher.services.legacy_category_renderer import (
-    render_category_board,
-    supports_category,
-)
-from price_publisher.services.tether_renderer import (
-    render_tether_board,
-    supports_tether_category,
-)
+from price_publisher.services.tether_renderer import supports_tether_category
 from price_publisher.services.special_offer_renderer import (
     SPECIAL_GBP_TEMPLATES,
     normalize_identifier,
@@ -228,6 +221,7 @@ class PublicationResult:
     success: bool
     response: str
     caption: Optional[str]
+    template_id: Optional[int] = None
     publish_path: str = "unknown"
     render_fallback_reason: Optional[str] = None
 
@@ -303,6 +297,7 @@ class PricePublisherService:
             image=image,
             caption=caption,
             buttons=buttons,
+            template_id=getattr(te_template_used, "id", None),
             publish_path=publish_path,
             render_fallback_reason=fallback_reason,
         )
@@ -318,16 +313,20 @@ class PricePublisherService:
         """Render and post a special price to Telegram."""
 
         custom_offer = supports_special_offer_type(special_price_type)
-        te_template = self._select_next_template_editor_for_special(special_price_type)
+        te_template, matched_category_price_type = self._select_next_template_editor_for_special(
+            special_price_type
+        )
         try:
             if te_template and self._template_editor_eligible(te_template):
                 dynamic_data = build_dynamic_data_for_special_offer(
-                    special_price_type, price_history
+                    special_price_type, price_history, matched_category_price_type
                 )
                 pil_image = render_price_template(te_template, SPECIAL_OFFER, dynamic_data)
                 image = self._pil_image_to_rendered(pil_image)
                 if getattr(te_template, "is_active", True):
-                    self._mark_special_price_template_used(special_price_type, te_template)
+                    self._mark_category_template_used(
+                        getattr(matched_category_price_type, "category", None), te_template
+                    )
                 caption = self._build_special_publish_caption(
                     special_price_type, price_history, dynamic_data, te_template, custom_offer=True
                 )
@@ -337,6 +336,7 @@ class PricePublisherService:
                     image=image,
                     caption=caption,
                     buttons=buttons,
+                    template_id=getattr(te_template, "id", None),
                     publish_path="special_template_editor",
                 )
             if not te_template:
@@ -419,9 +419,7 @@ class PricePublisherService:
         from template_editor.models import Template
 
         if not category:
-            return Template.objects.filter(
-                category__isnull=True, special_price_type__isnull=True
-            ).order_by("-updated_at").first()
+            return None
 
         # Honor pinned template only when it belongs to the same category.
         pinned_id = _safe_last_used_template_id(category)
@@ -442,11 +440,7 @@ class PricePublisherService:
             )
         )
         if not active:
-            return (
-                Template.objects.filter(category=category)
-                .order_by("-updated_at")
-                .first()
-            )
+            return None
         # Prefer templates that have PixelCast widgets so finalize does not pick an
         # empty placeholder row and fall back to the generic PriceImageRenderer card.
         with_widgets = [t for t in active if self._template_widget_count(t) > 0]
@@ -584,93 +578,38 @@ class PricePublisherService:
                 getattr(te_template, "id", None) if te_template else None,
             )
             fallback_reason = "template_render_failed"
-
-        if supports_tether_category(category):
-            try:
-                return (
-                    render_tether_board(
-                        category=category,
-                        price_items=price_items,
-                        timestamp=timestamp,
-                    ),
-                    None,
-                    "category_tether_renderer",
-                    fallback_reason,
-                )
-            except FileNotFoundError as exc:
-                raise PricePublicationError(str(exc)) from exc
-
-        if supports_category(category):
-            try:
-                return (
-                    render_category_board(
-                        category=category,
-                        price_items=price_items,
-                        timestamp=timestamp,
-                    ),
-                    None,
-                    "category_legacy_renderer",
-                    fallback_reason,
-                )
-            except FileNotFoundError as exc:
-                raise PricePublicationError(str(exc)) from exc
-
-        try:
-            return (
-                self._renderer.render_category_prices(
-                    category_name=category_name,
-                    price_entries=entries,
-                    notes=notes,
-                    timestamp=timestamp,
-                    template_assets=template_assets,
-                ),
-                None,
-                "category_default_renderer",
-                fallback_reason,
-            )
-        except PriceImageRenderingError as exc:  # pragma: no cover - delegated
-            raise PricePublicationError(str(exc)) from exc
+        raise PricePublicationError(
+            f"Template contract violation for category_id={getattr(category, 'id', None)}: {fallback_reason}"
+        )
 
     def _select_next_template_editor_for_special(self, special_price_type):
-        """Round-robin among active templates for this special price type; else any type template; else global default."""
-        from template_editor.models import Template
-
-        def _global_default():
-            return (
-                Template.objects.filter(
-                    category__isnull=True, special_price_type__isnull=True
-                )
-                .order_by("-updated_at")
-                .first()
-            )
+        """
+        Resolve special-price rendering template via category price contract.
+        Returns (template, matched_category_price_type) or (None, None).
+        """
+        from category.models import PriceType
 
         if not special_price_type:
-            return _global_default()
+            return None, None
 
-        active = list(
-            Template.objects.filter(
-                special_price_type=special_price_type, is_active=True
-            ).order_by("publish_order", "id")
-        )
-        if active:
-            with_widgets = [t for t in active if self._template_widget_count(t) > 0]
-            pool = with_widgets if with_widgets else active
-            ids = [t.pk for t in pool]
-            last_id = _safe_last_used_template_id(special_price_type)
-            if last_id not in ids:
-                return pool[0]
-            idx = ids.index(last_id)
-            return pool[(idx + 1) % len(pool)]
-
-        candidates = list(
-            Template.objects.filter(special_price_type=special_price_type).order_by(
-                "-updated_at"
+        matched_price_type = (
+            PriceType.objects.select_related("category")
+            .filter(
+                source_currency_id=getattr(special_price_type, "source_currency_id", None),
+                target_currency_id=getattr(special_price_type, "target_currency_id", None),
+                trade_type=getattr(special_price_type, "trade_type", None),
+                is_active=True,
             )
+            .order_by("category_id", "order", "id")
+            .first()
         )
-        if candidates:
-            rich = [t for t in candidates if self._template_widget_count(t) > 0]
-            return rich[0] if rich else candidates[0]
-        return _global_default()
+        if not matched_price_type:
+            return None, None
+
+        template = self._select_next_template_editor_for_category(matched_price_type.category)
+        if not template:
+            return None, None
+        return template, matched_price_type
 
     @staticmethod
     def _pil_image_to_rendered(pil_image) -> RenderedPriceImage:
@@ -708,6 +647,7 @@ class PricePublisherService:
         image: RenderedPriceImage,
         caption: Optional[str],
         buttons: Optional[list[list[dict]]] = None,
+        template_id: Optional[int] = None,
         publish_path: str = "unknown",
         render_fallback_reason: Optional[str] = None,
     ) -> PublicationResult:
@@ -725,6 +665,7 @@ class PricePublisherService:
             success=success,
             response=response,
             caption=caption,
+            template_id=template_id,
             publish_path=publish_path,
             render_fallback_reason=render_fallback_reason,
         )

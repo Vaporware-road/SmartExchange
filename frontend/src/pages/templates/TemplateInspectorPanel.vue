@@ -66,28 +66,52 @@
       </div>
 
       <div v-if="activeTab === 'data' && (w.type === 'text' || w.type === 'marquee')" class="space-y-2">
-        <label class="block text-xs text-[var(--text-secondary)]">Binding key (optional)</label>
-        <input
-          v-model="bindingKey"
-          type="text"
-          class="input-luxury w-full text-sm font-mono"
-          placeholder="e.g. price__usdt-buy or date_fa"
-          @blur="refitSelectedAfterTick"
-        />
+        <label class="block text-xs text-[var(--text-secondary)]">PriceType binding</label>
+        <select v-model="selectedPriceTypeId" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
+          <option :value="''">Select PriceType</option>
+          <option v-for="pt in categoryPriceTypeOptions" :key="pt.id" :value="String(pt.id)">
+            {{ pt.name }}
+          </option>
+        </select>
         <p v-if="linkedPriceTypeId != null" class="text-[10px] text-[var(--text-secondary)]">
-          Stable link: <span class="font-mono text-[var(--text-primary)]">price_type__{{ linkedPriceTypeId }}</span>
-          (resolves before binding key)
+          Stable key: <span class="font-mono text-[var(--text-primary)]">price_type__{{ linkedPriceTypeId }}</span>
         </p>
-        <p class="text-[10px] text-[var(--text-secondary)]">
-          When set, published image uses this key from live prices / dates instead of static content.
-        </p>
+        <div
+          v-if="showPriceDigitLocale"
+          class="flex flex-col gap-2 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/40 p-2"
+        >
+          <span class="text-[10px] font-medium text-[var(--text-secondary)]">{{ $t('templateEditor.priceDigitLocale') }}</span>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              class="rounded-lg border px-3 py-2 text-xs font-medium transition-colors min-h-[40px]"
+              :class="priceDigitLocale === 'en'
+                ? 'border-[var(--primary)] bg-[var(--primary-muted)] text-[var(--primary)]'
+                : 'border-[var(--border-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'"
+              @click="priceDigitLocale = 'en'"
+            >
+              {{ $t('templateEditor.priceDigitsEnglish') }}
+            </button>
+            <button
+              type="button"
+              class="rounded-lg border px-3 py-2 text-xs font-medium transition-colors min-h-[40px]"
+              :class="priceDigitLocale === 'fa'
+                ? 'border-[var(--primary)] bg-[var(--primary-muted)] text-[var(--primary)]'
+                : 'border-[var(--border-card)] text-[var(--text-secondary)] hover:bg-[var(--bg-hover)]'"
+              @click="priceDigitLocale = 'fa'"
+            >
+              {{ $t('templateEditor.priceDigitsPersian') }}
+            </button>
+          </div>
+          <p class="text-[10px] leading-snug text-[var(--text-secondary)]">{{ $t('templateEditor.priceDigitLocaleHint') }}</p>
+        </div>
         <div
           v-if="bindingPreviewInfo"
           class="rounded border border-[var(--border-card)] bg-[var(--bg-input)]/40 px-2 py-1.5 text-[10px] text-[var(--text-secondary)]"
         >
           Preview source:
           <span class="font-semibold text-[var(--text-primary)]">{{ bindingPreviewInfo.sourceLabel }}</span>
-          <span v-if="bindingPreviewInfo.value"> | Value: <span class="font-mono text-[var(--text-primary)]">{{ bindingPreviewInfo.value }}</span></span>
+          <span v-if="bindingPreviewDisplayValue"> | Value: <span class="font-mono text-[var(--text-primary)]">{{ bindingPreviewDisplayValue }}</span></span>
         </div>
         <label class="block text-xs text-[var(--text-secondary)]">Fallback value (used when live value is unavailable)</label>
         <textarea v-model="w.content" rows="3" class="input-luxury w-full text-sm font-mono" @blur="refitSelectedAfterTick" />
@@ -228,6 +252,7 @@ import { useTemplateEditorInjected } from './templateEditorInjectionKey.js'
 import { injectTemplateEditorFontFaces } from './templateEditorFonts.js'
 import { DATE_WIDGET_DATE_KEYS, WEEKDAY_WIDGET_KEYS } from './dateWidgetPresets.js'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
+import { toPersianDigits } from '@/utils/persianDigits.js'
 
 const { t } = useI18n()
 const te = useTemplateEditorInjected()
@@ -343,6 +368,23 @@ async function onImageFile(ev) {
   }
 }
 
+function isPriceLikeBindingKey(raw) {
+  const bk = String(raw || '').trim().toLowerCase()
+  if (!bk) return false
+  if (bk === 'price') return true
+  const prefixes = [
+    'price__',
+    'price_type__',
+    'price_buy__',
+    'price_sell__',
+    'price_buy_',
+    'price_sell_',
+    'tether_buy_',
+    'tether_sell_',
+  ]
+  return prefixes.some((p) => bk.startsWith(p))
+}
+
 const linkedPriceTypeId = computed(() => {
   const sw = w.value
   if (!sw || (sw.type !== 'text' && sw.type !== 'marquee')) return null
@@ -352,46 +394,68 @@ const linkedPriceTypeId = computed(() => {
   return Number.isFinite(n) ? n : null
 })
 
-const bindingKey = computed({
+const showPriceDigitLocale = computed(() => {
+  const sw = w.value
+  if (!sw || (sw.type !== 'text' && sw.type !== 'marquee')) return false
+  if (linkedPriceTypeId.value != null) return true
+  const bk = sw.style?.bindingKey ?? sw.style?.binding_key
+  return isPriceLikeBindingKey(bk)
+})
+
+const priceDigitLocale = computed({
   get() {
+    const raw = w.value?.style?.priceLocale ?? w.value?.style?.price_locale ?? 'en'
+    const s = String(raw).toLowerCase()
+    return s === 'fa' || s === 'fas' ? 'fa' : 'en'
+  },
+  set(v) {
     const sw = w.value
-    if (!sw) return ''
-    return sw.style?.bindingKey || sw.style?.binding_key || ''
+    if (!sw || !sw.style || typeof sw.style !== 'object') return
+    const loc = v === 'fa' ? 'fa' : 'en'
+    if (loc === 'en') {
+      delete sw.style.priceLocale
+      delete sw.style.price_locale
+    } else {
+      sw.style.priceLocale = 'fa'
+      delete sw.style.price_locale
+    }
+    refitSelectedAfterTick()
+  },
+})
+
+const categoryPriceTypeOptions = computed(() => {
+  const rows = te.categoryPriceTypes?.value
+  return Array.isArray(rows) ? rows : []
+})
+
+const selectedPriceTypeId = computed({
+  get() {
+    const id = linkedPriceTypeId.value
+    return id == null ? '' : String(id)
   },
   set(v) {
     const sw = w.value
     if (!sw) return
     if (!sw.style || typeof sw.style !== 'object') sw.style = {}
-    const oldKey = String(sw.style.bindingKey || sw.style.binding_key || '').trim()
-    const oldPt = linkedPriceTypeId.value
-    const oldIdPreview =
-      oldPt != null ? String(te.priceBindingPreviewMap?.value?.[`price_type__${oldPt}`]?.value || '').trim() : ''
-    const oldPreview = oldKey ? String(te.priceBindingPreviewMap?.value?.[oldKey]?.value || '').trim() : ''
-    const contentNow = sw?.content != null ? String(sw.content).trim() : ''
-    const sampleLike = (
-      !contentNow ||
-      /^sample text$/i.test(contentNow) ||
-      /^text$/i.test(contentNow) ||
-      /^\[.*\]$/.test(contentNow)
-    )
-    const s = String(v || '').trim()
-    if (s) {
-      sw.style.bindingKey = s
-      delete sw.style.binding_key
+    const normalized = String(v || '').trim()
+    if (!normalized) {
       delete sw.style.priceTypeId
       delete sw.style.price_type_id
-      if (sampleLike) {
-        const nextPreview = String(te.priceBindingPreviewMap?.value?.[s]?.value || '').trim()
-        sw.content = nextPreview || oldPreview || oldIdPreview || '123,456'
-      }
-    } else {
       delete sw.style.bindingKey
       delete sw.style.binding_key
-      delete sw.style.priceTypeId
-      delete sw.style.price_type_id
-      if (sampleLike) {
-        sw.content = oldPreview || oldIdPreview || '123,456'
-      }
+      delete sw.style.priceLocale
+      delete sw.style.price_locale
+      return
+    }
+    const idNum = Number(normalized)
+    if (!Number.isFinite(idNum)) return
+    sw.style.priceTypeId = idNum
+    sw.style.bindingKey = `price_type__${idNum}`
+    delete sw.style.price_type_id
+    delete sw.style.binding_key
+    const preview = String(te.priceBindingPreviewMap?.value?.[`price_type__${idNum}`]?.value || '').trim()
+    if (preview) {
+      sw.content = preview
     }
   },
 })
@@ -420,6 +484,13 @@ const bindingPreviewInfo = computed(() => {
     sourceLabel,
     value: row?.value != null ? String(row.value) : '',
   }
+})
+
+const bindingPreviewDisplayValue = computed(() => {
+  const raw = bindingPreviewInfo.value?.value
+  if (raw == null || raw === '') return ''
+  if (priceDigitLocale.value !== 'fa' || !showPriceDigitLocale.value) return String(raw)
+  return toPersianDigits(String(raw))
 })
 
 const dateKey = computed({
@@ -500,6 +571,9 @@ const styleFontFile = computed({
     st.font = s
     delete st.fontFilename
     delete st.font_filename
+    // Drop legacy inline family so preview & PNG use the @font-face from this file.
+    delete st.fontFamily
+    delete st.font_family
   },
 })
 

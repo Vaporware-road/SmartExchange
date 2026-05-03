@@ -84,17 +84,8 @@ class Template(models.Model):
     )
     category = models.ForeignKey(
         'category.Category',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        help_text="Category this template belongs to (optional)"
-    )
-    special_price_type = models.ForeignKey(
-        'special_price.SpecialPriceType',
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        help_text="Special price type this template belongs to (optional)"
+        on_delete=models.CASCADE,
+        help_text="Category this template belongs to."
     )
     image = models.ImageField(
         upload_to="templates/",
@@ -157,7 +148,7 @@ class Template(models.Model):
         return self.name
 
     def clean(self):
-        """Validate template name uniqueness and category/special_price exclusivity."""
+        """Validate template uniqueness and category-scoped price bindings."""
         super().clean()
         if self.name:
             # Check for duplicate names excluding current instance
@@ -167,11 +158,66 @@ class Template(models.Model):
             if qs.exists():
                 raise ValidationError({"name": _("A template with this name already exists.")})
         
-        # Ensure category and special_price_type are mutually exclusive
-        if self.category and self.special_price_type:
-            raise ValidationError(
-                _("Template cannot be assigned to both a category and a special price type. Please choose one.")
+        if not self.category_id:
+            raise ValidationError({"category": _("Template category is required.")})
+
+        if self.pk:
+            invalid_binding_ids = list(
+                self.price_bindings.exclude(price_type__category_id=self.category_id).values_list(
+                    "price_type_id", flat=True
+                )
             )
+            if invalid_binding_ids:
+                raise ValidationError(
+                    {
+                        "price_bindings": _(
+                            "All template price bindings must belong to the same category as template."
+                        )
+                    }
+                )
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+
+class TemplateWidgetBinding(models.Model):
+    """Stable contract between a widget slot and a category PriceType."""
+
+    template = models.ForeignKey(
+        Template,
+        related_name="price_bindings",
+        on_delete=models.CASCADE,
+    )
+    widget_uuid = models.UUIDField()
+    price_type = models.ForeignKey(
+        "category.PriceType",
+        related_name="template_bindings",
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["template_id", "id"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["template", "widget_uuid"],
+                name="template_widget_binding_unique_widget_per_template",
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.template_id and self.price_type_id:
+            if self.price_type.category_id != self.template.category_id:
+                raise ValidationError(
+                    {
+                        "price_type": _(
+                            "Price type must belong to the same category as template."
+                        )
+                    }
+                )
 
     def save(self, *args, **kwargs):
         self.full_clean()

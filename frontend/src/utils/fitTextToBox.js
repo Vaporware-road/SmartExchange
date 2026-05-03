@@ -1,5 +1,14 @@
-import { previewTextForDateWidget } from '@/pages/templates/dateWidgetPresets.js'
+import {
+  getLiveDatePreviewSamples,
+  previewTextForDateWidget,
+} from '@/pages/templates/dateWidgetPresets.js'
 import { editorFontFamilyToken } from '@/pages/templates/templateEditorFonts.js'
+import { toPersianDigits } from '@/utils/persianDigits.js'
+
+function priceLocaleIsFa(style) {
+  const loc = String(style?.priceLocale || style?.price_locale || 'en').toLowerCase()
+  return loc === 'fa' || loc === 'fas'
+}
 
 /** String used to estimate rendered width/height for a widget. */
 export function getWidgetTextForMeasure(w) {
@@ -7,11 +16,22 @@ export function getWidgetTextForMeasure(w) {
   const bk = w.style?.bindingKey || w.style?.binding_key
   const t = w.type
   if (t === 'text' || t === 'marquee') {
+    const pt = w.style?.priceTypeId ?? w.style?.price_type_id
+    const hasPriceBinding =
+      (pt != null && String(pt).trim() !== '') ||
+      (bk && String(bk).trim().toLowerCase().startsWith('price'))
+    let sample = ''
+    if (hasPriceBinding) {
+      const c = w.content && String(w.content).trim() ? String(w.content).trim() : '123,456'
+      sample = priceLocaleIsFa(w.style) ? toPersianDigits(c) : c
+      return sample.split('\n')[0] || sample
+    }
     if (bk) return `[${String(bk).trim()}]`
     const c = w.content
     return c && String(c).trim() ? String(c).trim() : 'Sample text'
   }
-  if (t === 'date' || t === 'weekday') return previewTextForDateWidget(w) || '۲۱ فروردین ۱۴۰۴'
+  if (t === 'date' || t === 'weekday')
+    return previewTextForDateWidget(w) || getLiveDatePreviewSamples().date_fa
   if (t === 'clock') return '99:99'
   return 'M'
 }

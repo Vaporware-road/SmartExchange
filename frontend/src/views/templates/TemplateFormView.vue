@@ -14,6 +14,13 @@
         <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('common.name') }}</label>
         <input v-model="name" type="text" class="input-luxury" required />
       </div>
+      <div>
+        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Category</label>
+        <select v-model.number="selectedCategoryId" class="input-luxury" required>
+          <option :value="null" disabled>Select category</option>
+          <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
+        </select>
+      </div>
       <button type="submit" class="btn-luxury" :disabled="submitting">
         <LoadingSpinner v-if="submitting" class="w-5 h-5" />
         {{ $t('common.create') }}
@@ -35,16 +42,11 @@ const toast = useToast()
 const name = ref('')
 const submitting = ref(false)
 const presetCategory = ref(null)
+const categories = ref([])
+const selectedCategoryId = ref(null)
 
 const categoryIdFromQuery = computed(() => {
   const id = route.query.category_id
-  if (id == null || id === '') return null
-  const n = Number(id)
-  return Number.isFinite(n) ? n : null
-})
-
-const specialPriceTypeIdFromQuery = computed(() => {
-  const id = route.query.specialPriceTypeId
   if (id == null || id === '') return null
   const n = Number(id)
   return Number.isFinite(n) ? n : null
@@ -56,9 +58,16 @@ onMounted(async () => {
     try {
       const { data } = await categoryApi.get(cid)
       presetCategory.value = data
+      selectedCategoryId.value = Number(data?.id) || null
     } catch {
       presetCategory.value = null
     }
+  }
+  try {
+    const { data } = await categoryApi.list()
+    categories.value = Array.isArray(data) ? data : []
+  } catch {
+    categories.value = []
   }
 })
 
@@ -82,11 +91,13 @@ async function handleSubmit() {
   }
   submitting.value = true
   try {
-    const cid = categoryIdFromQuery.value
-    const spid = specialPriceTypeIdFromQuery.value
+    const cid = selectedCategoryId.value ?? categoryIdFromQuery.value
+    if (cid == null || !Number.isFinite(Number(cid))) {
+      toast.error('A category is required to create template.')
+      return
+    }
     const payload = { name: trimmed }
-    if (cid != null) payload.category = cid
-    else if (spid != null) payload.special_price_type = spid
+    payload.category = cid
 
     const { data } = await templateEditorApi.create(payload)
     router.push(`/templates/${data.id}/editor`)

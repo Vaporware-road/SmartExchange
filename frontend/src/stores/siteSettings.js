@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
-import { settingsApi } from '@/services/api'
+import { settingsApi, templateEditorApi } from '@/services/api'
 import i18n from '@/i18n'
+import { editorFontFamilyToken, injectTemplateEditorFontFaces } from '@/pages/templates/templateEditorFonts'
 
 function normalizeAssetUrl(value) {
   if (!value || typeof value !== 'string') return value
@@ -46,6 +47,8 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
       instagram_link: '',
       twitter_link: '',
       linkedin_link: '',
+      ui_font_filename_rtl: '',
+      ui_font_filename_ltr: '',
     },
     loading: false,
   }),
@@ -66,6 +69,11 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
       }
       this.settings = { ...this.settings, ...normalized }
       this._applyDynamicAssets(this.settings)
+      if (typeof window !== 'undefined') {
+        queueMicrotask(() => {
+          this.refreshUiTypography(this.settings).catch(() => {})
+        })
+      }
     },
 
     async fetch() {
@@ -94,6 +102,37 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
           document.head.appendChild(link)
         }
         link.href = data.favicon
+      }
+    },
+
+    /**
+     * Set --font-ui-rtl / --font-ui-ltr and inject @font-face rules for /static/fonts (full list when API allows).
+     */
+    async refreshUiTypography(settings) {
+      if (typeof document === 'undefined') return
+      const s = settings || this.settings
+      const rtl = String(s?.ui_font_filename_rtl || '').trim()
+      const ltr = String(s?.ui_font_filename_ltr || '').trim()
+      const tokenRtl = rtl ? editorFontFamilyToken(rtl) : ''
+      const tokenLtr = ltr ? editorFontFamilyToken(ltr) : ''
+      const stackRtl = tokenRtl
+        ? `'${tokenRtl}', Vazirmatn, system-ui, -apple-system, sans-serif`
+        : `'Vazirmatn', system-ui, -apple-system, sans-serif`
+      const stackLtr = tokenLtr
+        ? `'${tokenLtr}', Inter, system-ui, sans-serif`
+        : `'Inter', system-ui, -apple-system, sans-serif`
+      document.documentElement.style.setProperty('--font-ui-rtl', stackRtl)
+      document.documentElement.style.setProperty('--font-ui-ltr', stackLtr)
+
+      const minimal = [...new Set([rtl, ltr].filter(Boolean))].map((fn) => ({
+        filename: fn,
+        display_name: fn,
+      }))
+      try {
+        const { data } = await templateEditorApi.fonts()
+        injectTemplateEditorFontFaces(Array.isArray(data) ? data : [])
+      } catch {
+        injectTemplateEditorFontFaces(minimal)
       }
     },
   },

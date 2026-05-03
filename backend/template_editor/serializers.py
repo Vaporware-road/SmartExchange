@@ -7,9 +7,7 @@ from .models import Template
 
 class TemplateSerializer(serializers.ModelSerializer):
     category_name = serializers.CharField(source="category.name", read_only=True, default=None)
-    special_price_type_name = serializers.CharField(
-        source="special_price_type.name", read_only=True, default=None
-    )
+    binding_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Template
@@ -18,8 +16,6 @@ class TemplateSerializer(serializers.ModelSerializer):
             "name",
             "category",
             "category_name",
-            "special_price_type",
-            "special_price_type_name",
             "image",
             "config",
             "config_json",
@@ -30,9 +26,13 @@ class TemplateSerializer(serializers.ModelSerializer):
             "publish_order",
             "telegram_caption_template",
             "telegram_buttons_json",
+            "binding_count",
             "created_at",
             "updated_at",
         ]
+
+    def get_binding_count(self, obj):
+        return obj.price_bindings.count()
 
     def validate_image(self, value):
         if value and hasattr(value, "read"):

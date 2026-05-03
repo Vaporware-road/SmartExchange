@@ -3,6 +3,7 @@ Variable catalog for template-based price banners.
 Defines standard variable keys with type and description for the editor and for building dynamic_data.
 """
 
+import time
 from typing import Any, Callable, Dict, List, Optional
 
 # Variable types for UI and validation
@@ -63,28 +64,20 @@ VARIABLE_CATALOG: List[Dict[str, Any]] = [
 # Keys only, for quick lookup
 VARIABLE_KEYS = [v["key"] for v in VARIABLE_CATALOG]
 
-# Static samples for editor preview / tests (not live "today")
-_DATE_SAMPLE_VALUES: Dict[str, str] = {
-    "date_fa": "۲۱ فروردین ۱۴۰۴",
-    "farsi_date": "۲۱ فروردین ۱۴۰۴",
-    "date_fa_slash": "۱۴۰۴/۰۱/۲۱",
-    "date_fa_slash_short": "۱۴۰۴/۱/۲۱",
-    "date_fa_iso": "۱۴۰۴-۰۱-۲۱",
-    "date_en": "April 21, 2026",
-    "english_date": "April 21, 2026",
-    "date_en_iso": "2026-04-21",
-    "date_en_dmy": "21/04/2026",
-    "date_en_mdy": "04/21/2026",
-    "date_en_short": "21 Apr 2026",
-    "date_en_weekday_long": "Tuesday, April 21, 2026",
-    "farsi_weekday": "سه‌شنبه",
-    "weekday_fa": "سه‌شنبه",
-    "english_weekday": "Tuesday",
-    "weekday_en": "Tuesday",
-    "tether_date": "21 apr",
-    "tether_year": "2026",
-    "time": "14:30",
-}
+_live_dates_bucket: Optional[int] = None
+_live_dates_map: Optional[Dict[str, str]] = None
+
+
+def _live_date_strings() -> Dict[str, str]:
+    """Same keys as ``dynamic_data._dates_from_timestamp``; refreshed each UTC minute."""
+    global _live_dates_bucket, _live_dates_map
+    from .dynamic_data import _dates_from_timestamp
+
+    b = int(time.time()) // 60
+    if _live_dates_bucket != b or _live_dates_map is None:
+        _live_dates_bucket = b
+        _live_dates_map = _dates_from_timestamp(None)
+    return _live_dates_map
 
 
 def get_variable_catalog() -> List[Dict[str, Any]]:
@@ -126,8 +119,9 @@ def get_default_sample_value(key: str) -> str:
         return "1,234.56"
     if k.startswith("price_type__"):
         return "1,234.56"
-    if k in _DATE_SAMPLE_VALUES:
-        return _DATE_SAMPLE_VALUES[k]
+    live_dates = _live_date_strings()
+    if k in live_dates:
+        return live_dates[k]
     for v in VARIABLE_CATALOG:
         if v["key"] == k:
             if v["type"] == VAR_TYPE_NUMBER:

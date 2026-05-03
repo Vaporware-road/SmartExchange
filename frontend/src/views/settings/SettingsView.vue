@@ -220,6 +220,96 @@
               </div>
             </div>
 
+            <!-- Fonts -->
+            <div v-else-if="activeTab === 'fonts'" key="fonts" class="p-4 sm:p-6 w-full min-w-0">
+              <h2 class="text-lg font-semibold text-gold mb-2 sm:mb-3">{{ $t('settings.tabs.fonts') }}</h2>
+              <p class="text-sm text-[var(--text-secondary)] mb-4 sm:mb-6 max-w-2xl">{{ $t('settings.fonts.description') }}</p>
+
+              <div class="space-y-6 w-full max-w-3xl min-w-0">
+                <div class="rounded-xl border p-4" style="border-color: var(--glass-border); background: var(--bg-input);">
+                  <p class="text-xs text-[var(--text-secondary)] mb-3">{{ $t('settings.fonts.uploadLabel') }}</p>
+                  <p class="text-xs text-[var(--text-secondary)] mb-3">{{ $t('settings.fonts.uploadHint') }}</p>
+                  <input
+                    ref="fontFileInputRef"
+                    type="file"
+                    accept=".ttf,.otf,font/ttf,font/otf"
+                    class="hidden"
+                    :disabled="!canEditSiteSettings || fontsUploading"
+                    @change="onFontFileSelected"
+                  >
+                  <button
+                    type="button"
+                    class="btn-luxury-outline min-h-[48px]"
+                    :disabled="!canEditSiteSettings || fontsUploading"
+                    @click="fontFileInputRef?.click()"
+                  >
+                    <i class="fas fa-upload" />
+                    {{ fontsUploading ? $t('common.loading') : $t('settings.fonts.uploadLabel') }}
+                  </button>
+                </div>
+
+                <div v-if="fontsList.length" class="overflow-x-auto rounded-xl border" style="border-color: var(--glass-border);">
+                  <table class="min-w-full text-sm text-start">
+                    <thead>
+                      <tr class="border-b text-[var(--text-secondary)]" style="border-color: var(--glass-border);">
+                        <th class="py-3 px-4 font-medium">{{ $t('settings.fonts.tableFile') }}</th>
+                        <th class="py-3 px-4 font-medium">{{ $t('settings.fonts.tableDisplay') }}</th>
+                        <th v-if="canEditSiteSettings" class="py-3 px-4 w-24" />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr
+                        v-for="row in fontsList"
+                        :key="row.filename"
+                        class="border-b border-[var(--glass-border)]/60"
+                      >
+                        <td class="py-2 px-4 font-mono text-xs break-all">{{ row.filename }}</td>
+                        <td class="py-2 px-4">{{ row.display_name || row.filename }}</td>
+                        <td v-if="canEditSiteSettings" class="py-2 px-4">
+                          <button
+                            type="button"
+                            class="text-red-400 hover:text-red-300 text-xs min-h-[40px]"
+                            @click="openDeleteFontModal(row.filename)"
+                          >
+                            {{ $t('common.delete') }}
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <p v-else class="text-sm text-[var(--text-secondary)]">{{ $t('settings.fonts.noFonts') }}</p>
+
+                <div class="space-y-4 pt-2 border-t" style="border-color: var(--glass-border);">
+                  <div>
+                    <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.fonts.rtlUiFont') }}</label>
+                    <select v-model="fontsForm.rtl" class="input-luxury w-full min-w-0 min-h-[48px]" :disabled="!canEditSiteSettings">
+                      <option value="">{{ $t('settings.fonts.defaultSystem') }}</option>
+                      <option v-for="f in fontsList" :key="'rtl-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.fonts.ltrUiFont') }}</label>
+                    <select v-model="fontsForm.ltr" class="input-luxury w-full min-w-0 min-h-[48px]" :disabled="!canEditSiteSettings">
+                      <option value="">{{ $t('settings.fonts.defaultSystem') }}</option>
+                      <option v-for="f in fontsList" :key="'ltr-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                    </select>
+                  </div>
+                  <button
+                    type="button"
+                    class="btn-luxury min-h-[48px] hidden md:inline-flex"
+                    :disabled="!canEditSiteSettings || fontsSaving"
+                    @click="saveFontsSettings"
+                  >
+                    <i class="fas fa-save" />
+                    {{ fontsSaving ? $t('common.loading') : $t('settings.fonts.saveUiFonts') }}
+                  </button>
+                </div>
+
+                <p class="text-xs text-[var(--text-secondary)]">{{ $t('settings.fonts.dockerHint') }}</p>
+              </div>
+            </div>
+
             <!-- Logs -->
             <div v-else-if="activeTab === 'logs'" key="logs" class="p-4 sm:p-6 w-full min-w-0 overflow-x-auto overflow-y-hidden">
               <LogsView embedded />
@@ -282,7 +372,7 @@
       </div>
     </div>
 
-    <!-- Mobile: Sticky Save bar (General tab only) -->
+    <!-- Mobile: Sticky Save bar (General + Fonts) -->
     <div
       v-show="activeTab === 'general'"
       class="fixed bottom-0 left-0 right-0 z-30 p-4 md:hidden border-t transition-colors duration-300"
@@ -296,6 +386,21 @@
       >
         <i class="fas fa-save" />
         {{ $t('settings.general.saveChanges') }}
+      </button>
+    </div>
+    <div
+      v-show="activeTab === 'fonts'"
+      class="fixed bottom-0 left-0 right-0 z-30 p-4 md:hidden border-t transition-colors duration-300"
+      style="background: var(--bg-base); border-color: var(--glass-border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);"
+    >
+      <button
+        type="button"
+        class="btn-luxury w-full min-h-[48px] flex items-center justify-center gap-2"
+        :disabled="!canEditSiteSettings || fontsSaving"
+        @click="saveFontsSettings"
+      >
+        <i class="fas fa-save" />
+        {{ fontsSaving ? $t('common.loading') : $t('settings.fonts.saveUiFonts') }}
       </button>
     </div>
 
@@ -319,6 +424,27 @@
         </button>
       </div>
     </BaseModal>
+
+    <!-- Delete font confirmation -->
+    <BaseModal
+      v-model="showDeleteFontModal"
+      :title="$t('common.confirm')"
+      aria-label="Confirm delete font"
+    >
+      <p class="text-[var(--text-secondary)] mb-6">{{ $t('settings.fonts.deleteConfirm', { name: fontPendingDelete || '' }) }}</p>
+      <div class="flex gap-3 justify-end">
+        <button type="button" class="btn-luxury-outline" @click="showDeleteFontModal = false">
+          {{ $t('common.cancel') }}
+        </button>
+        <button
+          type="button"
+          class="btn-luxury-outline border-red-500/50 text-red-400 hover:bg-red-500/10"
+          @click="confirmDeleteFont"
+        >
+          {{ $t('common.delete') }}
+        </button>
+      </div>
+    </BaseModal>
   </div>
 </template>
 
@@ -330,7 +456,7 @@ import { useI18n } from 'vue-i18n'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useCurrenciesStore } from '@/stores/currencies'
 import { useAuthStore } from '@/stores/auth'
-import { settingsApi, instagramHubApi } from '@/services/api'
+import { settingsApi, instagramHubApi, templateEditorApi } from '@/services/api'
 import LogsView from './LogsView.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
@@ -348,6 +474,7 @@ const tabs = [
   { id: 'general', labelKey: 'settings.tabs.general', icon: 'fas fa-sliders-h' },
   { id: 'uploads', labelKey: 'settings.tabs.uploads', icon: 'fas fa-cloud-upload-alt' },
   { id: 'instagram', labelKey: 'settings.tabs.instagram', icon: 'fab fa-instagram' },
+  { id: 'fonts', labelKey: 'settings.tabs.fonts', icon: 'fas fa-font' },
   { id: 'logs', labelKey: 'settings.tabs.logs', icon: 'fas fa-list' },
   { id: 'install-app', labelKey: 'settings.tabs.installApp', icon: 'fas fa-mobile-alt' },
 ]
@@ -396,6 +523,14 @@ const storageTotalGb = ref('10 GB')
 const instagramForm = reactive({ appId: '', appSecret: '' })
 const instagramConfig = ref({ has_app_id: false, has_token: false, token_expires_at: null })
 const instagramConnectUrl = ref('')
+
+const fontsList = ref([])
+const fontsForm = reactive({ rtl: '', ltr: '' })
+const fontsUploading = ref(false)
+const fontsSaving = ref(false)
+const fontFileInputRef = ref(null)
+const showDeleteFontModal = ref(false)
+const fontPendingDelete = ref('')
 const iosInstallSteps = computed(() =>
   locale.value === 'fa'
     ? [
@@ -559,6 +694,91 @@ async function loadInstagramConfig() {
   }
 }
 
+function syncFontsFormFromStore() {
+  fontsForm.rtl = siteSettings.settings?.ui_font_filename_rtl || ''
+  fontsForm.ltr = siteSettings.settings?.ui_font_filename_ltr || ''
+}
+
+async function loadFontsList() {
+  try {
+    const { data } = await templateEditorApi.fonts()
+    fontsList.value = Array.isArray(data) ? data : []
+    await siteSettings.refreshUiTypography(siteSettings.settings)
+  } catch {
+    fontsList.value = []
+  }
+}
+
+async function saveFontsSettings() {
+  if (!canEditSiteSettings.value) {
+    toast.error(t('errors.forbidden'))
+    return
+  }
+  fontsSaving.value = true
+  try {
+    const { data } = await settingsApi.updateSite({
+      ui_font_filename_rtl: fontsForm.rtl || '',
+      ui_font_filename_ltr: fontsForm.ltr || '',
+    })
+    siteSettings.applySettings(data)
+    syncFontsFormFromStore()
+    toast.success(t('toast.saveSuccess'))
+  } catch (e) {
+    const msg = e?.response?.data?.ui_font_filename_rtl?.[0] ||
+      e?.response?.data?.ui_font_filename_ltr?.[0] ||
+      e?.response?.data?.detail
+    toast.error(msg || t('toast.serverError'))
+  } finally {
+    fontsSaving.value = false
+  }
+}
+
+async function onFontFileSelected(event) {
+  const file = event.target?.files?.[0]
+  if (!file || !canEditSiteSettings.value) return
+  fontsUploading.value = true
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+    await templateEditorApi.uploadFont(formData)
+    toast.success(t('settings.fonts.uploadSuccess'))
+    await loadFontsList()
+    event.target.value = ''
+  } catch (e) {
+    toast.error(e?.response?.data?.detail || t('toast.serverError'))
+  } finally {
+    fontsUploading.value = false
+  }
+}
+
+function openDeleteFontModal(filename) {
+  fontPendingDelete.value = filename
+  showDeleteFontModal.value = true
+}
+
+async function confirmDeleteFont() {
+  const name = fontPendingDelete.value
+  if (!name || !canEditSiteSettings.value) {
+    showDeleteFontModal.value = false
+    return
+  }
+  try {
+    await templateEditorApi.deleteFont(name)
+    showDeleteFontModal.value = false
+    fontPendingDelete.value = ''
+    await loadFontsList()
+    syncFontsFormFromStore()
+    toast.success(t('toast.deleteSuccess'))
+  } catch (e) {
+    const detail = e?.response?.data?.detail
+    if (detail && String(detail).toLowerCase().includes('ui')) {
+      toast.error(t('settings.fonts.deleteBlocked'))
+    } else {
+      toast.error(typeof detail === 'string' ? detail : t('toast.serverError'))
+    }
+  }
+}
+
 async function clearCache() {
   if (!canEditSiteSettings.value) {
     toast.error(t('errors.forbidden'))
@@ -620,6 +840,7 @@ onMounted(() => {
   loadInstagramConfig()
   loadUploadSettings()
   currenciesStore.fetch()
+  syncFontsFormFromStore()
   if (siteSettings.settings?.site_name != null) {
     generalForm.platformName = siteSettings.settings.site_name
     generalForm.defaultBaseCurrency = siteSettings.settings?.base_currency_code ?? 'USD'
@@ -629,7 +850,17 @@ onMounted(() => {
       generalForm.platformName = siteSettings.settings?.site_name ?? ''
       generalForm.defaultBaseCurrency = siteSettings.settings?.base_currency_code ?? 'USD'
       setLogoPreviewFromSettings()
+      syncFontsFormFromStore()
     })
+  }
+  if (activeTab.value === 'fonts') {
+    loadFontsList()
+  }
+})
+
+watch(activeTab, (id) => {
+  if (id === 'fonts') {
+    loadFontsList()
   }
 })
 

@@ -3,7 +3,6 @@ Service for sending finalized prices to external API.
 Sends exactly four rates: GBP_BUY, GBP_SELL, USDT_BUY, USDT_SELL.
 Uses values from price_items directly — no DB read, no API fetch.
 """
-import json
 import logging
 import requests
 from django.conf import settings
@@ -11,13 +10,21 @@ from django.conf import settings
 logger = logging.getLogger(__name__)
 
 
-def _log_to_db(level, message, details=None):
+def _log_to_db(level, message, *, event=None, **fields):
     """Persist a log entry to the Log model for visibility in /settings/logs/."""
     try:
-        from setting.models import Log
-        Log.objects.create(level=level, source="external_api", message=message, details=details)
+        from setting.utils import log_structured
+
+        log_structured(
+            level=level,
+            source="external_api",
+            message=message,
+            event=event,
+            **fields,
+        )
     except Exception:
-        logger.exception("Failed to write seeded log to DB")
+        logger.exception("Failed to write external API log to DB")
+
 
 RATE_KEYS = ("GBP_BUY", "GBP_SELL", "USDT_BUY", "USDT_SELL")
 TIMEOUT_SECONDS = 10
@@ -113,15 +120,25 @@ def _send_one_rate(currency: str, rate: float) -> bool:
 
     if not api_url or not api_key:
         logger.error("EXTERNAL_API_URL or EXTERNAL_API_KEY not configured in settings")
+        _log_to_db(
+            "ERROR",
+            "External API not configured (missing URL or API key)",
+            event="external_api_config_error",
+        )
         return False
 
     payload = {"currency": currency, "rate": float(rate), "api_key": api_key}
     headers = {"Content-Type": "application/json"}
+    key_prefix = (api_key[:8] + "…") if len(api_key) >= 8 else "(set)"
 
     _log_to_db(
         "DEBUG",
-        f"SEED_LOG: POSTing {currency}={rate}",
-        details=f"URL: {api_url}\nPayload: currency={currency}, rate={rate}, api_key={api_key[:8]}…",
+        f"Posting {currency} rate to external API",
+        event="external_rate_request",
+        currency=currency,
+        rate=rate,
+        api_url=api_url,
+        api_key_prefix=key_prefix,
     )
 
     try:
@@ -134,23 +151,47 @@ def _send_one_rate(currency: str, rate: float) -> bool:
             )
             _log_to_db(
                 "ERROR",
-                f"SEED_LOG: POST {currency}={rate} returned HTTP {resp.status_code}",
-                details=f"Response body: {resp.text[:500]}",
+                f"External API HTTP {resp.status_code} for {currency}",
+                event="external_rate_http_error",
+                currency=currency,
+                rate=rate,
+                status_code=resp.status_code,
+                response_preview=resp.text[:500],
             )
             return False
 
         logger.info("Sent %s = %s successfully", currency, rate)
-        _log_to_db("INFO", f"SEED_LOG: POST {currency}={rate} succeeded (HTTP 200)",
-                    details=f"Response: {resp.text[:500]}")
+        _log_to_db(
+            "INFO",
+            f"External API accepted {currency} rate",
+            event="external_rate_success",
+            currency=currency,
+            rate=rate,
+            response_preview=resp.text[:500],
+        )
         return True
 
     except requests.exceptions.RequestException as exc:
         logger.exception("Request failed for %s=%s: %s", currency, rate, exc)
-        _log_to_db("ERROR", f"SEED_LOG: POST {currency}={rate} request exception", details=str(exc))
+        _log_to_db(
+            "ERROR",
+            f"External API request failed for {currency}",
+            event="external_rate_request_exception",
+            currency=currency,
+            rate=rate,
+            error=str(exc),
+        )
         return False
     except Exception as exc:
         logger.exception("Unexpected error sending %s=%s: %s", currency, rate, exc)
-        _log_to_db("ERROR", f"SEED_LOG: POST {currency}={rate} unexpected error", details=str(exc))
+        _log_to_db(
+            "ERROR",
+            f"Unexpected error posting {currency}",
+            event="external_rate_unexpected_error",
+            currency=currency,
+            rate=rate,
+            error=str(exc),
+        )
         return False
 
 
@@ -165,12 +206,15 @@ class ExternalAPIService:
         """
         if not price_items:
             logger.info("send_finalized_prices called with empty price_items")
-            _log_to_db("WARNING", "send_finalized_prices called with empty price_items")
+            _log_to_db(
+                "WARNING",
+                "send_finalized_prices called with empty price_items",
+                event="external_api_empty_items",
+            )
             return {"sent": [], "failed": [], "skipped": []}
 
         rates, skipped = _build_rates_from_items(price_items)
 
-        # Seeded logging: record exactly what was extracted and what was skipped
         items_summary = []
         for item in price_items:
             if isinstance(item, (list, tuple)) and len(item) == 2:
@@ -182,13 +226,15 @@ class ExternalAPIService:
                     f"trade={getattr(pt, 'trade_type', '?')} "
                     f"price={getattr(ph, 'price', '?')}"
                 )
+
         _log_to_db(
             "INFO",
-            f"SEED_LOG: Rates extracted: {json.dumps(rates, ensure_ascii=False)}",
-            details=(
-                f"Skipped: {json.dumps(skipped, ensure_ascii=False)}\n\n"
-                f"Input items ({len(price_items)}):\n" + "\n".join(items_summary)
-            ),
+            "External API: extracted rates from finalized price items",
+            event="rates_extracted",
+            rates=rates,
+            skipped=skipped,
+            item_count=len(price_items),
+            items_preview="\n".join(items_summary[:50]),
         )
 
         if not rates:
@@ -212,8 +258,11 @@ class ExternalAPIService:
 
         _log_to_db(
             "INFO" if not failed else "WARNING",
-            f"SEED_LOG: API dispatch complete — sent={len(sent)}, failed={len(failed)}",
-            details=f"Sent: {json.dumps(sent, ensure_ascii=False)}\nFailed: {json.dumps(failed, ensure_ascii=False)}",
+            f"External API dispatch finished: {len(sent)} sent, {len(failed)} failed",
+            event="external_api_dispatch_complete",
+            sent=sent,
+            failed=failed,
+            skipped_count=len(skipped),
         )
 
         logger.info("External API: %d sent, %d failed", len(sent), len(failed))

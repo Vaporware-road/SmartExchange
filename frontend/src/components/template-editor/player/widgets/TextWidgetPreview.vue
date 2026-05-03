@@ -17,39 +17,68 @@ import {
   resolvedDateKey,
   isPersianDateKey,
 } from '@/pages/templates/dateWidgetPresets.js'
+import { toPersianDigits } from '@/utils/persianDigits.js'
 
 const props = defineProps({
   widget: { type: Object, required: true },
 })
 const te = useTemplateEditorInjected()
 
+function priceLocaleFa(style) {
+  const loc = String(style?.priceLocale || style?.price_locale || 'en').toLowerCase()
+  return loc === 'fa' || loc === 'fas'
+}
+
+/** Matches backend _is_price_like_key — only these bindings use price digit locale. */
+function isPriceLikeBinding(widget) {
+  const pt = widget?.style?.priceTypeId ?? widget?.style?.price_type_id
+  if (pt != null && String(pt).trim() !== '') return true
+  const bk = String(widget?.style?.bindingKey || widget?.style?.binding_key || '').trim().toLowerCase()
+  if (!bk) return false
+  if (bk === 'price') return true
+  const prefixes = ('price__', 'price_type__', 'price_buy__', 'price_sell__', 'price_buy_', 'price_sell_', 'tether_buy_', 'tether_sell_')
+  return prefixes.some((p) => bk.startsWith(p))
+}
+
+function localizePriceDisplay(raw, style, widget) {
+  const s = raw != null ? String(raw).trim() : ''
+  if (!s) return s
+  if (!priceLocaleFa(style) || !isPriceLikeBinding(widget)) return s
+  return toPersianDigits(s)
+}
+
 const display = computed(() => {
   const PRICE_PLACEHOLDER = '123,456'
   const w = props.widget
+  const st = w?.style || {}
   const ptRaw = w?.style?.priceTypeId ?? w?.style?.price_type_id
   if (ptRaw != null && String(ptRaw).trim() !== '') {
     const idKey = `price_type__${String(ptRaw).trim()}`
     const resolved = te.priceBindingPreviewMap?.value?.[idKey]
     const fromPreview = resolved?.value != null ? String(resolved.value).trim() : ''
-    if (fromPreview) return fromPreview
+    if (fromPreview) return localizePriceDisplay(fromPreview, st, w)
     const bk = w?.style?.bindingKey || w?.style?.binding_key
     if (bk) {
       const byKey = te.priceBindingPreviewMap?.value?.[String(bk).trim()]
       const fromKey = byKey?.value != null ? String(byKey.value).trim() : ''
-      if (fromKey) return fromKey
+      if (fromKey) return localizePriceDisplay(fromKey, st, w)
     }
     const fallback = w?.content != null ? String(w.content).trim() : ''
-    if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) return fallback
-    return PRICE_PLACEHOLDER
+    if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) {
+      return localizePriceDisplay(fallback, st, w)
+    }
+    return localizePriceDisplay(PRICE_PLACEHOLDER, st, w)
   }
   const bk = w?.style?.bindingKey || w?.style?.binding_key
   if (bk) {
     const resolved = te.priceBindingPreviewMap?.value?.[String(bk).trim()]
     const fromPreview = resolved?.value != null ? String(resolved.value).trim() : ''
-    if (fromPreview) return fromPreview
+    if (fromPreview) return localizePriceDisplay(fromPreview, st, w)
     const fallback = w?.content != null ? String(w.content).trim() : ''
-    if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) return fallback
-    return PRICE_PLACEHOLDER
+    if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) {
+      return localizePriceDisplay(fallback, st, w)
+    }
+    return localizePriceDisplay(PRICE_PLACEHOLDER, st, w)
   }
   const t = w?.type
   if (t === 'date' || t === 'weekday') {
@@ -111,9 +140,12 @@ const textStyle = computed(() => {
     : 'Vazirmatn, Inter, system-ui, sans-serif'
   const persian = isPersianDate.value
   const ta = persian ? (align.value === 'left' ? 'left' : align.value === 'right' ? 'right' : 'right') : align.value
+  // When a font file is selected, its @font-face token must win — legacy `fontFamily`
+  // from saved templates would otherwise ignore the dropdown until removed.
+  const fontFamily = file ? fontStack : (s.fontFamily || fontStack)
   const style = {
     fontSize: `${s.fontSize ?? 24}px`,
-    fontFamily: s.fontFamily || fontStack,
+    fontFamily,
     textAlign: ta,
     maxWidth: '100%',
     wordBreak: useSingleLineFit.value ? 'normal' : 'break-word',

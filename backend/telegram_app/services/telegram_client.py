@@ -107,8 +107,14 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='INFO',
-                        message=f'Message sent to Telegram channel',
-                        details=f'Chat ID: {chat_id}, Message length: {len(text)} characters'
+                        message='Message sent to Telegram channel',
+                        details={
+                            'event': 'send_message',
+                            'chat_id': str(chat_id),
+                            'text_length': len(text),
+                            'parse_mode': parse_mode,
+                            'has_buttons': bool(buttons),
+                        },
                     )
                 except Exception:
                     pass  # Don't fail if logging fails
@@ -120,8 +126,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='ERROR',
-                        message=f'Failed to send message to Telegram',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Failed to send message to Telegram',
+                        details={
+                            'event': 'send_message_bad_request',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass
@@ -133,8 +143,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='ERROR',
-                        message=f'Telegram request timed out',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Telegram request timed out',
+                        details={
+                            'event': 'send_message_timeout',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass
@@ -146,8 +160,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='ERROR',
-                        message=f'Telegram network error',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Telegram network error',
+                        details={
+                            'event': 'send_message_network_error',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass
@@ -159,8 +177,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='ERROR',
-                        message=f'Telegram API error',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Telegram API error',
+                        details={
+                            'event': 'send_message_telegram_error',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass
@@ -172,8 +194,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='CRITICAL',
-                        message=f'Unexpected error sending Telegram message',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Unexpected error sending Telegram message',
+                        details={
+                            'event': 'send_message_unexpected_error',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass
@@ -254,10 +280,17 @@ class TelegramService:
             # Log to database
             if log_telegram_event:
                 try:
+                    cap_preview = (caption[:100] + '…') if caption and len(caption) > 100 else caption
                     log_telegram_event(
                         level='INFO',
-                        message=f'Photo sent to Telegram channel',
-                        details=f'Chat ID: {chat_id}, Caption: {caption[:100] if caption else "None"}'
+                        message='Photo sent to Telegram channel',
+                        details={
+                            'event': 'send_photo',
+                            'chat_id': str(chat_id),
+                            'caption_length': len(caption) if caption else 0,
+                            'caption_preview': cap_preview or None,
+                            'has_buttons': bool(buttons),
+                        },
                     )
                 except Exception:
                     pass  # Don't fail if logging fails
@@ -269,8 +302,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='ERROR',
-                        message=f'Failed to send photo to Telegram',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Failed to send photo to Telegram',
+                        details={
+                            'event': 'send_photo_bad_request',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass
@@ -282,8 +319,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='ERROR',
-                        message=f'Telegram photo request timed out',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Telegram photo request timed out',
+                        details={
+                            'event': 'send_photo_timeout',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass
@@ -295,8 +336,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='ERROR',
-                        message=f'Telegram network error (photo)',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Telegram network error (photo)',
+                        details={
+                            'event': 'send_photo_network_error',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass
@@ -308,8 +353,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='ERROR',
-                        message=f'Telegram API error (photo)',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Telegram API error (photo)',
+                        details={
+                            'event': 'send_photo_telegram_error',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass
@@ -321,8 +370,12 @@ class TelegramService:
                 try:
                     log_telegram_event(
                         level='CRITICAL',
-                        message=f'Unexpected error sending Telegram photo',
-                        details=f'Chat ID: {chat_id}, Error: {error_msg}'
+                        message='Unexpected error sending Telegram photo',
+                        details={
+                            'event': 'send_photo_unexpected_error',
+                            'chat_id': str(chat_id),
+                            'error': error_msg,
+                        },
                     )
                 except Exception:
                     pass

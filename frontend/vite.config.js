@@ -1,12 +1,13 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { resolve } from 'path'
 
-export default defineConfig(({ command }) => {
+export default defineConfig(({ command, mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
   // In Docker, point proxy to backend service name.
   // Outside Docker it still defaults to local Django.
-  const apiProxyTarget = process.env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000'
+  const apiProxyTarget = env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000'
 
   return {
   base: command === 'serve' ? '/' : '/static/vue/',
@@ -82,6 +83,12 @@ export default defineConfig(({ command }) => {
         changeOrigin: true,
       },
       '/media': {
+        target: apiProxyTarget,
+        changeOrigin: true,
+      },
+      // Template editor @font-face URLs use /static/fonts/*. Uploaded fonts live on Django;
+      // without this, Vite (e.g. :3000) would 404 and the preview always falls back to Vazirmatn.
+      '/static': {
         target: apiProxyTarget,
         changeOrigin: true,
       },

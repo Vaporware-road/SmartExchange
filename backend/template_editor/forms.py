@@ -1,7 +1,6 @@
 from django import forms
 from .models import Template
 from category.models import Category
-from special_price.models import SpecialPriceType
 
 
 class TemplateForm(forms.ModelForm):
@@ -9,7 +8,7 @@ class TemplateForm(forms.ModelForm):
     
     class Meta:
         model = Template
-        fields = ['name', 'category', 'special_price_type', 'image']
+        fields = ['name', 'category', 'image']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -18,10 +17,6 @@ class TemplateForm(forms.ModelForm):
             'category': forms.Select(attrs={
                 'class': 'form-select',
                 'id': 'id_category'
-            }),
-            'special_price_type': forms.Select(attrs={
-                'class': 'form-select',
-                'id': 'id_special_price_type'
             }),
             'image': forms.FileInput(attrs={
                 'class': 'form-control',
@@ -33,26 +28,8 @@ class TemplateForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Populate category dropdown with all categories
         self.fields['category'].queryset = Category.objects.all().order_by('name')
-        self.fields['category'].required = False
-        self.fields['category'].empty_label = "Select a category (optional)"
-        
-        # Populate special_price_type dropdown with all special price types
-        self.fields['special_price_type'].queryset = SpecialPriceType.objects.all().order_by('name')
-        self.fields['special_price_type'].required = False
-        self.fields['special_price_type'].empty_label = "Select a special price type (optional)"
-    
-    def clean(self):
-        cleaned_data = super().clean()
-        category = cleaned_data.get('category')
-        special_price_type = cleaned_data.get('special_price_type')
-        
-        # Ensure only one is selected
-        if category and special_price_type:
-            raise forms.ValidationError(
-                "Template cannot be assigned to both a category and a special price type. Please choose one."
-            )
-        
-        return cleaned_data
+        self.fields['category'].required = True
+        self.fields['category'].empty_label = "Select a category"
 
 
 class TextFieldConfigForm(forms.Form):

@@ -49,6 +49,10 @@
   --color-white-soft: var(--text-primary);
   --glow-soft: 0 0 30px rgba(37, 99, 235, 0.25);
   --glow-strong: 0 0 50px rgba(37, 99, 235, 0.4);
+  /* UI typography — overridden in JS from Site Settings when custom fonts are chosen */
+  --font-ui-rtl: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+  --font-ui-ltr: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-ui-sans: var(--font-ui-ltr);
 }
 
 /* Design Tokens - Dark Mode (Charcoal & Slate) */
@@ -90,6 +94,9 @@
   --color-white-soft: #e2e8f0;
   --glow-soft: 0 0 30px rgba(255, 215, 0, 0.25);
   --glow-strong: 0 0 50px rgba(255, 215, 0, 0.45);
+  --font-ui-rtl: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+  --font-ui-ltr: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-ui-sans: var(--font-ui-ltr);
 }
 
 * {
@@ -98,12 +105,20 @@
   box-sizing: border-box;
 }
 
+html[dir="rtl"] {
+  --font-ui-sans: var(--font-ui-rtl);
+}
+
+html[dir="ltr"] {
+  --font-ui-sans: var(--font-ui-ltr);
+}
+
 html[dir="rtl"] body {
-  font-family: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-ui-rtl);
 }
 
 html[dir="ltr"] body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-ui-ltr);
 }
 
 body {

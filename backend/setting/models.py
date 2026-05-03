@@ -127,6 +127,18 @@ class SiteSettings(models.Model):
         blank=True,
         help_text="Allowed upload formats list, e.g. ['PNG', 'JPG', 'SVG'].",
     )
+    ui_font_filename_rtl = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Optional .ttf/.otf filename under static/fonts for RTL UI (Persian). Empty = default stack.",
+    )
+    ui_font_filename_ltr = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Optional .ttf/.otf filename under static/fonts for LTR UI. Empty = default stack.",
+    )
 
     class Meta:
         verbose_name = "Site Settings"

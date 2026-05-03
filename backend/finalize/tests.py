@@ -3,13 +3,14 @@ from rest_framework.test import APIRequestFactory, force_authenticate
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from unittest.mock import patch, MagicMock
 from decimal import Decimal
+from celery.exceptions import TimeoutError as CeleryTimeoutError
 
 from accounts.models import CustomUser
 from category.models import Category, Currency, PriceType
 from change_price.models import PriceHistory
 from finalize.api_views import FinalizeCategoryAPIView
 from finalize.services import ExternalAPIService
-from price_publisher.services.publisher import PricePublisherService, PublicationResult
+from price_publisher.services.publisher import PricePublisherService
 from telegram_app.models import TelegramBot, TelegramChannel
 from template_editor.models import Template
 from template_editor.api_views import _validate_telegram_buttons_json
@@ -25,20 +26,17 @@ class ExternalAPIServiceTest(TestCase):
     def setUp(self):
         """Set up test data"""
         # Create currencies
-        self.usdt_currency = Currency.objects.create(
+        self.usdt_currency, _ = Currency.objects.get_or_create(
             code='USDT',
-            name='Tether',
-            symbol='USDT'
+            defaults={'name': 'Tether', 'symbol': 'USDT'}
         )
-        self.irr_currency = Currency.objects.create(
+        self.irr_currency, _ = Currency.objects.get_or_create(
             code='IRR',
-            name='Iranian Rial',
-            symbol='IRR'
+            defaults={'name': 'Iranian Rial', 'symbol': 'IRR'}
         )
-        self.gbp_currency = Currency.objects.create(
+        self.gbp_currency, _ = Currency.objects.get_or_create(
             code='GBP',
-            name='British Pound',
-            symbol='GBP'
+            defaults={'name': 'British Pound', 'symbol': 'GBP'}
         )
 
         # Create category
@@ -227,7 +225,7 @@ class ExternalAPIServiceTest(TestCase):
             name='خرید نقدی',
             source_currency=self.gbp_currency,
             target_currency=self.irr_currency,
-            trade_type='buy'
+            trade_type='sell'
         )
         mock_post.return_value = MagicMock(status_code=200)
 
@@ -301,15 +299,38 @@ class FinalizeCategorySoftFeedbackTest(TestCase):
             price=Decimal("12345"),
         )
 
-    @patch("finalize.api_views.PricePublisherService.publish_category_prices")
-    def test_response_contains_publish_debug_fields_in_soft_mode(self, mock_publish):
-        mock_publish.return_value = PublicationResult(
-            success=False,
-            response="Telegram error: chat not found",
-            caption="",
-            publish_path="category_default_renderer",
-            render_fallback_reason="template_render_failed",
+    @patch("finalize.api_views.publish_category_prices_task.apply_async")
+    def test_category_finalize_fails_when_template_contract_invalid(self, mock_apply_async):
+        async_result = MagicMock()
+        async_result.get.return_value = {
+            "success": False,
+            "response": "Template contract violation",
+            "caption": "",
+            "publish_path": "template_contract_error",
+            "render_fallback_reason": "template_missing_or_invalid",
+        }
+        mock_apply_async.return_value = async_result
+
+        request = self.factory.post(
+            f"/api/finalize/category/{self.category.id}/",
+            {"channel_id": self.channel.id, "notes": ""},
+            format="json",
         )
+        force_authenticate(request, user=self.user)
+
+        response = FinalizeCategoryAPIView.as_view()(request, category_id=self.category.id)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data["publish_path"], "template_contract_error")
+        self.assertEqual(response.data["render_fallback_reason"], "template_missing_or_invalid")
+        self.assertIn("Template contract", response.data["telegram_response"])
+
+    @patch("finalize.api_views.publish_category_prices_task.apply_async")
+    def test_publish_timeout_returns_controlled_failure(self, mock_apply_async):
+        async_result = MagicMock()
+        async_result.id = "task-timeout-1"
+        async_result.get.side_effect = CeleryTimeoutError("timeout")
+        mock_apply_async.return_value = async_result
 
         request = self.factory.post(
             f"/api/finalize/category/{self.category.id}/",
@@ -322,9 +343,9 @@ class FinalizeCategorySoftFeedbackTest(TestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertFalse(response.data["message_sent"])
-        self.assertEqual(response.data["publish_path"], "category_default_renderer")
-        self.assertEqual(response.data["render_fallback_reason"], "template_render_failed")
-        self.assertIn("Telegram error", response.data["telegram_response"])
+        self.assertEqual(response.data["publish_path"], "worker_timeout")
+        self.assertEqual(response.data["render_fallback_reason"], "task_timeout")
+        self.assertIn("timed out", response.data["telegram_response"].lower())
 
 
 class TelegramButtonsValidationTest(TestCase):

@@ -182,13 +182,13 @@ class PriceHistoryAdmin(admin.ModelAdmin):
     # ------------------------------------------------------------------
     def _resolve_template(self, category_id):
         if not category_id:
-            return Template.objects.filter(category__isnull=True, special_price_type__isnull=True).order_by("-updated_at").first()
+            return None
         template = (
             Template.objects.filter(category_id=category_id).order_by("-updated_at").first()
         )
         if template:
             return template
-        return Template.objects.filter(category__isnull=True, special_price_type__isnull=True).order_by("-updated_at").first()
+        return None
 
     def _build_dynamic_payload(self, template, queryset):
         now = timezone.localtime()

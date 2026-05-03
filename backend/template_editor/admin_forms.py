@@ -28,7 +28,6 @@ class TemplateAdminForm(forms.ModelForm):
         fields = (
             "name",
             "category",
-            "special_price_type",
             "image",
             "config",
         )

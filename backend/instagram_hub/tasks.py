@@ -1,13 +1,11 @@
 """
 Instagram Hub — background job: generate images and publish to Instagram after finalize.
-
-Runs in a thread (or Celery task when available). Failures are logged; they do not
-affect the finalize API response.
 """
 
 import logging
-import threading
 from typing import List
+
+from celery import shared_task
 
 logger = logging.getLogger(__name__)
 
@@ -207,35 +205,37 @@ def run_post_finalize_to_instagram(
                 pass
 
 
+@shared_task(
+    bind=True,
+    autoretry_for=(Exception,),
+    max_retries=2,
+    retry_backoff=True,
+    retry_jitter=True,
+)
+def post_finalize_to_instagram_task(
+    self,
+    *,
+    category_ids: List[int],
+    special_price_history_ids: List[int],
+    theme: str = "dark",
+) -> None:
+    run_post_finalize_to_instagram(
+        category_ids=category_ids,
+        special_price_history_ids=special_price_history_ids,
+        theme=theme,
+    )
+
+
 def enqueue_post_finalize_to_instagram(
     category_ids: List[int],
     special_price_history_ids: List[int],
     theme: str = "dark",
 ) -> None:
     """
-    Run post-finalize Instagram job in a background thread so the HTTP response
-    is not blocked. Use Celery in production when available.
+    Queue post-finalize Instagram job in Celery.
     """
-    def _run():
-        try:
-            run_post_finalize_to_instagram(
-                category_ids=category_ids,
-                special_price_history_ids=special_price_history_ids,
-                theme=theme,
-            )
-        except Exception as exc:
-            logger.exception("post_finalize_to_instagram thread failed: %s", exc)
-            try:
-                from setting.utils import log_event
-                log_event(
-                    level="ERROR",
-                    source="other",
-                    message="Instagram post after finalize failed",
-                    details=str(exc)[:500],
-                    user=None,
-                )
-            except Exception:
-                pass
-
-    t = threading.Thread(target=_run, daemon=True)
-    t.start()
+    post_finalize_to_instagram_task.delay(
+        category_ids=category_ids,
+        special_price_history_ids=special_price_history_ids,
+        theme=theme,
+    )

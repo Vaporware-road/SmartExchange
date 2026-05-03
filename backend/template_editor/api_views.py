@@ -10,7 +10,7 @@ from urllib.parse import urlparse
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.shortcuts import get_object_or_404
-from django.utils.text import get_valid_filename
+from django.utils.text import get_valid_filename, slugify
 from rest_framework import status
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
-from accounts.permissions import IsSuperAdminOrManagement
+from accounts.permissions import IsSuperAdmin, IsSuperAdminOrManagement
 from category.models import PriceType
 from finalize.models import Finalization
 from core.exceptions import error_response
@@ -27,7 +27,7 @@ from core.utils import MAX_ASSET_SIZE, format_price_display, validate_uploaded_i
 
 from .models import Template
 from .serializers import TemplateSerializer
-from .utils import get_available_fonts
+from .utils import FONT_ROOT, get_available_fonts
 from .variables import get_variable_catalog, extend_variable_catalog_with_category
 from .widget_sync import _sync_widgets_from_config
 
@@ -51,6 +51,62 @@ def _validate_config_json_widgets(config_json):
         for field in ("x", "y", "width", "height"):
             if widget.get(field) is None:
                 raise DRFValidationError({f"config_json.widgets[{idx}].{field}": "This field is required"})
+
+
+def _extract_bound_price_type_ids(config_json):
+    if not isinstance(config_json, dict):
+        return set()
+    widgets = config_json.get("widgets")
+    if not isinstance(widgets, list):
+        return set()
+    result = set()
+    for widget in widgets:
+        if not isinstance(widget, dict):
+            continue
+        if str(widget.get("type") or "").strip() not in ("text", "marquee"):
+            continue
+        style = widget.get("style") if isinstance(widget.get("style"), dict) else {}
+        raw = (
+            style.get("priceTypeId")
+            or style.get("price_type_id")
+            or widget.get("priceTypeId")
+            or widget.get("price_type_id")
+        )
+        if raw in (None, ""):
+            continue
+        try:
+            result.add(int(raw))
+        except (TypeError, ValueError):
+            raise DRFValidationError({"config_json": "priceTypeId must be an integer."})
+    return result
+
+
+def _validate_template_price_bindings(template, config_json):
+    """
+    Draft saves are allowed without any PriceType bindings (e.g. background-only).
+
+    When a widget sets priceTypeId, it must reference an active PriceType for this template's category.
+    """
+    price_type_ids = _extract_bound_price_type_ids(config_json)
+    if not price_type_ids:
+        return
+    valid_ids = set(
+        PriceType.objects.filter(
+            category_id=template.category_id,
+            id__in=price_type_ids,
+            is_active=True,
+        ).values_list("id", flat=True)
+    )
+    invalid = sorted(price_type_ids - valid_ids)
+    if invalid:
+        raise DRFValidationError(
+            {
+                "config_json": (
+                    "Some bound price types are invalid for this template category: "
+                    + ", ".join(str(x) for x in invalid)
+                )
+            }
+        )
 
 
 def _safe_sync_widgets(template, user):
@@ -101,9 +157,7 @@ class TemplateViewSet(ModelViewSet):
     """CRUD for Template (template_editor.Template)."""
 
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
-    queryset = Template.objects.select_related(
-        "category", "special_price_type"
-    ).order_by("-created_at")
+    queryset = Template.objects.select_related("category").order_by("-created_at")
     serializer_class = TemplateSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
@@ -159,6 +213,7 @@ class TemplateConfigUpdateAPIView(APIView):
         if config_json is not None:
             try:
                 _validate_config_json_widgets(config_json)
+                _validate_template_price_bindings(template, config_json)
             except DRFValidationError as exc:
                 return error_response(
                     "Template config JSON is invalid.",
@@ -372,13 +427,94 @@ class TemplateVariablesAPIView(APIView):
 
 
 class TemplateFontsAPIView(APIView):
-    """GET /api/template-editor/fonts/ - return available font list for editor dropdown."""
+    """
+    GET /api/template-editor/fonts/ — list fonts for editor dropdown.
+    POST /api/template-editor/fonts/ — upload .ttf/.otf (super admin only).
+    DELETE /api/template-editor/fonts/<filename>/ — remove file (super admin); blocked if used as UI font.
+    """
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [IsAuthenticated(), IsSuperAdminOrManagement()]
+        return [IsAuthenticated(), IsSuperAdmin()]
 
     def get(self, request):
         fonts = get_available_fonts()
         return Response([{"filename": f[0], "display_name": f[1]} for f in fonts])
+
+    def post(self, request):
+        uploaded = request.FILES.get("file")
+        if not uploaded:
+            return Response({"detail": "No file provided (expected field 'file')."}, status=status.HTTP_400_BAD_REQUEST)
+        name = getattr(uploaded, "name", "") or ""
+        ext = Path(name).suffix.lower()
+        if ext not in (".ttf", ".otf"):
+            return Response({"detail": "Only .ttf and .otf files are allowed."}, status=status.HTTP_400_BAD_REQUEST)
+        if uploaded.size > MAX_ASSET_SIZE:
+            return Response(
+                {"detail": f"File too large (max {MAX_ASSET_SIZE // (1024 * 1024)} MB)."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        stem = get_valid_filename(Path(name).stem) or "font"
+        safe_stem = slugify(stem) or "font"
+        dest_name = f"{safe_stem}{ext}"
+
+        FONT_ROOT.mkdir(parents=True, exist_ok=True)
+        dest_path = FONT_ROOT / dest_name
+        if dest_path.exists():
+            n = 2
+            while True:
+                alt = FONT_ROOT / f"{safe_stem}_{n}{ext}"
+                if not alt.exists():
+                    dest_path = alt
+                    dest_name = alt.name
+                    break
+                n += 1
+
+        with dest_path.open("wb") as out:
+            for chunk in uploaded.chunks():
+                out.write(chunk)
+
+        fonts = get_available_fonts()
+        row = next((x for x in fonts if x[0] == dest_name), None)
+        display_name = row[1] if row else Path(dest_name).stem
+        return Response({"filename": dest_name, "display_name": display_name}, status=status.HTTP_201_CREATED)
+
+
+class TemplateFontDeleteAPIView(APIView):
+    """DELETE /api/template-editor/fonts/<filename>/ — super admin only."""
+
+    permission_classes = [IsAuthenticated, IsSuperAdmin]
+
+    def delete(self, request, filename):
+        base = Path(str(filename)).name
+        if not base:
+            return Response({"detail": "Invalid filename."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            from setting.models import SiteSettings
+
+            obj = SiteSettings.load()
+            if base == (obj.ui_font_filename_rtl or "") or base == (obj.ui_font_filename_ltr or ""):
+                return Response(
+                    {"detail": "This font is selected for UI. Choose another UI font in Settings before deleting."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except Exception:
+            pass
+
+        path = FONT_ROOT / base
+        if not path.is_file():
+            return Response({"detail": "Font not found."}, status=status.HTTP_404_NOT_FOUND)
+        try:
+            path.unlink()
+        except OSError as e:
+            logger.warning("Font delete failed: %s", e)
+            return Response({"detail": "Could not delete file."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class TemplatePriceBindingsPreviewAPIView(APIView):
@@ -456,3 +592,28 @@ class TemplatePriceBindingsPreviewAPIView(APIView):
                 }
             )
         return Response(rows)
+
+
+class TemplateCategoryPriceTypesAPIView(APIView):
+    """GET /api/template-editor/category-price-types/?category=<id>."""
+
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+
+    def get(self, request):
+        raw_category = request.query_params.get("category")
+        try:
+            category_id = int(raw_category)
+        except (TypeError, ValueError):
+            return error_response(
+                "Valid category id is required.",
+                code="template_category_price_types_category_required",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                errors={"category": "Must be an integer category id."},
+            )
+
+        price_types = (
+            PriceType.objects.filter(category_id=category_id, is_active=True)
+            .order_by("order", "id")
+            .values("id", "name", "slug", "trade_type")
+        )
+        return Response(list(price_types))

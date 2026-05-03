@@ -3,7 +3,24 @@ import fa from '@/locales/fa.json'
 import en from '@/locales/en.json'
 
 const SUPPORTED_LOCALES = ['en', 'fa']
-const savedLocale = localStorage.getItem('smartexchange-locale') || 'en'
+const safeStorage = {
+  get(key) {
+    try {
+      return window.localStorage.getItem(key)
+    } catch {
+      return null
+    }
+  },
+  set(key, value) {
+    try {
+      window.localStorage.setItem(key, value)
+    } catch {
+      // Ignore storage failures (e.g. privacy mode or disabled storage).
+    }
+  },
+}
+
+const savedLocale = safeStorage.get('smartexchange-locale') || 'en'
 const initialLocale = SUPPORTED_LOCALES.includes(savedLocale) ? savedLocale : 'en'
 
 // Some bundlers may expose JSON as { default: ... }
@@ -20,6 +37,11 @@ function getMessageByPath(obj, path) {
     current = current[k]
   }
   return typeof current === 'string' ? current : undefined
+}
+
+function applyDocumentLocale(locale) {
+  document.documentElement.lang = locale
+  document.documentElement.dir = locale === 'fa' ? 'rtl' : 'ltr'
 }
 
 // Use legacy: true so $t() in templates resolves correctly (vue-i18n v12 alpha issue with legacy: false)
@@ -41,6 +63,8 @@ const i18n = createI18n({
   },
 })
 
+applyDocumentLocale(initialLocale)
+
 export function setLocale(locale) {
   const next = SUPPORTED_LOCALES.includes(locale) ? locale : 'en'
   const g = i18n.global
@@ -49,9 +73,8 @@ export function setLocale(locale) {
   } else if (g.locale && typeof g.locale === 'object' && 'value' in g.locale) {
     g.locale.value = next
   }
-  localStorage.setItem('smartexchange-locale', next)
-  document.documentElement.lang = next
-  document.documentElement.dir = next === 'fa' ? 'rtl' : 'ltr'
+  safeStorage.set('smartexchange-locale', next)
+  applyDocumentLocale(next)
 }
 
 export default i18n

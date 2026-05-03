@@ -9,7 +9,8 @@ User = get_user_model()
 class Command(BaseCommand):
     help = (
         "Create default admin user if missing (username/password from args or env). "
-        "Does not change password if the user already exists."
+        "If the user already exists, staff/superuser/role are fixed; set "
+        "DEFAULT_ADMIN_SYNC_PASSWORD=true to also reset the password from env/CLI."
     )
 
     def add_arguments(self, parser):
@@ -23,9 +24,14 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        username = options["username"]
-        password = options["password"]
-        sync_password = os.environ.get("DEFAULT_ADMIN_SYNC_PASSWORD", "").lower() in (
+        # Strip CR/LF/spaces from env-file values (Windows CRLF often breaks password matching).
+        username = (str(options["username"] or "")).strip().replace("\r", "")
+        password = (str(options["password"] or "")).strip().replace("\r", "")
+        if not username:
+            username = "admin"
+        if not password:
+            password = "admin"
+        sync_password = os.environ.get("DEFAULT_ADMIN_SYNC_PASSWORD", "").strip().lower() in (
             "true",
             "1",
             "yes",

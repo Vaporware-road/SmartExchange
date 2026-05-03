@@ -14,7 +14,7 @@ export default {
         DEFAULT: 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
       fontFamily: {
-        sans: ['Vazirmatn', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        sans: ['var(--font-ui-sans)', 'system-ui', '-apple-system', 'sans-serif'],
         latin: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
       },
       colors: {

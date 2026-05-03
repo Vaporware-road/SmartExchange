@@ -61,10 +61,6 @@ class PriceTypeSerializer(serializers.ModelSerializer):
 
         instance = getattr(self, "instance", None)
         name = attrs.get("name", getattr(instance, "name", None))
-        source_currency = attrs.get("source_currency", getattr(instance, "source_currency", None))
-        target_currency = attrs.get("target_currency", getattr(instance, "target_currency", None))
-        trade_type = attrs.get("trade_type", getattr(instance, "trade_type", None))
-
         qs = PriceType.objects.filter(category=category)
         if instance is not None:
             qs = qs.exclude(pk=instance.pk)
@@ -72,15 +68,6 @@ class PriceTypeSerializer(serializers.ModelSerializer):
         errors = {}
         if name and qs.filter(name=name).exists():
             errors["name"] = ["A price type with this name already exists in this category."]
-
-        if source_currency and target_currency and trade_type and qs.filter(
-            source_currency=source_currency,
-            target_currency=target_currency,
-            trade_type=trade_type,
-        ).exists():
-            errors["trade_type"] = [
-                "A price type with this source/target currency and trade type already exists in this category."
-            ]
 
         if errors:
             raise serializers.ValidationError(errors)

@@ -16,7 +16,7 @@ from urllib.request import urlopen
 from django.conf import settings
 from PIL import Image, ImageDraw
 
-from core.utils import format_price_display
+from core.utils import format_price_display, to_persian_digits
 from .utils import draw_text_field, _parse_color
 from .variables import get_default_sample_value
 
@@ -161,6 +161,39 @@ def _price_bind_fallback(binding: str, dynamic_data: Dict[str, Any], w: Dict[str
     if _looks_like_placeholder_text(sample_text):
         return _fallback_price_text(dynamic_data)
     return sample_text
+
+
+def _price_locale_is_fa(style: Dict[str, Any]) -> bool:
+    loc = str(style.get("priceLocale") or style.get("price_locale") or "en").strip().lower()
+    return loc in ("fa", "fas", "persian")
+
+
+def _widget_is_price_bound(w: Dict[str, Any]) -> bool:
+    style = w.get("style") if isinstance(w.get("style"), dict) else {}
+    raw_pt = style.get("priceTypeId")
+    if raw_pt is None:
+        raw_pt = style.get("price_type_id")
+    if raw_pt not in (None, ""):
+        return True
+    binding_raw = (
+        w.get("bindingKey")
+        or w.get("binding_key")
+        or style.get("bindingKey")
+        or style.get("binding_key")
+    )
+    bk = str(binding_raw).strip() if binding_raw else ""
+    return bool(bk and _is_price_like_key(bk))
+
+
+def _apply_price_digit_locale(text: str, w: Dict[str, Any]) -> str:
+    if not text or not text.strip():
+        return text
+    style = w.get("style") if isinstance(w.get("style"), dict) else {}
+    if not _widget_is_price_bound(w) or not _price_locale_is_fa(style):
+        return text
+    if not _is_probable_price_text(text):
+        return text
+    return to_persian_digits(text)
 
 
 def _widget_text_value(w: Dict[str, Any], dynamic_data: Dict[str, Any]) -> str:
@@ -349,6 +382,7 @@ def render_template_from_config_json(
             continue
 
         text_val = _widget_text_value(w, dynamic_data)
+        text_val = _apply_price_digit_locale(text_val, w)
         if not text_val.strip():
             continue
         try:
