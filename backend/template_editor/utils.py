@@ -3,17 +3,121 @@ Utility functions for rendering templates with dynamic data.
 """
 import logging
 from pathlib import Path
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Iterable, Optional, Tuple
+
 from PIL import Image, ImageDraw, ImageFont
 from django.conf import settings
-from django.utils.text import slugify
-import os
 
 logger = logging.getLogger(__name__)
 
 # Default font candidates - prioritize Persian fonts
 STATIC_ROOT_DIR = Path(settings.BASE_DIR) / "static"
 FONT_ROOT = Path(getattr(settings, "PRICE_RENDERER_FONT_ROOT", STATIC_ROOT_DIR / "fonts"))
+
+# Shipped OFL fonts (see scripts/download_template_fonts.ps1). Variable TTFs load with Pillow FreeType.
+DEFAULT_RTL_FONT_FILENAME = "VazirmatnVF.ttf"
+DEFAULT_LATIN_FONT_FILENAME = "InterVF.ttf"
+
+# Explicit RTL-primary bundled files (latin-only content uses DEFAULT_LATIN_FONT_FILENAME instead).
+BUNDLED_RTL_FONT_FILENAMES: frozenset[str] = frozenset(
+    {
+        DEFAULT_RTL_FONT_FILENAME,
+        "vazir.ttf",
+        "Kalameh.ttf",
+        "YekanBakh.ttf",
+        "Morabba.ttf",
+    }
+)
+
+BUNDLED_LATIN_FONT_FILENAMES: frozenset[str] = frozenset(
+    {
+        DEFAULT_LATIN_FONT_FILENAME,
+        "montsrrat.otf",
+    }
+)
+
+_RTL_NAME_HINTS: tuple[str, ...] = (
+    "vazir",
+    "vazirmatn",
+    "kalameh",
+    "yekan",
+    "morabba",
+    "iran",
+    "farsi",
+    "nasim",
+    "naskh",
+    "notonaskh",
+    "mehr",
+    "samim",
+    "shabnam",
+    "tanha",
+)
+
+_LATIN_NAME_HINTS: tuple[str, ...] = (
+    "inter",
+    "montserrat",
+    "roboto",
+    "opensans",
+    "lato",
+    "arial",
+    "helvetica",
+    "dejavu",
+    "freesans",
+)
+
+
+def _filename_hints_rtl(filename: str) -> bool:
+    lower = (filename or "").lower()
+    return any(h in lower for h in _RTL_NAME_HINTS)
+
+
+def _filename_hints_latin(filename: str) -> bool:
+    lower = (filename or "").lower()
+    return any(h in lower for h in _LATIN_NAME_HINTS)
+
+
+def font_script_hint(filename: str) -> str:
+    """
+    API metadata: primary script category for template editor font picker.
+    unknown = uploaded/custom font — PIL does not substitute script fallback for these unless filename hints RTL.
+    """
+    base = Path(str(filename or "")).name
+    if not base:
+        return "unknown"
+    if base in BUNDLED_LATIN_FONT_FILENAMES or _filename_hints_latin(base):
+        return "ltr"
+    if base in BUNDLED_RTL_FONT_FILENAMES or _filename_hints_rtl(base):
+        return "both"
+    return "unknown"
+
+
+def resolve_font_filename_for_text(font_filename: Optional[str], text: Optional[str]) -> Optional[str]:
+    """
+    If a Persian-primary font is selected but the string has no Arabic-script characters,
+    use the bundled Latin font so outlines stay readable (prices in Western digits, English labels).
+
+    If a Latin-primary font is selected but the text contains Arabic script, use the bundled RTL font.
+    """
+    if not font_filename:
+        return None
+    base = Path(font_filename).name
+    if text is None:
+        return base
+    s = str(text)
+    if _is_rtl(s):
+        if base in BUNDLED_LATIN_FONT_FILENAMES or (
+            base not in BUNDLED_RTL_FONT_FILENAMES and _filename_hints_latin(base)
+        ):
+            return (
+                DEFAULT_RTL_FONT_FILENAME if (FONT_ROOT / DEFAULT_RTL_FONT_FILENAME).is_file() else base
+            )
+        return base
+    # Latin / digits / punctuation only — substitute away from RTL-primary faces if applicable.
+    if base in BUNDLED_RTL_FONT_FILENAMES or (
+        base not in BUNDLED_LATIN_FONT_FILENAMES and _filename_hints_rtl(base)
+    ):
+        return DEFAULT_LATIN_FONT_FILENAME if (FONT_ROOT / DEFAULT_LATIN_FONT_FILENAME).is_file() else base
+    return base
 
 
 def get_available_fonts() -> list[tuple[str, str]]:
@@ -34,51 +138,63 @@ def get_available_fonts() -> list[tuple[str, str]]:
     
     return fonts
 
-DEFAULT_FONT_CANDIDATES = (
-    getattr(settings, "TEMPLATE_EDITOR_DEFAULT_FONT", None),
-    str(FONT_ROOT / "Kalameh.ttf"),    # Kalameh - Persian & English
-    str(FONT_ROOT / "montsrrat.otf"),  # Same font as tether banner
-    str(FONT_ROOT / "YekanBakh.ttf"),  # Persian font fallback
-    str(FONT_ROOT / "Morabba.ttf"),    # Persian font fallback
-    "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-    "/usr/share/fonts/truetype/freefont/FreeSans.ttf",
-    "arial.ttf",
-)
+
+def _font_candidate_paths() -> Iterable[str]:
+    """Existing files under FONT_ROOT first, then optional OS fonts."""
+    yield getattr(settings, "TEMPLATE_EDITOR_DEFAULT_FONT", None)
+    for name in (
+        DEFAULT_RTL_FONT_FILENAME,
+        DEFAULT_LATIN_FONT_FILENAME,
+        "vazir.ttf",
+        "Kalameh.ttf",
+        "montsrrat.otf",
+        "YekanBakh.ttf",
+        "Morabba.ttf",
+    ):
+        p = FONT_ROOT / name
+        if p.is_file():
+            yield str(p)
+    yield "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"
+    yield "/usr/share/fonts/truetype/freefont/FreeSans.ttf"
+    yield "arial.ttf"
 
 
-def _get_font(size: int, weight: str = 'normal', font_filename: str = None) -> ImageFont.ImageFont:
+def _get_font(
+    size: int,
+    weight: str = "normal",
+    font_filename: Optional[str] = None,
+    text: Optional[str] = None,
+) -> ImageFont.ImageFont:
     """
     Get font with specified size and weight.
-    
+
     Args:
         size: Font size in pixels
         weight: Font weight (not directly supported by PIL, kept for compatibility)
-        font_filename: Optional font filename (e.g., 'montsrrat.otf'). If provided, uses this font.
-                      If not provided, uses default font candidates.
+        font_filename: Optional font filename (e.g., 'InterVF.ttf').
+        text: When set, may switch bundled RTL fonts to Latin for latin-only content.
     """
-    # If specific font is requested, try to load it first
-    if font_filename:
-        font_path = FONT_ROOT / font_filename
+    resolved = resolve_font_filename_for_text(font_filename, text)
+
+    if resolved:
+        font_path = FONT_ROOT / resolved
         if font_path.exists():
             try:
                 return ImageFont.truetype(str(font_path), size=size)
             except (OSError, IOError) as e:
-                logger.warning(f"Failed to load requested font '{font_filename}': {e}. Falling back to default.")
-    
-    # Fall back to default font candidates
-    for path in DEFAULT_FONT_CANDIDATES:
+                logger.warning("Failed to load requested font '%s': %s. Falling back to default.", resolved, e)
+
+    # Fall back to bundled / system candidates (only paths that exist)
+    for path in _font_candidate_paths():
         if not path:
             continue
         try:
-            # Check if path exists
             if not Path(path).exists():
                 continue
             font = ImageFont.truetype(path, size=size)
-            # Note: PIL doesn't directly support font weight, but we can use different font files
-            # For now, we'll use the same font regardless of weight
             return font
         except (OSError, IOError) as e:
-            logger.debug(f"Failed to load font '{path}': {e}")
+            logger.debug("Failed to load font '%s': %s", path, e)
             continue
     logger.warning("Falling back to default bitmap font. Persian text may not display correctly.")
     return ImageFont.load_default()
@@ -142,6 +258,28 @@ def _is_rtl(text: str) -> bool:
     return False
 
 
+def _shape_rtl_text_for_pil(text: str) -> str:
+    """
+    Reshape + bidi visual order for Pillow draw.text without libraqm RTL direction.
+    Matches instagram_hub image_generator._shape_persian configuration.
+    """
+    if not text:
+        return ""
+    try:
+        import arabic_reshaper
+        from bidi.algorithm import get_display
+    except ImportError:
+        return text
+    config = {
+        "delete_harakat": True,
+        "support_ligatures": True,
+        "use_unshaped_instead_of_isolated": False,
+    }
+    reshaper = arabic_reshaper.ArabicReshaper(configuration=config)
+    reshaped = reshaper.reshape(text)
+    return get_display(reshaped)
+
+
 def draw_text_field(
     draw: ImageDraw.ImageDraw,
     x: int,
@@ -155,24 +293,33 @@ def draw_text_field(
     weight: str = "normal",
     stroke_width: Optional[int] = None,
     shadow: bool = True,
+    use_arabic_reshape: bool = True,
 ) -> None:
     """
     Draw a single text field on the image (optional shadow + stroke).
     stroke_width=None keeps legacy auto stroke; 0 disables outline.
+    When use_arabic_reshape and text contains Arabic script, applies arabic_reshaper + bidi
+    and draws without Pillow direction=rtl (correct when libraqm is missing).
     """
-    font = _get_font(size=size, weight=weight, font_filename=font_filename)
+    raw = str(text_value)
+    font = _get_font(size=size, weight=weight, font_filename=font_filename, text=text_value)
     color_rgb = _parse_color(color)
+    is_rtl_text = _is_rtl(raw)
+    if use_arabic_reshape and is_rtl_text:
+        text_to_draw = _shape_rtl_text_for_pil(raw)
+        direction = None
+    else:
+        text_to_draw = raw
+        direction = "rtl" if is_rtl_text else None
+
     if align == "center" and max_width:
-        text_width = _measure_text(str(text_value), font, draw)
+        text_width = _measure_text(text_to_draw, font, draw)
         if text_width < max_width:
             x = x + (max_width - int(text_width)) // 2
     elif align == "right" and max_width:
-        text_width = _measure_text(str(text_value), font, draw)
+        text_width = _measure_text(text_to_draw, font, draw)
         if text_width < max_width:
             x = x + max_width - int(text_width)
-    is_rtl = _is_rtl(str(text_value))
-    direction = "rtl" if is_rtl else None
-    text_to_draw = str(text_value)
     if stroke_width is None:
         stroke_eff = max(size // 14, 1)
     else:

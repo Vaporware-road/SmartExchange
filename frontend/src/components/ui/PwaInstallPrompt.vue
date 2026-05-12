@@ -35,14 +35,19 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import {
+  STORAGE_PWA_DISMISSED,
+  STORAGE_PWA_DISMISSED_LEGACY,
+  storageGet,
+  storageSet,
+  storageRemove,
+} from '@/constants/branding.js'
 
 const showPrompt = ref(false)
 let deferredPrompt = null
 
-const DISMISS_KEY = 'smartexchange-pwa-dismissed'
-
 function handleBeforeInstall(e) {
-  const dismissed = localStorage.getItem(DISMISS_KEY)
+  const dismissed = storageGet(STORAGE_PWA_DISMISSED, STORAGE_PWA_DISMISSED_LEGACY)
   if (dismissed) {
     const dismissedAt = Number(dismissed)
     const daysSinceDismissed = (Date.now() - dismissedAt) / (1000 * 60 * 60 * 24)
@@ -61,13 +66,13 @@ async function install() {
   deferredPrompt = null
   showPrompt.value = false
   if (outcome === 'accepted') {
-    localStorage.removeItem(DISMISS_KEY)
+    storageRemove(STORAGE_PWA_DISMISSED, STORAGE_PWA_DISMISSED_LEGACY)
   }
 }
 
 function dismiss() {
   showPrompt.value = false
-  localStorage.setItem(DISMISS_KEY, String(Date.now()))
+  storageSet(STORAGE_PWA_DISMISSED, STORAGE_PWA_DISMISSED_LEGACY, String(Date.now()))
 }
 
 onMounted(() => {

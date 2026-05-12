@@ -14,8 +14,11 @@ from rest_framework.decorators import action
 
 from .models import TelegramBot, TelegramChannel, DefaultMessageSettings, AutoPostConfig
 from .services.telegram_client import TelegramService
-from setting.models import SiteSettings
-from setting.utils import log_telegram_event
+from setting.utils import (
+    log_telegram_event,
+    read_auto_post_on_update_safe,
+    write_auto_post_on_update_safe,
+)
 from core.exceptions import error_response
 from .serializers import (
     TelegramChannelSerializer,
@@ -330,7 +333,7 @@ class AutoPostConfigViewSet(ModelViewSet):
 
 
 class AutomationSettingsSerializer(drf_serializers.Serializer):
-    auto_post_on_update = drf_serializers.BooleanField()
+    auto_post_on_update = drf_serializers.BooleanField(required=False, default=False)
 
 
 class AutomationSettingsAPIView(APIView):
@@ -345,25 +348,21 @@ class AutomationSettingsAPIView(APIView):
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
     def get(self, request):
-        settings = SiteSettings.load()
-        return Response(
-            {
-                "auto_post_on_update": getattr(
-                    settings, "auto_post_on_update", False
-                ),
-            }
-        )
+        payload = read_auto_post_on_update_safe()
+        body = {"auto_post_on_update": payload["value"]}
+        if not payload["ok"]:
+            body["degraded"] = True
+            body["detail"] = payload["detail"]
+        return Response(body)
 
     def put(self, request):
         serializer = AutomationSettingsSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        settings = SiteSettings.load()
-        settings.auto_post_on_update = serializer.validated_data[
-            "auto_post_on_update"
-        ]
-        settings.save()
-        return Response(
-            {
-                "auto_post_on_update": settings.auto_post_on_update,
-            }
-        )
+        flag = serializer.validated_data["auto_post_on_update"]
+        result = write_auto_post_on_update_safe(flag)
+        if not result["ok"]:
+            return Response(
+                {"detail": result["detail"]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response({"auto_post_on_update": bool(flag)})

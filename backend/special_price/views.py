@@ -4,6 +4,7 @@ from django.db.models import Prefetch
 from .models import SpecialPriceType, SpecialPriceHistory
 from .forms import SpecialPriceUpdateForm, SpecialPriceTypeForm
 from setting.utils import log_event
+from core.prices_webhook import notify_prices_webhook
 
 
 def special_price_dashboard(request):
@@ -45,7 +46,8 @@ def update_special_price(request, special_price_type_id):
                 details=f'Old price: {old_price}, New price: {price_history.price}, Notes: {price_history.notes or "None"}',
                 user=request.user if request.user.is_authenticated else None
             )
-            
+
+            notify_prices_webhook("special_price.legacy_single")
             messages.success(request, f'Special price updated successfully for {special_price_type.name}')
             return redirect('finalize:dashboard')
     else:

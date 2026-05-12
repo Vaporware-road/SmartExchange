@@ -95,7 +95,7 @@
 | `visible` | نگاشت به `is_active` ویجت در سینک (وقتی در payload باشد). |
 | `content` | رشته عمومی: متن، URL تصویر/ویدیو/webview، داده ساده برای برخی انواع. |
 | `content_id` / `content_ids` | ارجاع به رکورد `Content` برای رسانه/پلی‌لیست. |
-| `style` | آبجکت JSON آزاد برای تنظیمات ویجت (تم شمارش معکوس، marquee، آب و هوا، QR، آلبوم، نمودار، …). |
+| `style` | آبجکت JSON آزاد برای تنظیمات ویجت (تم شمارش معکوس، آب و هوا، QR، آلبوم، نمودار، …). |
 
 **ذخیره (`saveTemplate`):**  
 `config_json` شامل `backgroundColor`, `backgroundImage` (اختیاری), و آرایه `widgets` با مختصات **درصدی**، به‌همراه `playlist_items` برابر با `style.playlist` برای آلبوم.
@@ -114,7 +114,7 @@
 انواع پشتیبانی‌شده در UI (باید با `Widget.WIDGET_TYPE_CHOICES` در `app/templates/models.py` سازگار باشد):
 
 - `clock`, `date`, `weekday`, `countdown`
-- `text`, `marquee`, `weather`, `qr_action`
+- `text`, `weather`, `qr_action`
 - `image`, `video`, `album`
 - `webview`, `chart`
 
@@ -143,7 +143,7 @@
 
 ## ۹. پیش‌نمایش ویجت (`WidgetPreview.vue`)
 
-برای هر `type`، کامپوننت ویجت **همان پلیر** import می‌شود (مثلاً `TextWidget`, `MarqueeWidget`, …) تا پیش‌نمایش ادیتور به رفتار پلیر نزدیک باشد.
+برای هر `type`، کامپوننت ویجت **همان پلیر** import می‌شود (مثلاً `TextWidget`, …) تا پیش‌نمایش ادیتور به رفتار پلیر نزدیک باشد.
 
 استثنا: **webview** در ادیتور iframe زنده نمی‌گیرد (پیام در UI: جلوگیری از مشکلات cross-origin/focus).
 
@@ -205,7 +205,7 @@
    - **`Widget.objects.get_or_create`** / به‌روزرسانی فیلدها شامل نگاشت **`zIndex`** و **`visible` → is_active**.
    - **`content_json`** در DB = `style` ادیتور.
    - لینک **`content_ids`** و **`style.playlist`** به رکوردهای `Content` (ترتیب، duration، transition در `content_json` محتوا در صورت نیاز).
-   - **`text` / `marquee`:** ایجاد/به‌روزرسانی `Content` نوع `text` با `text_content` برای سازگاری پلیر.
+   - **`text`:** ایجاد/به‌روزرسانی `Content` نوع `text` با `text_content` برای سازگاری پلیر.
    - **`image`/`video`/`webview` بدون Content:** در صورت وجود URL، `Content` ساخته می‌شود.
    - **`qr_action`:** `QRActionLink` + حذف و ایجاد مجدد `QRActionRule`ها از آرایه `rules`؛ به‌روزرسانی `slug`/`redirectPath` در style و ذخیره widget.
 4. در پایان **`template.config_json['widgets']`** با idهای نهایی دوباره save می‌شود.

@@ -20,6 +20,14 @@ else:
     # Development defaults
     ALLOWED_HOSTS = ['panel.sarafipardis.co.uk', 'www.panel.sarafipardis.co.uk', "localhost", "127.0.0.1", "admin.sarafipardis.co.uk", "www.admin.sarafipardis.co.uk"]
 
+# When behind a reverse proxy (e.g. Vite dev proxy) that sends X-Forwarded-Host, use it for
+# request.build_absolute_uri() — needed for Instagram OAuth redirect_uri matching the browser origin.
+_xfh_env = os.environ.get('DJANGO_USE_X_FORWARDED_HOST')
+if _xfh_env is not None:
+    USE_X_FORWARDED_HOST = _xfh_env.lower() in ('1', 'true', 'yes')
+else:
+    USE_X_FORWARDED_HOST = DEBUG
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -66,6 +74,7 @@ REST_FRAMEWORK = {
         'user': '1000/hour',
         'finalize': '60/hour',
         'settings': '200/hour',
+        'public_prices': '2000/hour',
     },
 }
 
@@ -85,6 +94,8 @@ SIMPLE_JWT = {
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://localhost:5190',
+    'http://127.0.0.1:5190',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://localhost:8000',
@@ -97,6 +108,8 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
+    'http://localhost:5190',
+    'http://127.0.0.1:5190',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://localhost:8000',
@@ -168,6 +181,9 @@ LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Tehran'  # Change to Iran's time zone
 USE_I18N = True
 USE_TZ = True
+
+# Max span (days) for GET /api/analysis/dashboard/?start=&end=
+ANALYTICS_MAX_RANGE_DAYS = int(os.environ.get('ANALYTICS_MAX_RANGE_DAYS', '366'))
 
 # -----------------------------
 # Static & Media configuration

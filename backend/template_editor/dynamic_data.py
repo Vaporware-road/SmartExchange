@@ -148,7 +148,7 @@ def _branding_from_site() -> Dict[str, str]:
     return {
         "working_hours": (s.business_hours or "").strip() or "دوشنبه تا شنبه: 9:30 صبح تا ۱۷",
         "phone": s.support_phone or "",
-        "channel_username": getattr(s, "site_name", "") or "SmartExchange",
+        "channel_username": getattr(s, "site_name", "") or "Mr Exchange",
         "website": "",
     }
 

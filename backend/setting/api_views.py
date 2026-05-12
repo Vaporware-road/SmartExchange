@@ -54,7 +54,7 @@ def _upload_settings_fallback():
 def _public_site_settings_fallback():
     """Shape must match SiteSettingsSerializer (used when DB schema is behind migrations)."""
     return {
-        "site_name": "SmartExchange",
+        "site_name": "Mr Exchange",
         "tagline": "Premium Exchange Panel",
         "logo": None,
         "favicon": None,
@@ -74,6 +74,7 @@ def _public_site_settings_fallback():
         "use_template_editor_for_boards": False,
         "ui_font_filename_rtl": "",
         "ui_font_filename_ltr": "",
+        "prices_webhook_url": "",
     }
 
 

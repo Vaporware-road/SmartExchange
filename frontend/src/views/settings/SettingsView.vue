@@ -55,24 +55,24 @@
                   />
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">لوگو / Brand Logo</label>
+                  <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.general.brandLogo') }}</label>
                   <div class="rounded-xl border p-3 sm:p-4 flex flex-col gap-3" style="border-color: var(--glass-border); background: var(--bg-input);">
                     <div class="flex items-center gap-3 sm:gap-4">
                       <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl border bg-primary-muted flex items-center justify-center overflow-hidden shrink-0" style="border-color: var(--border-color);">
                         <img
                           v-if="logoPreviewUrl"
                           :src="logoPreviewUrl"
-                          alt="Site logo preview"
+                          :alt="$t('settings.general.logoPreviewAlt')"
                           class="w-full h-full object-contain"
                         >
                         <i v-else class="fas fa-coins text-xl sm:text-2xl text-[var(--primary)]" />
                       </div>
                       <div class="min-w-0">
                         <p class="text-sm font-medium text-[var(--text-primary)]">
-                          {{ selectedLogoFile ? selectedLogoFile.name : 'لوگوی فعلی / Current logo' }}
+                          {{ selectedLogoFile ? selectedLogoFile.name : $t('settings.general.currentLogo') }}
                         </p>
                         <p class="text-xs mt-1 text-[var(--text-secondary)]">
-                          فرمت مجاز: PNG, JPG, GIF, WebP (حداکثر 2MB)
+                          {{ $t('settings.general.logoFormatsHint') }}
                         </p>
                       </div>
                     </div>
@@ -91,7 +91,7 @@
                         @click="openLogoPicker"
                       >
                         <i class="fas fa-upload" />
-                        آپلود لوگو
+                        {{ $t('settings.general.uploadLogo') }}
                       </button>
                       <button
                         type="button"
@@ -100,7 +100,7 @@
                         @click="removeSelectedLogo"
                       >
                         <i class="fas fa-trash-alt" />
-                        حذف لوگو
+                        {{ $t('settings.general.removeLogo') }}
                       </button>
                     </div>
                   </div>
@@ -285,19 +285,35 @@
                     <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.fonts.rtlUiFont') }}</label>
                     <select v-model="fontsForm.rtl" class="input-luxury w-full min-w-0 min-h-[48px]" :disabled="!canEditSiteSettings">
                       <option value="">{{ $t('settings.fonts.defaultSystem') }}</option>
-                      <option v-for="f in fontsList" :key="'rtl-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                      <optgroup v-if="fontsGroupedForRtl.both.length" :label="$t('settings.fonts.optgroupPersianDual')">
+                        <option v-for="f in fontsGroupedForRtl.both" :key="'rtl-b-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                      </optgroup>
+                      <optgroup v-if="fontsGroupedForRtl.ltr.length" :label="$t('settings.fonts.optgroupLatin')">
+                        <option v-for="f in fontsGroupedForRtl.ltr" :key="'rtl-l-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                      </optgroup>
+                      <optgroup v-if="fontsGroupedForRtl.other.length" :label="$t('settings.fonts.optgroupOther')">
+                        <option v-for="f in fontsGroupedForRtl.other" :key="'rtl-o-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                      </optgroup>
                     </select>
                   </div>
                   <div>
                     <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.fonts.ltrUiFont') }}</label>
                     <select v-model="fontsForm.ltr" class="input-luxury w-full min-w-0 min-h-[48px]" :disabled="!canEditSiteSettings">
                       <option value="">{{ $t('settings.fonts.defaultSystem') }}</option>
-                      <option v-for="f in fontsList" :key="'ltr-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                      <optgroup v-if="fontsGroupedForLtr.ltr.length" :label="$t('settings.fonts.optgroupLatin')">
+                        <option v-for="f in fontsGroupedForLtr.ltr" :key="'ltr-l-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                      </optgroup>
+                      <optgroup v-if="fontsGroupedForLtr.both.length" :label="$t('settings.fonts.optgroupPersianDual')">
+                        <option v-for="f in fontsGroupedForLtr.both" :key="'ltr-b-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                      </optgroup>
+                      <optgroup v-if="fontsGroupedForLtr.other.length" :label="$t('settings.fonts.optgroupOther')">
+                        <option v-for="f in fontsGroupedForLtr.other" :key="'ltr-o-' + f.filename" :value="f.filename">{{ f.display_name || f.filename }}</option>
+                      </optgroup>
                     </select>
                   </div>
                   <button
                     type="button"
-                    class="btn-luxury min-h-[48px] hidden md:inline-flex"
+                    class="btn-luxury inline-flex w-full sm:w-auto min-h-[48px] items-center justify-center gap-2"
                     :disabled="!canEditSiteSettings || fontsSaving"
                     @click="saveFontsSettings"
                   >
@@ -307,6 +323,45 @@
                 </div>
 
                 <p class="text-xs text-[var(--text-secondary)]">{{ $t('settings.fonts.dockerHint') }}</p>
+              </div>
+            </div>
+
+            <!-- API (prices webhook + public GET URL) -->
+            <div v-else-if="activeTab === 'api'" key="api" class="p-4 sm:p-6 w-full min-w-0">
+              <h2 class="text-lg font-semibold text-gold mb-4 sm:mb-6">{{ $t('settings.tabs.api') }}</h2>
+              <div class="space-y-6 w-full max-w-2xl min-w-0">
+                <p class="text-sm text-[var(--text-secondary)]">{{ $t('settings.api.intro') }}</p>
+                <div>
+                  <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.api.webhookLabel') }}</label>
+                  <input
+                    v-model="apiForm.webhookUrl"
+                    type="url"
+                    class="input-luxury w-full min-w-0 min-h-[48px]"
+                    :placeholder="$t('settings.api.webhookPlaceholder')"
+                    :disabled="!canEditSiteSettings"
+                  >
+                  <p class="text-xs mt-2 text-[var(--text-secondary)]">{{ $t('settings.api.webhookHint') }}</p>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.api.publicGetLabel') }}</label>
+                  <div class="flex flex-col sm:flex-row gap-2 sm:items-center">
+                    <code class="flex-1 text-xs sm:text-sm break-all rounded-xl border px-3 py-3 min-h-[48px] flex items-center" style="border-color: var(--glass-border); background: var(--bg-input);">{{ publicPricesUrl }}</code>
+                    <button type="button" class="btn-luxury-outline shrink-0 min-h-[48px] px-4" @click="copyPublicPricesUrl">
+                      <i class="fas fa-copy me-2" />
+                      {{ copyPublicLabel }}
+                    </button>
+                  </div>
+                  <p class="text-xs mt-2 text-[var(--text-secondary)]">{{ $t('settings.api.publicGetHint') }}</p>
+                </div>
+                <button
+                  type="button"
+                  class="btn-luxury inline-flex w-full sm:w-auto min-h-[48px] items-center justify-center gap-2"
+                  :disabled="!canEditSiteSettings || apiSaving"
+                  @click="saveApiSettings"
+                >
+                  <i class="fas fa-save" />
+                  {{ apiSaving ? $t('common.loading') : $t('settings.api.save') }}
+                </button>
               </div>
             </div>
 
@@ -403,6 +458,21 @@
         {{ fontsSaving ? $t('common.loading') : $t('settings.fonts.saveUiFonts') }}
       </button>
     </div>
+    <div
+      v-show="activeTab === 'api'"
+      class="fixed bottom-0 left-0 right-0 z-30 p-4 md:hidden border-t transition-colors duration-300"
+      style="background: var(--bg-base); border-color: var(--glass-border); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);"
+    >
+      <button
+        type="button"
+        class="btn-luxury w-full min-h-[48px] flex items-center justify-center gap-2"
+        :disabled="!canEditSiteSettings || apiSaving"
+        @click="saveApiSettings"
+      >
+        <i class="fas fa-save" />
+        {{ apiSaving ? $t('common.loading') : $t('settings.api.save') }}
+      </button>
+    </div>
 
     <!-- Clear cache confirmation modal -->
     <BaseModal
@@ -457,6 +527,7 @@ import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useCurrenciesStore } from '@/stores/currencies'
 import { useAuthStore } from '@/stores/auth'
 import { settingsApi, instagramHubApi, templateEditorApi } from '@/services/api'
+import { instagramConnectHref } from '@/utils/instagramConnect'
 import LogsView from './LogsView.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
@@ -475,6 +546,7 @@ const tabs = [
   { id: 'uploads', labelKey: 'settings.tabs.uploads', icon: 'fas fa-cloud-upload-alt' },
   { id: 'instagram', labelKey: 'settings.tabs.instagram', icon: 'fab fa-instagram' },
   { id: 'fonts', labelKey: 'settings.tabs.fonts', icon: 'fas fa-font' },
+  { id: 'api', labelKey: 'settings.tabs.api', icon: 'fas fa-code' },
   { id: 'logs', labelKey: 'settings.tabs.logs', icon: 'fas fa-list' },
   { id: 'install-app', labelKey: 'settings.tabs.installApp', icon: 'fas fa-mobile-alt' },
 ]
@@ -528,9 +600,53 @@ const fontsList = ref([])
 const fontsForm = reactive({ rtl: '', ltr: '' })
 const fontsUploading = ref(false)
 const fontsSaving = ref(false)
+
+const apiForm = reactive({ webhookUrl: '' })
+const apiSaving = ref(false)
+const copyPublicState = ref(false)
+const publicPricesUrl = computed(() => {
+  if (typeof window === 'undefined') return '/api/public/prices/'
+  return `${window.location.origin}/api/public/prices/`
+})
+const copyPublicLabel = computed(() =>
+  copyPublicState.value ? t('settings.api.copied') : t('settings.api.copyLink'),
+)
 const fontFileInputRef = ref(null)
 const showDeleteFontModal = ref(false)
 const fontPendingDelete = ref('')
+
+function fontScriptKey(f) {
+  const s = f?.script
+  if (s === 'ltr' || s === 'both') return s
+  return 'other'
+}
+
+const fontsGroupedForRtl = computed(() => {
+  const both = []
+  const ltr = []
+  const other = []
+  for (const f of fontsList.value) {
+    const k = fontScriptKey(f)
+    if (k === 'both') both.push(f)
+    else if (k === 'ltr') ltr.push(f)
+    else other.push(f)
+  }
+  return { both, ltr, other }
+})
+
+const fontsGroupedForLtr = computed(() => {
+  const ltr = []
+  const both = []
+  const other = []
+  for (const f of fontsList.value) {
+    const k = fontScriptKey(f)
+    if (k === 'ltr') ltr.push(f)
+    else if (k === 'both') both.push(f)
+    else other.push(f)
+  }
+  return { ltr, both, other }
+})
+
 const iosInstallSteps = computed(() =>
   locale.value === 'fa'
     ? [
@@ -549,6 +665,9 @@ const iosInstallSteps = computed(() =>
 
 function setTab(id) {
   activeTab.value = id
+  if (id === 'api') {
+    syncApiFormFromStore()
+  }
   const hash = '#' + id
   if (typeof window !== 'undefined' && window.history.replaceState) {
     window.history.replaceState(null, '', route.path + hash)
@@ -687,7 +806,7 @@ async function loadInstagramConfig() {
       has_token: data?.has_token ?? false,
       token_expires_at: data?.token_expires_at ?? null,
     }
-    instagramConnectUrl.value = data?.connect_url ?? ''
+    instagramConnectUrl.value = instagramConnectHref(Boolean(data?.has_app_id))
     if (data?.has_app_id && !instagramForm.appId) instagramForm.appId = '••••••••'
   } catch {
     instagramConnectUrl.value = ''
@@ -697,6 +816,40 @@ async function loadInstagramConfig() {
 function syncFontsFormFromStore() {
   fontsForm.rtl = siteSettings.settings?.ui_font_filename_rtl || ''
   fontsForm.ltr = siteSettings.settings?.ui_font_filename_ltr || ''
+}
+
+function syncApiFormFromStore() {
+  apiForm.webhookUrl = siteSettings.settings?.prices_webhook_url ?? ''
+}
+
+async function saveApiSettings() {
+  if (!canEditSiteSettings.value) {
+    toast.error(t('errors.forbidden'))
+    return
+  }
+  apiSaving.value = true
+  try {
+    const { data } = await settingsApi.updateSite({ prices_webhook_url: apiForm.webhookUrl.trim() })
+    siteSettings.applySettings(data)
+    syncApiFormFromStore()
+    toast.success(t('toast.saveSuccess'))
+  } catch {
+    toast.error(t('toast.serverError'))
+  } finally {
+    apiSaving.value = false
+  }
+}
+
+async function copyPublicPricesUrl() {
+  try {
+    await navigator.clipboard.writeText(publicPricesUrl.value)
+    copyPublicState.value = true
+    setTimeout(() => {
+      copyPublicState.value = false
+    }, 2000)
+  } catch {
+    toast.error(t('toast.serverError'))
+  }
 }
 
 async function loadFontsList() {
@@ -799,7 +952,8 @@ async function clearCache() {
 
 function handleBeforeInstall(e) {
   // Keep the browser's native banner behavior if our custom install UI is not needed.
-  const dismissed = localStorage.getItem('smartexchange-pwa-dismissed')
+  const dismissed =
+    localStorage.getItem('mrexchange-pwa-dismissed') || localStorage.getItem('smartexchange-pwa-dismissed')
   if (dismissed) return
   e.preventDefault()
   deferredInstallPrompt = e
@@ -845,26 +999,50 @@ onMounted(() => {
     generalForm.platformName = siteSettings.settings.site_name
     generalForm.defaultBaseCurrency = siteSettings.settings?.base_currency_code ?? 'USD'
     setLogoPreviewFromSettings()
+    syncApiFormFromStore()
   } else {
     siteSettings.fetch().then(() => {
       generalForm.platformName = siteSettings.settings?.site_name ?? ''
       generalForm.defaultBaseCurrency = siteSettings.settings?.base_currency_code ?? 'USD'
       setLogoPreviewFromSettings()
       syncFontsFormFromStore()
+      syncApiFormFromStore()
     })
   }
   if (activeTab.value === 'fonts') {
     loadFontsList()
   }
+  syncApiFormFromStore()
 })
 
-watch(activeTab, (id) => {
+let fontsPreviewTimer = null
+watch(activeTab, (id, prev) => {
   if (id === 'fonts') {
     loadFontsList()
   }
+  if (prev === 'fonts' && id !== 'fonts') {
+    siteSettings.refreshUiTypography(siteSettings.settings).catch(() => {})
+  }
 })
 
+watch(
+  () => [fontsForm.rtl, fontsForm.ltr, activeTab.value],
+  () => {
+    if (activeTab.value !== 'fonts') return
+    if (fontsPreviewTimer) clearTimeout(fontsPreviewTimer)
+    fontsPreviewTimer = setTimeout(() => {
+      siteSettings
+        .previewUiTypography({
+          ui_font_filename_rtl: fontsForm.rtl,
+          ui_font_filename_ltr: fontsForm.ltr,
+        })
+        .catch(() => {})
+    }, 200)
+  },
+)
+
 onUnmounted(() => {
+  if (fontsPreviewTimer) clearTimeout(fontsPreviewTimer)
   window.removeEventListener('beforeinstallprompt', handleBeforeInstall)
   clearLogoPreviewObjectUrl()
 })

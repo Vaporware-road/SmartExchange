@@ -6,6 +6,7 @@ from category.models import PriceType, Category
 from .models import PriceHistory
 from .forms import PriceUpdateForm, CategoryPriceUpdateForm
 from setting.utils import log_event
+from core.prices_webhook import notify_prices_webhook
 
 
 def sort_gbp_price_types(price_types):
@@ -157,7 +158,8 @@ def update_price(request, price_type_id):
                 details=f'Old price: {old_price}, New price: {price_history.price}, Notes: {price_history.notes or "None"}',
                 user=request.user if request.user.is_authenticated else None
             )
-            
+
+            notify_prices_webhook("change_price.legacy_single")
             messages.success(request, f'Price updated successfully for {price_type.name}')
             return redirect('finalize:dashboard')
     else:
@@ -241,7 +243,9 @@ def update_category_prices(request, category_id):
                 details=f'Updated {len(updated_prices)} price(s). Changes: {"; ".join(updated_prices)}. Notes: {notes or "None"}',
                 user=request.user if request.user.is_authenticated else None
             )
-            
+
+            if updated_prices:
+                notify_prices_webhook("change_price.legacy_bulk")
             messages.success(request, f'All prices updated successfully for category {category.name}')
             return redirect('finalize:dashboard')
     else:

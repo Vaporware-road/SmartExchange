@@ -81,7 +81,7 @@ class SiteSettings(models.Model):
     Only one row should exist; use ``SiteSettings.load()`` to retrieve it.
     """
 
-    site_name = models.CharField(max_length=100, default="SmartExchange")
+    site_name = models.CharField(max_length=100, default="Mr Exchange")
     tagline = models.CharField(max_length=200, default="Premium Exchange Panel")
     logo = models.ImageField(upload_to="branding/", null=True, blank=True)
     favicon = models.ImageField(upload_to="branding/", null=True, blank=True)
@@ -139,6 +139,12 @@ class SiteSettings(models.Model):
         default="",
         help_text="Optional .ttf/.otf filename under static/fonts for LTR UI. Empty = default stack.",
     )
+    prices_webhook_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="If set, the panel POSTs a JSON prices snapshot to this URL after each price update.",
+    )
 
     class Meta:
         verbose_name = "Site Settings"
@@ -154,10 +160,9 @@ class SiteSettings(models.Model):
 
     @classmethod
     def load(cls):
-        cached = cache.get("site_settings")
-        if cached:
-            return cached
+        # Do not cache ORM instances: pickled/stale cache entries break after schema
+        # changes (e.g. new fields) and can cause 500s on endpoints that read flags
+        # like auto_post_on_update. Fresh DB read is cheap for a singleton row.
         obj, _ = cls.objects.get_or_create(pk=1)
-        cache.set("site_settings", obj, timeout=300)
         return obj
 

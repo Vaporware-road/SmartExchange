@@ -282,6 +282,7 @@ function restorePageTitle() {
 }
 
 onMounted(async () => {
+  window.addEventListener('keydown', onDocumentKeydown)
   try {
     const [pRes, cRes] = await Promise.all([priceApi.list(), categoryApi.list()])
     const cats = Array.isArray(cRes.data) ? cRes.data : cRes.data?.results ?? []
@@ -316,6 +317,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onDocumentKeydown)
   restorePageTitle()
 })
 
@@ -324,7 +326,23 @@ watch(
   () => setPageTitle()
 )
 
+/** Enter acts like Save (same rules as the floating save button). */
+function onDocumentKeydown(e) {
+  if (e.key !== 'Enter' || e.repeat || e.isComposing) return
+  if (loading.value || !priceTypes.value.length) return
+  if (!hasPayload.value || submitting.value) return
+
+  const el = e.target
+  if (el?.closest?.('a[href]')) return
+  // Let Enter activate focused buttons (avoid double-submit with handleSubmit).
+  if (el instanceof HTMLButtonElement || el?.closest?.('button')) return
+
+  e.preventDefault()
+  handleSubmit()
+}
+
 async function handleSubmit() {
+  if (submitting.value) return
   const pricePayload = buildEffectivePricePayload()
   if (!Object.keys(pricePayload).length) return
 

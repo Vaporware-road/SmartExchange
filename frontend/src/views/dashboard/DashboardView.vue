@@ -44,7 +44,7 @@
               <i class="fas fa-arrow-up text-2xl text-gold"></i>
             </div>
             <div>
-              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ summary?.highest_price != null ? Number(summary.highest_price).toFixed(2) : 'N/A' }}</p>
+              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ summary?.highest_price != null ? fmtDec(summary.highest_price) : 'N/A' }}</p>
               <p class="text-sm text-[var(--text-secondary)]">{{ $t('dashboard.highestPostedPrice') }}</p>
               <p v-if="summary?.highest_price_label" class="text-xs text-[var(--text-secondary)] opacity-80">{{ summary.highest_price_label }}</p>
               <svg class="w-20 h-8 mt-2 opacity-70" viewBox="0 0 80 32" preserveAspectRatio="none"><path :d="sparklinePath" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-opacity="0.7"/></svg>
@@ -56,7 +56,7 @@
             </div>
             <div>
               <p class="text-2xl font-bold" :class="summary?.avg_24h_change > 0 ? 'text-buy' : summary?.avg_24h_change < 0 ? 'text-sell' : 'text-[var(--text-secondary)]'">
-                {{ (summary?.avg_24h_change ?? 0).toFixed(2) }}%
+                {{ fmtDec(summary?.avg_24h_change ?? 0) }}%
               </p>
               <p class="text-sm text-[var(--text-secondary)]">{{ $t('dashboard.avg24hChange') }}</p>
               <p v-if="summary?.biggest_change" class="text-xs text-[var(--text-secondary)] opacity-80">{{ summary.biggest_change.name }}</p>
@@ -68,9 +68,9 @@
               <i class="fas fa-robot text-2xl text-gold"></i>
             </div>
             <div>
-              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ summary?.total_bots ?? 0 }}</p>
+              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ fmtInt(summary?.total_bots ?? 0) }}</p>
               <p class="text-sm text-[var(--text-secondary)]">{{ $t('dashboard.totalBots') }}</p>
-              <p class="text-xs text-[var(--text-secondary)] opacity-80">{{ summary?.active_bots ?? 0 }} {{ $t('dashboard.active') }}</p>
+              <p class="text-xs text-[var(--text-secondary)] opacity-80">{{ fmtInt(summary?.active_bots ?? 0) }} {{ $t('dashboard.active') }}</p>
               <svg class="w-20 h-8 mt-2 opacity-70" viewBox="0 0 80 32" preserveAspectRatio="none"><path :d="sparklinePath" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-opacity="0.7"/></svg>
             </div>
           </template>
@@ -79,9 +79,9 @@
               <i class="fas fa-broadcast-tower text-2xl text-gold"></i>
             </div>
             <div>
-              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ summary?.total_channels ?? 0 }}</p>
+              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ fmtInt(summary?.total_channels ?? 0) }}</p>
               <p class="text-sm text-[var(--text-secondary)]">{{ $t('dashboard.totalChannels') }}</p>
-              <p class="text-xs text-[var(--text-secondary)] opacity-80">{{ summary?.active_channels ?? 0 }} {{ $t('dashboard.active') }}</p>
+              <p class="text-xs text-[var(--text-secondary)] opacity-80">{{ fmtInt(summary?.active_channels ?? 0) }} {{ $t('dashboard.active') }}</p>
               <svg class="w-20 h-8 mt-2 opacity-70" viewBox="0 0 80 32" preserveAspectRatio="none"><path :d="sparklinePath" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-opacity="0.7"/></svg>
             </div>
           </template>
@@ -90,7 +90,7 @@
               <i class="fas fa-tags text-2xl text-gold"></i>
             </div>
             <div>
-              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ summary?.total_price_types ?? 0 }}</p>
+              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ fmtInt(summary?.total_price_types ?? 0) }}</p>
               <p class="text-sm text-[var(--text-secondary)]">{{ $t('dashboard.priceTypes') }}</p>
               <svg class="w-20 h-8 mt-2 opacity-70" viewBox="0 0 80 32" preserveAspectRatio="none"><path :d="sparklinePath" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-opacity="0.7"/></svg>
             </div>
@@ -100,7 +100,7 @@
               <i class="fas fa-sync-alt text-2xl text-gold"></i>
             </div>
             <div>
-              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ summary?.recent_updates_24h ?? 0 }}</p>
+              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ fmtInt(summary?.recent_updates_24h ?? 0) }}</p>
               <p class="text-sm text-[var(--text-secondary)]">{{ $t('dashboard.updates24h') }}</p>
               <svg class="w-20 h-8 mt-2 opacity-70" viewBox="0 0 80 32" preserveAspectRatio="none"><path :d="sparklinePath" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-opacity="0.7"/></svg>
             </div>
@@ -110,7 +110,7 @@
               <i class="fas fa-history text-2xl text-gold"></i>
             </div>
             <div>
-              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ summary?.total_price_updates ?? 0 }}</p>
+              <p class="text-2xl font-bold text-[var(--text-primary)]">{{ fmtInt(summary?.total_price_updates ?? 0) }}</p>
               <p class="text-sm text-[var(--text-secondary)]">{{ $t('dashboard.totalUpdates') }}</p>
               <svg class="w-20 h-8 mt-2 opacity-70" viewBox="0 0 80 32" preserveAspectRatio="none"><path :d="sparklinePath" fill="none" stroke="var(--primary)" stroke-width="1.5" stroke-opacity="0.7"/></svg>
             </div>
@@ -136,10 +136,17 @@
           class="hover-lift animate-fade-in-up border border-[var(--glass-border)]"
           style="animation-delay: 0.08s"
         >
-          <h2 class="text-lg font-bold text-gold mb-4 flex items-center gap-2">
+          <h2 class="text-lg font-bold text-gold mb-1 flex items-center gap-2">
             <i class="fas fa-chart-line"></i> {{ $t('dashboard.priceTrends') }}
           </h2>
-          <div class="h-56">
+          <p
+            v-if="lastTrendLabel"
+            class="text-sm text-[var(--text-secondary)] mb-3 truncate"
+            :title="lastTrendLabel"
+          >
+            {{ lastTrendLabel }}
+          </p>
+          <div class="h-72 min-h-[18rem]">
             <Line v-if="priceTrendData" :data="priceTrendData" :options="lineChartOptions" />
           </div>
         </BaseCard>
@@ -228,7 +235,7 @@
               <CategoryIcon :category-name="cat.name" size-class="h-4 w-4" />
               <span class="truncate">{{ cat.name }}</span>
             </h3>
-            <p class="text-sm text-[var(--text-secondary)] mb-3">{{ cat.price_type_count ?? cat.price_types?.length ?? 0 }} {{ $t('analysis.priceType') }}</p>
+            <p class="text-sm text-[var(--text-secondary)] mb-3">{{ fmtInt(cat.price_type_count ?? cat.price_types?.length ?? 0) }} {{ $t('analysis.priceType') }}</p>
             <router-link
               :to="`/prices/category/${cat.id}/update`"
               class="btn-luxury-outline text-sm py-2"
@@ -259,13 +266,13 @@
             <p class="text-sm text-[var(--text-secondary)] mb-2">{{ sp.source_currency?.code ?? sp.source_currency }} / {{ sp.target_currency?.code ?? sp.target_currency }}</p>
             <template v-if="sp.cash_price != null || sp.account_price != null">
               <p v-if="sp.cash_price != null" class="text-[var(--text-primary)] text-sm mb-1">
-                <i class="fas fa-money-bill-wave text-buy me-1"></i>{{ $t('dashboard.cashPrice') }}: <span class="font-bold text-buy">{{ Number(sp.cash_price).toLocaleString(undefined, { maximumFractionDigits: 2 }) }}</span>
+                <i class="fas fa-money-bill-wave text-buy me-1"></i>{{ $t('dashboard.cashPrice') }}: <span class="font-bold text-buy">{{ fmtPrice(sp.cash_price) }}</span>
               </p>
               <p v-if="sp.account_price != null" class="text-[var(--text-primary)] text-sm mb-3">
-                <i class="fas fa-university text-sell me-1"></i>{{ $t('dashboard.accountPrice') }}: <span class="font-bold text-sell">{{ Number(sp.account_price).toLocaleString(undefined, { maximumFractionDigits: 2 }) }}</span>
+                <i class="fas fa-university text-sell me-1"></i>{{ $t('dashboard.accountPrice') }}: <span class="font-bold text-sell">{{ fmtPrice(sp.account_price) }}</span>
               </p>
             </template>
-            <p v-else-if="sp.latest_price?.price" class="text-gold font-bold mb-3">{{ Number(sp.latest_price.price).toLocaleString(undefined, { maximumFractionDigits: 2 }) }}</p>
+            <p v-else-if="sp.latest_price?.price" class="text-gold font-bold mb-3">{{ fmtPrice(sp.latest_price.price) }}</p>
             <router-link
               :to="`/prices/special/${sp.id}/update`"
               class="btn-luxury-outline text-sm py-2"
@@ -286,6 +293,7 @@ import { useDate } from '@/composables/useDate'
 import { dashboardApi, categoryApi, specialPriceApi, analysisApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
+import { formatAppNumber, formatAppDecimal, createAppDateTimeFormat } from '@/utils/localeFormat.js'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import CategoryIcon from '@/components/ui/CategoryIcon.vue'
@@ -315,12 +323,30 @@ const specialPriceTypes = ref([])
 const now = ref(new Date())
 const isOnline = ref(true)
 const timelineData = ref(null)
+/** ISO timestamps aligned with chart labels (for tooltips) when showing last-updated series */
+const priceTrendTimestamps = ref([])
+const lastTrendLabel = ref('')
 let clockIntervalId = null
 
 const liveClock = computed(() => formatDateTime(now.value))
 const lastPriceUpdateByLabel = computed(() =>
   locale.value === 'fa' ? 'آخرین بروزرسانی قیمت توسط' : 'Last price update by'
 )
+
+const appLoc = computed(() => (locale.value === 'fa' ? 'fa' : 'en'))
+
+function fmtInt(v) {
+  return formatAppNumber(appLoc.value, v, { maximumFractionDigits: 0 })
+}
+
+function fmtDec(v) {
+  return formatAppDecimal(appLoc.value, v, 2)
+}
+
+function fmtPrice(v) {
+  if (v == null || v === '') return '—'
+  return formatAppNumber(appLoc.value, v, { maximumFractionDigits: 2 })
+}
 
 const sparklinePath = computed(() => {
   const points = [12, 18, 14, 22, 19, 28, 24]
@@ -388,6 +414,7 @@ const priceTrendData = computed(() => {
   if (!priceTrendLabels.value.length || !timelineData.value?.datasets?.length) return null
   const ds = timelineData.value.datasets[0]
   const data = ds?.data ?? []
+  const n = data.filter((v) => v != null && !Number.isNaN(Number(v))).length
   const dir = priceTrendDirection.value
   const colors = getChartThemeColors()
   const borderColor = dir === 'up' ? '#10B981' : dir === 'down' ? '#F43F5E' : colors.primary
@@ -409,8 +436,8 @@ const priceTrendData = computed(() => {
       },
       fill: true,
       tension: 0.4,
-      pointRadius: 0,
-      pointHoverRadius: 5,
+      pointRadius: n <= 24 ? 3 : 0,
+      pointHoverRadius: 6,
       borderWidth: 3,
       spanGaps: true,
     }],
@@ -419,6 +446,7 @@ const priceTrendData = computed(() => {
 
 const lineChartOptions = computed(() => {
   themeStore.isDark /* reactive dependency so options update on theme toggle */
+  priceTrendTimestamps.value /* tooltip titles refresh when series changes */
   const c = getChartThemeColors()
   return {
     responsive: true,
@@ -435,17 +463,36 @@ const lineChartOptions = computed(() => {
         cornerRadius: 12,
         padding: 12,
         callbacks: {
+          title(items) {
+            const i = items[0]?.dataIndex
+            const iso = priceTrendTimestamps.value[i]
+            if (iso) {
+              try {
+                return formatDateTime(new Date(iso))
+              } catch {
+                return iso
+              }
+            }
+            const lbl = items[0]?.label
+            return lbl ?? ''
+          },
           label(ctx) {
             const v = ctx.parsed?.y
             if (v == null) return ''
-            return `${ctx.dataset.label}: ${Number(v).toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+            return `${ctx.dataset.label}: ${formatAppNumber(appLoc.value, v, { maximumFractionDigits: 2 })}`
           },
         },
       },
     },
     scales: {
-      x: { grid: { color: c.borderColor }, ticks: { color: c.textSecondary, maxTicksLimit: 8 } },
-      y: { grid: { color: c.borderColor }, ticks: { color: c.textSecondary, callback: (v) => typeof v === 'number' ? v.toLocaleString() : v } },
+      x: { grid: { color: c.borderColor }, ticks: { color: c.textSecondary, maxTicksLimit: 12, maxRotation: 45 } },
+      y: {
+        grid: { color: c.borderColor },
+        ticks: {
+          color: c.textSecondary,
+          callback: (v) => (typeof v === 'number' ? formatAppNumber(appLoc.value, v, { maximumFractionDigits: 2 }) : v),
+        },
+      },
     },
   }
 })
@@ -517,77 +564,96 @@ const topCategoriesOptions = computed(() => {
   }
 })
 
-function formatDate(d) {
-  return d?.toLocaleString?.() ?? '-'
-}
-
 function formatLastUpdate(iso) {
   if (!iso) return t('dashboard.never')
   try {
     const d = new Date(iso)
-    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+    return createAppDateTimeFormat(appLoc.value, { hour: '2-digit', minute: '2-digit' }).format(d)
   } catch {
     return t('dashboard.never')
   }
 }
 
+/** Primary chart: last price type (regular or special) that was updated most recently */
+function buildTimelineFromLastUpdated(trend) {
+  if (!trend?.data?.length) return null
+  lastTrendLabel.value = trend.label ?? ''
+  const timestamps = []
+  const labels = []
+  const values = []
+  for (const p of trend.data) {
+    timestamps.push(p.x)
+    const d = new Date(p.x)
+    labels.push(
+      isNaN(d.getTime())
+        ? String(p.x)
+        : createAppDateTimeFormat(appLoc.value, { month: 'short', day: 'numeric' }).format(d)
+    )
+    values.push(p.y)
+  }
+  priceTrendTimestamps.value = timestamps
+  return {
+    labels,
+    datasets: [{ label: trend.label ?? '', data: values }],
+  }
+}
+
+/** Fallback when API has no last_updated_price_trend (older backend): merged timelines */
 function buildTimelineFromAnalysis(dash) {
+  lastTrendLabel.value = ''
+  priceTrendTimestamps.value = []
   const timelines = [...(dash?.timeline_data ?? []), ...(dash?.special_timeline_data ?? [])]
   if (!timelines?.length) return null
   const allTs = new Set()
   for (const ds of timelines) {
     for (const p of ds.data ?? []) allTs.add(p.x)
   }
-  const labels = [...allTs].sort()
-  if (!labels.length) return null
-  const shortLabels = labels.map((iso) => {
+  const sortedLabels = [...allTs].sort()
+  if (!sortedLabels.length) return null
+  const shortLabels = sortedLabels.map((iso) => {
     const d = new Date(iso)
-    return isNaN(d.getTime()) ? iso : d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    return isNaN(d.getTime()) ? iso : createAppDateTimeFormat(appLoc.value, { month: 'short', day: 'numeric' }).format(d)
   })
+  priceTrendTimestamps.value = sortedLabels
   const datasets = timelines.slice(0, 3).map((ds, i) => {
     const pointMap = {}
     for (const p of ds.data ?? []) pointMap[p.x] = p.y
     return {
       label: ds.label ?? `Series ${i + 1}`,
-      data: labels.map((ts) => pointMap[ts] ?? null),
+      data: sortedLabels.map((ts) => pointMap[ts] ?? null),
     }
   })
   return { labels: shortLabels, datasets }
 }
 
-function getMockTimeline() {
-  const days = 7
-  const labels = []
-  const data = []
-  for (let i = days - 1; i >= 0; i--) {
-    const d = new Date()
-    d.setDate(d.getDate() - i)
-    labels.push(d.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }))
-    data.push(1000 + Math.random() * 500 + i * 20)
-  }
-  return { labels, datasets: [{ label: 'Price', data }] }
-}
+const dashboardSilent = { silent: true }
 
 onMounted(async () => {
   try {
     const [summaryRes, categoriesRes, specialRes, analysisRes] = await Promise.all([
-      dashboardApi.summary(),
-      categoryApi.list(),
-      specialPriceApi.list().catch(() => ({ data: [] })),
-      analysisApi.dashboard().catch(() => ({ data: {} })),
+      dashboardApi.summary(dashboardSilent).catch(() => ({ data: {} })),
+      categoryApi.list(dashboardSilent).catch(() => ({ data: [] })),
+      specialPriceApi.list(dashboardSilent).catch(() => ({ data: [] })),
+      analysisApi.dashboard({}, dashboardSilent).catch(() => ({ data: {} })),
     ])
-    summary.value = summaryRes.data
+    summary.value = summaryRes.data ?? {}
     const catData = categoriesRes.data
     categories.value = Array.isArray(catData) ? catData : (catData?.results ?? [])
     const spData = specialRes?.data
     specialPriceTypes.value = Array.isArray(spData) ? spData : (spData?.results ?? [])
-    timelineData.value = buildTimelineFromAnalysis(analysisRes.data) || getMockTimeline()
+    const dash = analysisRes.data ?? {}
+    timelineData.value =
+      buildTimelineFromLastUpdated(dash.last_updated_price_trend)
+      || buildTimelineFromAnalysis(dash)
+      || null
     isOnline.value = true
   } catch {
     summary.value = {}
     categories.value = []
     specialPriceTypes.value = []
-    timelineData.value = getMockTimeline()
+    lastTrendLabel.value = ''
+    priceTrendTimestamps.value = []
+    timelineData.value = null
     isOnline.value = false
   } finally {
     loading.value = false

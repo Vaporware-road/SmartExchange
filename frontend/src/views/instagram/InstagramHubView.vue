@@ -44,6 +44,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { instagramHubApi } from '@/services/api'
+import { instagramConnectHref } from '@/utils/instagramConnect'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -51,6 +52,7 @@ const router = useRouter()
 const toast = useToast()
 
 const config = ref({
+  has_app_id: false,
   has_token: false,
   token_expires_at: null,
 })
@@ -60,10 +62,11 @@ async function loadConfig() {
   try {
     const { data } = await instagramHubApi.getConfig()
     config.value = {
+      has_app_id: data?.has_app_id ?? false,
       has_token: data?.has_token ?? false,
       token_expires_at: data?.token_expires_at ?? null,
     }
-    connectUrl.value = data?.connect_url ?? ''
+    connectUrl.value = instagramConnectHref(Boolean(data?.has_app_id))
   } catch {
     connectUrl.value = ''
   }

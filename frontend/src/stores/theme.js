@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
-
-const STORAGE_KEY = 'smartexchange-theme'
+import { STORAGE_THEME, STORAGE_THEME_LEGACY, storageGet, storageSet } from '@/constants/branding.js'
 
 export const useThemeStore = defineStore('theme', {
   state: () => ({
@@ -13,7 +12,7 @@ export const useThemeStore = defineStore('theme', {
 
   actions: {
     init() {
-      const stored = localStorage.getItem(STORAGE_KEY)
+      const stored = storageGet(STORAGE_THEME, STORAGE_THEME_LEGACY)
       if (stored === 'light' || stored === 'dark') {
         this.isDark = stored === 'dark'
       } else if (window.matchMedia?.('(prefers-color-scheme: light)').matches) {
@@ -29,7 +28,7 @@ export const useThemeStore = defineStore('theme', {
       } else {
         root.classList.remove('dark')
       }
-      localStorage.setItem(STORAGE_KEY, this.isDark ? 'dark' : 'light')
+      storageSet(STORAGE_THEME, STORAGE_THEME_LEGACY, this.isDark ? 'dark' : 'light')
     },
 
     toggle() {

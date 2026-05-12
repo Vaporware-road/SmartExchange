@@ -888,7 +888,7 @@ class PricePublisherService:
         office_url = s.office_map_url or "#"
         office_text = s.address or "—"
         hours = s.business_hours or "دوشنبه تا شنبه از ۹:۳۰ صبح تا ۵ عصر (به وقت لندن)\nیکشنبه‌ها تعطیل است"
-        site_name = s.site_name or "SmartExchange"
+        site_name = s.site_name or "Mr Exchange"
         contact_lines = []
         if s.support_phone:
             c = s.support_phone.replace("+", "").replace(" ", "")
@@ -926,7 +926,7 @@ class PricePublisherService:
         office_url = s.office_map_url or "#"
         office_text = s.address or "—"
         hours = s.business_hours or "دوشنبه تا شنبه از ۹:۳۰ صبح تا ۵ عصر (به وقت لندن)\nیکشنبه‌ها تعطیل است"
-        site_name = s.site_name or "SmartExchange"
+        site_name = s.site_name or "Mr Exchange"
         contact_lines = []
         if s.support_phone:
             c = s.support_phone.replace("+", "").replace(" ", "")

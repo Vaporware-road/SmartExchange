@@ -106,6 +106,7 @@ class SpecialPriceHistory(models.Model):
         related_name="histories",
     )
     price = models.DecimalField(max_digits=20, decimal_places=2, validators=[MinValueValidator(0)])
+    event_at = models.DateTimeField(null=True, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     notes = models.TextField(blank=True, null=True)

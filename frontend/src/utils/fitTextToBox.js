@@ -11,29 +11,34 @@ function priceLocaleIsFa(style) {
 }
 
 /** String used to estimate rendered width/height for a widget. */
+/** Same sample strings as TextWidgetPreview; no PIL reshape so canvas measure matches editor preview. */
 export function getWidgetTextForMeasure(w) {
   if (!w) return 'M'
   const bk = w.style?.bindingKey || w.style?.binding_key
   const t = w.type
-  if (t === 'text' || t === 'marquee') {
+  let raw = 'M'
+  if (t === 'text') {
     const pt = w.style?.priceTypeId ?? w.style?.price_type_id
     const hasPriceBinding =
       (pt != null && String(pt).trim() !== '') ||
       (bk && String(bk).trim().toLowerCase().startsWith('price'))
-    let sample = ''
     if (hasPriceBinding) {
       const c = w.content && String(w.content).trim() ? String(w.content).trim() : '123,456'
-      sample = priceLocaleIsFa(w.style) ? toPersianDigits(c) : c
-      return sample.split('\n')[0] || sample
+      const sample = priceLocaleIsFa(w.style) ? toPersianDigits(c) : c
+      raw = sample.split('\n')[0] || sample
+      return raw
     }
-    if (bk) return `[${String(bk).trim()}]`
-    const c = w.content
-    return c && String(c).trim() ? String(c).trim() : 'Sample text'
+    if (bk) raw = `[${String(bk).trim()}]`
+    else {
+      const c = w.content
+      raw = c && String(c).trim() ? String(c).trim() : 'Sample text'
+    }
+    return raw
   }
   if (t === 'date' || t === 'weekday')
-    return previewTextForDateWidget(w) || getLiveDatePreviewSamples().date_fa
-  if (t === 'clock') return '99:99'
-  return 'M'
+    raw = previewTextForDateWidget(w) || getLiveDatePreviewSamples().date_fa
+  else if (t === 'clock') raw = '99:99'
+  return raw
 }
 
 export function fontStackForWidgetMeasure(w) {

@@ -48,49 +48,53 @@ function localizePriceDisplay(raw, style, widget) {
 }
 
 const display = computed(() => {
-  const PRICE_PLACEHOLDER = '123,456'
-  const w = props.widget
-  const st = w?.style || {}
-  const ptRaw = w?.style?.priceTypeId ?? w?.style?.price_type_id
-  if (ptRaw != null && String(ptRaw).trim() !== '') {
-    const idKey = `price_type__${String(ptRaw).trim()}`
-    const resolved = te.priceBindingPreviewMap?.value?.[idKey]
-    const fromPreview = resolved?.value != null ? String(resolved.value).trim() : ''
-    if (fromPreview) return localizePriceDisplay(fromPreview, st, w)
+  const raw = (() => {
+    const PRICE_PLACEHOLDER = '123,456'
+    const w = props.widget
+    const st = w?.style || {}
+    const ptRaw = w?.style?.priceTypeId ?? w?.style?.price_type_id
+    if (ptRaw != null && String(ptRaw).trim() !== '') {
+      const idKey = `price_type__${String(ptRaw).trim()}`
+      const resolved = te.priceBindingPreviewMap?.value?.[idKey]
+      const fromPreview = resolved?.value != null ? String(resolved.value).trim() : ''
+      if (fromPreview) return localizePriceDisplay(fromPreview, st, w)
+      const bk = w?.style?.bindingKey || w?.style?.binding_key
+      if (bk) {
+        const byKey = te.priceBindingPreviewMap?.value?.[String(bk).trim()]
+        const fromKey = byKey?.value != null ? String(byKey.value).trim() : ''
+        if (fromKey) return localizePriceDisplay(fromKey, st, w)
+      }
+      const fallback = w?.content != null ? String(w.content).trim() : ''
+      if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) {
+        return localizePriceDisplay(fallback, st, w)
+      }
+      return localizePriceDisplay(PRICE_PLACEHOLDER, st, w)
+    }
     const bk = w?.style?.bindingKey || w?.style?.binding_key
     if (bk) {
-      const byKey = te.priceBindingPreviewMap?.value?.[String(bk).trim()]
-      const fromKey = byKey?.value != null ? String(byKey.value).trim() : ''
-      if (fromKey) return localizePriceDisplay(fromKey, st, w)
+      const resolved = te.priceBindingPreviewMap?.value?.[String(bk).trim()]
+      const fromPreview = resolved?.value != null ? String(resolved.value).trim() : ''
+      if (fromPreview) return localizePriceDisplay(fromPreview, st, w)
+      const fallback = w?.content != null ? String(w.content).trim() : ''
+      if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) {
+        return localizePriceDisplay(fallback, st, w)
+      }
+      return localizePriceDisplay(PRICE_PLACEHOLDER, st, w)
     }
-    const fallback = w?.content != null ? String(w.content).trim() : ''
-    if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) {
-      return localizePriceDisplay(fallback, st, w)
+    const t = w?.type
+    if (t === 'date' || t === 'weekday') {
+      return previewTextForDateWidget(w)
     }
-    return localizePriceDisplay(PRICE_PLACEHOLDER, st, w)
-  }
-  const bk = w?.style?.bindingKey || w?.style?.binding_key
-  if (bk) {
-    const resolved = te.priceBindingPreviewMap?.value?.[String(bk).trim()]
-    const fromPreview = resolved?.value != null ? String(resolved.value).trim() : ''
-    if (fromPreview) return localizePriceDisplay(fromPreview, st, w)
-    const fallback = w?.content != null ? String(w.content).trim() : ''
-    if (fallback && !/^sample text$/i.test(fallback) && !/^text$/i.test(fallback) && !/^\[.*\]$/.test(fallback)) {
-      return localizePriceDisplay(fallback, st, w)
+    if (t === 'clock') return '14:30'
+    const c = w?.content
+    if (c && String(c).trim()) {
+      const normalized = String(c).trim()
+      if (!/^sample text$/i.test(normalized) && !/^text$/i.test(normalized)) return normalized
     }
-    return localizePriceDisplay(PRICE_PLACEHOLDER, st, w)
-  }
-  const t = w?.type
-  if (t === 'date' || t === 'weekday') {
-    return previewTextForDateWidget(w)
-  }
-  if (t === 'clock') return '14:30'
-  const c = w?.content
-  if (c && String(c).trim()) {
-    const normalized = String(c).trim()
-    if (!/^sample text$/i.test(normalized) && !/^text$/i.test(normalized)) return normalized
-  }
-  return PRICE_PLACEHOLDER
+    return PRICE_PLACEHOLDER
+  })()
+  // Editor preview: always native shaping (RTL/LTR from styles). PIL reshape runs on device/export only.
+  return raw
 })
 
 const align = computed(() => {
@@ -106,12 +110,19 @@ const isPersianDate = computed(() => {
   return isPersianDateKey(resolvedDateKey(props.widget))
 })
 
+const verticalAlignItems = computed(() => {
+  const a = String(props.widget?.style?.verticalAlign ?? props.widget?.style?.vertical_align ?? 'middle').toLowerCase()
+  if (a === 'top' || a === 'start') return 'flex-start'
+  if (a === 'bottom' || a === 'end') return 'flex-end'
+  return 'center'
+})
+
 const textDirAttr = computed(() => (isPersianDate.value ? 'rtl' : undefined))
 
 /** Single-line box fit in editor (matches canvas measure in fitTextToBox). */
 const useSingleLineFit = computed(() => {
   const t = props.widget?.type
-  return t === 'text' || t === 'marquee' || t === 'date' || t === 'weekday' || t === 'clock'
+  return t === 'text' || t === 'date' || t === 'weekday' || t === 'clock'
 })
 
 const containerStyle = computed(() => {
@@ -127,7 +138,7 @@ const containerStyle = computed(() => {
   }
   return {
     justifyContent: justify,
-    alignItems: 'center',
+    alignItems: verticalAlignItems.value,
   }
 })
 

@@ -48,7 +48,11 @@
 
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import InlinePriceInput from '@/components/prices/InlinePriceInput.vue'
+import { formatAppNumber, formatAppDecimal } from '@/utils/localeFormat.js'
+
+const { locale } = useI18n()
 
 const props = defineProps({
   categoryId: {
@@ -78,10 +82,12 @@ const targetCode = computed(() =>
   props.priceType?.target_currency?.code ?? props.priceType?.target_currency ?? '—'
 )
 
+const appLoc = computed(() => (locale.value === 'fa' ? 'fa' : 'en'))
+
 const formattedPrice = computed(() => {
   const value = Number(props.priceType?.latest_price)
   if (!Number.isFinite(value)) return '—'
-  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(value)
+  return formatAppNumber(appLoc.value, value, { maximumFractionDigits: 0 })
 })
 
 const changePercent = computed(() => {
@@ -106,7 +112,7 @@ const trendClass = computed(() => {
 const trendText = computed(() => {
   if (changePercent.value == null) return '—'
   const sign = changePercent.value > 0 ? '+' : ''
-  return `${sign}${changePercent.value.toFixed(1)}%`
+  return `${sign}${formatAppDecimal(appLoc.value, changePercent.value, 1)}%`
 })
 
 const relativeUpdatedAt = computed(() => {
@@ -117,11 +123,20 @@ const relativeUpdatedAt = computed(() => {
   const now = Date.now()
   const diffMs = Math.max(now - date.getTime(), 0)
   const diffMin = Math.floor(diffMs / 60000)
+  const loc = appLoc.value
+  if (loc === 'fa') {
+    if (diffMin < 1) return 'همین الان'
+    if (diffMin < 60) return `${formatAppNumber('fa', diffMin)} دقیقه پیش`
+    const diffHours = Math.floor(diffMin / 60)
+    if (diffHours < 24) return `${formatAppNumber('fa', diffHours)} ساعت پیش`
+    const diffDays = Math.floor(diffHours / 24)
+    return `${formatAppNumber('fa', diffDays)} روز پیش`
+  }
   if (diffMin < 1) return 'Just now'
-  if (diffMin < 60) return `${diffMin}m ago`
+  if (diffMin < 60) return `${formatAppNumber('en', diffMin)}m ago`
   const diffHours = Math.floor(diffMin / 60)
-  if (diffHours < 24) return `${diffHours}h ago`
+  if (diffHours < 24) return `${formatAppNumber('en', diffHours)}h ago`
   const diffDays = Math.floor(diffHours / 24)
-  return `${diffDays}d ago`
+  return `${formatAppNumber('en', diffDays)}d ago`
 })
 </script>

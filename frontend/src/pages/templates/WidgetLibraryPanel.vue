@@ -148,7 +148,6 @@ const sections = [
     icon: 'fa-font',
     widgets: [
       { type: 'text', label: 'Text', icon: 'fa-pen-nib', hint: 'Headline or note', thumbClass: 'bg-gradient-to-r from-slate-300/60 to-transparent', extra: null },
-      { type: 'marquee', label: 'Marquee', icon: 'fa-wave-square', hint: 'Ticker style line', thumbClass: 'bg-[repeating-linear-gradient(90deg,rgba(148,163,184,0.45)_0,rgba(148,163,184,0.45)_8px,transparent_8px,transparent_14px)]', extra: null },
       { type: 'date', label: 'Date', icon: 'fa-calendar-alt', hint: 'Localized date', thumbClass: 'bg-gradient-to-b from-slate-300/50 to-transparent', extra: { style: { dateKey: 'date_fa' } } },
       {
         type: 'weekday',

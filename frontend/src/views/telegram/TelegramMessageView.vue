@@ -617,10 +617,11 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { telegramApi, categoryApi, specialPriceApi } from '@/services/api'
+import { createAppDateTimeFormat } from '@/utils/localeFormat.js'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 
 const tabs = [
@@ -729,7 +730,8 @@ const previewPriceLine = computed(() => {
 
 const previewTimestamp = computed(() => {
   const now = new Date()
-  return now.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })
+  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  return createAppDateTimeFormat(appLoc, { hour: '2-digit', minute: '2-digit' }).format(now)
 })
 
 onMounted(async () => {
@@ -860,6 +862,9 @@ async function loadAutomationSettings() {
   try {
     const { data } = await telegramApi.automationSettings.get()
     autoPostOnUpdate.value = !!data?.auto_post_on_update
+    if (data?.degraded && data?.detail) {
+      toast.warning(String(data.detail))
+    }
   } catch {
     autoPostOnUpdate.value = false
   }
@@ -871,7 +876,8 @@ async function saveAutoPostOnUpdate() {
     await telegramApi.automationSettings.update({ auto_post_on_update: autoPostOnUpdate.value })
     toast.success(t('toast.saveSuccess'))
   } catch (err) {
-    toast.error(t('toast.serverError'))
+    const detail = err?.response?.data?.detail
+    toast.error(detail ? String(detail) : t('toast.serverError'))
     autoPostOnUpdate.value = !autoPostOnUpdate.value
   } finally {
     automationSettingsSaving.value = false
@@ -957,7 +963,8 @@ function formatBotCreatedAt(dateStr) {
   try {
     const d = new Date(dateStr)
     if (Number.isNaN(d.getTime())) return '—'
-    return d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })
+    const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+    return createAppDateTimeFormat(appLoc, { year: 'numeric', month: 'short', day: 'numeric' }).format(d)
   } catch {
     return '—'
   }

@@ -7,7 +7,69 @@ from typing import List
 
 from celery import shared_task
 
+from instagram_hub.services.instagram_api import CAPTION_MAX
+
 logger = logging.getLogger(__name__)
+
+
+def _feed_caption_with_config_extras(base: str) -> str:
+    """Append active InstagramConfig feed_caption_suffix and feed_hashtags; cap at CAPTION_MAX."""
+    text = (base or "").strip()
+    try:
+        from instagram_hub.models import InstagramConfig
+
+        cfg = InstagramConfig.objects.filter(is_active=True).order_by("pk").first()
+        if not cfg:
+            return text[:CAPTION_MAX]
+        suffix = (cfg.feed_caption_suffix or "").strip()
+        hashtags = (cfg.feed_hashtags or "").strip()
+        parts = [text] if text else []
+        if suffix:
+            parts.append(suffix)
+        if hashtags:
+            parts.append(hashtags)
+        combined = "\n\n".join(parts) if parts else ""
+        return combined[:CAPTION_MAX]
+    except Exception:
+        return text[:CAPTION_MAX]
+
+
+def _log_instagram_publication(
+    *,
+    kind: str,
+    category_ids: List[int],
+    special_price_history_ids: List[int],
+    result: dict,
+) -> None:
+    try:
+        from instagram_hub.models import InstagramPublicationLog
+
+        InstagramPublicationLog.objects.create(
+            kind=kind,
+            success=bool(result.get("success")),
+            error_message=(
+                (result.get("message") or "")[:4000] if not result.get("success") else ""
+            ),
+            media_id=str(result.get("id") or "")[:128],
+            container_id=str(result.get("creation_id") or "")[:128],
+            category_ids=list(category_ids),
+            special_price_history_ids=list(special_price_history_ids),
+        )
+    except Exception:
+        logger.exception("Failed to write InstagramPublicationLog")
+
+
+def schedule_instagram_post_finalize(
+    category_ids: List[int],
+    special_price_history_ids: List[int],
+    theme: str = "dark",
+) -> None:
+    """Queue Celery task to render and publish finalize snapshot to Instagram."""
+    post_finalize_to_instagram_task.delay(
+        category_ids=list(category_ids),
+        special_price_history_ids=list(special_price_history_ids),
+        theme=theme,
+    )
 
 
 def _build_price_entries_for_finalize(
@@ -44,6 +106,18 @@ def _build_price_entries_for_finalize(
         cat = Category.objects.filter(id=category_ids[0]).values_list("name", flat=True).first()
         if cat:
             category_title = cat
+    if (
+        not category_title
+        or category_title == "Price Update"
+    ) and special_price_history_ids and len(special_price_history_ids) == 1 and not category_ids:
+        from special_price.models import SpecialPriceHistory
+        name = (
+            SpecialPriceHistory.objects.filter(id=special_price_history_ids[0])
+            .values_list("special_price_type__name", flat=True)
+            .first()
+        )
+        if name:
+            category_title = name
     if not category_title:
         category_title = "Price Update"  # fallback
 
@@ -137,9 +211,10 @@ def run_post_finalize_to_instagram(
 
     post_path = result.get("post_path")
     story_path = result.get("story_path")
-    caption = (category_title or "")[:2200]
+    caption = _feed_caption_with_config_extras(category_title or "")
 
     # Publish to Meta API (requests) — catch all to avoid 500
+    from instagram_hub.models import InstagramPublicationLog
     from instagram_hub.services.instagram_api import publish_to_instagram
 
     if post_path:
@@ -149,6 +224,12 @@ def run_post_finalize_to_instagram(
                 caption=caption,
                 is_story=False,
                 request=None,
+            )
+            _log_instagram_publication(
+                kind=InstagramPublicationLog.KIND_FEED,
+                category_ids=category_ids,
+                special_price_history_ids=special_price_history_ids,
+                result=pub,
             )
             if not pub.get("success"):
                 logger.warning(
@@ -160,6 +241,12 @@ def run_post_finalize_to_instagram(
                 "post_finalize_to_instagram: Meta API (post) failed: %s",
                 e,
                 exc_info=True,
+            )
+            _log_instagram_publication(
+                kind=InstagramPublicationLog.KIND_FEED,
+                category_ids=category_ids,
+                special_price_history_ids=special_price_history_ids,
+                result={"success": False, "message": str(e)[:500], "creation_id": None},
             )
             try:
                 from setting.utils import log_event
@@ -181,6 +268,12 @@ def run_post_finalize_to_instagram(
                 is_story=True,
                 request=None,
             )
+            _log_instagram_publication(
+                kind=InstagramPublicationLog.KIND_STORY,
+                category_ids=category_ids,
+                special_price_history_ids=special_price_history_ids,
+                result=pub,
+            )
             if not pub.get("success"):
                 logger.warning(
                     "Instagram story failed: %s",
@@ -191,6 +284,12 @@ def run_post_finalize_to_instagram(
                 "post_finalize_to_instagram: Meta API (story) failed: %s",
                 e,
                 exc_info=True,
+            )
+            _log_instagram_publication(
+                kind=InstagramPublicationLog.KIND_STORY,
+                category_ids=category_ids,
+                special_price_history_ids=special_price_history_ids,
+                result={"success": False, "message": str(e)[:500], "creation_id": None},
             )
             try:
                 from setting.utils import log_event
@@ -232,9 +331,9 @@ def enqueue_post_finalize_to_instagram(
     theme: str = "dark",
 ) -> None:
     """
-    Queue post-finalize Instagram job in Celery.
+    Queue post-finalize Instagram job in Celery (alias for schedule_instagram_post_finalize).
     """
-    post_finalize_to_instagram_task.delay(
+    schedule_instagram_post_finalize(
         category_ids=category_ids,
         special_price_history_ids=special_price_history_ids,
         theme=theme,

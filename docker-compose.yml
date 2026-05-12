@@ -1,5 +1,12 @@
 name: smart-exchange
 
+# BuildKit makes /etc/resolv.conf read-only during build; broken builder DNS then breaks pip/npm.
+# Static hosts for package indexes (Fastly/Cloudflare edges; update if downloads fail after CDN changes).
+x-build-extra-hosts: &build-extra-hosts
+  - "pypi.org=151.101.64.223"
+  - "files.pythonhosted.org=151.101.64.223"
+  - "registry.npmjs.org=104.16.0.34"
+
 services:
   redis:
     image: redis:7-alpine
@@ -16,6 +23,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      extra_hosts: *build-extra-hosts
     env_file:
       - .env.docker
     command: >
@@ -58,6 +66,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      extra_hosts: *build-extra-hosts
     env_file:
       - .env.docker
     command: >
@@ -81,6 +90,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      extra_hosts: *build-extra-hosts
     env_file:
       - .env.docker
     command: >

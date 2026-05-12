@@ -126,6 +126,13 @@ import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { categoryApi, specialPriceApi } from '@/services/api'
+import {
+  STORAGE_RECENT_SEARCHES,
+  STORAGE_RECENT_SEARCHES_LEGACY,
+  storageGet,
+  storageSet,
+  storageRemove,
+} from '@/constants/branding.js'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -139,8 +146,6 @@ const paletteRef = ref(null)
 const categories = ref([])
 const specialPrices = ref([])
 const recentSearches = ref([])
-
-const STORAGE_KEY = 'smartexchange-recent-searches'
 
 const pageLinks = [
   { to: '/', labelKey: 'sidebar.dashboard', icon: 'fas fa-tachometer-alt' },
@@ -254,7 +259,8 @@ function close() {
 
 function loadRecent() {
   try {
-    recentSearches.value = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]').slice(0, 5)
+    const raw = storageGet(STORAGE_RECENT_SEARCHES, STORAGE_RECENT_SEARCHES_LEGACY) || '[]'
+    recentSearches.value = JSON.parse(raw).slice(0, 5)
   } catch {
     recentSearches.value = []
   }
@@ -265,12 +271,12 @@ function saveRecentSearch(term) {
   let recent = recentSearches.value.filter(r => r !== term)
   recent.unshift(term)
   recent = recent.slice(0, 5)
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(recent))
+  storageSet(STORAGE_RECENT_SEARCHES, STORAGE_RECENT_SEARCHES_LEGACY, JSON.stringify(recent))
   recentSearches.value = recent
 }
 
 function clearRecent() {
-  localStorage.removeItem(STORAGE_KEY)
+  storageRemove(STORAGE_RECENT_SEARCHES, STORAGE_RECENT_SEARCHES_LEGACY)
   recentSearches.value = []
 }
 

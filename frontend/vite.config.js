@@ -1,25 +1,111 @@
+import fs from 'node:fs'
+import path from 'path'
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { resolve } from 'path'
+
+/**
+ * Serve template-editor fonts from the repo (backend/static/fonts) during `vite dev`.
+ * The blanket `/static` proxy runs after this; without it, `/static/fonts/*.ttf` is proxied
+ * to Django and returns 404 when the backend is down or misconfigured.
+ */
+function serveTemplateFontsFromRepo() {
+  return {
+    name: 'serve-template-fonts-from-repo',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const pathname = (req.url || '').split('?')[0]
+        if (!pathname.startsWith('/static/fonts/')) {
+          next()
+          return
+        }
+        const decoded = decodeURIComponent(pathname.slice('/static/fonts/'.length))
+        const safeName = path.basename(decoded)
+        if (!safeName || safeName !== decoded) {
+          res.statusCode = 400
+          res.end()
+          return
+        }
+        const repoFontsDir = path.resolve(__dirname, '..', 'backend', 'static', 'fonts')
+        const pubFontsDir = path.resolve(__dirname, 'public', 'static', 'fonts')
+        const candidates = [
+          path.join(repoFontsDir, safeName),
+          path.join(pubFontsDir, safeName),
+        ]
+        for (const fp of candidates) {
+          try {
+            if (!fs.existsSync(fp) || !fs.statSync(fp).isFile()) continue
+          } catch {
+            continue
+          }
+          const ext = path.extname(safeName).toLowerCase()
+          const ct =
+            ext === '.ttf' ? 'font/ttf' : ext === '.otf' ? 'font/otf' : 'application/octet-stream'
+          res.statusCode = 200
+          res.setHeader('Content-Type', ct)
+          res.setHeader('Cache-Control', 'public, max-age=3600')
+          fs.createReadStream(fp).pipe(res)
+          return
+        }
+        next()
+      })
+    },
+  }
+}
 
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   // In Docker, point proxy to backend service name.
   // Outside Docker it still defaults to local Django.
   const apiProxyTarget = env.VITE_API_PROXY_TARGET || 'http://127.0.0.1:8000'
+  /** Vite listen port (may differ from the port users open in the browser, e.g. port mapping). */
+  const devServerPort = Number(env.VITE_DEV_SERVER_PORT || 3000)
+  /**
+   * HMR WebSocket port as seen by the browser. If you open http://localhost:5190 but Vite listens
+   * on 3000 inside Docker, set VITE_HMR_CLIENT_PORT=5190 (and optionally VITE_HMR_HOST).
+   * @see https://vite.dev/config/server-options.html#server-hmr
+   */
+  const hmrClientPort = env.VITE_HMR_CLIENT_PORT
+  const hmrHost = env.VITE_HMR_HOST
+  const hmr =
+    hmrClientPort || hmrHost
+      ? {
+          protocol: env.VITE_HMR_PROTOCOL || 'ws',
+          port: devServerPort,
+          ...(hmrHost ? { host: hmrHost } : {}),
+          ...(hmrClientPort ? { clientPort: Number(hmrClientPort) } : {}),
+        }
+      : undefined
+
+  /** Let Django see the browser host (OAuth redirect_uri, absolute URLs) when changeOrigin rewrites Host. */
+  function forwardBrowserHostHeader() {
+    return (proxy) => {
+      proxy.on('proxyReq', (proxyReq, req) => {
+        const host = req.headers['x-forwarded-host'] || req.headers.host
+        if (host) {
+          proxyReq.setHeader('X-Forwarded-Host', host)
+        }
+        const proto = req.headers['x-forwarded-proto']
+        if (proto) {
+          proxyReq.setHeader('X-Forwarded-Proto', proto)
+        }
+      })
+    }
+  }
 
   return {
   base: command === 'serve' ? '/' : '/static/vue/',
   plugins: [
+    serveTemplateFontsFromRepo(),
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'favicon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'SmartExchange Panel',
-        short_name: 'SmartExchange',
-        description: 'Premium Exchange Management Panel',
+        name: 'Mr Exchange',
+        short_name: 'Mr Exchange',
+        description: 'Exchange management panel',
         start_url: '/',
         display: 'standalone',
         background_color: '#121212',
@@ -72,8 +158,11 @@ export default defineConfig(({ command, mode }) => {
   },
   server: {
     host: true,
-    port: 3000,
-    strictPort: true,
+    port: devServerPort,
+    strictPort: env.VITE_DEV_STRICT_PORT === 'false' ? false : true,
+    /** When behind a reverse proxy, set e.g. VITE_DEV_ORIGIN=http://localhost:5190 */
+    origin: env.VITE_DEV_ORIGIN || undefined,
+    hmr,
     watch: {
       usePolling: true,
     },
@@ -81,6 +170,13 @@ export default defineConfig(({ command, mode }) => {
       '/api': {
         target: apiProxyTarget,
         changeOrigin: true,
+        configure: forwardBrowserHostHeader(),
+      },
+      // Django OAuth views (login_required); must hit backend on the same origin as the SPA in dev.
+      '/instagram-hub': {
+        target: apiProxyTarget,
+        changeOrigin: true,
+        configure: forwardBrowserHostHeader(),
       },
       '/media': {
         target: apiProxyTarget,

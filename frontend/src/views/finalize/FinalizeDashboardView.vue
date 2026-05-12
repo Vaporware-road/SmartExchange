@@ -127,9 +127,10 @@ import { finalizeApi } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import FinalizeAllModal from './FinalizeAllModal.vue'
 import CategoryIcon from '@/components/ui/CategoryIcon.vue'
+import { formatAppDecimal, createAppDateTimeFormat } from '@/utils/localeFormat.js'
 
 const toast = useToast()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const loading = ref(true)
 const data = ref(null)
 const finalizeAllModalOpen = ref(false)
@@ -168,7 +169,8 @@ function formatPrice(value) {
   if (value == null || value === '') return '—'
   const num = typeof value === 'string' ? parseFloat(value) : value
   if (Number.isNaN(num)) return String(value)
-  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  return formatAppDecimal(appLoc, num, 2)
 }
 
 function formatPriceChange(item) {
@@ -194,7 +196,8 @@ function formatDate(isoString) {
   if (!isoString) return '—'
   try {
     const d = new Date(isoString)
-    return d.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })
+    const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+    return createAppDateTimeFormat(appLoc, { dateStyle: 'short', timeStyle: 'short' }).format(d)
   } catch {
     return isoString
   }

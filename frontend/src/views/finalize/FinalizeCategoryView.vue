@@ -201,8 +201,9 @@ import { finalizeApi, telegramApi, getApiErrorDetails } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import FloatingInput from '@/components/ui/FloatingInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
+import { formatAppDecimal } from '@/utils/localeFormat.js'
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const toast = useToast()
 const route = useRoute()
 const router = useRouter()
@@ -280,7 +281,8 @@ function formatPrice(value) {
   if (value == null || value === '') return '—'
   const num = typeof value === 'string' ? parseFloat(value) : value
   if (Number.isNaN(num)) return String(value)
-  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  return formatAppDecimal(appLoc, num, 2)
 }
 
 function formatPriceChange(item) {

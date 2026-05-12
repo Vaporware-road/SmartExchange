@@ -33,6 +33,11 @@ urlpatterns = [
         name="api-template-editor-fonts",
     ),
     path(
+        "fonts/file/<str:filename>/",
+        api_views.TemplateFontFileServeAPIView.as_view(),
+        name="api-template-editor-font-file",
+    ),
+    path(
         "fonts/<str:filename>/",
         api_views.TemplateFontDeleteAPIView.as_view(),
         name="api-template-editor-font-delete",

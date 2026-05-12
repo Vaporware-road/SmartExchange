@@ -1,26 +1,24 @@
 import { createI18n } from 'vue-i18n'
 import fa from '@/locales/fa.json'
 import en from '@/locales/en.json'
+import {
+  STORAGE_LOCALE,
+  STORAGE_LOCALE_LEGACY,
+  storageGet,
+  storageSet,
+} from '@/constants/branding.js'
 
 const SUPPORTED_LOCALES = ['en', 'fa']
 const safeStorage = {
-  get(key) {
-    try {
-      return window.localStorage.getItem(key)
-    } catch {
-      return null
-    }
+  get() {
+    return storageGet(STORAGE_LOCALE, STORAGE_LOCALE_LEGACY)
   },
-  set(key, value) {
-    try {
-      window.localStorage.setItem(key, value)
-    } catch {
-      // Ignore storage failures (e.g. privacy mode or disabled storage).
-    }
+  set(value) {
+    storageSet(STORAGE_LOCALE, STORAGE_LOCALE_LEGACY, value)
   },
 }
 
-const savedLocale = safeStorage.get('smartexchange-locale') || 'en'
+const savedLocale = safeStorage.get() || 'en'
 const initialLocale = SUPPORTED_LOCALES.includes(savedLocale) ? savedLocale : 'en'
 
 // Some bundlers may expose JSON as { default: ... }
@@ -73,7 +71,7 @@ export function setLocale(locale) {
   } else if (g.locale && typeof g.locale === 'object' && 'value' in g.locale) {
     g.locale.value = next
   }
-  safeStorage.set('smartexchange-locale', next)
+  safeStorage.set(next)
   applyDocumentLocale(next)
 }
 

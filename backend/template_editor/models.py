@@ -38,7 +38,6 @@ class Widget(models.Model):
         ("weekday", _("Weekday")),
         ("countdown", _("Countdown")),
         ("text", _("Text")),
-        ("marquee", _("Marquee")),
         ("weather", _("Weather")),
         ("qr_action", _("QR action")),
         ("image", _("Image")),

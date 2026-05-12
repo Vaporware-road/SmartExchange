@@ -17,7 +17,6 @@ const props = defineProps({
 const comp = computed(() => {
   switch (props.widget?.type) {
     case 'text':
-    case 'marquee':
     case 'date':
     case 'clock':
     case 'weekday':

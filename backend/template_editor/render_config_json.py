@@ -129,6 +129,26 @@ def _pct_to_fraction(raw: Any) -> float:
         return 0.0
 
 
+def _design_to_actual_font_scale(
+    design_w: int,
+    design_h: int,
+    actual_w: int,
+    actual_h: int,
+) -> float:
+    """
+    Scale factor for style.fontSize (stored in template canvas px) when the background
+    image pixel size differs from template.canvas_width / canvas_height.
+
+    Widget boxes already scale via _logical_to_actual; fonts must use the same mapping.
+    min(sx, sy) matches single-line box-fit behavior (limiting axis), matching the editor.
+    """
+    if design_w < 1 or design_h < 1:
+        return 1.0
+    sx = actual_w / float(design_w)
+    sy = actual_h / float(design_h)
+    return min(sx, sy)
+
+
 def _logical_to_actual(
     raw: Any,
     design_size: int,
@@ -336,6 +356,7 @@ def render_template_from_config_json(
         base_image = Image.new("RGBA", (design_w, design_h), fill)
 
     actual_w, actual_h = base_image.size
+    font_scale = _design_to_actual_font_scale(design_w, design_h, actual_w, actual_h)
 
     sorted_widgets: List[Dict[str, Any]] = sorted(
         [w for w in widgets if isinstance(w, dict)],
@@ -386,13 +407,18 @@ def render_template_from_config_json(
         if not text_val.strip():
             continue
         try:
-            font_size = int(style.get("fontSize") or style.get("font_size") or max(14, min(hh - 4, int(hh * 0.45))))
+            raw_fs = int(style.get("fontSize") or style.get("font_size") or max(14, min(hh - 4, int(hh * 0.45))))
         except (TypeError, ValueError):
-            font_size = max(14, min(hh - 4, int(hh * 0.45)))
-        font_size = max(8, min(200, font_size))
+            raw_fs = max(14, min(hh - 4, int(hh * 0.45)))
+        font_size = int(round(raw_fs * font_scale))
+        # Fit inside widget box (editor single-line fit); removes old hard 200px cap.
+        font_size = max(8, min(font_size, max(hh - 8, 8)))
         color = style.get("color") or "#ffffff"
         font_fn = style.get("font") or style.get("fontFilename") or style.get("font_filename")
         tw, tstroke, tshadow = _text_fx_from_style(style)
+        use_arabic_reshape = style.get("useArabicReshaper", style.get("use_arabic_reshaper", True))
+        if isinstance(use_arabic_reshape, str):
+            use_arabic_reshape = use_arabic_reshape.strip().lower() in ("1", "true", "yes", "on")
         draw_text_field(
             draw,
             x + 4,
@@ -406,6 +432,7 @@ def render_template_from_config_json(
             weight=tw,
             stroke_width=tstroke,
             shadow=tshadow,
+            use_arabic_reshape=bool(use_arabic_reshape),
         )
 
     return base_image

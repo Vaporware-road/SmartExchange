@@ -65,7 +65,7 @@
         <input :value="w.type" type="text" class="input-luxury w-full text-sm opacity-70" disabled />
       </div>
 
-      <div v-if="activeTab === 'data' && (w.type === 'text' || w.type === 'marquee')" class="space-y-2">
+      <div v-if="activeTab === 'data' && w.type === 'text'" class="space-y-2">
         <label class="block text-xs text-[var(--text-secondary)]">PriceType binding</label>
         <select v-model="selectedPriceTypeId" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
           <option :value="''">Select PriceType</option>
@@ -139,7 +139,7 @@
         <p class="text-xs font-semibold text-[var(--text-primary)]">Typography</p>
         <div class="space-y-2">
           <label class="block text-xs text-[var(--text-secondary)]">Font size</label>
-          <input v-model.number="styleFontSize" type="number" min="8" max="200" class="input-luxury w-full text-sm" />
+          <input v-model.number="styleFontSize" type="number" min="1" max="200" step="1" class="input-luxury w-full text-sm" />
         </div>
         <div class="grid grid-cols-[1fr_auto] gap-2">
           <div class="space-y-2">
@@ -169,6 +169,14 @@
           </select>
         </div>
         <div class="space-y-2">
+          <label class="block text-xs text-[var(--text-secondary)]">Vertical (in box)</label>
+          <select v-model="styleVerticalAlign" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
+            <option value="middle">Middle</option>
+            <option value="top">Top</option>
+            <option value="bottom">Bottom</option>
+          </select>
+        </div>
+        <div class="space-y-2">
           <label class="block text-xs text-[var(--text-secondary)]">Weight</label>
           <select v-model="styleFontWeight" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
             <option value="normal">Normal</option>
@@ -190,6 +198,24 @@
           <BaseCheckbox v-model="styleShadowEnabled">Drop shadow (PNG)</BaseCheckbox>
           <BaseCheckbox v-model="styleOutlineEnabled">Text outline (PNG)</BaseCheckbox>
         </template>
+      </div>
+
+      <div
+        v-if="activeTab === 'appearance' && canAlignWidgetToBackground"
+        class="space-y-2 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/40 p-2"
+      >
+        <p class="text-xs font-semibold text-[var(--text-primary)]">Snap to background image</p>
+        <p class="text-[10px] leading-snug text-[var(--text-secondary)]">
+          Moves the widget box to the edges of the visible image (letterboxing excluded).
+        </p>
+        <div class="grid grid-cols-3 gap-1">
+          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('left')">Left</button>
+          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('center-h')">H mid</button>
+          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('right')">Right</button>
+          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('top')">Top</button>
+          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('center-v')">V mid</button>
+          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('bottom')">Bottom</button>
+        </div>
       </div>
 
       <div v-if="activeTab === 'appearance' && w.type === 'image'" class="space-y-2">
@@ -219,6 +245,16 @@
         <label class="block text-xs text-[var(--text-secondary)]">Opacity (editor + PNG)</label>
         <input v-model.number="styleOpacity" type="range" min="0" max="1" step="0.01" class="w-full accent-[var(--primary)]" />
         <div class="text-right text-[10px] tabular-nums text-[var(--text-secondary)]">{{ Math.round(styleOpacity * 100) }}%</div>
+      </div>
+
+      <div
+        v-if="activeTab === 'appearance' && isTextLikeWidget"
+        class="space-y-1 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/40 p-2"
+      >
+        <BaseSwitch v-model="styleUseArabicReshaper" :label="$t('templateEditor.arabicShapingLabel')" />
+        <p class="text-[10px] leading-snug text-[var(--text-secondary)]">
+          {{ $t('templateEditor.arabicShapingHelp') }}
+        </p>
       </div>
 
       <div v-if="activeTab === 'appearance'" class="grid grid-cols-2 gap-2">
@@ -252,7 +288,12 @@ import { useTemplateEditorInjected } from './templateEditorInjectionKey.js'
 import { injectTemplateEditorFontFaces } from './templateEditorFonts.js'
 import { DATE_WIDGET_DATE_KEYS, WEEKDAY_WIDGET_KEYS } from './dateWidgetPresets.js'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
+import BaseSwitch from '@/components/ui/BaseSwitch.vue'
 import { toPersianDigits } from '@/utils/persianDigits.js'
+
+/** Range for widget font size in px. Do not use min 8 in v-model clamping — it turned "2" into 8 and "22" into 82 while typing. */
+const FONT_SIZE_MIN = 1
+const FONT_SIZE_MAX = 200
 
 const { t } = useI18n()
 const te = useTemplateEditorInjected()
@@ -277,7 +318,7 @@ const inspectorTabs = [
 
 const isTextLikeWidget = computed(() => {
   const ty = w.value?.type
-  return ['text', 'marquee', 'date', 'weekday', 'clock'].includes(ty)
+  return ['text', 'date', 'weekday', 'clock'].includes(ty)
 })
 const templateName = computed({
   get() {
@@ -387,7 +428,7 @@ function isPriceLikeBindingKey(raw) {
 
 const linkedPriceTypeId = computed(() => {
   const sw = w.value
-  if (!sw || (sw.type !== 'text' && sw.type !== 'marquee')) return null
+  if (!sw || sw.type !== 'text') return null
   const raw = sw.style?.priceTypeId ?? sw.style?.price_type_id
   if (raw == null || raw === '') return null
   const n = Number(raw)
@@ -396,7 +437,7 @@ const linkedPriceTypeId = computed(() => {
 
 const showPriceDigitLocale = computed(() => {
   const sw = w.value
-  if (!sw || (sw.type !== 'text' && sw.type !== 'marquee')) return false
+  if (!sw || sw.type !== 'text') return false
   if (linkedPriceTypeId.value != null) return true
   const bk = sw.style?.bindingKey ?? sw.style?.binding_key
   return isPriceLikeBindingKey(bk)
@@ -462,7 +503,7 @@ const selectedPriceTypeId = computed({
 
 const bindingPreviewInfo = computed(() => {
   const sw = w.value
-  if (!sw || (sw.type !== 'text' && sw.type !== 'marquee')) return null
+  if (!sw || sw.type !== 'text') return null
   const pt = linkedPriceTypeId.value
   let row = null
   if (pt != null) {
@@ -526,12 +567,15 @@ const styleFontSize = computed({
   get() {
     const s = w.value?.style
     const n = Number(s?.fontSize ?? s?.font_size ?? 24)
-    return Number.isFinite(n) ? Math.min(200, Math.max(8, n)) : 24
+    if (!Number.isFinite(n)) return 24
+    return Math.min(FONT_SIZE_MAX, Math.max(FONT_SIZE_MIN, n))
   },
   set(v) {
     const st = ensureStyle()
     if (!st) return
-    st.fontSize = Math.min(200, Math.max(8, Number(v) || 24))
+    const num = typeof v === 'number' ? v : Number(v)
+    if (!Number.isFinite(num)) return
+    st.fontSize = Math.min(FONT_SIZE_MAX, Math.max(FONT_SIZE_MIN, num))
     delete st.font_size
   },
 })
@@ -588,6 +632,48 @@ const styleAlign = computed({
     const st = ensureStyle()
     if (!st) return
     st.align = v || 'center'
+  },
+})
+
+const styleUseArabicReshaper = computed({
+  get() {
+    const s = w.value?.style
+    const v = s?.useArabicReshaper ?? s?.use_arabic_reshaper
+    if (v === false) return false
+    if (v === true) return true
+    return true
+  },
+  set(val) {
+    const st = ensureStyle()
+    if (!st) return
+    st.useArabicReshaper = Boolean(val)
+    delete st.use_arabic_reshaper
+    refitSelectedAfterTick()
+  },
+})
+
+const canAlignWidgetToBackground = computed(() =>
+  Boolean(te.template?.value?.image && te.backgroundImageContentRect?.value),
+)
+
+function alignWidgetToBackground(edge) {
+  te.alignSelectedToBackgroundEdge?.(edge)
+  refitSelectedAfterTick()
+}
+
+const styleVerticalAlign = computed({
+  get() {
+    const a = String(w.value?.style?.verticalAlign ?? w.value?.style?.vertical_align ?? 'middle').toLowerCase()
+    if (a === 'top' || a === 'start') return 'top'
+    if (a === 'bottom' || a === 'end') return 'bottom'
+    return 'middle'
+  },
+  set(v) {
+    const st = ensureStyle()
+    if (!st) return
+    const val = v === 'top' || v === 'bottom' ? v : 'middle'
+    st.verticalAlign = val
+    delete st.vertical_align
   },
 })
 

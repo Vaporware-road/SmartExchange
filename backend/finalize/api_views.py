@@ -16,13 +16,15 @@ from celery.exceptions import TimeoutError as CeleryTimeoutError
 
 from accounts.permissions import IsSuperAdminOrManagement
 from category.models import Category, PriceType
+from change_price.prefetch_helpers import prefetch_price_histories_latest
 from special_price.models import SpecialPriceType, SpecialPriceHistory
+from special_price.prefetch_helpers import prefetch_special_price_histories_latest
 from telegram_app.models import TelegramChannel
 from price_publisher.tasks import publish_category_prices_task, publish_special_price_task
 from setting.utils import log_finalize_event, log_telegram_event
 
 from instagram_hub.services.instagram_config import is_instagram_configured
-from instagram_hub.tasks import post_finalize_to_instagram_task
+from instagram_hub.tasks import schedule_instagram_post_finalize
 
 from .models import Finalization, FinalizedPriceHistory, SpecialPriceFinalization
 from .tasks import send_finalized_prices_task, send_finalized_special_prices_task
@@ -109,9 +111,11 @@ def _build_finalize_dashboard_data():
         .prefetch_related(
             Prefetch(
                 "price_types",
-                queryset=PriceType.objects.prefetch_related("price_histories").select_related(
+                queryset=PriceType.objects.select_related(
                     "source_currency", "target_currency"
-                ),
+                )
+                .prefetch_related(prefetch_price_histories_latest())
+                .order_by("order", "id"),
             )
         )
         .order_by("name")
@@ -192,12 +196,7 @@ def _build_finalize_dashboard_data():
 
     special_price_types = (
         SpecialPriceType.objects.defer(*_DASHBOARD_SPECIAL_TYPE_DEFER)
-        .prefetch_related(
-            Prefetch(
-                "special_price_histories",
-                queryset=SpecialPriceHistory.objects.order_by("-created_at"),
-            )
-        )
+        .prefetch_related(prefetch_special_price_histories_latest())
         .select_related("source_currency", "target_currency")
         .order_by("name")
     )
@@ -424,6 +423,14 @@ class FinalizeCategoryAPIView(APIView):
                     price_history_ids=[price_history.id for _, price_history in price_items]
                 )
             )
+            if is_instagram_configured():
+                transaction.on_commit(
+                    lambda cid=category.id: schedule_instagram_post_finalize(
+                        category_ids=[cid],
+                        special_price_history_ids=[],
+                        theme="dark",
+                    )
+                )
 
         total_prices_count = len(price_items)
         new_prices_count = len(pending_prices)
@@ -550,6 +557,14 @@ class FinalizeSpecialPriceAPIView(APIView):
                     special_price_history_ids=[special_price_history.id]
                 )
             )
+            if is_instagram_configured():
+                transaction.on_commit(
+                    lambda spid=special_price_history.id: schedule_instagram_post_finalize(
+                        category_ids=[],
+                        special_price_history_ids=[spid],
+                        theme="dark",
+                    )
+                )
 
         log_finalize_event(
             level="INFO" if message_sent else "WARNING",
@@ -713,9 +728,9 @@ class FinalizeAllAPIView(APIView):
 
         if is_instagram_configured() and (category_ids or special_price_history_ids):
             transaction.on_commit(
-                lambda: post_finalize_to_instagram_task.delay(
-                    category_ids=category_ids,
-                    special_price_history_ids=special_price_history_ids,
+                lambda cids=list(category_ids), spids=list(special_price_history_ids): schedule_instagram_post_finalize(
+                    category_ids=cids,
+                    special_price_history_ids=spids,
                     theme="dark",
                 )
             )

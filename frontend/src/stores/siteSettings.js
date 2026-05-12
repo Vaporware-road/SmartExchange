@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { settingsApi, templateEditorApi } from '@/services/api'
 import i18n from '@/i18n'
 import { editorFontFamilyToken, injectTemplateEditorFontFaces } from '@/pages/templates/templateEditorFonts'
+import { DEFAULT_SITE_NAME } from '@/constants/branding.js'
 
 function normalizeAssetUrl(value) {
   if (!value || typeof value !== 'string') return value
@@ -31,7 +32,7 @@ function normalizeAssetUrl(value) {
 export const useSiteSettingsStore = defineStore('siteSettings', {
   state: () => ({
     settings: {
-      site_name: 'SmartExchange',
+      site_name: DEFAULT_SITE_NAME,
       tagline: 'Premium Exchange Panel',
       logo: null,
       favicon: null,
@@ -49,12 +50,13 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
       linkedin_link: '',
       ui_font_filename_rtl: '',
       ui_font_filename_ltr: '',
+      prices_webhook_url: '',
     },
     loading: false,
   }),
 
   getters: {
-    siteName: (state) => state.settings.site_name ?? 'SmartExchange',
+    siteName: (state) => state.settings.site_name ?? DEFAULT_SITE_NAME,
     tagline: (state) => state.settings.tagline ?? 'Premium Exchange Panel',
   },
 
@@ -91,7 +93,7 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
 
     _applyDynamicAssets(data) {
       const t = i18n.global.t
-      const name = data.site_name || 'SmartExchange'
+      const name = data.site_name || DEFAULT_SITE_NAME
       document.title = `${name} | ${t('common.panel')}`
 
       if (data.favicon) {
@@ -106,7 +108,7 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
     },
 
     /**
-     * Set --font-ui-rtl / --font-ui-ltr and inject @font-face rules for /static/fonts (full list when API allows).
+     * Set --font-ui-rtl / --font-ui-ltr; inject @font-face for active UI font files (full list if subset incomplete).
      */
     async refreshUiTypography(settings) {
       if (typeof document === 'undefined') return
@@ -124,16 +126,33 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
       document.documentElement.style.setProperty('--font-ui-rtl', stackRtl)
       document.documentElement.style.setProperty('--font-ui-ltr', stackLtr)
 
-      const minimal = [...new Set([rtl, ltr].filter(Boolean))].map((fn) => ({
+      const neededNames = new Set([rtl, ltr].filter(Boolean))
+      const minimal = [...neededNames].map((fn) => ({
         filename: fn,
         display_name: fn,
       }))
       try {
         const { data } = await templateEditorApi.fonts()
-        injectTemplateEditorFontFaces(Array.isArray(data) ? data : [])
+        const full = Array.isArray(data) ? data : []
+        let faces = full.filter((f) => neededNames.has(f.filename))
+        if (neededNames.size > 0 && faces.length < neededNames.size) {
+          faces = full
+        }
+        if (faces.length === 0 && full.length > 0) {
+          faces = full
+        }
+        injectTemplateEditorFontFaces(faces.length ? faces : minimal)
       } catch {
         injectTemplateEditorFontFaces(minimal)
       }
+    },
+
+    /**
+     * Live preview in Settings (unsaved): merged with current store settings.
+     */
+    previewUiTypography(partial = {}) {
+      const merged = { ...this.settings, ...partial }
+      return this.refreshUiTypography(merged)
     },
   },
 })

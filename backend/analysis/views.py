@@ -4,9 +4,12 @@ import math
 from collections import defaultdict
 from datetime import timedelta, datetime, timezone as dt_timezone
 
+from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import OuterRef, Subquery, Count
+from django.db.models import DateTimeField, OuterRef, Subquery, Count
+from django.db.models.functions import Coalesce
 from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime
 from django.views.generic import TemplateView
 
 logger = logging.getLogger(__name__)
@@ -56,6 +59,87 @@ def _json_safe_float(value):
     return f if math.isfinite(f) else None
 
 
+def _parse_query_datetime(value):
+    """Parse ISO date or datetime from query string; return timezone-aware datetime or None."""
+    if value is None or value == "":
+        return None
+    if isinstance(value, datetime):
+        return _ensure_aware_datetime(value)
+    text = str(value).strip()
+    dt = parse_datetime(text)
+    if dt is not None:
+        return _ensure_aware_datetime(dt)
+    d = parse_date(text)
+    if d is not None:
+        naive = datetime.combine(d, datetime.min.time())
+        try:
+            return timezone.make_aware(naive, timezone.get_current_timezone())
+        except Exception:
+            return timezone.make_aware(naive, dt_timezone.utc)
+    return None
+
+
+def parse_analytics_query_params(request):
+    """
+    Build window bounds and optional filters from request.GET.
+    Defaults: last 30 days ending at now. Enforces max span (settings.ANALYTICS_MAX_RANGE_DAYS).
+    """
+    max_days = int(getattr(settings, "ANALYTICS_MAX_RANGE_DAYS", 366))
+    now = timezone.now()
+
+    end_raw = request.GET.get("end") if request else None
+    start_raw = request.GET.get("start") if request else None
+
+    window_end = _parse_query_datetime(end_raw) if end_raw else now
+    if window_end is None:
+        window_end = now
+    if window_end > now:
+        window_end = now
+
+    window_start = _parse_query_datetime(start_raw) if start_raw else None
+    if window_start is None:
+        window_start = window_end - timedelta(days=30)
+
+    if window_start > window_end:
+        window_start = window_end - timedelta(days=30)
+
+    span_days = (window_end - window_start).total_seconds() / 86400.0
+    if span_days > max_days:
+        window_start = window_end - timedelta(days=max_days)
+
+    stats_week_start = max(window_start, window_end - timedelta(days=7))
+    trend_window_start = max(window_start, window_end - timedelta(days=90))
+
+    category_id = None
+    if request and request.GET.get("category_id"):
+        try:
+            category_id = int(request.GET["category_id"])
+        except (TypeError, ValueError):
+            category_id = None
+
+    price_type_ids = None
+    if request and request.GET.get("price_type_ids"):
+        raw = request.GET.get("price_type_ids", "")
+        ids = []
+        for part in raw.replace(" ", "").split(","):
+            if not part:
+                continue
+            try:
+                ids.append(int(part))
+            except ValueError:
+                continue
+        price_type_ids = ids if ids else None
+
+    return {
+        "window_start": window_start,
+        "window_end": window_end,
+        "stats_week_start": stats_week_start,
+        "trend_window_start": trend_window_start,
+        "category_id": category_id,
+        "price_type_ids": price_type_ids,
+    }
+
+
 class AnalyticsDashboardView(TemplateView):
     template_name = "analysis/dashboard.html"
 
@@ -75,19 +159,24 @@ class AnalyticsDashboardView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # Determine the time window for the line charts
-        window_start = timezone.now() - timedelta(days=30)
-        week_start = timezone.now() - timedelta(days=7)
+        # Determine the time window for the line charts (server HTML dashboard)
+        window_end = timezone.now()
+        window_start = window_end - timedelta(days=30)
+        stats_week_start = max(window_start, window_end - timedelta(days=7))
 
         # Regular prices
         price_types = self._get_price_types_with_latest_prices()
-        timelines = self._build_timelines(price_types, window_start)
+        timelines = self._build_timelines(price_types, window_start, window_end)
         latest_cards = self._build_latest_cards(price_types)
-        price_statistics = self._calculate_price_statistics(price_types, window_start)
+        price_statistics = self._calculate_price_statistics(
+            price_types, window_start, window_end
+        )
 
         # Special prices
         special_price_types = self._get_special_price_types_with_latest()
-        special_timelines = self._build_special_timelines(special_price_types, window_start)
+        special_timelines = self._build_special_timelines(
+            special_price_types, window_start, window_end
+        )
         special_cards = self._build_special_cards(special_price_types)
 
         # Category and summary data
@@ -95,10 +184,14 @@ class AnalyticsDashboardView(TemplateView):
         top_movers = self._derive_top_movers(latest_cards)
         
         # Finalization statistics
-        finalization_stats = self._get_finalization_statistics(week_start)
+        finalization_stats = self._get_finalization_statistics(
+            stats_week_start, window_end
+        )
         
         # Overall statistics
-        overall_stats = self._get_overall_statistics(price_types, special_price_types, week_start)
+        overall_stats = self._get_overall_statistics(
+            price_types, special_price_types, stats_week_start, window_end
+        )
 
         context.update(
             {
@@ -117,34 +210,61 @@ class AnalyticsDashboardView(TemplateView):
 
         return context
 
-    def get_analytics_data(self):
+    def get_analytics_data(self, request=None):
         """
         Build analytics data for API consumption.
         Returns a dict with all dashboard metrics (no JSON stringification).
+        Optional ``request`` supplies GET params: start, end, category_id, price_type_ids.
         """
-        window_start = timezone.now() - timedelta(days=30)
-        week_start = timezone.now() - timedelta(days=7)
+        q = parse_analytics_query_params(request)
+        window_start = q["window_start"]
+        window_end = q["window_end"]
+        stats_week_start = q["stats_week_start"]
+        trend_window_start = q["trend_window_start"]
+        category_id = q["category_id"]
+        price_type_ids = q["price_type_ids"]
 
         price_types = self._get_price_types_with_latest_prices()
-        timelines = self._build_timelines(price_types, window_start)
+        if category_id is not None:
+            price_types = price_types.filter(category_id=category_id)
+        if price_type_ids is not None:
+            price_types = price_types.filter(id__in=price_type_ids)
+
+        timelines = self._build_timelines(price_types, window_start, window_end)
         latest_cards = self._build_latest_cards(price_types)
-        price_statistics = self._calculate_price_statistics(price_types, window_start)
+        price_statistics = self._calculate_price_statistics(
+            price_types, window_start, window_end
+        )
 
         special_price_types = self._get_special_price_types_with_latest()
-        special_timelines = self._build_special_timelines(special_price_types, window_start)
+        special_timelines = self._build_special_timelines(
+            special_price_types, window_start, window_end
+        )
         special_cards = self._build_special_cards(special_price_types)
 
         category_summary = self._build_category_summary(latest_cards)
         top_movers = self._derive_top_movers(latest_cards)
-        finalization_stats = self._get_finalization_statistics(week_start)
+        finalization_stats = self._get_finalization_statistics(
+            stats_week_start, window_end
+        )
         overall_stats = self._get_overall_statistics(
-            price_types, special_price_types, week_start
+            price_types, special_price_types, stats_week_start, window_end
         )
         try:
-            telegram_engagement = self._build_telegram_engagement(window_start)
+            telegram_engagement = self._build_telegram_engagement(
+                window_start, window_end
+            )
         except Exception:
             logger.exception("Failed to build telegram engagement for analytics dashboard")
             telegram_engagement = {"timeline": [], "channels": []}
+
+        try:
+            last_updated_price_trend = self._build_last_updated_price_trend(
+                trend_window_start, window_end
+            )
+        except Exception:
+            logger.exception("Failed to build last_updated_price_trend")
+            last_updated_price_trend = None
 
         def _serialize_card(card):
             c = dict(card)
@@ -178,6 +298,10 @@ class AnalyticsDashboardView(TemplateView):
 
         return {
             "generated_at": timezone.localtime(timezone.now()).isoformat(),
+            "range": {
+                "start": timezone.localtime(window_start).isoformat(),
+                "end": timezone.localtime(window_end).isoformat(),
+            },
             "latest_cards": [_serialize_card(c) for c in latest_cards],
             "special_cards": [_serialize_card(c) for c in special_cards],
             "top_movers": [_serialize_card(c) for c in top_movers],
@@ -188,6 +312,7 @@ class AnalyticsDashboardView(TemplateView):
             "special_timeline_data": special_timelines,
             "category_summary": category_summary,
             "telegram_engagement": telegram_engagement,
+            "last_updated_price_trend": last_updated_price_trend,
         }
 
     def _get_price_types_with_latest_prices(self):
@@ -213,27 +338,35 @@ class AnalyticsDashboardView(TemplateView):
         )
         return price_types
 
-    def _build_timelines(self, price_types, window_start):
+    def _build_timelines(self, price_types, window_start, window_end):
         relevant_ids = [pt.id for pt in price_types if pt.latest_price is not None]
         
         if not relevant_ids:
             return []
 
         history_qs = (
-            PriceHistory.objects.filter(price_type_id__in=relevant_ids, created_at__gte=window_start)
+            PriceHistory.objects.filter(price_type_id__in=relevant_ids)
+            .annotate(
+                effective_ts=Coalesce(
+                    "event_at",
+                    "created_at",
+                    output_field=DateTimeField(),
+                )
+            )
+            .filter(effective_ts__gte=window_start, effective_ts__lte=window_end)
             .select_related(
                 "price_type",
                 "price_type__category",
                 "price_type__source_currency",
                 "price_type__target_currency",
             )
-            .order_by("price_type_id", "created_at")
+            .order_by("price_type_id", "effective_ts")
         )
 
         timeline_map = defaultdict(list)
         for history in history_qs:
             # Convert datetime to ISO string for Chart.js compatibility
-            ts = _ensure_aware_datetime(history.created_at)
+            ts = _ensure_aware_datetime(history.effective_ts)
             timestamp = timezone.localtime(ts).isoformat() if ts else ""
             timeline_map[history.price_type_id].append(
                 {
@@ -262,6 +395,114 @@ class AnalyticsDashboardView(TemplateView):
             )
 
         return datasets
+
+    def _build_last_updated_price_trend(self, window_start, window_end):
+        """
+        Single-series timeline for the regular or special price row that was updated most recently.
+        Used by the dashboard Price Trends chart (full history within ``window_start``).
+        """
+        latest_regular = (
+            PriceHistory.objects.select_related(
+                "price_type",
+                "price_type__category",
+                "price_type__source_currency",
+                "price_type__target_currency",
+            )
+            .order_by("-created_at")
+            .first()
+        )
+        latest_special = (
+            SpecialPriceHistory.objects.select_related(
+                "special_price_type",
+                "special_price_type__source_currency",
+                "special_price_type__target_currency",
+            )
+            .order_by("-created_at")
+            .first()
+        )
+
+        pick_regular = None
+        if latest_regular and latest_special:
+            pick_regular = latest_regular.created_at >= latest_special.created_at
+        elif latest_regular:
+            pick_regular = True
+        elif latest_special:
+            pick_regular = False
+        else:
+            return None
+
+        if pick_regular:
+            pt = latest_regular.price_type
+            histories = (
+                PriceHistory.objects.filter(price_type_id=pt.id)
+                .annotate(
+                    effective_ts=Coalesce(
+                        "event_at",
+                        "created_at",
+                        output_field=DateTimeField(),
+                    )
+                )
+                .filter(effective_ts__gte=window_start, effective_ts__lte=window_end)
+                .order_by("effective_ts")
+            )
+            label = (
+                f"{pt.name} — {pt.source_currency.code}/{pt.target_currency.code} "
+                f"{pt.get_trade_type_display()}"
+            )
+            data = []
+            for h in histories:
+                ts = _ensure_aware_datetime(h.effective_ts)
+                timestamp = timezone.localtime(ts).isoformat() if ts else ""
+                data.append(
+                    {
+                        "x": timestamp,
+                        "y": _json_safe_float(h.price) or 0.0,
+                    }
+                )
+            if not data:
+                return None
+            return {
+                "kind": "regular",
+                "price_type_id": pt.id,
+                "label": label,
+                "data": data,
+            }
+
+        spt = latest_special.special_price_type
+        histories = (
+            SpecialPriceHistory.objects.filter(special_price_type_id=spt.id)
+            .annotate(
+                effective_ts=Coalesce(
+                    "event_at",
+                    "created_at",
+                    output_field=DateTimeField(),
+                )
+            )
+            .filter(effective_ts__gte=window_start, effective_ts__lte=window_end)
+            .order_by("effective_ts")
+        )
+        label = (
+            f"{spt.name} — {spt.source_currency.code}/{spt.target_currency.code} "
+            f"{spt.get_trade_type_display()} [Special]"
+        )
+        data = []
+        for h in histories:
+            ts = _ensure_aware_datetime(h.effective_ts)
+            timestamp = timezone.localtime(ts).isoformat() if ts else ""
+            data.append(
+                {
+                    "x": timestamp,
+                    "y": _json_safe_float(h.price) or 0.0,
+                }
+            )
+        if not data:
+            return None
+        return {
+            "kind": "special",
+            "special_price_type_id": spt.id,
+            "label": label,
+            "data": data,
+        }
 
     def _build_latest_cards(self, price_types):
         cards = []
@@ -355,7 +596,7 @@ class AnalyticsDashboardView(TemplateView):
         )
         return special_price_types
     
-    def _build_special_timelines(self, special_price_types, window_start):
+    def _build_special_timelines(self, special_price_types, window_start, window_end):
         """Build timeline data for special prices."""
         relevant_ids = [spt.id for spt in special_price_types if spt.latest_price is not None]
         
@@ -363,22 +604,27 @@ class AnalyticsDashboardView(TemplateView):
             return []
 
         history_qs = (
-            SpecialPriceHistory.objects.filter(
-                special_price_type_id__in=relevant_ids, 
-                created_at__gte=window_start
+            SpecialPriceHistory.objects.filter(special_price_type_id__in=relevant_ids)
+            .annotate(
+                effective_ts=Coalesce(
+                    "event_at",
+                    "created_at",
+                    output_field=DateTimeField(),
+                )
             )
+            .filter(effective_ts__gte=window_start, effective_ts__lte=window_end)
             .select_related(
                 "special_price_type",
                 "special_price_type__source_currency",
                 "special_price_type__target_currency",
             )
-            .order_by("special_price_type_id", "created_at")
+            .order_by("special_price_type_id", "effective_ts")
         )
 
         timeline_map = defaultdict(list)
         for history in history_qs:
             # Convert datetime to ISO string for Chart.js compatibility
-            ts = _ensure_aware_datetime(history.created_at)
+            ts = _ensure_aware_datetime(history.effective_ts)
             timestamp = timezone.localtime(ts).isoformat() if ts else ""
             timeline_map[history.special_price_type_id].append(
                 {
@@ -450,7 +696,7 @@ class AnalyticsDashboardView(TemplateView):
 
         return cards
     
-    def _calculate_price_statistics(self, price_types, window_start):
+    def _calculate_price_statistics(self, price_types, window_start, window_end):
         """Calculate advanced statistics for prices."""
         stats = {}
         
@@ -458,10 +704,18 @@ class AnalyticsDashboardView(TemplateView):
             if price_type.latest_price is None:
                 continue
             
-            histories = PriceHistory.objects.filter(
-                price_type=price_type,
-                created_at__gte=window_start
-            ).order_by('created_at')
+            histories = (
+                PriceHistory.objects.filter(price_type=price_type)
+                .annotate(
+                    effective_ts=Coalesce(
+                        "event_at",
+                        "created_at",
+                        output_field=DateTimeField(),
+                    )
+                )
+                .filter(effective_ts__gte=window_start, effective_ts__lte=window_end)
+                .order_by("effective_ts")
+            )
             
             if histories.count() < 2:
                 continue
@@ -515,16 +769,22 @@ class AnalyticsDashboardView(TemplateView):
         
         return stats
     
-    def _get_finalization_statistics(self, week_start):
+    def _get_finalization_statistics(self, week_start, window_end):
         """Get statistics about finalizations."""
         total_finalizations = Finalization.objects.count()
-        week_finalizations = Finalization.objects.filter(finalized_at__gte=week_start).count()
+        week_finalizations = Finalization.objects.filter(
+            finalized_at__gte=week_start,
+            finalized_at__lte=window_end,
+        ).count()
         
         successful_telegram = Finalization.objects.filter(message_sent=True).count()
         failed_telegram = Finalization.objects.filter(message_sent=False).count()
         
         special_finalizations = SpecialPriceFinalization.objects.count()
-        week_special = SpecialPriceFinalization.objects.filter(finalized_at__gte=week_start).count()
+        week_special = SpecialPriceFinalization.objects.filter(
+            finalized_at__gte=week_start,
+            finalized_at__lte=window_end,
+        ).count()
         
         # Get most active categories
         category_stats = (
@@ -552,13 +812,21 @@ class AnalyticsDashboardView(TemplateView):
             "channel_stats": list(channel_stats),
         }
     
-    def _get_overall_statistics(self, price_types, special_price_types, week_start):
+    def _get_overall_statistics(
+        self, price_types, special_price_types, week_start, window_end
+    ):
         """Get overall system statistics."""
         total_price_updates = PriceHistory.objects.count()
-        week_price_updates = PriceHistory.objects.filter(created_at__gte=week_start).count()
+        week_price_updates = PriceHistory.objects.filter(
+            created_at__gte=week_start,
+            created_at__lte=window_end,
+        ).count()
         
         total_special_updates = SpecialPriceHistory.objects.count()
-        week_special_updates = SpecialPriceHistory.objects.filter(created_at__gte=week_start).count()
+        week_special_updates = SpecialPriceHistory.objects.filter(
+            created_at__gte=week_start,
+            created_at__lte=window_end,
+        ).count()
         
         active_categories = Category.objects.count()
         active_price_types = PriceType.objects.count()
@@ -577,7 +845,7 @@ class AnalyticsDashboardView(TemplateView):
             "active_channels": active_channels,
         }
 
-    def _build_telegram_engagement(self, window_start):
+    def _build_telegram_engagement(self, window_start, window_end):
         """
         Build engagement statistics for Telegram publications.
 
@@ -600,7 +868,10 @@ class AnalyticsDashboardView(TemplateView):
         # Timeline: aggregate successful/failed posts per day
         day_buckets = defaultdict(lambda: {"success": 0, "failed": 0})
 
-        final_qs = Finalization.objects.filter(finalized_at__gte=window_start)
+        final_qs = Finalization.objects.filter(
+            finalized_at__gte=window_start,
+            finalized_at__lte=window_end,
+        )
         for f in final_qs:
             day = timezone.localtime(_ensure_aware_datetime(f.finalized_at)).date()
             bucket = day_buckets[day]
@@ -610,7 +881,8 @@ class AnalyticsDashboardView(TemplateView):
                 bucket["failed"] += 1
 
         special_qs = SpecialPriceFinalization.objects.filter(
-            finalized_at__gte=window_start
+            finalized_at__gte=window_start,
+            finalized_at__lte=window_end,
         )
         for sf in special_qs:
             day = timezone.localtime(_ensure_aware_datetime(sf.finalized_at)).date()

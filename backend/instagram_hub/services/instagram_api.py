@@ -9,8 +9,6 @@ import time
 
 import requests
 
-from django.conf import settings
-
 from instagram_hub.models import InstagramConfig
 from instagram_hub.utils import path_to_public_url
 
@@ -50,6 +48,75 @@ def _get_credentials() -> tuple:
     return None, None
 
 
+def create_media_container(
+    ig_user_id: str,
+    token: str,
+    image_url: str,
+    caption: str,
+    is_story: bool,
+) -> dict:
+    """
+    POST /{ig-user-id}/media — create container.
+
+    Returns dict: success (bool), container_id (str|None), message (str).
+    """
+    payload = {"image_url": image_url, "access_token": token}
+    cap = (caption or "")[:CAPTION_MAX] if not is_story else ""
+    if not is_story and cap:
+        payload["caption"] = cap
+    if is_story:
+        payload["media_type"] = "STORIES"
+    create_url = f"{GRAPH_API_BASE}/{ig_user_id}/media"
+    try:
+        r = requests.post(create_url, data=payload, timeout=REQUEST_TIMEOUT)
+        r.raise_for_status()
+        data = r.json()
+        container_id = data.get("id")
+        if not container_id:
+            err = data.get("error", {})
+            return {
+                "success": False,
+                "container_id": None,
+                "message": err.get("message", "No container id"),
+            }
+        return {"success": True, "container_id": str(container_id), "message": "ok"}
+    except requests.RequestException as e:
+        msg = str(e)
+        if getattr(e, "response", None) is not None:
+            try:
+                msg = e.response.json().get("error", {}).get("message", msg)
+            except Exception:
+                pass
+        return {"success": False, "container_id": None, "message": msg}
+
+
+def publish_media_container(ig_user_id: str, token: str, creation_id: str) -> dict:
+    """
+    POST /{ig-user-id}/media_publish — publish a container.
+
+    Returns dict: success (bool), media_id (str|None), message (str).
+    """
+    try:
+        r2 = requests.post(
+            f"{GRAPH_API_BASE}/{ig_user_id}/media_publish",
+            data={"creation_id": creation_id, "access_token": token},
+            timeout=REQUEST_TIMEOUT,
+        )
+        r2.raise_for_status()
+        media_id = r2.json().get("id")
+        if not media_id:
+            return {"success": False, "media_id": None, "message": "No media id in response"}
+        return {"success": True, "media_id": str(media_id), "message": "Published"}
+    except requests.RequestException as e:
+        msg = str(e)
+        if getattr(e, "response", None) is not None:
+            try:
+                msg = e.response.json().get("error", {}).get("message", msg)
+            except Exception:
+                pass
+        return {"success": False, "media_id": None, "message": msg}
+
+
 def publish_to_instagram(
     image_url_or_path: str,
     caption: str = "",
@@ -59,70 +126,83 @@ def publish_to_instagram(
     """
     Publish image to Instagram. image_url_or_path: public URL or filesystem path.
 
-    Returns dict: {success, message, id (media_id if success)}.
+    Returns dict: {success, message, id (media_id if success), creation_id (container if known)}.
     """
     ig_user_id, token = _get_credentials()
     if not ig_user_id or not token:
-        return {"success": False, "message": "Instagram not configured"}
+        return {"success": False, "message": "Instagram not configured", "creation_id": None}
 
     image_url = image_url_or_path
     if not image_url.startswith("http"):
         image_url = path_to_public_url(image_url_or_path, request=request)
     if not image_url or not image_url.startswith("http"):
-        return {"success": False, "message": "Image URL not accessible (set INSTAGRAM_BASE_URL for local paths)"}
+        return {
+            "success": False,
+            "message": "Image URL not accessible (set INSTAGRAM_BASE_URL for local paths)",
+            "creation_id": None,
+        }
 
     caption = (caption or "")[:CAPTION_MAX] if not is_story else ""
 
-    payload = {"image_url": image_url, "access_token": token}
-    if not is_story and caption:
-        payload["caption"] = caption
-    if is_story:
-        payload["media_type"] = "STORIES"
-
-    create_url = f"{GRAPH_API_BASE}/{ig_user_id}/media"
-    last_error = None
+    last_creation_id = None
+    last_message = "Unknown error"
 
     for attempt in range(1, MAX_RETRIES + 1):
-        try:
-            r = requests.post(create_url, data=payload, timeout=REQUEST_TIMEOUT)
-            r.raise_for_status()
-            data = r.json()
-            container_id = data.get("id")
-            if not container_id:
-                err = data.get("error", {})
-                return {"success": False, "message": err.get("message", "No container id")}
-
-            r2 = requests.post(
-                f"{GRAPH_API_BASE}/{ig_user_id}/media_publish",
-                data={"creation_id": container_id, "access_token": token},
-                timeout=REQUEST_TIMEOUT,
+        cr = create_media_container(
+            ig_user_id, token, image_url, caption, is_story=is_story
+        )
+        if not cr.get("success"):
+            last_message = cr.get("message", "Create failed")
+            last_creation_id = None
+            logger.warning(
+                "Instagram publish attempt %d/%d (create): %s",
+                attempt,
+                MAX_RETRIES,
+                last_message,
             )
-            r2.raise_for_status()
-            media_id = r2.json().get("id")
-            logger.info("Instagram publish: media_id=%s is_story=%s", media_id, is_story)
-            return {"success": True, "message": "Published", "id": media_id}
-        except requests.RequestException as e:
-            last_error = e
-            msg = str(e)
-            if getattr(e, "response", None) is not None:
-                try:
-                    msg = e.response.json().get("error", {}).get("message", msg)
-                except Exception:
-                    pass
-            logger.warning("Instagram publish attempt %d/%d: %s", attempt, MAX_RETRIES, msg)
             if attempt < MAX_RETRIES:
                 time.sleep(RETRY_DELAY_SECONDS)
+                continue
+            break
 
-    msg = str(last_error)[:500] if last_error else "Unknown error"
-    error_code = None
-    if last_error and getattr(last_error, "response", None) is not None:
-        try:
-            error_code = last_error.response.json().get("error", {}).get("code")
-        except Exception:
-            pass
+        creation_id = cr["container_id"]
+        last_creation_id = creation_id
+        pr = publish_media_container(ig_user_id, token, creation_id)
+        if pr.get("success"):
+            media_id = pr.get("media_id")
+            logger.info("Instagram publish: media_id=%s is_story=%s", media_id, is_story)
+            return {
+                "success": True,
+                "message": "Published",
+                "id": media_id,
+                "creation_id": creation_id,
+            }
+        last_message = pr.get("message", "Publish failed")
+        logger.warning(
+            "Instagram publish attempt %d/%d (publish): %s",
+            attempt,
+            MAX_RETRIES,
+            last_message,
+        )
+        if attempt < MAX_RETRIES:
+            time.sleep(RETRY_DELAY_SECONDS)
+            continue
+        break
+
+    msg = str(last_message)[:500]
     try:
         from setting.utils import log_event
-        log_event(level="ERROR", source="other", message="Instagram post failed: %s" % msg, details=("Error code: %s" % error_code if error_code else None), user=None)
+        log_event(
+            level="ERROR",
+            source="other",
+            message="Instagram post failed: %s" % msg,
+            details=None,
+            user=None,
+        )
     except Exception:
         pass
-    return {"success": False, "message": msg}
+    return {
+        "success": False,
+        "message": msg,
+        "creation_id": last_creation_id,
+    }

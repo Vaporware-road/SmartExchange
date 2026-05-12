@@ -1,6 +1,19 @@
+import math
+
 from rest_framework import serializers
 
 from .models import Category, Currency, PriceType
+
+
+def _json_safe_api_float(value):
+    """Avoid NaN/inf in JSON (breaks DRF JSONRenderer → 500)."""
+    if value is None:
+        return None
+    try:
+        x = float(value)
+    except (TypeError, ValueError):
+        return None
+    return x if math.isfinite(x) else None
 
 
 def _resolve_preview_template(category_obj):
@@ -103,7 +116,9 @@ class PriceTypeExplorerSerializer(serializers.ModelSerializer):
     def get_latest_price(self, obj):
         histories = self._get_recent_histories(obj)
         first = histories[0] if histories else None
-        return first.price if first else None
+        if not first or first.price is None:
+            return None
+        return _json_safe_api_float(first.price)
 
     def get_latest_price_at(self, obj):
         histories = self._get_recent_histories(obj)
@@ -116,7 +131,13 @@ class PriceTypeExplorerSerializer(serializers.ModelSerializer):
             return None
         latest = histories[0].price
         previous = histories[1].price
-        return latest - previous
+        if latest is None or previous is None:
+            return None
+        try:
+            delta = float(latest) - float(previous)
+        except (TypeError, ValueError):
+            return None
+        return _json_safe_api_float(delta)
 
     def get_change_percent(self, obj):
         histories = self._get_recent_histories(obj)
@@ -124,9 +145,17 @@ class PriceTypeExplorerSerializer(serializers.ModelSerializer):
             return None
         latest = histories[0].price
         previous = histories[1].price
-        if previous == 0:
+        if latest is None or previous is None:
             return None
-        return ((latest - previous) / previous) * 100
+        try:
+            lp = float(latest)
+            pp = float(previous)
+        except (TypeError, ValueError):
+            return None
+        if pp == 0:
+            return None
+        pct = ((lp - pp) / pp) * 100
+        return _json_safe_api_float(pct)
 
 
 class CategorySerializer(serializers.ModelSerializer):

@@ -4,7 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from django.db import IntegrityError, transaction
 from django.db.models import Prefetch, Max
+
 from django.shortcuts import get_object_or_404
+
+from change_price.prefetch_helpers import prefetch_price_histories_latest
 
 from core.exceptions import error_response
 from .models import Category, Currency, PriceType
@@ -32,9 +35,12 @@ class CategoryViewSet(viewsets.ModelViewSet):
             qs = qs.prefetch_related(
                 Prefetch(
                     "price_types",
-                    queryset=PriceType.objects.order_by("order", "id"),
+                    queryset=PriceType.objects.select_related(
+                        "source_currency", "target_currency"
+                    )
+                    .prefetch_related(prefetch_price_histories_latest())
+                    .order_by("order", "id"),
                 ),
-                "price_types__price_histories",
             )
         return qs
 

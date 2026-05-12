@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from core.exceptions import error_response
+from core.prices_webhook import notify_prices_webhook
 from setting.utils import log_event
 from accounts.utils import log_activity
 from accounts.models import UserActivityLog
@@ -84,6 +85,7 @@ class SpecialPriceUpdateAPIView(APIView):
                 ),
             )
 
+        notify_prices_webhook("special_price.single")
         return Response(
             SpecialPriceHistorySerializer(ph).data,
             status=status.HTTP_201_CREATED,

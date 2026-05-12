@@ -101,6 +101,7 @@
               >
                   <img
                     v-if="imageUrl"
+                    ref="baseImageEl"
                     :src="imageUrl"
                     alt=""
                     class="pointer-events-none absolute inset-0 h-full w-full object-contain opacity-100"
@@ -112,7 +113,6 @@
                     :key="item.id"
                     :ref="(el) => setWidgetEl(item.id, el)"
                     class="absolute box-border will-change-transform"
-                    :class="[selectedId === item.id ? 'ring-2 ring-inset ring-[var(--primary)]/80' : '']"
                     :style="widgetDomStyle(item)"
                     :data-wid="item.id"
                     @mousedown.stop="selectWidget(item.id)"
@@ -207,6 +207,7 @@ const categoryPriceTypes = ref([])
 
 const viewportRef = ref(null)
 const canvasRootRef = ref(null)
+const baseImageEl = ref(null)
 const widgetEls = new Map()
 
 const scale = ref(0.35)
@@ -231,6 +232,58 @@ const sortedWidgets = computed(() => [...widgets.value].sort((a, b) => (a.zIndex
 const imageUrl = computed(() => {
   return normalizeTemplateImageUrl(template.value?.image)
 })
+
+/** Pixel rect where the background image is painted (`object-fit: contain` inside the canvas). Used for snap-to-image alignment. */
+const backgroundImageContentRect = computed(() => {
+  const cw = canvasW.value
+  const ch = canvasH.value
+  const el = baseImageEl.value
+  if (!el?.naturalWidth || !el?.naturalHeight || cw < 1 || ch < 1) return null
+  const iw = el.naturalWidth
+  const ih = el.naturalHeight
+  const s = Math.min(cw / iw, ch / ih)
+  const dw = iw * s
+  const dh = ih * s
+  const ox = (cw - dw) / 2
+  const oy = (ch - dh) / 2
+  return {
+    left: ox,
+    top: oy,
+    width: dw,
+    height: dh,
+    right: ox + dw,
+    bottom: oy + dh,
+  }
+})
+
+function alignSelectedToBackgroundEdge(edge) {
+  const w = selectedWidget.value
+  const r = backgroundImageContentRect.value
+  if (!w || !r) return
+  switch (edge) {
+    case 'top':
+      w.y = Math.round(r.top)
+      break
+    case 'bottom':
+      w.y = Math.round(r.bottom - w.height)
+      break
+    case 'left':
+      w.x = Math.round(r.left)
+      break
+    case 'right':
+      w.x = Math.round(r.right - w.width)
+      break
+    case 'center-h':
+      w.x = Math.round(r.left + (r.width - w.width) / 2)
+      break
+    case 'center-v':
+      w.y = Math.round(r.top + (r.height - w.height) / 2)
+      break
+    default:
+      return
+  }
+  clampWidgetToCanvas(w)
+}
 
 function normalizeTemplateImageUrl(rawUrl) {
   if (!rawUrl || typeof rawUrl !== 'string') return ''
@@ -278,7 +331,7 @@ function clampWidgetToCanvas(w) {
   w.y = Math.min(maxY, Math.max(0, w.y || 0))
 }
 
-const TEXT_LIKE_WIDGETS = new Set(['text', 'marquee', 'date', 'clock', 'weekday'])
+const TEXT_LIKE_WIDGETS = new Set(['text', 'date', 'clock', 'weekday'])
 
 /** Editor-only frame: text-like widgets show raw text; image keeps a light frame. */
 function widgetInnerChromeClass(type) {
@@ -358,7 +411,7 @@ function addWidget(type, extra = null) {
       base.style = { ...base.style, ...extra.style }
     }
   }
-  if (type === 'text' || type === 'marquee') {
+  if (type === 'text') {
     base.width = Math.min(640, cw * 0.45)
     base.height = Math.min(120, ch * 0.12)
     if (!String(base.content || '').trim()) {
@@ -500,7 +553,7 @@ function parseTransform(target) {
   }
 }
 
-const FONT_AUTOSCALE_TYPES = new Set(['text', 'marquee', 'date', 'weekday', 'clock'])
+const FONT_AUTOSCALE_TYPES = new Set(['text', 'date', 'weekday', 'clock'])
 
 function refitSelectedTextWidget() {
   const sw = selectedWidget.value
@@ -614,20 +667,24 @@ function loadWidgetsFromConfigJson(cj) {
   const cw = canvasW.value
   const ch = canvasH.value
   const list = Array.isArray(cj?.widgets) ? cj.widgets : []
-  widgets.value = list.map((raw) => ({
-    id: String(raw.id),
-    type: raw.type || 'text',
-    name: raw.name || defaultName(raw.type || 'text'),
-    x: pctToPx(raw.x, cw),
-    y: pctToPx(raw.y, ch),
-    width: pctToPx(raw.width, cw),
-    height: pctToPx(raw.height, ch),
-    rotation: Number(raw.rotation) || 0,
-    zIndex: Number(raw.zIndex) || 1,
-    visible: raw.visible !== false,
-    content: raw.content ?? '',
-    style: raw.style && typeof raw.style === 'object' ? { ...raw.style } : {},
-  }))
+  widgets.value = list.map((raw) => {
+    const rawType = String(raw.type || 'text').trim() || 'text'
+    const widgetType = rawType === 'marquee' ? 'text' : rawType
+    return {
+      id: String(raw.id),
+      type: widgetType,
+      name: raw.name || defaultName(widgetType),
+      x: pctToPx(raw.x, cw),
+      y: pctToPx(raw.y, ch),
+      width: pctToPx(raw.width, cw),
+      height: pctToPx(raw.height, ch),
+      rotation: Number(raw.rotation) || 0,
+      zIndex: Number(raw.zIndex) || 1,
+      visible: raw.visible !== false,
+      content: raw.content ?? '',
+      style: raw.style && typeof raw.style === 'object' ? { ...raw.style } : {},
+    }
+  })
 }
 
 async function save() {
@@ -761,6 +818,8 @@ provideTemplateEditor({
   categoryPriceTypes,
   backgroundColor,
   saveState,
+  backgroundImageContentRect,
+  alignSelectedToBackgroundEdge,
 })
 
 onMounted(async () => {

@@ -1,25 +1,55 @@
+import logging
 from datetime import timedelta
 
-from django.db.models import Prefetch
+from django.conf import settings
 from django.utils import timezone
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from category.models import Category, PriceType
+from category.models import PriceType
 from change_price.models import PriceHistory
+from change_price.prefetch_helpers import prefetch_price_histories_latest
 from setting.models import Log
-from special_price.models import SpecialPriceType, SpecialPriceHistory
 from telegram_app.models import TelegramBot, TelegramChannel
+
+logger = logging.getLogger(__name__)
 
 
 class DashboardSummaryAPIView(APIView):
 
     def get(self, request):
+        try:
+            return self._get_summary_response()
+        except Exception as exc:
+            logger.exception("DashboardSummaryAPIView.get failed")
+            detail = str(exc) if getattr(settings, "DEBUG", False) else ""
+            payload = {
+                "degraded": True,
+                "detail": detail or "Summary temporarily unavailable.",
+                "highest_price": 0,
+                "highest_price_label": "N/A",
+                "avg_24h_change": 0,
+                "biggest_change": None,
+                "price_changes": [],
+                "total_bots": 0,
+                "active_bots": 0,
+                "total_channels": 0,
+                "active_channels": 0,
+                "total_price_types": 0,
+                "total_price_updates": 0,
+                "latest_update_time": None,
+                "recent_updates_24h": 0,
+                "last_price_update_by": None,
+            }
+            return Response(payload)
+
+    def _get_summary_response(self):
         now = timezone.now()
         twenty_four_hours_ago = now - timedelta(hours=24)
 
         highest_price_obj = (
-            PriceHistory.objects.select_related("price_type")
+            PriceHistory.objects.defer("event_at")
+            .select_related("price_type")
             .order_by("-price")
             .first()
         )
@@ -29,7 +59,7 @@ class DashboardSummaryAPIView(APIView):
         )
 
         price_changes = []
-        price_types = PriceType.objects.prefetch_related("price_histories").all()
+        price_types = PriceType.objects.prefetch_related(prefetch_price_histories_latest()).all()
         for pt in price_types:
             latest = pt.price_histories.first()
             if not latest:
@@ -67,7 +97,7 @@ class DashboardSummaryAPIView(APIView):
         total_price_types = PriceType.objects.count()
         total_price_updates = PriceHistory.objects.count()
 
-        latest_update = PriceHistory.objects.order_by("-created_at").first()
+        latest_update = PriceHistory.objects.defer("event_at").order_by("-created_at").first()
         latest_update_time = latest_update.created_at.isoformat() if latest_update else None
 
         recent_updates = PriceHistory.objects.filter(

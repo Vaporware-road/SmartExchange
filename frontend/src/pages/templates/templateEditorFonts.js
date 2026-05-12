@@ -6,7 +6,19 @@ export function editorFontFamilyToken(filename) {
 }
 
 /**
- * Inject @font-face rules for template editor preview (/static/fonts/…).
+ * Absolute URL path for a font binary. Uses signed query ?t=... because @font-face cannot
+ * send Authorization: Bearer (JWT). Tokens come from GET /api/template-editor/fonts/.
+ */
+export function templateEditorFontFaceUrl(filename, faceToken) {
+  if (!filename || typeof filename !== 'string') return ''
+  if (!faceToken || typeof faceToken !== 'string') return ''
+  const enc = encodeURIComponent(filename)
+  const t = encodeURIComponent(faceToken)
+  return `/api/template-editor/fonts/file/${enc}/?t=${t}`
+}
+
+/**
+ * Inject @font-face rules for template editor preview (fonts API file endpoint).
  * Call once after fetching GET /api/template-editor/fonts/.
  */
 export function injectTemplateEditorFontFaces(fontList) {
@@ -19,11 +31,12 @@ export function injectTemplateEditorFontFaces(fontList) {
     document.head.appendChild(el)
   }
   const rules = fontList
-    .filter((f) => f && f.filename)
+    .filter((f) => f && f.filename && f.face_token)
     .map((f) => {
       const token = editorFontFamilyToken(f.filename)
-      const enc = encodeURIComponent(f.filename)
-      return `@font-face{font-family:'${token}';src:url('/static/fonts/${enc}') format('opentype'),url('/static/fonts/${enc}') format('truetype');font-display:swap;}`
+      const url = templateEditorFontFaceUrl(f.filename, f.face_token).replace(/'/g, "\\'")
+      const fmt = String(f.filename).toLowerCase().endsWith('.otf') ? 'opentype' : 'truetype'
+      return `@font-face{font-family:'${token}';src:url('${url}') format('${fmt}');font-display:swap;}`
     })
   el.textContent = rules.join('\n')
 }

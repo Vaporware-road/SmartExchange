@@ -35,6 +35,8 @@ api.interceptors.response.use(
   (error) => {
     const toast = useToast()
     const status = error.response?.status
+    /** When true, errors reject without toast (used for dashboard bulk fetch). */
+    const silent = error.config?.silent === true
 
     const requestUrl = error.config?.url ?? ''
     const isAuthRequest = requestUrl.includes('/auth/')
@@ -68,11 +70,16 @@ api.interceptors.response.use(
     if (status === 403 && !hasAccessToken) {
       return Promise.reject(error)
     } else if (status === 403) {
-      toast.error(resolveApiErrorMessage({ data: error.response?.data, status }))
+      if (!silent) toast.error(resolveApiErrorMessage({ data: error.response?.data, status }))
     } else if (status >= 500) {
       const skipServerErrorRedirect =
+        silent ||
         error.config?.skipGlobalErrorRedirect === true ||
         requestUrl.includes('/analysis/dashboard') ||
+        requestUrl.includes('/dashboard/summary') ||
+        requestUrl.includes('/categories') ||
+        requestUrl.includes('/prices/') ||
+        requestUrl.includes('/special-prices') ||
         isAuthRequest
       const logId = error.response?.data?.log_id ?? error.response?.data?.error_id ?? error.response?.data?.request_id
       const currentName = router.currentRoute?.value?.name
@@ -84,12 +91,12 @@ api.interceptors.response.use(
       ) {
         router.push({ name: 'error-500', query: logId != null ? { logId: String(logId) } : {} })
       }
-      toast.error(resolveApiErrorMessage({ data: error.response?.data, status }))
+      if (!silent) toast.error(resolveApiErrorMessage({ data: error.response?.data, status }))
     } else if (!error.response) {
-      toast.error(i18n.global.t('errors.networkError'))
+      if (!silent) toast.error(i18n.global.t('errors.networkError'))
     } else if (status >= 400) {
       const msg = resolveApiErrorMessage({ data: error.response?.data, status })
-      if (msg) toast.error(msg)
+      if (!silent && msg) toast.error(msg)
     }
 
     return Promise.reject(error)
@@ -165,9 +172,14 @@ export function extractApiErrorDetails(data) {
 
 export function resolveApiErrorMessage({ data, status } = {}) {
   const { message, code } = extractApiErrorDetails(data)
+  const trimmed = typeof message === 'string' ? message.trim() : ''
+  // Prefer the API message (e.g. buy/sell spread) over generic code copy like validation_error.
+  if (trimmed && trimmed !== 'Request failed') {
+    return trimmed
+  }
   const byCode = translateApiErrorCode(code)
   if (byCode) return byCode
-  if (message) return message
+  if (trimmed) return trimmed
   return i18n.global.t(statusFallbackKey(status))
 }
 
@@ -220,11 +232,11 @@ export const authApi = {
 }
 
 export const dashboardApi = {
-  summary: () => api.get('/dashboard/summary/'),
+  summary: (config = {}) => api.get('/dashboard/summary/', config),
 }
 
 export const categoryApi = {
-  list: () => api.get('/categories/'),
+  list: (config = {}) => api.get('/categories/', config),
   currencies: () => api.get('/categories/currencies/'),
   create: (data) => api.post('/categories/', data),
   get: (id) => api.get(`/categories/${id}/`),
@@ -256,7 +268,7 @@ export const priceApi = {
 }
 
 export const specialPriceApi = {
-  list: () => api.get('/special-prices/'),
+  list: (config = {}) => api.get('/special-prices/', config),
   create: (data) => api.post('/special-prices/', data),
   get: (id) => api.get(`/special-prices/${id}/`),
   update: (id, data) => api.put(`/special-prices/${id}/`, data),
@@ -293,7 +305,9 @@ export const settingsApi = {
 
 export const analysisApi = {
   pricing: () => api.get('/analysis/pricing/'),
-  dashboard: () => api.get('/analysis/dashboard/'),
+  dashboard: (params = {}, axiosConfig = {}) =>
+    api.get('/analysis/dashboard/', { params, ...axiosConfig }),
+  importCommit: (data) => api.post('/analysis/import-commit/', data),
 }
 
 export const telegramApi = {

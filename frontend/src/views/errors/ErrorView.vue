@@ -88,7 +88,7 @@ const showLogId = computed(() => props.code === 500 && !!resolvedErrorId.value)
 const supportLink = computed(() => {
   const link = siteSettings.settings?.telegram_link?.trim()
   if (link) return link.startsWith('http') ? link : `https://t.me/${link.replace(/^@/, '')}`
-  return 'https://t.me/smartexchange_support'
+  return 'https://t.me/mrexchange_support'
 })
 
 onMounted(() => {

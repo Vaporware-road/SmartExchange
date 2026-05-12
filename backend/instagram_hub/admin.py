@@ -4,7 +4,7 @@ from django import forms
 from django.contrib import admin
 from django.utils.html import format_html
 
-from .models import InstagramConfig
+from .models import InstagramConfig, InstagramPublicationLog
 
 
 class InstagramConfigAdminForm(forms.ModelForm):
@@ -27,6 +27,8 @@ class InstagramConfigAdminForm(forms.ModelForm):
             "access_token_encrypted",
             "token_expires_at",
             "oauth_state",
+            "feed_caption_suffix",
+            "feed_hashtags",
         ]
 
     def __init__(self, *args, **kwargs):
@@ -68,6 +70,13 @@ class InstagramConfigAdmin(admin.ModelAdmin):
                 "fields": ("ig_user_id", "access_token_encrypted", "token_expires_at", "oauth_state"),
             },
         ),
+        (
+            "Feed caption extras",
+            {
+                "fields": ("feed_caption_suffix", "feed_hashtags"),
+                "description": "Appended to Instagram feed captions after finalize (within 2200 character limit).",
+            },
+        ),
         ("Timestamps", {"fields": ("created_at", "updated_at")}),
     )
 
@@ -83,3 +92,28 @@ class InstagramConfigAdmin(admin.ModelAdmin):
 
     has_token.boolean = True
     has_token.short_description = "Has token"
+
+
+@admin.register(InstagramPublicationLog)
+class InstagramPublicationLogAdmin(admin.ModelAdmin):
+    list_display = ("created_at", "kind", "success", "media_id", "container_id")
+    list_filter = ("kind", "success")
+    readonly_fields = (
+        "kind",
+        "success",
+        "error_message",
+        "media_id",
+        "container_id",
+        "category_ids",
+        "special_price_history_ids",
+        "created_at",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

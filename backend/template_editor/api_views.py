@@ -9,25 +9,29 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.core.files.storage import default_storage
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.utils.text import get_valid_filename, slugify
 from rest_framework import status
 from rest_framework.exceptions import ValidationError as DRFValidationError
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from accounts.auth import JWTAuthenticationWithTokenVersion
 from accounts.permissions import IsSuperAdmin, IsSuperAdminOrManagement
 from category.models import PriceType
+from change_price.prefetch_helpers import prefetch_price_histories_latest
 from finalize.models import Finalization
 from core.exceptions import error_response
 from core.utils import MAX_ASSET_SIZE, format_price_display, validate_uploaded_image
 
+from .font_face_tokens import sign_font_face_filename, verify_font_face_token
 from .models import Template
 from .serializers import TemplateSerializer
-from .utils import FONT_ROOT, get_available_fonts
+from .utils import FONT_ROOT, font_script_hint, get_available_fonts
 from .variables import get_variable_catalog, extend_variable_catalog_with_category
 from .widget_sync import _sync_widgets_from_config
 
@@ -63,7 +67,7 @@ def _extract_bound_price_type_ids(config_json):
     for widget in widgets:
         if not isinstance(widget, dict):
             continue
-        if str(widget.get("type") or "").strip() not in ("text", "marquee"):
+        if str(widget.get("type") or "").strip() != "text":
             continue
         style = widget.get("style") if isinstance(widget.get("style"), dict) else {}
         raw = (
@@ -442,7 +446,17 @@ class TemplateFontsAPIView(APIView):
 
     def get(self, request):
         fonts = get_available_fonts()
-        return Response([{"filename": f[0], "display_name": f[1]} for f in fonts])
+        return Response(
+            [
+                {
+                    "filename": f[0],
+                    "display_name": f[1],
+                    "script": font_script_hint(f[0]),
+                    "face_token": sign_font_face_filename(f[0]),
+                }
+                for f in fonts
+            ]
+        )
 
     def post(self, request):
         uploaded = request.FILES.get("file")
@@ -481,7 +495,56 @@ class TemplateFontsAPIView(APIView):
         fonts = get_available_fonts()
         row = next((x for x in fonts if x[0] == dest_name), None)
         display_name = row[1] if row else Path(dest_name).stem
-        return Response({"filename": dest_name, "display_name": display_name}, status=status.HTTP_201_CREATED)
+        return Response(
+            {
+                "filename": dest_name,
+                "display_name": display_name,
+                "script": font_script_hint(dest_name),
+                "face_token": sign_font_face_filename(dest_name),
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class TemplateFontFileServeAPIView(APIView):
+    """
+    GET /api/template-editor/fonts/file/<filename>/ — stream a font from FONT_ROOT.
+
+    SPA @font-face cannot send Bearer tokens; allow either JWT (management) or ?t=<signed_token>.
+    """
+
+    authentication_classes = [JWTAuthenticationWithTokenVersion]
+    permission_classes = [AllowAny]
+    throttle_classes = []  # many @font-face loads per page; signed URL is the access gate
+
+    def get(self, request, filename):
+        base = Path(str(filename)).name
+        if not base:
+            return Response({"detail": "Invalid filename."}, status=status.HTTP_400_BAD_REQUEST)
+        if "/" in str(filename) or "\\" in str(filename):
+            return Response({"detail": "Invalid filename."}, status=status.HTTP_400_BAD_REQUEST)
+        allowed = {fn for fn, _ in get_available_fonts()}
+        if base not in allowed:
+            return Response({"detail": "Font not found."}, status=status.HTTP_404_NOT_FOUND)
+        path = FONT_ROOT / base
+        if not path.is_file():
+            return Response({"detail": "Font not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        qp = request.query_params.get("t") or request.query_params.get("token")
+        ok_signed = qp and verify_font_face_token(qp, base)
+        ok_jwt = (
+            request.user
+            and request.user.is_authenticated
+            and IsSuperAdminOrManagement().has_permission(request, self)
+        )
+        if not (ok_signed or ok_jwt):
+            return Response(
+                {"detail": "Authentication credentials were not provided."},
+                status=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        ct = "font/otf" if base.lower().endswith(".otf") else "font/ttf"
+        return FileResponse(path.open("rb"), content_type=ct)
 
 
 class TemplateFontDeleteAPIView(APIView):
@@ -542,7 +605,7 @@ class TemplatePriceBindingsPreviewAPIView(APIView):
 
         price_types = list(
             PriceType.objects.filter(category_id=category_id, is_active=True)
-            .prefetch_related("price_histories")
+            .prefetch_related(prefetch_price_histories_latest())
             .order_by("order", "id")
         )
         if not price_types:

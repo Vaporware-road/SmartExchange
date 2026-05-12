@@ -113,7 +113,10 @@ import { finalizeApi, telegramApi } from '@/services/api'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
+import { useI18n } from 'vue-i18n'
+import { formatAppDecimal, createAppDateTimeFormat } from '@/utils/localeFormat.js'
 
+const { locale } = useI18n()
 const route = useRoute()
 const router = useRouter()
 const specialPriceHistoryId = computed(() => route.params.id)
@@ -136,7 +139,8 @@ function formatPrice(value) {
   if (value == null || value === '') return '—'
   const num = typeof value === 'string' ? parseFloat(value) : value
   if (Number.isNaN(num)) return String(value)
-  return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  return formatAppDecimal(appLoc, num, 2)
 }
 
 function formatPriceChange(item) {
@@ -162,7 +166,8 @@ function formatDate(isoString) {
   if (!isoString) return '—'
   try {
     const d = new Date(isoString)
-    return d.toLocaleString(undefined, { dateStyle: 'short', timeStyle: 'short' })
+    const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+    return createAppDateTimeFormat(appLoc, { dateStyle: 'short', timeStyle: 'short' }).format(d)
   } catch {
     return isoString
   }

@@ -1,4 +1,8 @@
+import logging
+
+from django.conf import settings
 from django.db import transaction
+from django.db.utils import OperationalError, ProgrammingError
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import IsAuthenticated
@@ -7,17 +11,21 @@ from rest_framework.views import APIView
 
 from accounts.permissions import IsSuperAdminOrManagement
 from core.exceptions import error_response
+from core.prices_webhook import notify_prices_webhook
 from category.models import Category, PriceType
 from setting.utils import log_event
 from accounts.utils import log_activity
 from accounts.models import UserActivityLog
 from .models import PriceHistory
+from .prefetch_helpers import prefetch_price_histories_latest
 from .serializers import (
     BulkPriceUpdateSerializer,
     PriceHistorySerializer,
     PriceUpdateSerializer,
     PriceTypeWithLatestPriceSerializer,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class PriceListAPIView(APIView):
@@ -30,7 +38,7 @@ class PriceListAPIView(APIView):
             PriceType.objects.select_related(
                 "category", "source_currency", "target_currency"
             )
-            .prefetch_related("price_histories")
+            .prefetch_related(prefetch_price_histories_latest())
             .all()
         )
 
@@ -65,7 +73,7 @@ class PriceDetailAPIView(APIView):
                 PriceType.objects.select_related(
                     "category", "source_currency", "target_currency"
                 )
-                .prefetch_related("price_histories")
+                .prefetch_related(prefetch_price_histories_latest())
                 .get(id=price_type_id)
             )
         except PriceType.DoesNotExist:
@@ -109,49 +117,51 @@ class PriceUpdateAPIView(APIView):
         serializer = PriceUpdateSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        from category.models import validate_category_buy_sell_spread
-        from rest_framework.exceptions import ValidationError as DRFValidationError
-        from django.core.exceptions import ValidationError as DjangoValidationError
-        category = price_type.category
-        # Build effective prices: current latest for all, new price for this type
-        price_types_in_cat = PriceType.objects.filter(category=category).prefetch_related("price_histories")
-        prices_map = {}
-        for pt in price_types_in_cat:
-            latest = pt.price_histories.first()
-            prices_map[pt.id] = serializer.validated_data["price"] if pt.id == price_type.id else (latest.price if latest else None)
         try:
-            validate_category_buy_sell_spread(category, prices_map)
-        except DjangoValidationError as e:
-            raise DRFValidationError(e.messages[0] if e.messages else str(e))
+            old_price_obj = (
+                PriceHistory.objects.filter(price_type=price_type).defer("event_at").first()
+            )
+            old_price = old_price_obj.price if old_price_obj else None
 
-        old_price_obj = PriceHistory.objects.filter(price_type=price_type).first()
-        old_price = old_price_obj.price if old_price_obj else None
-
-        price_history = PriceHistory.objects.create(
-            price_type=price_type,
-            price=serializer.validated_data["price"],
-            notes=serializer.validated_data.get("notes", ""),
-        )
-
-        log_event(
-            level="INFO",
-            source="system",
-            message=f"Price updated for {price_type.name} ({price_type.category.name})",
-            details=f"Old: {old_price}, New: {price_history.price}",
-            user=request.user if request.user.is_authenticated else None,
-        )
-        if request.user.is_authenticated:
-            log_activity(
-                request.user,
-                UserActivityLog.ACTION_PRICE_UPDATE,
-                request,
-                details=f"{price_type.name}: {old_price} -> {price_history.price}",
+            price_history = PriceHistory.objects.create(
+                price_type=price_type,
+                price=serializer.validated_data["price"],
+                notes=serializer.validated_data.get("notes", ""),
             )
 
-        return Response(
-            PriceHistorySerializer(price_history).data,
-            status=status.HTTP_201_CREATED,
-        )
+            log_event(
+                level="INFO",
+                source="system",
+                message=f"Price updated for {price_type.name} ({price_type.category.name})",
+                details=f"Old: {old_price}, New: {price_history.price}",
+                user=request.user if request.user.is_authenticated else None,
+            )
+            if request.user.is_authenticated:
+                log_activity(
+                    request.user,
+                    UserActivityLog.ACTION_PRICE_UPDATE,
+                    request,
+                    details=f"{price_type.name}: {old_price} -> {price_history.price}",
+                )
+
+            notify_prices_webhook("change_price.single")
+            return Response(
+                PriceHistorySerializer(price_history).data,
+                status=status.HTTP_201_CREATED,
+            )
+        except (OperationalError, ProgrammingError) as exc:
+            logger.exception("Single price update database error")
+            hint = (
+                "Could not save price. Run migrations on the server "
+                "(Docker: docker compose exec app python manage.py migrate)."
+            )
+            if settings.DEBUG:
+                hint = f"{hint} Detail: {exc}"
+            return error_response(
+                hint,
+                code="database_error",
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
 
 class BulkPriceUpdateAPIView(APIView):
@@ -177,37 +187,53 @@ class BulkPriceUpdateAPIView(APIView):
         price_types = PriceType.objects.filter(category=category)
         created = []
 
-        with transaction.atomic():
-            for pt in price_types:
-                key = str(pt.id)
-                if key not in prices_map:
-                    continue
-                ph = PriceHistory.objects.create(
-                    price_type=pt,
-                    price=prices_map[key],
-                    notes=notes,
-                )
-                created.append(ph)
+        try:
+            with transaction.atomic():
+                for pt in price_types:
+                    key = str(pt.id)
+                    if key not in prices_map:
+                        continue
+                    ph = PriceHistory.objects.create(
+                        price_type=pt,
+                        price=prices_map[key],
+                        notes=notes,
+                    )
+                    created.append(ph)
 
-        log_event(
-            level="INFO",
-            source="system",
-            message=f"Category prices updated: {category.name}",
-            details=f"Updated {len(created)} price(s). Notes: {notes or 'None'}",
-            user=request.user if request.user.is_authenticated else None,
-        )
-        if request.user.is_authenticated:
-            log_activity(
-                request.user,
-                UserActivityLog.ACTION_BULK_PRICE_UPDATE,
-                request,
-                details=f"{category.name}: {len(created)} price(s)",
+            log_event(
+                level="INFO",
+                source="system",
+                message=f"Category prices updated: {category.name}",
+                details=f"Updated {len(created)} price(s). Notes: {notes or 'None'}",
+                user=request.user if request.user.is_authenticated else None,
             )
+            if request.user.is_authenticated:
+                log_activity(
+                    request.user,
+                    UserActivityLog.ACTION_BULK_PRICE_UPDATE,
+                    request,
+                    details=f"{category.name}: {len(created)} price(s)",
+                )
 
-        return Response(
-            PriceHistorySerializer(created, many=True).data,
-            status=status.HTTP_201_CREATED,
-        )
+            if created:
+                notify_prices_webhook("change_price.bulk")
+            return Response(
+                PriceHistorySerializer(created, many=True).data,
+                status=status.HTTP_201_CREATED,
+            )
+        except (OperationalError, ProgrammingError) as exc:
+            logger.exception("Bulk price update database error")
+            hint = (
+                "Could not save prices. Run migrations on the server "
+                "(Docker: docker compose exec app python manage.py migrate)."
+            )
+            if settings.DEBUG:
+                hint = f"{hint} Detail: {exc}"
+            return error_response(
+                hint,
+                code="database_error",
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
 
 
 class PriceHistoryAPIView(ListAPIView):
@@ -218,6 +244,8 @@ class PriceHistoryAPIView(ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        return PriceHistory.objects.filter(
-            price_type_id=self.kwargs["price_type_id"]
-        ).order_by("-created_at")
+        return (
+            PriceHistory.objects.filter(price_type_id=self.kwargs["price_type_id"])
+            .defer("event_at")
+            .order_by("-created_at")
+        )

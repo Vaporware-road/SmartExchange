@@ -1,4 +1,5 @@
 from django.contrib.auth import login, logout
+from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -77,7 +78,8 @@ class MeAPIView(APIView):
 
     def get(self, request):
         if not request.user.is_authenticated:
-            return Response(None)
+            # JSON ``null`` (DRF Response(None) renders an empty body and breaks clients expecting JSON).
+            return JsonResponse(None, safe=False)
         return Response(UserSerializer(request.user).data)
 
 

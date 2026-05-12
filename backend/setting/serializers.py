@@ -1,8 +1,42 @@
+from django.core.files.storage import default_storage
 from rest_framework import serializers
 
+from accounts.permissions import IsSuperAdmin
 from core.utils import validate_uploaded_image, MAX_IMAGE_SIZE
 from template_editor.utils import get_available_fonts
 from .models import SiteSettings, Log
+
+
+class SafeImageField(serializers.ImageField):
+    """
+    Serialize ImageField URLs only when the underlying file exists in storage.
+
+    Default DRF ImageField calls ``value.url`` before we can null out stale DB paths; some
+    storages or absolute-URI building can raise when media was wiped (e.g. Docker volumes).
+    """
+
+    def to_representation(self, value):
+        if not value:
+            return None
+        path = getattr(value, "name", None)
+        if not path:
+            return None
+        try:
+            if not default_storage.exists(path):
+                return None
+        except Exception:
+            return None
+        try:
+            url = value.url
+        except Exception:
+            return None
+        request = self.context.get("request", None)
+        if request is not None:
+            try:
+                return request.build_absolute_uri(url)
+            except Exception:
+                return url
+        return url
 from telegram_app.models import TelegramBot, TelegramChannel
 
 CANONICAL_BASE_CURRENCIES = {
@@ -13,6 +47,9 @@ UPLOAD_FORMAT_CHOICES = {"PNG", "JPG", "SVG", "GIF", "WEBP", "JPEG"}
 
 
 class SiteSettingsSerializer(serializers.ModelSerializer):
+    logo = SafeImageField(allow_null=True, required=False)
+    favicon = SafeImageField(allow_null=True, required=False)
+
     class Meta:
         model = SiteSettings
         fields = [
@@ -36,7 +73,20 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "use_template_editor_for_boards",
             "ui_font_filename_rtl",
             "ui_font_filename_ltr",
+            "prices_webhook_url",
         ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        request = self.context.get("request")
+        perm = IsSuperAdmin()
+        if not (request is not None and perm.has_permission(request, self)):
+            data.pop("prices_webhook_url", None)
+        return data
+
+    def validate_prices_webhook_url(self, value):
+        s = str(value or "").strip()
+        return s
 
     def validate_base_currency_code(self, value):
         code = str(value or "").upper().strip()
