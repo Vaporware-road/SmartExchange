@@ -3,7 +3,7 @@
     <div class="w-full max-w-6xl px-4 relative">
       <nav class="mb-4">
         <router-link to="/categories" class="text-[var(--text-secondary)] hover:text-gold transition-colors inline-flex items-center gap-2">
-          <i class="fas" :class="isRtl ? 'fa-arrow-right' : 'fa-arrow-left'" />
+          <i class="fas fa-arrow-left icon-back me-2" />
           <span>{{ $t('categories.backToList') }}</span>
         </router-link>
       </nav>
@@ -203,7 +203,10 @@ async function handleSubmit() {
     if (isEdit.value) {
       await categoryApi.update(id.value, form.value)
     } else {
-      await categoryApi.create(form.value)
+      const { data } = await categoryApi.create(form.value)
+      if (data?.id != null) {
+        sessionStorage.setItem('guideAddPriceType', String(data.id))
+      }
     }
     toast.success(t('toast.saveSuccess'))
     router.push('/categories')
@@ -223,10 +226,13 @@ async function createPresetCategory(preset) {
   activePresetCode.value = preset.code
   errors.non_field_errors = null
   try {
-    await categoryApi.create({
+    const { data } = await categoryApi.create({
       name: preset.label,
       description: preset.description,
     })
+    if (data?.id != null) {
+      sessionStorage.setItem('guideAddPriceType', String(data.id))
+    }
     toast.success(t('toast.saveSuccess'))
     router.push('/categories')
   } catch (err) {

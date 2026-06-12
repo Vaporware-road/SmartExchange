@@ -264,6 +264,7 @@
     "openFullForm": "باز کردن فرم کامل",
     "deleteConfirmTitle": "حذف دسته‌بندی؟",
     "deleteConfirmMessage": "آیا از حذف «{name}» اطمینان دارید؟ این عمل قابل بازگشت نیست.",
+    "deleteBlockedByOrders": "این دسته‌بندی به سفارش‌های ثبت‌شده متصل است و قابل حذف نیست. ابتدا سفارش‌ها را بررسی یا حذف کنید.",
     "hubPrices": "قیمت‌ها",
     "hubDesignTemplate": "قالب گرافیکی",
     "hubTelegramContent": "محتوای تلگرام",
@@ -271,6 +272,9 @@
     "readyCategoriesTitle": "دسته‌بندی‌های آماده",
     "readyCategoriesHint": "برای ایجاد فوری دسته‌بندی روی یکی از ارزهای آماده بزنید.",
     "presetCreateFailed": "ایجاد دسته‌بندی آماده انجام نشد.",
+    "priceTypeGuideTitle": "قدم بعدی: نوع قیمت",
+    "priceTypeGuideMessage": "دسته‌بندی شما ساخته شد. برای فعال‌سازی آن، حداقل یک نوع قیمت (خرید یا فروش) اضافه کنید.",
+    "priceTypeGuideDismiss": "متوجه شدم",
     "presetLabels": {
       "USD": "دلار آمریکا",
       "EUR": "یورو",

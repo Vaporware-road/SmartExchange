@@ -4,12 +4,14 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from django.db import IntegrityError, transaction
 from django.db.models import Prefetch, Max
+from django.db.models.deletion import ProtectedError
 
 from django.shortcuts import get_object_or_404
 
 from change_price.prefetch_helpers import prefetch_price_histories_latest
 
 from core.exceptions import error_response
+from orders.models import OrderIntake
 from .models import Category, Currency, PriceType
 from .serializers import (
     CategorySerializer,
@@ -29,6 +31,27 @@ class CurrencyListAPIView(APIView):
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        order_count = OrderIntake.objects.filter(category=instance).count()
+        if order_count:
+            return error_response(
+                "This category is linked to existing orders and cannot be deleted. "
+                "Remove those orders from the orders queue first.",
+                code="category_protected_by_orders",
+                status_code=status.HTTP_409_CONFLICT,
+                extra={"order_count": order_count},
+            )
+        try:
+            return super().destroy(request, *args, **kwargs)
+        except ProtectedError:
+            return error_response(
+                "This category cannot be deleted because it is linked to existing orders. "
+                "Resolve or remove those orders first.",
+                code="category_protected_by_orders",
+                status_code=status.HTTP_409_CONFLICT,
+            )
+
     def get_queryset(self):
         qs = Category.objects.select_related("last_used_template")
         if self.action == "list":

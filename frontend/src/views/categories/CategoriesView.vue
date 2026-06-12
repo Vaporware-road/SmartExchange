@@ -35,6 +35,7 @@
             v-for="(cat, index) in categories"
             :key="'cat-' + cat.id"
             class="card-vip p-5 flex flex-col overflow-hidden hover-lift animate-fade-in-up"
+            :class="{ 'relative z-[210]': showPriceTypeGuide && guideCategoryId === cat.id }"
             :style="{ animationDelay: `${index * 0.05}s` }"
           >
             <div class="flex items-start justify-between gap-3 mb-4">
@@ -116,9 +117,11 @@
             </router-link>
             <div class="flex gap-2 flex-wrap mt-auto">
               <router-link
+                :ref="(el) => setAddPriceTypeRef(cat.id, el)"
                 :to="`/categories/${cat.id}/price-types/new`"
                 class="btn-luxury-outline text-sm py-1.5 flex-[1.35] min-w-[170px] inline-flex items-center justify-center gap-2 whitespace-nowrap"
                 :aria-label="addPriceTypeLabel"
+                @click="dismissPriceTypeGuide"
               >
                 <i class="fas fa-plus" />
                 <span>{{ addPriceTypeLabel }}</span>
@@ -239,7 +242,7 @@
     <BaseModal
       v-model="showDeleteModal"
       :title="$t('categories.deleteConfirmTitle')"
-      aria-label="Delete category confirmation"
+      :aria-label="$t('categories.deleteConfirmAria')"
     >
       <p class="text-[var(--text-secondary)] mb-6">
         {{ deleteConfirmMessage }}
@@ -258,11 +261,20 @@
         </button>
       </div>
     </BaseModal>
+
+    <OnboardingGuide
+      :visible="showPriceTypeGuide"
+      :target="guideTargetEl"
+      :title="$t('categories.priceTypeGuideTitle')"
+      :message="$t('categories.priceTypeGuideMessage')"
+      :dismiss-label="$t('categories.priceTypeGuideDismiss')"
+      @dismiss="dismissPriceTypeGuide"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { categoryApi, specialPriceApi, priceApi, priceTypeApi, formatDrfError } from '@/services/api'
@@ -271,6 +283,7 @@ import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import CategoryIcon from '@/components/ui/CategoryIcon.vue'
+import OnboardingGuide from '@/components/ui/OnboardingGuide.vue'
 
 const { t, locale } = useI18n()
 const toast = useToast()
@@ -281,15 +294,64 @@ const specialPrices = ref([])
 const showDeleteModal = ref(false)
 const categoryToDelete = ref(null)
 const deletingPriceTypeId = ref(null)
+const showPriceTypeGuide = ref(false)
+const guideCategoryId = ref(null)
+const addPriceTypeRefs = ref({})
 
 const deleteConfirmMessage = computed(() =>
   categoryToDelete.value
     ? t('categories.deleteConfirmMessage', { name: categoryToDelete.value.name })
     : ''
 )
-const addPriceTypeLabel = computed(() =>
-  locale.value === 'fa' ? 'افزودن نوع قیمت' : 'Add Price Type'
-)
+const addPriceTypeLabel = computed(() => t('categories.addPriceType'))
+const guideTargetEl = computed(() => {
+  if (!guideCategoryId.value) return null
+  return addPriceTypeRefs.value[guideCategoryId.value] ?? null
+})
+
+function setAddPriceTypeRef(categoryId, el) {
+  if (el) {
+    addPriceTypeRefs.value[categoryId] = el
+  } else {
+    delete addPriceTypeRefs.value[categoryId]
+  }
+}
+
+const PRICE_TYPE_GUIDE_KEY = 'guideAddPriceType'
+const PRICE_TYPE_GUIDE_SEEN_PREFIX = 'priceTypeGuideSeen:'
+
+function isPriceTypeGuideSeen(categoryId) {
+  return localStorage.getItem(`${PRICE_TYPE_GUIDE_SEEN_PREFIX}${categoryId}`) === '1'
+}
+
+function markPriceTypeGuideSeen(categoryId) {
+  if (categoryId == null) return
+  localStorage.setItem(`${PRICE_TYPE_GUIDE_SEEN_PREFIX}${categoryId}`, '1')
+}
+
+function dismissPriceTypeGuide() {
+  markPriceTypeGuideSeen(guideCategoryId.value)
+  showPriceTypeGuide.value = false
+  guideCategoryId.value = null
+}
+
+async function maybeShowPriceTypeGuide() {
+  const rawId = sessionStorage.getItem(PRICE_TYPE_GUIDE_KEY)
+  if (!rawId) return
+  sessionStorage.removeItem(PRICE_TYPE_GUIDE_KEY)
+
+  const categoryId = Number(rawId)
+  if (!Number.isFinite(categoryId) || isPriceTypeGuideSeen(categoryId)) return
+
+  const category = categories.value.find((cat) => cat.id === categoryId)
+  if (!category || getCategoryPriceTypes(category).length > 0) return
+
+  guideCategoryId.value = categoryId
+  await nextTick()
+  if (!addPriceTypeRefs.value[categoryId]) return
+
+  showPriceTypeGuide.value = true
+}
 
 onMounted(async () => {
   try {
@@ -318,6 +380,7 @@ onMounted(async () => {
     specialPrices.value = []
   } finally {
     loading.value = false
+    await maybeShowPriceTypeGuide()
   }
 })
 
@@ -352,11 +415,7 @@ function getCategoryPriceTypes(category) {
 
 async function deletePriceType(categoryId, priceType) {
   if (!priceType?.id) return
-  const ok = window.confirm(
-    locale.value === 'fa'
-      ? `نوع قیمت «${priceType.name}» حذف شود؟`
-      : `Delete price type "${priceType.name}"?`
-  )
+  const ok = window.confirm(t('categories.deletePriceTypeConfirm', { name: priceType.name }))
   if (!ok) return
 
   deletingPriceTypeId.value = priceType.id
@@ -385,8 +444,18 @@ async function confirmDelete() {
     await categoryApi.delete(cat.id)
     categories.value = categories.value.filter((c) => c.id !== cat.id)
     toast.success(t('toast.deleteSuccess'))
-  } catch {
-    toast.error(t('toast.serverError'))
+  } catch (err) {
+    const code = err?.response?.data?.code
+    if (code === 'category_protected_by_orders') {
+      const count = err?.response?.data?.order_count
+      toast.error(
+        count
+          ? t('categories.deleteBlockedByOrdersCount', { count })
+          : t('categories.deleteBlockedByOrders'),
+      )
+    } else {
+      toast.error(formatDrfError(err?.response?.data) || t('toast.serverError'))
+    }
   } finally {
     categoryToDelete.value = null
   }

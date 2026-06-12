@@ -264,6 +264,7 @@
     "openFullForm": "Open full form",
     "deleteConfirmTitle": "Delete category?",
     "deleteConfirmMessage": "Are you sure you want to delete \"{name}\"? This cannot be undone.",
+    "deleteBlockedByOrders": "This category is linked to existing orders and cannot be deleted. Review or remove those orders first.",
     "hubPrices": "Prices",
     "hubDesignTemplate": "Design Template",
     "hubTelegramContent": "Telegram Content",
@@ -271,6 +272,9 @@
     "readyCategoriesTitle": "Ready Categories",
     "readyCategoriesHint": "Tap a preset currency to create the category instantly.",
     "presetCreateFailed": "Failed to create preset category.",
+    "priceTypeGuideTitle": "Next step: price type",
+    "priceTypeGuideMessage": "Your category is ready. Add at least one price type (buy or sell) to start using it.",
+    "priceTypeGuideDismiss": "Got it",
     "presetLabels": {
       "USD": "US Dollar",
       "EUR": "Euro",
