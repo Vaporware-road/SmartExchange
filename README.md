@@ -114,7 +114,7 @@ docker compose up --build
 
 Current port mapping from `docker-compose.yml`:
 
-- **Frontend (Vite in container):** `http://localhost:5190`
+- **Frontend (Vite in container):** `http://localhost:5250`
 - **Backend (Django in container):** `http://localhost:18000`
 - **Redis broker:** `redis://localhost:6379`
 

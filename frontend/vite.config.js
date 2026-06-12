@@ -62,8 +62,8 @@ export default defineConfig(({ command, mode }) => {
   /** Vite listen port (may differ from the port users open in the browser, e.g. port mapping). */
   const devServerPort = Number(env.VITE_DEV_SERVER_PORT || 3000)
   /**
-   * HMR WebSocket port as seen by the browser. If you open http://localhost:5190 but Vite listens
-   * on 3000 inside Docker, set VITE_HMR_CLIENT_PORT=5190 (and optionally VITE_HMR_HOST).
+   * HMR WebSocket port as seen by the browser. If you open http://localhost:5250 but Vite listens
+   * on 3000 inside Docker, set VITE_HMR_CLIENT_PORT=5250 (and optionally VITE_HMR_HOST).
    * @see https://vite.dev/config/server-options.html#server-hmr
    */
   const hmrClientPort = env.VITE_HMR_CLIENT_PORT
@@ -160,7 +160,7 @@ export default defineConfig(({ command, mode }) => {
     host: true,
     port: devServerPort,
     strictPort: env.VITE_DEV_STRICT_PORT === 'false' ? false : true,
-    /** When behind a reverse proxy, set e.g. VITE_DEV_ORIGIN=http://localhost:5190 */
+    /** When behind a reverse proxy, set e.g. VITE_DEV_ORIGIN=http://localhost:5250 */
     origin: env.VITE_DEV_ORIGIN || undefined,
     hmr,
     watch: {

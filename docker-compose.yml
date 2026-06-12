@@ -56,8 +56,8 @@ services:
     ports:
       - "18000:8000"
       # Host port must avoid Windows excluded ranges (see: netsh interface ipv4 show excludedportrange).
-      # 5083-5182 blocks default Vite host ports; use a stable gap port e.g. 5183-5227.
-      - "5190:5173"
+      # 5141-5240 is reserved on many Windows hosts; use gap port 5250 (5241-5270).
+      - "5250:5173"
     depends_on:
       redis:
         condition: service_healthy
