@@ -1,0 +1,116 @@
+name: smart-exchange
+
+# BuildKit makes /etc/resolv.conf read-only during build; broken builder DNS then breaks pip/npm.
+# Static hosts for package indexes (Fastly/Cloudflare edges; update if downloads fail after CDN changes).
+x-build-extra-hosts: &build-extra-hosts
+  - "pypi.org=151.101.64.223"
+  - "files.pythonhosted.org=151.101.64.223"
+  - "registry.npmjs.org=104.16.0.34"
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      extra_hosts: *build-extra-hosts
+    env_file:
+      - .env.docker
+    command: >
+      sh -c "mkdir -p /app/backend/data /app/backend/public/media /app/backend/public/staticfiles &&
+             cd /app/backend &&
+             python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             python manage.py ensure_default_admin --username admin --password admin &&
+             exec supervisord -c /etc/supervisor/conf.d/supervisord.conf"
+    environment:
+      DJANGO_DEBUG: "False"
+      DJANGO_USE_HTTP_BEHIND_PROXY: "true"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,smartexchange-application-o0bso2-3d625a-204-168-142-183.traefik.me"
+      SQLITE_PATH: "/app/backend/data/db.sqlite3"
+      # Default panel login (ensure_default_admin); sync keeps password matching on each container start.
+      DEFAULT_ADMIN_USERNAME: "admin"
+      DEFAULT_ADMIN_PASSWORD: "admin"
+      DEFAULT_ADMIN_SYNC_PASSWORD: "true"
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      VITE_API_PROXY_TARGET: "http://127.0.0.1:8000"
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      - media_data:/app/backend/public/media
+      - static_data:/app/backend/public/staticfiles
+      - frontend_node_modules:/app/frontend/node_modules
+    ports:
+      - "18000:8000"
+      # Host port must avoid Windows excluded ranges (see: netsh interface ipv4 show excludedportrange).
+      # 5141-5240 is reserved on many Windows hosts; use gap port 5250 (5241-5270).
+      - "5250:5173"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      extra_hosts: *build-extra-hosts
+    env_file:
+      - .env.docker
+    command: >
+      sh -c "cd /app/backend &&
+             celery -A SmartExchangePanel worker --loglevel=INFO --concurrency=2"
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      SQLITE_PATH: "/app/backend/data/db.sqlite3"
+    volumes:
+      - ./backend:/app/backend
+      - media_data:/app/backend/public/media
+      - static_data:/app/backend/public/staticfiles
+    depends_on:
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      extra_hosts: *build-extra-hosts
+    env_file:
+      - .env.docker
+    command: >
+      sh -c "cd /app/backend &&
+             celery -A SmartExchangePanel beat --loglevel=INFO"
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      SQLITE_PATH: "/app/backend/data/db.sqlite3"
+    volumes:
+      - ./backend:/app/backend
+      - media_data:/app/backend/public/media
+      - static_data:/app/backend/public/staticfiles
+    depends_on:
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+volumes:
+  media_data:
+  static_data:
+  frontend_node_modules:
