@@ -3,6 +3,7 @@ Telegram service for sending messages and media to Telegram channels.
 Compatible with python-telegram-bot v20 (async).
 """
 import asyncio
+import concurrent.futures
 import logging
 from typing import Any, Iterable, List, Mapping, Optional
 
@@ -10,6 +11,34 @@ from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.error import TelegramError, BadRequest, TimedOut, NetworkError
 
 logger = logging.getLogger(__name__)
+
+
+def _run_coroutine_sync(make_coroutine):
+    """Run an async send from sync code (Celery task, DRF view, management command).
+
+    ``make_coroutine`` is a zero-arg callable returning a fresh coroutine, not a
+    coroutine object: the coroutine is only created on the branch that awaits it, so
+    no "coroutine was never awaited" warning is possible.
+
+    The loop probe is deliberately isolated from running the coroutine. The previous
+    version wrapped both in one ``try/except RuntimeError``, so a RuntimeError raised
+    *inside* an already-executing send fell into the handler and ran the whole send a
+    second time — publishing the same price message/photo to the channel twice.
+    """
+    try:
+        asyncio.get_running_loop()
+    except RuntimeError:
+        loop_is_running = False
+    else:
+        loop_is_running = True
+
+    if loop_is_running:
+        # Already inside an event loop (e.g. an async caller): asyncio.run() would
+        # raise here, so hand the work to a thread that owns its own loop.
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            return executor.submit(lambda: asyncio.run(make_coroutine())).result()
+
+    return asyncio.run(make_coroutine())
 
 # Import logging utility (with try-except to avoid circular imports)
 try:
@@ -218,28 +247,9 @@ class TelegramService:
         Returns:
             tuple: (success: bool, message: str)
         """
-        try:
-            # Try to get existing event loop
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # If loop is running, create a new event loop in a new thread
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    future = executor.submit(
-                        lambda: asyncio.run(
-                            self._send_message_async(chat_id, text, parse_mode, buttons)
-                        )
-                    )
-                    return future.result()
-            else:
-                return loop.run_until_complete(
-                    self._send_message_async(chat_id, text, parse_mode, buttons)
-                )
-        except RuntimeError:
-            # No event loop exists, create a new one
-            return asyncio.run(
-                self._send_message_async(chat_id, text, parse_mode, buttons)
-            )
+        return _run_coroutine_sync(
+            lambda: self._send_message_async(chat_id, text, parse_mode, buttons)
+        )
 
     async def _send_photo_async(
         self,
@@ -395,27 +405,6 @@ class TelegramService:
         Returns:
             tuple: (success: bool, message: str)
         """
-        try:
-            # Try to get existing event loop
-            loop = asyncio.get_event_loop()
-            if loop.is_running():
-                # If loop is running, create a new event loop in a new thread
-                import concurrent.futures
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    future = executor.submit(
-                        lambda: asyncio.run(
-                            self._send_photo_async(
-                                chat_id, photo, caption, parse_mode, buttons
-                            )
-                        )
-                    )
-                    return future.result()
-            else:
-                return loop.run_until_complete(
-                    self._send_photo_async(chat_id, photo, caption, parse_mode, buttons)
-                )
-        except RuntimeError:
-            # No event loop exists, create a new one
-            return asyncio.run(
-                self._send_photo_async(chat_id, photo, caption, parse_mode, buttons)
-            )
+        return _run_coroutine_sync(
+            lambda: self._send_photo_async(chat_id, photo, caption, parse_mode, buttons)
+        )

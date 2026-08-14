@@ -1,0 +1,40 @@
+# Graphify corpus scope — keep the graph to real source, not build artifacts/assets.
+graphify-out/
+
+# Django collectstatic output + uploaded media (duplicates backend/static)
+backend/public/
+
+# Binary brand/theme assets — no program structure in them
+backend/static/img/
+backend/static/fonts/
+backend/static/vue/
+frontend/dist/
+frontend/public/
+node_modules/
+
+# macOS AppleDouble junk
+._*
+.DS_Store
+
+# Media & fonts
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.webp
+*.mp4
+*.mp3
+*.ttf
+*.woff
+*.woff2
+*.otf
+*.eot
+
+# Vendored / generated
+*.min.js
+*.min.css
+package-lock.json
+*.sqlite3
+*.log

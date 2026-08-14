@@ -1,0 +1,11 @@
+---
+# TODO: replace YOUR_CPANEL_USERNAME with the real cPanel account name.
+# Until then this deployment fails at the `test -d` guard below rather than
+# silently copying nothing (the previous version ran `cp -R * $DEPLOYPATH`
+# against a non-existent path).
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/YOUR_CPANEL_USERNAME/public_html/
+    - test -d "$DEPLOYPATH" || { echo "DEPLOYPATH $DEPLOYPATH does not exist - set your cPanel username in .cpanel.yml"; exit 1; }
+    # rsync excludes the repo metadata and macOS sidecars that `cp -R *` used to ship.
+    - /usr/bin/rsync -a --delete --exclude='.git' --exclude='.gitignore' --exclude='.cpanel.yml' --exclude='._*' --exclude='.DS_Store' ./ "$DEPLOYPATH"

@@ -1,0 +1,4 @@
+# macOS resource-fork sidecars. These were previously committed and deployed
+# to public_html alongside the real files.
+._*
+.DS_Store

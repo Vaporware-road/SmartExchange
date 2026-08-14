@@ -1,8 +1,12 @@
 /**
  * Central permission config — single source of truth for roles and access.
  *
- * کارمند (employee): اجازهٔ کامل مثل مدیر و ادمین، به‌جز «تغییر و اضافه کردن ادمین».
- * تنها محدودیت: مدیریت کاربران (User Center) — فقط super_admin و management.
+ * MUST stay in sync with backend/accounts/permissions.py. This file only decides what the
+ * UI *shows*; the API is the real gate. When the two disagree the user gets a nav item
+ * that 403s on click, which is exactly what used to happen here:
+ *   - `settings` was ALL_PANEL_ROLES, but SiteSettings/bots/channels/logs are IsSuperAdmin.
+ *   - `adminManagement` allowed `management`, but User Management is IsSuperAdmin.
+ * Both are narrowed below to match the backend.
  */
 
 export const ROLES = {
@@ -15,24 +19,37 @@ export const ROLES = {
 /** All roles that can use the panel. */
 export const ALL_PANEL_ROLES = Object.values(ROLES)
 
-/** Only these roles can manage users (add/edit/remove admins, activity log). */
-const ADMIN_MANAGEMENT_ROLES = [ROLES.SUPER_ADMIN, ROLES.MANAGEMENT]
+/** Backend: IsSuperAdmin — user management and site settings. */
+const SUPER_ADMIN_ONLY = [ROLES.SUPER_ADMIN]
+
+/** Backend: IsSuperAdminOrManagement — finalize, price writes, template editor, Instagram. */
+const SUPER_ADMIN_OR_MANAGEMENT = [ROLES.SUPER_ADMIN, ROLES.MANAGEMENT]
+
+/** Backend: IsSuperAdminOrManagementOrEmployee — Telegram bots/channels CRUD and sending. */
+const SUPER_ADMIN_OR_MANAGEMENT_OR_EMPLOYEE = [ROLES.SUPER_ADMIN, ROLES.MANAGEMENT, ROLES.EMPLOYEE]
 
 /**
- * Which roles can access each feature.
- * کارمند = همه اجازه‌ها به‌جز adminManagement
+ * Which roles can access each feature. Mirrors backend/accounts/permissions.py.
+ *
+ * NOTE on ROLES.DEVELOPER: it is a valid choice on CustomUser.ROLE_CHOICES but no
+ * backend permission class accepts it — not IsSuperAdmin, not IsSuperAdminOrManagement,
+ * not IsSuperAdminOrManagementOrEmployee. A developer therefore only reaches the plain
+ * IsAuthenticated endpoints (analysis, finalize dashboard read, price hub read). It is
+ * listed here only where that is actually true, instead of being shown a panel that 403s.
  */
 export const PERMISSIONS = {
-  /** تحلیل و نمودارها — همه */
+  /** تحلیل و نمودارها — IsAuthenticated (همه) */
   analysis: ALL_PANEL_ROLES,
-  /** نهایی‌سازی و انتشار به تلگرام — همه */
-  finalize: ALL_PANEL_ROLES,
-  /** تنظیمات پنل (سایت، ربات، کانال، لاگ‌ها) — همه */
-  settings: ALL_PANEL_ROLES,
-  /** حذف آیتم‌ها (دسته‌بندی، قالب و غیره) — همه */
-  deleteItems: ALL_PANEL_ROLES,
-  /** مدیریت کاربران / ادمین‌ها (اضافه، ویرایش، حذف، لاگ فعالیت) — فقط super_admin و management */
-  adminManagement: ADMIN_MANAGEMENT_ROLES,
+  /** نهایی‌سازی و انتشار به تلگرام — IsSuperAdminOrManagement */
+  finalize: SUPER_ADMIN_OR_MANAGEMENT,
+  /** تنظیمات پنل (سایت، ربات، کانال، لاگ‌ها) — IsSuperAdmin */
+  settings: SUPER_ADMIN_ONLY,
+  /** ربات و کانال تلگرام — IsSuperAdminOrManagementOrEmployee */
+  telegram: SUPER_ADMIN_OR_MANAGEMENT_OR_EMPLOYEE,
+  /** حذف آیتم‌ها (دسته‌بندی، قالب و غیره) — IsSuperAdminOrManagement */
+  deleteItems: SUPER_ADMIN_OR_MANAGEMENT,
+  /** مدیریت کاربران / ادمین‌ها (اضافه، ویرایش، حذف، لاگ فعالیت) — IsSuperAdmin */
+  adminManagement: SUPER_ADMIN_ONLY,
 }
 
 function normalizeRole(role) {

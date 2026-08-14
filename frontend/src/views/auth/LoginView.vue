@@ -81,7 +81,28 @@ const loading = ref(false)
 
 const siteName = computed(() => siteSettings.siteName)
 
-onMounted(() => siteSettings.fetch())
+onMounted(() => {
+  siteSettings.fetch()
+  if (route.query.demo === '1' || route.query.demo === 'true') {
+    startDemoLogin()
+  }
+})
+
+async function startDemoLogin() {
+  if (auth.isAuthenticated) {
+    router.push(route.query.redirect || '/')
+    return
+  }
+  loading.value = true
+  try {
+    await auth.demoLogin()
+    router.push(route.query.redirect || '/')
+  } catch (err) {
+    error.value = getApiErrorDetails(err).message
+  } finally {
+    loading.value = false
+  }
+}
 
 async function handleSubmit() {
   error.value = ''

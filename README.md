@@ -156,10 +156,13 @@ Install deps and run:
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py ensure_default_admin
+python manage.py ensure_demo_user
 python manage.py runserver
 ```
 
 Backend URL: `http://127.0.0.1:8000`
+
+The `ensure_demo_user` command creates the demo account (role=management, unusable password) that backs the `POST /api/auth/demo-login/` autologin endpoint used by the marketing page's demo buttons (`https://mrexchange.co.uk/login?demo=1`).
 
 In additional terminals (required for finalize/telegram background execution):
 

@@ -31,7 +31,7 @@ export const useAuthStore = defineStore('auth', {
     canAccessFinalize() {
       return canPermission(this.role, 'finalize')
     },
-    /** دسترسی به تنظیمات پنل — فقط super_admin و management */
+    /** دسترسی به تنظیمات پنل — فقط super_admin (backend: IsSuperAdmin) */
     canAccessSettings() {
       return canPermission(this.role, 'settings')
     },
@@ -39,11 +39,15 @@ export const useAuthStore = defineStore('auth', {
     canAccessAnalysis() {
       return canPermission(this.role, 'analysis')
     },
-    /** دسترسی به مدیریت کاربران/ادمین — فقط super_admin و management */
+    /** دسترسی به ربات و کانال تلگرام — super_admin، management و employee */
+    canAccessTelegram() {
+      return canPermission(this.role, 'telegram')
+    },
+    /** دسترسی به مدیریت کاربران/ادمین — فقط super_admin (backend: IsSuperAdmin) */
     canAccessUserCenter() {
       return canPermission(this.role, 'adminManagement')
     },
-    /** اجازه حذف آیتم‌ها — همه نقش‌ها */
+    /** اجازه حذف آیتم‌ها — فقط super_admin و management */
     canDeleteItems() {
       return canPermission(this.role, 'deleteItems')
     },
@@ -78,6 +82,19 @@ export const useAuthStore = defineStore('auth', {
       this.loading = true
       try {
         const { data } = await authApi.login(username, password)
+        if (data.access) localStorage.setItem('access_token', data.access)
+        if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
+        this.user = data.user ?? data
+        return this.user
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async demoLogin() {
+      this.loading = true
+      try {
+        const { data } = await authApi.demoLogin()
         if (data.access) localStorage.setItem('access_token', data.access)
         if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
         this.user = data.user ?? data

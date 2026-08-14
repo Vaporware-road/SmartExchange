@@ -30,9 +30,39 @@ api.interceptors.request.use((config) => {
   return config
 })
 
+/**
+ * Single in-flight refresh shared by every 401 that arrives while it is running,
+ * so a burst of parallel requests produces one POST /auth/token/refresh/ and not N.
+ * Cleared as soon as it settles.
+ */
+let refreshPromise = null
+
+function runTokenRefresh() {
+  if (refreshPromise) return refreshPromise
+  const refresh = localStorage.getItem('refresh_token')
+  if (!refresh) return Promise.reject(new Error('no refresh token'))
+
+  // Bare axios, not `api`: this must not re-enter the interceptor below and
+  // recurse if the refresh itself 401s.
+  refreshPromise = axios
+    .post('/api/auth/token/refresh/', { refresh }, { headers: { 'Content-Type': 'application/json' } })
+    .then(({ data }) => {
+      if (!data?.access) throw new Error('refresh response had no access token')
+      localStorage.setItem('access_token', data.access)
+      // ROTATE_REFRESH_TOKENS is on server-side, so a new refresh comes back too.
+      if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
+      return data.access
+    })
+    .finally(() => {
+      refreshPromise = null
+    })
+
+  return refreshPromise
+}
+
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const toast = useToast()
     const status = error.response?.status
     /** When true, errors reject without toast (used for dashboard bulk fetch). */
@@ -47,6 +77,24 @@ api.interceptors.response.use(
 
     if (status === 401) {
       const url = error.config?.url ?? ''
+      const original = error.config ?? {}
+      const isRefreshCall = url.includes('/auth/token/refresh')
+      const isLoginCall = url.includes('/auth/login') || url.includes('/auth/demo-login')
+
+      // ACCESS_TOKEN_LIFETIME is 12h but REFRESH_TOKEN_LIFETIME is 7 days. Without this
+      // the refresh token was stored and never used, so every session died at the 12h
+      // mark with a hard bounce to /login. Try exactly one refresh + replay per request.
+      if (!original._retriedAfterRefresh && !isRefreshCall && !isLoginCall && localStorage.getItem('refresh_token')) {
+        original._retriedAfterRefresh = true
+        try {
+          const access = await runTokenRefresh()
+          original.headers = { ...(original.headers || {}), Authorization: `Bearer ${access}` }
+          return api(original)
+        } catch {
+          // fall through to the hard logout below
+        }
+      }
+
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
       const isSessionCheck = url.includes('/auth/me')
@@ -219,6 +267,7 @@ export function formatDrfError(data) {
 export const authApi = {
   login: (username, password) =>
     api.post('/auth/login/', { username, password }),
+  demoLogin: () => api.post('/auth/demo-login/'),
   logout: (refresh) => api.post('/auth/logout/', { refresh }),
   me: () => api.get('/auth/me/'),
   users: {

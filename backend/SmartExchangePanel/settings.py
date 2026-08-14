@@ -18,7 +18,7 @@ if allowed_hosts_env:
     ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
 else:
     # Development defaults
-    ALLOWED_HOSTS = ['panel.sarafipardis.co.uk', 'www.panel.sarafipardis.co.uk', "localhost", "127.0.0.1", "admin.sarafipardis.co.uk", "www.admin.sarafipardis.co.uk"]
+    ALLOWED_HOSTS = ['panel.sarafipardis.co.uk', 'www.panel.sarafipardis.co.uk', 'mrexchange.co.uk', 'www.mrexchange.co.uk', "localhost", "127.0.0.1", "admin.sarafipardis.co.uk", "www.admin.sarafipardis.co.uk"]
 
 # When behind a reverse proxy (e.g. Vite dev proxy) that sends X-Forwarded-Host, use it for
 # request.build_absolute_uri() — needed for Instagram OAuth redirect_uri matching the browser origin.
@@ -100,6 +100,8 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'https://mrexchange.co.uk',
+    'https://www.mrexchange.co.uk',
 ]
 CORS_ALLOW_CREDENTIALS = True
 
@@ -114,6 +116,8 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:3000',
     'http://localhost:8000',
     'http://127.0.0.1:8000',
+    'https://mrexchange.co.uk',
+    'https://www.mrexchange.co.uk',
 ]
 _csrf_extra = os.environ.get('DJANGO_CSRF_TRUSTED_ORIGINS', '').strip()
 if _csrf_extra:
@@ -159,10 +163,26 @@ TEMPLATES = [
 WSGI_APPLICATION = 'SmartExchangePanel.wsgi.application'
 
 # Database
+#
+# SQLite is shared by three processes writing the same file (Django, celery-worker,
+# celery-beat — see docker-compose.yml). With the defaults that means a rollback
+# journal and a 5s lock timeout, which surfaces as "database is locked" during
+# finalize/publish bursts. WAL lets readers run while a writer holds the lock, and
+# the longer busy timeout absorbs the remaining contention.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.environ.get('SQLITE_PATH', str(BASE_DIR / 'db.sqlite3')),
+        'OPTIONS': {
+            'timeout': int(os.environ.get('SQLITE_TIMEOUT', '30')),
+            'init_command': (
+                'PRAGMA journal_mode=WAL;'
+                'PRAGMA synchronous=NORMAL;'
+                'PRAGMA busy_timeout=30000;'
+                'PRAGMA foreign_keys=ON;'
+            ),
+            'transaction_mode': 'IMMEDIATE',
+        },
     }
 }
 
@@ -223,6 +243,11 @@ LOGIN_URL = '/login'
 LOGIN_REDIRECT_URL = '/'
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# Demo account for the public demo-login endpoint (autologin from the marketing page).
+# The account is created with `python manage.py ensure_demo_user` (role=management, unusable password).
+DEMO_LOGIN_ENABLED = os.environ.get('DEMO_LOGIN_ENABLED', 'True').lower() in ('true', '1', 'yes')
+DEMO_USERNAME = (os.environ.get('DEMO_USERNAME', 'demo') or 'demo').strip()
 
 # -----------------------------
 # External API (sarafipardis.co.uk rates)

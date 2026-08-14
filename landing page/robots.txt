@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+
+# The panel itself is a private app — no value in crawling it, and it only
+# produces soft-404s / login redirects in Search Console.
+Disallow: /login
+Disallow: /api/
+
+Sitemap: https://mrexchange.co.uk/sitemap.xml

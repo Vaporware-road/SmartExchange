@@ -6,6 +6,7 @@ mkdir -p /app/backend/data /app/backend/public/media /app/backend/public/staticf
 cd /app/backend
 python manage.py migrate --noinput
 python manage.py ensure_default_admin
+python manage.py ensure_demo_user
 
 python manage.py runserver 0.0.0.0:8000 &
 DJANGO_PID=$!
