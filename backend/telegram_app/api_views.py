@@ -6,13 +6,24 @@ import json
 from rest_framework import status, serializers as drf_serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from accounts.permissions import IsSuperAdminOrManagementOrEmployee
-from rest_framework.viewsets import ModelViewSet
+from accounts.permissions import (
+    IsSuperAdminOrManagement,
+    IsSuperAdminOrManagementOrEmployee,
+)
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import action
 
-from .models import TelegramBot, TelegramChannel, DefaultMessageSettings, AutoPostConfig
+from .models import (
+    AutoPostConfig,
+    CustomerProfile,
+    DefaultMessageSettings,
+    ExchangeRequest,
+    PriceAlert,
+    TelegramBot,
+    TelegramChannel,
+)
 from .services.telegram_client import TelegramService
 from setting.utils import (
     log_telegram_event,
@@ -21,12 +32,16 @@ from setting.utils import (
 )
 from core.exceptions import error_response
 from .serializers import (
-    TelegramChannelSerializer,
-    TelegramBotSerializer,
-    TelegramBotDetailSerializer,
-    DefaultMessageSettingsSerializer,
-    SendMessageSerializer,
     AutoPostConfigSerializer,
+    CustomerProfileSerializer,
+    CustomerTagUpdateSerializer,
+    DefaultMessageSettingsSerializer,
+    ExchangeRequestSerializer,
+    PriceAlertSerializer,
+    SendMessageSerializer,
+    TelegramBotDetailSerializer,
+    TelegramBotSerializer,
+    TelegramChannelSerializer,
 )
 
 
@@ -101,8 +116,8 @@ class SendMessageAPIView(APIView):
             )
 
         try:
-            client = TelegramService(bot.token)
-            success, response = client.send_message(channel.chat_id, message)
+            client = TelegramService(bot.get_plain_token())
+            success, response, _ = client.send_message(channel.chat_id, message)
 
             if success:
                 log_telegram_event(
@@ -261,8 +276,8 @@ class TelegramBotViewSet(ModelViewSet):
             chat_id = channel.chat_id
 
         try:
-            client = TelegramService(bot.token)
-            success, response = client.send_message(
+            client = TelegramService(bot.get_plain_token())
+            success, response, _ = client.send_message(
                 chat_id, "✅ Test message from Telegram Management Hub"
             )
             log_telegram_event(
@@ -366,3 +381,83 @@ class AutomationSettingsAPIView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         return Response({"auto_post_on_update": bool(flag)})
+
+
+class TelegramCustomerWebhookAPIView(APIView):
+    """
+    POST /api/telegram/webhook/<bot_id>/
+
+    Telegram customer-bot ingress. Always returns 200 after accepting the body
+    so Telegram does not retry aggressively on application errors.
+    """
+
+    authentication_classes = []
+    permission_classes = [AllowAny]
+    throttle_classes = []
+
+    def post(self, request, bot_id: int):
+        from .services.dispatcher import process_update_payload
+
+        try:
+            bot = TelegramBot.objects.get(pk=bot_id, is_active=True)
+        except TelegramBot.DoesNotExist:
+            return Response({"ok": False, "detail": "bot not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        payload = request.data
+        if not isinstance(payload, dict):
+            return Response({"ok": False, "detail": "invalid json"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            process_update_payload(bot, payload)
+        except Exception:
+            # Still 200 — Telegram retries on non-2xx and can amplify outages.
+            try:
+                log_telegram_event(
+                    level="ERROR",
+                    message="Customer webhook handler failed",
+                    details={"event": "customer_webhook_error", "bot_id": bot_id},
+                )
+            except Exception:
+                pass
+        return Response({"ok": True})
+
+
+class CustomerProfileViewSet(ModelViewSet):
+    """
+    Staff: list/retrieve customers; PATCH tag (management / super_admin only).
+    """
+
+    queryset = CustomerProfile.objects.all().order_by("-updated_at")
+    serializer_class = CustomerProfileSerializer
+    http_method_names = ["get", "patch", "head", "options"]
+
+    def get_permissions(self):
+        return [IsAuthenticated(), IsSuperAdminOrManagement()]
+
+    def get_serializer_class(self):
+        if self.action in ("partial_update", "update"):
+            return CustomerTagUpdateSerializer
+        return CustomerProfileSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        customer = self.get_object()
+        serializer = CustomerTagUpdateSerializer(
+            customer, data=request.data, partial=True
+        )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(CustomerProfileSerializer(customer).data)
+
+
+class ExchangeRequestViewSet(ReadOnlyModelViewSet):
+    queryset = ExchangeRequest.objects.select_related("customer", "bot").order_by(
+        "-created_at"
+    )
+    serializer_class = ExchangeRequestSerializer
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+
+
+class PriceAlertViewSet(ReadOnlyModelViewSet):
+    queryset = PriceAlert.objects.select_related("customer").order_by("-created_at")
+    serializer_class = PriceAlertSerializer
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]

@@ -38,7 +38,7 @@ def settings_view(request):
                 message = telegram_form.cleaned_data['message']
 
                 try:
-                    client = TelegramService(bot.token)
+                    client = TelegramService(bot.get_plain_token())
                     success, response = client.send_message(channel.chat_id, message)
 
                     if success:

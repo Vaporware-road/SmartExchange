@@ -1,29 +1,44 @@
 """
-Telegram service for sending messages and media to Telegram channels.
-Compatible with python-telegram-bot v20 (async).
+Telegram service for sending messages and media.
+
+Uses aiogram 3 under the hood. Sync wrappers for Celery, DRF, and admin.
 """
+
+from __future__ import annotations
+
 import asyncio
 import concurrent.futures
 import logging
+from pathlib import Path
 from typing import Any, Iterable, List, Mapping, Optional
 
-from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.error import TelegramError, BadRequest, TimedOut, NetworkError
+from aiogram import Bot
+from aiogram.exceptions import (
+    TelegramAPIError,
+    TelegramBadRequest,
+    TelegramNetworkError,
+    TelegramRetryAfter,
+)
+from aiogram.types import (
+    FSInputFile,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
+    KeyboardButton,
+    ReplyKeyboardMarkup,
+)
 
 logger = logging.getLogger(__name__)
 
+try:
+    from setting.utils import log_telegram_event
+except ImportError:
+    log_telegram_event = None
+
 
 def _run_coroutine_sync(make_coroutine):
-    """Run an async send from sync code (Celery task, DRF view, management command).
+    """Run an async coroutine from sync code (Celery, DRF, management command).
 
-    ``make_coroutine`` is a zero-arg callable returning a fresh coroutine, not a
-    coroutine object: the coroutine is only created on the branch that awaits it, so
-    no "coroutine was never awaited" warning is possible.
-
-    The loop probe is deliberately isolated from running the coroutine. The previous
-    version wrapped both in one ``try/except RuntimeError``, so a RuntimeError raised
-    *inside* an already-executing send fell into the handler and ran the whole send a
-    second time — publishing the same price message/photo to the channel twice.
+    ``make_coroutine`` is a zero-arg callable returning a fresh coroutine.
     """
     try:
         asyncio.get_running_loop()
@@ -33,37 +48,39 @@ def _run_coroutine_sync(make_coroutine):
         loop_is_running = True
 
     if loop_is_running:
-        # Already inside an event loop (e.g. an async caller): asyncio.run() would
-        # raise here, so hand the work to a thread that owns its own loop.
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
             return executor.submit(lambda: asyncio.run(make_coroutine())).result()
 
     return asyncio.run(make_coroutine())
 
-# Import logging utility (with try-except to avoid circular imports)
-try:
-    from setting.utils import log_telegram_event
-except ImportError:
-    log_telegram_event = None
+
+def _log_event(level: str, message: str, details: dict) -> None:
+    if not log_telegram_event:
+        return
+    try:
+        log_telegram_event(level=level, message=message, details=details)
+    except Exception:
+        pass
 
 
 class TelegramService:
-    """Service class for interacting with Telegram Bot API."""
-    
-    def __init__(self, token):
-        """
-        Initialize Telegram service with bot token.
-        
-        Args:
-            token: Telegram bot token from @BotFather
-        """
+    """Sync façade over aiogram.Bot for outbound Telegram Bot API calls.
+
+    Always creates a fresh Bot for sync call sites (Celery/admin). Do not cache
+    Bot across asyncio.run() calls — aiohttp sessions die with the closed loop.
+    """
+
+    def __init__(self, token: str):
         if not token:
             raise ValueError("Bot token is required")
         self.token = token
         self.bot = Bot(token=token)
 
+
     @staticmethod
-    def _build_inline_keyboard(buttons: Optional[Iterable[Iterable[Mapping[str, Any]]]]):
+    def _build_inline_keyboard(
+        buttons: Optional[Iterable[Iterable[Mapping[str, Any]]]],
+    ) -> InlineKeyboardMarkup | None:
         if not buttons:
             return None
 
@@ -74,29 +91,85 @@ class TelegramService:
                 text = button.get("text")
                 if not text:
                     continue
-                kwargs = {}
+                kwargs: dict[str, Any] = {}
                 if "url" in button:
                     kwargs["url"] = button["url"]
                 elif "callback_data" in button:
-                    kwargs["callback_data"] = button["callback_data"]
-                elif "switch_inline_query" in button:
-                    kwargs["switch_inline_query"] = button["switch_inline_query"]
-                elif "switch_inline_query_current_chat" in button:
-                    kwargs["switch_inline_query_current_chat"] = button[
-                        "switch_inline_query_current_chat"
-                    ]
-
-                if not kwargs:
+                    kwargs["callback_data"] = str(button["callback_data"])
+                else:
                     continue
-
-                button_row.append(InlineKeyboardButton(text=text, **kwargs))
+                button_row.append(InlineKeyboardButton(text=str(text), **kwargs))
             if button_row:
                 keyboard.append(button_row)
 
         if not keyboard:
             return None
-
         return InlineKeyboardMarkup(inline_keyboard=keyboard)
+
+    @staticmethod
+    def _build_reply_keyboard(
+        buttons: Optional[Iterable[Iterable[Mapping[str, Any] | str]]],
+    ) -> ReplyKeyboardMarkup | None:
+        """Bottom-of-chat button panel (not inline under a message)."""
+        if not buttons:
+            return None
+        keyboard: List[List[KeyboardButton]] = []
+        for row in buttons:
+            # Tolerate a flat row of dicts accidentally passed as the whole keyboard,
+            # or a row that is itself a single dict / string.
+            if isinstance(row, Mapping):
+                row = [row]
+            elif isinstance(row, str):
+                row = [row]
+            button_row: List[KeyboardButton] = []
+            for button in row:
+                if isinstance(button, str):
+                    text = button
+                elif isinstance(button, Mapping):
+                    text = button.get("text")
+                else:
+                    continue
+                if not text:
+                    continue
+                button_row.append(KeyboardButton(text=str(text)))
+            if button_row:
+                keyboard.append(button_row)
+        if not keyboard:
+            return None
+        return ReplyKeyboardMarkup(
+            keyboard=keyboard,
+            resize_keyboard=True,
+            is_persistent=True,
+        )
+
+    @classmethod
+    def _build_keyboard(
+        cls,
+        buttons: Optional[Iterable[Iterable[Mapping[str, Any]]]],
+        keyboard: str | None = None,
+    ):
+        if not buttons:
+            return None
+        kind = (keyboard or "").lower()
+        if kind == "reply":
+            return cls._build_reply_keyboard(buttons)
+        if kind == "inline":
+            return cls._build_inline_keyboard(buttons)
+        # Auto: URL/callback → inline (channel posts); text-only → reply panel
+        for row in buttons:
+            for button in row:
+                if "url" in button or "callback_data" in button:
+                    return cls._build_inline_keyboard(buttons)
+        return cls._build_reply_keyboard(buttons)
+
+    @staticmethod
+    def _photo_input(photo):
+        if isinstance(photo, (str, Path)):
+            path = Path(photo)
+            if path.exists():
+                return FSInputFile(path)
+            return str(photo)
+        return photo
 
     async def _send_message_async(
         self,
@@ -104,151 +177,113 @@ class TelegramService:
         text,
         parse_mode="HTML",
         buttons=None,
+        keyboard=None,
     ):
-        """
-        Async helper method to send a message.
-        
-        Args:
-            chat_id: Telegram chat ID (can be channel username or ID)
-            text: Message text to send
-            parse_mode: Message parse mode (HTML, Markdown, or None)
-        
-        Returns:
-            tuple: (success: bool, message: str)
-        """
         if not chat_id:
-            return False, "Chat ID is required"
-        
-        if not text or not text.strip():
-            return False, "Message text cannot be empty"
-        
+            return False, "Chat ID is required", None
+        if not text or not str(text).strip():
+            return False, "Message text cannot be empty", None
+
         try:
-            reply_markup = self._build_inline_keyboard(buttons)
-            await self.bot.send_message(
+            reply_markup = self._build_keyboard(buttons, keyboard=keyboard)
+            result = await self.bot.send_message(
                 chat_id=chat_id,
                 text=text,
                 parse_mode=parse_mode,
                 reply_markup=reply_markup,
             )
-            logger.info(f"Message sent successfully to {chat_id}")
-            # Log to database
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='INFO',
-                        message='Message sent to Telegram channel',
-                        details={
-                            'event': 'send_message',
-                            'chat_id': str(chat_id),
-                            'text_length': len(text),
-                            'parse_mode': parse_mode,
-                            'has_buttons': bool(buttons),
-                        },
-                    )
-                except Exception:
-                    pass  # Don't fail if logging fails
-            return True, "Message sent successfully."
-        except BadRequest as e:
-            error_msg = f"Bad request: {str(e)}"
+            logger.info("Message sent successfully to %s", chat_id)
+            _log_event(
+                "INFO",
+                "Message sent to Telegram channel",
+                {
+                    "event": "send_message",
+                    "chat_id": str(chat_id),
+                    "text_length": len(text),
+                    "parse_mode": parse_mode,
+                    "has_buttons": bool(buttons),
+                },
+            )
+            return True, "Message sent successfully.", getattr(result, "message_id", None)
+        except TelegramBadRequest as e:
+            error_msg = f"Bad request: {e}"
             logger.error(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='ERROR',
-                        message='Failed to send message to Telegram',
-                        details={
-                            'event': 'send_message_bad_request',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
-            return False, error_msg
-        except TimedOut as e:
-            error_msg = f"Request timed out: {str(e)}"
+            _log_event(
+                "ERROR",
+                "Failed to send message to Telegram",
+                {
+                    "event": "send_message_bad_request",
+                    "chat_id": str(chat_id),
+                    "error": error_msg,
+                },
+            )
+            return False, error_msg, None
+        except TelegramRetryAfter as e:
+            error_msg = f"Flood control: retry after {e.retry_after}s"
             logger.error(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='ERROR',
-                        message='Telegram request timed out',
-                        details={
-                            'event': 'send_message_timeout',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
-            return False, error_msg
-        except NetworkError as e:
-            error_msg = f"Network error: {str(e)}"
+            return False, error_msg, None
+        except TelegramNetworkError as e:
+            error_msg = f"Network error: {e}"
             logger.error(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='ERROR',
-                        message='Telegram network error',
-                        details={
-                            'event': 'send_message_network_error',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
-            return False, error_msg
-        except TelegramError as e:
-            error_msg = f"Telegram error: {str(e)}"
+            _log_event(
+                "ERROR",
+                "Telegram network error",
+                {
+                    "event": "send_message_network_error",
+                    "chat_id": str(chat_id),
+                    "error": error_msg,
+                },
+            )
+            return False, error_msg, None
+        except TelegramAPIError as e:
+            error_msg = f"Telegram error: {e}"
             logger.error(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='ERROR',
-                        message='Telegram API error',
-                        details={
-                            'event': 'send_message_telegram_error',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
-            return False, error_msg
+            _log_event(
+                "ERROR",
+                "Telegram API error",
+                {
+                    "event": "send_message_telegram_error",
+                    "chat_id": str(chat_id),
+                    "error": error_msg,
+                },
+            )
+            return False, error_msg, None
         except Exception as e:
-            error_msg = f"Unexpected error: {str(e)}"
+            error_msg = f"Unexpected error: {e}"
             logger.exception(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='CRITICAL',
-                        message='Unexpected error sending Telegram message',
-                        details={
-                            'event': 'send_message_unexpected_error',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
-            return False, error_msg
+            _log_event(
+                "CRITICAL",
+                "Unexpected error sending Telegram message",
+                {
+                    "event": "send_message_unexpected_error",
+                    "chat_id": str(chat_id),
+                    "error": error_msg,
+                },
+            )
+            return False, error_msg, None
+        finally:
+            try:
+                await self.bot.session.close()
+            except Exception:
+                pass
 
-    def send_message(self, chat_id, text, parse_mode="HTML", buttons=None):
+    def send_message(self, chat_id, text, parse_mode="HTML", buttons=None, keyboard=None):
         """
-        Send a text message to a Telegram chat.
-        This is a synchronous wrapper for the async method.
-        
-        Args:
-            chat_id: Telegram chat ID (can be channel username or ID)
-            text: Message text to send
-            parse_mode: Message parse mode (HTML, Markdown, or None)
-        
+        Send a text message.
+
+        ``keyboard``: ``"reply"`` (bottom panel), ``"inline"``, or None (auto).
+
         Returns:
-            tuple: (success: bool, message: str)
+            tuple: (success: bool, message: str, message_id: int | None)
         """
+        if not chat_id:
+            return False, "Chat ID is required", None
+        if not text or not str(text).strip():
+            return False, "Message text cannot be empty", None
         return _run_coroutine_sync(
-            lambda: self._send_message_async(chat_id, text, parse_mode, buttons)
+            lambda: self._send_message_async(
+                chat_id, text, parse_mode, buttons, keyboard=keyboard
+            )
         )
 
     async def _send_photo_async(
@@ -259,152 +294,189 @@ class TelegramService:
         parse_mode="HTML",
         buttons=None,
     ):
-        """
-        Async helper method to send a photo.
-        
-        Args:
-            chat_id: Telegram chat ID (can be channel username or ID)
-            photo: Photo file (file path, file-like object, or file_id)
-            caption: Optional photo caption
-            parse_mode: Caption parse mode (HTML, Markdown, or None)
-        
-        Returns:
-            tuple: (success: bool, message: str)
-        """
         if not chat_id:
             return False, "Chat ID is required"
-        
         if not photo:
             return False, "Photo is required"
-        
+
         try:
-            reply_markup = self._build_inline_keyboard(buttons)
+            reply_markup = self._build_keyboard(buttons)
             await self.bot.send_photo(
                 chat_id=chat_id,
-                photo=photo,
+                photo=self._photo_input(photo),
                 caption=caption,
                 parse_mode=parse_mode if caption else None,
                 reply_markup=reply_markup,
             )
-            logger.info(f"Photo sent successfully to {chat_id}")
-            # Log to database
-            if log_telegram_event:
-                try:
-                    cap_preview = (caption[:100] + '…') if caption and len(caption) > 100 else caption
-                    log_telegram_event(
-                        level='INFO',
-                        message='Photo sent to Telegram channel',
-                        details={
-                            'event': 'send_photo',
-                            'chat_id': str(chat_id),
-                            'caption_length': len(caption) if caption else 0,
-                            'caption_preview': cap_preview or None,
-                            'has_buttons': bool(buttons),
-                        },
-                    )
-                except Exception:
-                    pass  # Don't fail if logging fails
+            logger.info("Photo sent successfully to %s", chat_id)
+            cap_preview = (
+                (caption[:100] + "…") if caption and len(caption) > 100 else caption
+            )
+            _log_event(
+                "INFO",
+                "Photo sent to Telegram channel",
+                {
+                    "event": "send_photo",
+                    "chat_id": str(chat_id),
+                    "caption_length": len(caption) if caption else 0,
+                    "caption_preview": cap_preview or None,
+                    "has_buttons": bool(buttons),
+                },
+            )
             return True, "Photo sent successfully."
-        except BadRequest as e:
-            error_msg = f"Bad request: {str(e)}"
+        except TelegramBadRequest as e:
+            error_msg = f"Bad request: {e}"
             logger.error(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='ERROR',
-                        message='Failed to send photo to Telegram',
-                        details={
-                            'event': 'send_photo_bad_request',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
+            _log_event(
+                "ERROR",
+                "Failed to send photo to Telegram",
+                {
+                    "event": "send_photo_bad_request",
+                    "chat_id": str(chat_id),
+                    "error": error_msg,
+                },
+            )
             return False, error_msg
-        except TimedOut as e:
-            error_msg = f"Request timed out: {str(e)}"
+        except TelegramNetworkError as e:
+            error_msg = f"Network error: {e}"
             logger.error(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='ERROR',
-                        message='Telegram photo request timed out',
-                        details={
-                            'event': 'send_photo_timeout',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
             return False, error_msg
-        except NetworkError as e:
-            error_msg = f"Network error: {str(e)}"
+        except TelegramAPIError as e:
+            error_msg = f"Telegram error: {e}"
             logger.error(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='ERROR',
-                        message='Telegram network error (photo)',
-                        details={
-                            'event': 'send_photo_network_error',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
-            return False, error_msg
-        except TelegramError as e:
-            error_msg = f"Telegram error: {str(e)}"
-            logger.error(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='ERROR',
-                        message='Telegram API error (photo)',
-                        details={
-                            'event': 'send_photo_telegram_error',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
             return False, error_msg
         except Exception as e:
-            error_msg = f"Unexpected error: {str(e)}"
+            error_msg = f"Unexpected error: {e}"
             logger.exception(error_msg)
-            if log_telegram_event:
-                try:
-                    log_telegram_event(
-                        level='CRITICAL',
-                        message='Unexpected error sending Telegram photo',
-                        details={
-                            'event': 'send_photo_unexpected_error',
-                            'chat_id': str(chat_id),
-                            'error': error_msg,
-                        },
-                    )
-                except Exception:
-                    pass
             return False, error_msg
 
     def send_photo(self, chat_id, photo, caption=None, parse_mode="HTML", buttons=None):
-        """
-        Send a photo to a Telegram chat.
-        This is a synchronous wrapper for the async method.
-        
-        Args:
-            chat_id: Telegram chat ID (can be channel username or ID)
-            photo: Photo file (file path, file-like object, or file_id)
-            caption: Optional photo caption
-            parse_mode: Caption parse mode (HTML, Markdown, or None)
-        
-        Returns:
-            tuple: (success: bool, message: str)
-        """
         return _run_coroutine_sync(
             lambda: self._send_photo_async(chat_id, photo, caption, parse_mode, buttons)
         )
+
+    async def _edit_message_text_async(
+        self,
+        chat_id,
+        message_id,
+        text,
+        parse_mode="HTML",
+        buttons=None,
+    ):
+        if not chat_id or not message_id:
+            return False, "Chat ID and message ID are required"
+        if not text or not str(text).strip():
+            return False, "Message text cannot be empty"
+
+        try:
+            reply_markup = self._build_keyboard(buttons)
+            await self.bot.edit_message_text(
+                chat_id=chat_id,
+                message_id=message_id,
+                text=text,
+                parse_mode=parse_mode,
+                reply_markup=reply_markup,
+            )
+            return True, "Message edited successfully."
+        except TelegramBadRequest as e:
+            error_msg = str(e)
+            if "message is not modified" in error_msg.lower():
+                return True, "Message unchanged."
+            logger.warning("edit_message_text bad request: %s", error_msg)
+            return False, f"Bad request: {error_msg}"
+        except TelegramAPIError as e:
+            error_msg = f"Telegram error: {e}"
+            logger.error(error_msg)
+            return False, error_msg
+        except Exception as e:
+            error_msg = f"Unexpected error: {e}"
+            logger.exception(error_msg)
+            return False, error_msg
+
+    def edit_message_text(
+        self,
+        chat_id,
+        message_id,
+        text,
+        parse_mode="HTML",
+        buttons=None,
+    ):
+        return _run_coroutine_sync(
+            lambda: self._edit_message_text_async(
+                chat_id, message_id, text, parse_mode, buttons
+            )
+        )
+
+    async def _answer_callback_query_async(
+        self,
+        callback_query_id,
+        text=None,
+        show_alert=False,
+    ):
+        if not callback_query_id:
+            return False, "Callback query ID is required"
+        try:
+            await self.bot.answer_callback_query(
+                callback_query_id=callback_query_id,
+                text=(text[:200] if text else None),
+                show_alert=bool(show_alert),
+            )
+            return True, "Callback answered."
+        except TelegramAPIError as e:
+            error_msg = f"Telegram error: {e}"
+            logger.warning(error_msg)
+            return False, error_msg
+        except Exception as e:
+            error_msg = f"Unexpected error: {e}"
+            logger.exception(error_msg)
+            return False, error_msg
+
+    def answer_callback_query(self, callback_query_id, text=None, show_alert=False):
+        return _run_coroutine_sync(
+            lambda: self._answer_callback_query_async(
+                callback_query_id, text=text, show_alert=show_alert
+            )
+        )
+
+    async def _set_webhook_async(self, url, secret_token=None, drop_pending_updates=False):
+        if not url:
+            return False, "Webhook URL is required"
+        try:
+            kwargs: dict[str, Any] = {
+                "url": url,
+                "drop_pending_updates": bool(drop_pending_updates),
+            }
+            if secret_token:
+                kwargs["secret_token"] = secret_token
+            await self.bot.set_webhook(**kwargs)
+            return True, "Webhook set."
+        except TelegramAPIError as e:
+            return False, str(e)
+        except Exception as e:
+            logger.exception("set_webhook failed: %s", e)
+            return False, str(e)
+
+    def set_webhook(self, url, secret_token=None, drop_pending_updates=False):
+        return _run_coroutine_sync(
+            lambda: self._set_webhook_async(
+                url, secret_token=secret_token, drop_pending_updates=drop_pending_updates
+            )
+        )
+
+    async def _delete_webhook_async(self, drop_pending_updates=False):
+        try:
+            await self.bot.delete_webhook(drop_pending_updates=bool(drop_pending_updates))
+            return True, "Webhook removed."
+        except TelegramAPIError as e:
+            return False, str(e)
+        except Exception as e:
+            logger.exception("delete_webhook failed: %s", e)
+            return False, str(e)
+
+    def delete_webhook(self, drop_pending_updates=False):
+        return _run_coroutine_sync(
+            lambda: self._delete_webhook_async(drop_pending_updates=drop_pending_updates)
+        )
+
+    async def aclose(self):
+        await self.bot.session.close()

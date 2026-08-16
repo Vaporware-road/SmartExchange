@@ -86,6 +86,23 @@
             />
           </div>
 
+          <div>
+            <label class="block text-sm font-medium text-gray-400 mb-2">
+              {{ $t('telegram.botSetup.defaultExchangeTtl') }}
+            </label>
+            <input
+              v-model.number="form.default_exchange_ttl_minutes"
+              type="number"
+              min="1"
+              step="1"
+              class="input-luxury w-full"
+              required
+            />
+            <p class="mt-1 text-xs text-[var(--text-secondary)]">
+              {{ $t('telegram.botSetup.defaultExchangeTtlHint') }}
+            </p>
+          </div>
+
           <div class="space-y-3">
             <BaseSwitch v-model="form.is_active" :label="$t('telegram.botSetup.isActive')" />
             <BaseSwitch v-model="form.restrict_to_known_channels" :label="$t('telegram.botSetup.restrictChannels')" />
@@ -141,6 +158,7 @@ const form = reactive({
   is_active: true,
   restrict_to_known_channels: false,
   log_all_messages: false,
+  default_exchange_ttl_minutes: 5,
 })
 const tokenRevealed = ref(false)
 const submitting = ref(false)
@@ -169,6 +187,9 @@ onMounted(async () => {
         form.is_active = !!bot.is_active
         form.restrict_to_known_channels = !!bot.restrict_to_known_channels
         form.log_all_messages = !!bot.log_all_messages
+        form.default_exchange_ttl_minutes = Number(bot.default_exchange_ttl_minutes) > 0
+          ? Number(bot.default_exchange_ttl_minutes)
+          : 5
       } else {
         toast.error(t('toast.serverError'))
         goBack()
@@ -185,6 +206,11 @@ onMounted(async () => {
 })
 
 async function handleSubmit() {
+  const ttl = Number(form.default_exchange_ttl_minutes)
+  if (!Number.isInteger(ttl) || ttl < 1) {
+    toast.error(t('validation.required'))
+    return
+  }
   const payload = {
     name: (form.name || '').trim(),
     display_name: (form.display_name || '').trim(),
@@ -192,6 +218,7 @@ async function handleSubmit() {
     is_active: form.is_active,
     restrict_to_known_channels: form.restrict_to_known_channels,
     log_all_messages: form.log_all_messages,
+    default_exchange_ttl_minutes: ttl,
   }
   if (isEdit.value) {
     if ((form.token || '').trim()) {

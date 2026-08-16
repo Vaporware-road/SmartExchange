@@ -470,7 +470,7 @@
 
         <!-- Tab 4: Automation -->
         <div
-          v-else
+          v-else-if="activeTab === 'automation'"
           class="space-y-6 animate-fade-in-up"
         >
           <div class="card-luxury px-4 py-3">
@@ -606,6 +606,65 @@
             </template>
           </div>
         </div>
+
+        <!-- Tab 5: Customers -->
+        <div
+          v-else-if="activeTab === 'customers'"
+          class="space-y-6 animate-fade-in-up"
+        >
+          <div class="card-luxury px-4 py-3">
+            <h2 class="text-lg font-semibold text-gold mb-2">
+              {{ $t('telegram.tabs.customers') }}
+            </h2>
+            <p class="text-sm text-gray-400 mb-2">
+              {{ $t('telegram.customers.description') }}
+            </p>
+            <p class="text-xs text-amber-400/90 mb-4">
+              {{ $t('telegram.customers.staffTelegramHint') }}
+            </p>
+            <div v-if="customersLoading" class="flex justify-center py-8">
+              <LoadingSpinner class="w-8 h-8 text-gold" />
+            </div>
+            <div v-else class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="border-b border-[var(--glass-border)] text-[var(--text-secondary)]">
+                    <th class="text-left py-3 px-2 font-medium">{{ $t('telegram.customers.telegramId') }}</th>
+                    <th class="text-left py-3 px-2 font-medium">{{ $t('telegram.customers.username') }}</th>
+                    <th class="text-left py-3 px-2 font-medium">{{ $t('telegram.customers.name') }}</th>
+                    <th class="text-left py-3 px-2 font-medium">{{ $t('telegram.customers.tag') }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr
+                    v-for="c in customersList"
+                    :key="c.id"
+                    class="border-b border-[var(--glass-border)]/60"
+                  >
+                    <td class="py-3 px-2 font-mono text-xs">{{ c.telegram_user_id }}</td>
+                    <td class="py-3 px-2">{{ c.username || '—' }}</td>
+                    <td class="py-3 px-2">{{ [c.first_name, c.last_name].filter(Boolean).join(' ') || '—' }}</td>
+                    <td class="py-3 px-2">
+                      <select
+                        class="input-luxury py-1 text-sm min-w-[8rem]"
+                        :value="c.tag"
+                        :disabled="customerTagSavingId === c.id"
+                        @change="updateCustomerTag(c, $event.target.value)"
+                      >
+                        <option value="global">{{ $t('telegram.customers.tags.global') }}</option>
+                        <option value="vip">{{ $t('telegram.customers.tags.vip') }}</option>
+                        <option value="special">{{ $t('telegram.customers.tags.special') }}</option>
+                      </select>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <p v-if="!customersList.length" class="text-center text-gray-500 py-6">
+                {{ $t('telegram.customers.empty') }}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </Transition>
   </div>
@@ -618,18 +677,31 @@ import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { telegramApi, categoryApi, specialPriceApi } from '@/services/api'
 import { createAppDateTimeFormat } from '@/utils/localeFormat.js'
+import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
 
 const { t, locale } = useI18n()
 const toast = useToast()
+const auth = useAuthStore()
 
-const tabs = [
-  { id: 'messenger', labelKey: 'telegram.tabs.messenger', icon: 'fas fa-paper-plane' },
-  { id: 'bot', labelKey: 'telegram.tabs.botSetup', icon: 'fas fa-robot' },
-  { id: 'channels', labelKey: 'telegram.tabs.channels', icon: 'fas fa-broadcast-tower' },
-  { id: 'automation', labelKey: 'telegram.tabs.automation', icon: 'fas fa-clock' },
-]
+const tabs = computed(() => {
+  const base = [
+    { id: 'messenger', labelKey: 'telegram.tabs.messenger', icon: 'fas fa-paper-plane' },
+    { id: 'bot', labelKey: 'telegram.tabs.botSetup', icon: 'fas fa-robot' },
+    { id: 'channels', labelKey: 'telegram.tabs.channels', icon: 'fas fa-broadcast-tower' },
+    { id: 'automation', labelKey: 'telegram.tabs.automation', icon: 'fas fa-clock' },
+  ]
+  // Customer tags API is management / super_admin only (matches backend).
+  if (auth.isSuperAdmin || auth.isManager) {
+    base.push({
+      id: 'customers',
+      labelKey: 'telegram.tabs.customers',
+      icon: 'fas fa-users',
+    })
+  }
+  return base
+})
 
 const activeTab = ref('messenger')
 const route = useRoute()
@@ -675,6 +747,10 @@ const scheduleTargetType = ref('category')
 const scheduleSaving = ref(false)
 const autoPostOnUpdate = ref(false)
 const automationSettingsSaving = ref(false)
+
+const customersList = ref([])
+const customersLoading = ref(false)
+const customerTagSavingId = ref(null)
 
 const bannerKey = ref('none')
 const cashPrice = ref('')
@@ -747,6 +823,38 @@ onMounted(async () => {
   loadSchedules()
   loadAutomationSettings()
 })
+
+watch(activeTab, (tab) => {
+  if (tab === 'customers') loadCustomers()
+})
+
+async function loadCustomers() {
+  customersLoading.value = true
+  try {
+    const { data } = await telegramApi.customers.list()
+    customersList.value = Array.isArray(data) ? data : (data?.results ?? [])
+  } catch {
+    customersList.value = []
+    toast.error(t('telegram.customers.loadError'))
+  } finally {
+    customersLoading.value = false
+  }
+}
+
+async function updateCustomerTag(customer, tag) {
+  if (!customer?.id || customer.tag === tag) return
+  customerTagSavingId.value = customer.id
+  try {
+    const { data } = await telegramApi.customers.updateTag(customer.id, { tag })
+    const idx = customersList.value.findIndex((c) => c.id === customer.id)
+    if (idx >= 0) customersList.value[idx] = { ...customersList.value[idx], ...data }
+    toast.success(t('telegram.customers.tagUpdated'))
+  } catch (err) {
+    toast.error(err?.response?.data?.detail || t('telegram.customers.tagError'))
+  } finally {
+    customerTagSavingId.value = null
+  }
+}
 
 async function loadManageChannels() {
   manageChannelsLoading.value = true

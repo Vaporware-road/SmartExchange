@@ -5,7 +5,15 @@ from django.db import models
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
-from .models import DefaultMessageSettings, TelegramBot, TelegramChannel
+from .models import (
+    BotSession,
+    CustomerProfile,
+    DefaultMessageSettings,
+    ExchangeRequest,
+    PriceAlert,
+    TelegramBot,
+    TelegramChannel,
+)
 from .services.telegram_client import TelegramService
 
 
@@ -13,14 +21,20 @@ from .services.telegram_client import TelegramService
 class TelegramBotAdmin(admin.ModelAdmin):
     """Admin interface for TelegramBot model."""
     
-    list_display = ('name', 'is_active', 'created_at', 'updated_at')
+    list_display = (
+        'name',
+        'is_active',
+        'default_exchange_ttl_minutes',
+        'created_at',
+        'updated_at',
+    )
     list_filter = ('is_active', 'created_at', 'updated_at')
     search_fields = ('name', 'token')
     readonly_fields = ('created_at', 'updated_at')
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'token', 'is_active')
+            'fields': ('name', 'token', 'is_active', 'default_exchange_ttl_minutes')
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -120,8 +134,8 @@ class DefaultMessageSettingsAdmin(admin.ModelAdmin):
                 continue
 
             try:
-                client = TelegramService(setting.bot.token)
-                success, detail = client.send_message(
+                client = TelegramService(setting.bot.get_plain_token())
+                success, detail, _ = client.send_message(
                     chat_id=channel.chat_id,
                     text=setting.default_caption or "Preview caption",
                     buttons=setting.default_buttons,
@@ -142,3 +156,82 @@ class DefaultMessageSettingsAdmin(admin.ModelAdmin):
                     _(f"Failed to send preview to {channel.chat_id}: {detail}"),
                     level=messages.ERROR,
                 )
+
+
+@admin.register(CustomerProfile)
+class CustomerProfileAdmin(admin.ModelAdmin):
+    list_display = (
+        "telegram_user_id",
+        "username",
+        "first_name",
+        "last_name",
+        "tag",
+        "language",
+        "updated_at",
+    )
+    list_filter = ("tag", "language", "created_at")
+    search_fields = ("telegram_user_id", "username", "first_name", "last_name")
+    readonly_fields = ("created_at", "updated_at")
+
+
+@admin.register(BotSession)
+class BotSessionAdmin(admin.ModelAdmin):
+    list_display = (
+        "telegram_user_id",
+        "bot",
+        "state",
+        "last_activity",
+        "updated_at",
+    )
+    list_filter = ("state", "bot", "last_activity")
+    search_fields = ("telegram_user_id", "bot__name")
+    readonly_fields = ("created_at", "updated_at", "last_activity")
+    list_select_related = ("bot",)
+
+
+@admin.register(ExchangeRequest)
+class ExchangeRequestAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "customer",
+        "source_currency",
+        "target_currency",
+        "amount",
+        "price_at_request",
+        "ttl_minutes",
+        "status",
+        "created_at",
+    )
+    list_filter = ("status", "source_currency", "target_currency", "created_at")
+    search_fields = (
+        "customer__telegram_user_id",
+        "customer__username",
+        "source_currency",
+        "target_currency",
+    )
+    readonly_fields = ("created_at", "updated_at")
+    list_select_related = ("customer", "bot")
+
+
+@admin.register(PriceAlert)
+class PriceAlertAdmin(admin.ModelAdmin):
+    list_display = (
+        "id",
+        "customer",
+        "direction",
+        "source_currency",
+        "target_currency",
+        "target_price",
+        "is_active",
+        "last_triggered_at",
+        "created_at",
+    )
+    list_filter = ("direction", "is_active", "source_currency", "target_currency")
+    search_fields = (
+        "customer__telegram_user_id",
+        "customer__username",
+        "source_currency",
+        "target_currency",
+    )
+    readonly_fields = ("created_at", "updated_at")
+    list_select_related = ("customer",)

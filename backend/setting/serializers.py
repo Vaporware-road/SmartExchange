@@ -74,6 +74,7 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "ui_font_filename_rtl",
             "ui_font_filename_ltr",
             "prices_webhook_url",
+            "telegram_webhook_base_url",
         ]
 
     def to_representation(self, instance):
@@ -82,11 +83,15 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
         perm = IsSuperAdmin()
         if not (request is not None and perm.has_permission(request, self)):
             data.pop("prices_webhook_url", None)
+            data.pop("telegram_webhook_base_url", None)
         return data
 
     def validate_prices_webhook_url(self, value):
         s = str(value or "").strip()
         return s
+
+    def validate_telegram_webhook_base_url(self, value):
+        return str(value or "").strip()
 
     def validate_base_currency_code(self, value):
         code = str(value or "").upper().strip()

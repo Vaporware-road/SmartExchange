@@ -1,6 +1,14 @@
 from rest_framework import serializers
 
-from .models import TelegramBot, TelegramChannel, DefaultMessageSettings, AutoPostConfig
+from .models import (
+    AutoPostConfig,
+    CustomerProfile,
+    DefaultMessageSettings,
+    ExchangeRequest,
+    PriceAlert,
+    TelegramBot,
+    TelegramChannel,
+)
 
 
 class TelegramBotSerializer(serializers.ModelSerializer):
@@ -14,6 +22,7 @@ class TelegramBotSerializer(serializers.ModelSerializer):
             "is_active",
             "restrict_to_known_channels",
             "log_all_messages",
+            "default_exchange_ttl_minutes",
             "created_at",
             "updated_at",
         ]
@@ -34,6 +43,7 @@ class TelegramBotDetailSerializer(serializers.ModelSerializer):
             "is_active",
             "restrict_to_known_channels",
             "log_all_messages",
+            "default_exchange_ttl_minutes",
             "created_at",
             "updated_at",
         ]
@@ -155,3 +165,88 @@ class AutoPostConfigSerializer(serializers.ModelSerializer):
         if obj.special_price_type_id:
             return "special"
         return "none"
+
+
+class CustomerProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerProfile
+        fields = [
+            "id",
+            "telegram_user_id",
+            "username",
+            "first_name",
+            "last_name",
+            "language",
+            "tag",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "id",
+            "telegram_user_id",
+            "username",
+            "first_name",
+            "last_name",
+            "language",
+            "created_at",
+            "updated_at",
+        ]
+
+
+class CustomerTagUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CustomerProfile
+        fields = ["tag"]
+
+    def validate_tag(self, value):
+        allowed = {c.value for c in CustomerProfile.Tag}
+        if value not in allowed:
+            raise serializers.ValidationError("Invalid tag.")
+        return value
+
+
+class ExchangeRequestSerializer(serializers.ModelSerializer):
+    customer_telegram_user_id = serializers.IntegerField(
+        source="customer.telegram_user_id", read_only=True
+    )
+
+    class Meta:
+        model = ExchangeRequest
+        fields = [
+            "id",
+            "customer",
+            "customer_telegram_user_id",
+            "bot",
+            "source_currency",
+            "target_currency",
+            "amount",
+            "price_at_request",
+            "ttl_minutes",
+            "status",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = fields
+
+
+class PriceAlertSerializer(serializers.ModelSerializer):
+    customer_telegram_user_id = serializers.IntegerField(
+        source="customer.telegram_user_id", read_only=True
+    )
+
+    class Meta:
+        model = PriceAlert
+        fields = [
+            "id",
+            "customer",
+            "customer_telegram_user_id",
+            "direction",
+            "source_currency",
+            "target_currency",
+            "target_price",
+            "is_active",
+            "last_triggered_at",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = fields

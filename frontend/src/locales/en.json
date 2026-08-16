@@ -13,7 +13,10 @@
     "instagramHub": "Instagram Hub",
     "settings": "Settings",
     "userCenter": "Admin Management",
-    "adminManagement": "Admin Management"
+    "adminManagement": "Admin Management",
+    "userManagement": "User Management",
+    "registerUser": "Register user",
+    "plans": "Plans"
   },
   "common": {
     "save": "Save",
@@ -143,7 +146,10 @@
     "templateMediaLibrary": "Media library",
     "telegramStudio": "Telegram Message Studio",
     "instagramHub": "Instagram Hub",
-    "userCenter": "Admin Management"
+    "userCenter": "Admin Management",
+    "programmerHub": "User Management",
+    "programmerRegister": "Register user",
+    "programmerTemplates": "Plans"
   },
   "instagramHub": {
     "description": "Generate post and story images from your finalized prices. Choose a theme and categories, then preview before publishing to Instagram.",
@@ -652,7 +658,8 @@
       "messenger": "Messenger",
       "botSetup": "Bot Setup",
       "channels": "Channels",
-      "automation": "Automation"
+      "automation": "Automation",
+      "customers": "Customers"
     },
     "messenger": {
       "channelLabel": "Channel",
@@ -689,6 +696,8 @@
       "isActive": "Active",
       "restrictChannels": "Restrict to allowed channels only",
       "logMessages": "Log sent messages",
+      "defaultExchangeTtl": "Default exchange TTL (minutes)",
+      "defaultExchangeTtlHint": "Applied to every exchange request from this bot. Default is 5. Bot users cannot change it.",
       "testConnection": "Test connection",
       "testSuccess": "Connection successful.",
       "testFailed": "Connection failed.",
@@ -737,6 +746,23 @@
       "schedules": "Schedules",
       "noSchedules": "No schedules yet. Add a schedule to automate posting.",
       "hint": "Automation is configuration-only in this phase. A future scheduler (Celery or cron) can read these configs and call the existing price publisher services."
+    },
+    "customers": {
+      "description": "Telegram customers who messaged the bot. Set Global, VIP, or Special tags for staff use.",
+      "staffTelegramHint": "Staff need a Telegram ID on their panel user account to receive exchange-request notifications.",
+      "telegramId": "Telegram ID",
+      "username": "Username",
+      "name": "Name",
+      "tag": "Tag",
+      "empty": "No customers yet. They appear after messaging the bot.",
+      "loadError": "Could not load customers.",
+      "tagUpdated": "Customer tag updated.",
+      "tagError": "Could not update tag.",
+      "tags": {
+        "global": "Global",
+        "vip": "VIP",
+        "special": "Special"
+      }
     },
     "settings": {
       "description": "Configure Telegram bots and channels for broadcasting exchange rates.",
@@ -811,5 +837,35 @@
       "unknown": "Something went wrong. Please try again."
     },
     "fields": {}
+  },
+  "nav": {
+    "userManagement": "User Management",
+    "registerUser": "Register user",
+    "plans": "Plans"
+  },
+  "programmerHub": {
+    "title": "User Management",
+    "register": "Register user",
+    "templates": "Plans",
+    "templatesTitle": "Plans",
+    "templatesHint": "Mark which pictures belong to Bronze, Silver, or Gold.",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "exchangeName": "Exchange name",
+    "country": "Country",
+    "email": "Email",
+    "phone": "Phone number",
+    "telegramId": "Telegram ID",
+    "botToken": "Telegram bot token",
+    "generatedPassword": "Generated password",
+    "created": "User created",
+    "empty": "No users yet. Register one to see a card here.",
+    "viewingAs": "Viewing as {name}",
+    "exit": "Exit",
+    "plans": {
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold"
+    }
   }
 }

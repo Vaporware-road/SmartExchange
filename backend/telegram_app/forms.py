@@ -68,7 +68,7 @@ class TelegramBotForm(forms.ModelForm):
     
     class Meta:
         model = TelegramBot
-        fields = ['name', 'token', 'is_active']
+        fields = ['name', 'token', 'is_active', 'default_exchange_ttl_minutes']
         widgets = {
             'name': forms.TextInput(attrs={
                 'class': 'form-control theme-input',
@@ -80,17 +80,23 @@ class TelegramBotForm(forms.ModelForm):
             }),
             'is_active': forms.CheckboxInput(attrs={
                 'class': 'form-check-input theme-input'
-            })
+            }),
+            'default_exchange_ttl_minutes': forms.NumberInput(attrs={
+                'class': 'form-control theme-input',
+                'min': 1,
+            }),
         }
         labels = {
             'name': 'Bot Name',
             'token': 'Bot Token',
-            'is_active': 'Active'
+            'is_active': 'Active',
+            'default_exchange_ttl_minutes': 'Default exchange TTL (minutes)',
         }
         help_texts = {
             'name': 'A friendly name for this bot',
             'token': 'Telegram bot token from @BotFather',
-            'is_active': 'Whether this bot is currently active'
+            'is_active': 'Whether this bot is currently active',
+            'default_exchange_ttl_minutes': 'TTL for exchange requests (default 5)',
         }
 
 

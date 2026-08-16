@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.utils import timezone
 from .managers import CustomUserManager
+from .plans import PLAN_BRONZE, PLAN_CHOICES
 
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
@@ -18,7 +19,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     )
 
     username = models.CharField(max_length=150, unique=True)
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
     full_name = models.CharField(max_length=255, blank=True)
+    exchange_name = models.CharField(max_length=255, blank=True)
+    country = models.CharField(max_length=120, blank=True)
+    email = models.EmailField(blank=True, null=True, unique=True)
+    phone = models.CharField(max_length=40, blank=True)
+    telegram_id = models.CharField(max_length=64, blank=True)
+    plan = models.CharField(max_length=16, choices=PLAN_CHOICES, default=PLAN_BRONZE)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=ROLE_EMPLOYEE)
 
     is_active = models.BooleanField(default=True)
@@ -35,8 +44,17 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'user'
         verbose_name_plural = 'users'
 
+    def save(self, *args, **kwargs):
+        composed = f"{self.first_name} {self.last_name}".strip()
+        if composed:
+            self.full_name = composed
+        if self.email == "":
+            self.email = None
+        super().save(*args, **kwargs)
+
     def get_full_name(self):
-        return self.full_name or self.username
+        composed = f"{self.first_name} {self.last_name}".strip()
+        return composed or self.full_name or self.username
 
     def get_short_name(self):
         return self.username
@@ -56,6 +74,7 @@ class UserActivityLog(models.Model):
     ACTION_SPECIAL_PRICE_UPDATE = 'special_price_update'
     ACTION_TEMPLATE_CHANGE = 'template_change'
     ACTION_FINALIZE = 'finalize'
+    ACTION_IMPERSONATE_START = 'impersonate_start'
     ACTION_OTHER = 'other'
 
     ACTION_CHOICES = (
@@ -67,6 +86,7 @@ class UserActivityLog(models.Model):
         (ACTION_SPECIAL_PRICE_UPDATE, 'Special price update'),
         (ACTION_TEMPLATE_CHANGE, 'Template change'),
         (ACTION_FINALIZE, 'Finalize'),
+        (ACTION_IMPERSONATE_START, 'Impersonate start'),
         (ACTION_OTHER, 'Other'),
     )
 

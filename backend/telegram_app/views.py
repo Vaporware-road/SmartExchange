@@ -21,8 +21,8 @@ def send_message_view(request):
             message = form.cleaned_data['message']
 
             try:
-                client = TelegramService(bot.token)
-                success, response = client.send_message(channel.chat_id, message)
+                client = TelegramService(bot.get_plain_token())
+                success, response, _ = client.send_message(channel.chat_id, message)
 
                 if success:
                     messages.success(request, response)
@@ -79,8 +79,8 @@ def default_settings_view(request):
                 if action == "preview_send":
                     if preview_channel:
                         try:
-                            client = TelegramService(instance.bot.token)
-                            success, detail = client.send_message(
+                            client = TelegramService(instance.bot.get_plain_token())
+                            success, detail, _ = client.send_message(
                                 chat_id=preview_channel.chat_id,
                                 text=instance.default_caption or "Preview caption",
                                 buttons=instance.default_buttons,

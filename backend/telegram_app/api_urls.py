@@ -15,12 +15,32 @@ router.register(
     api_views.AutoPostConfigViewSet,
     basename="api-telegram-auto-post-config",
 )
+router.register(
+    "customers",
+    api_views.CustomerProfileViewSet,
+    basename="api-telegram-customers",
+)
+router.register(
+    "exchange-requests",
+    api_views.ExchangeRequestViewSet,
+    basename="api-telegram-exchange-requests",
+)
+router.register(
+    "price-alerts",
+    api_views.PriceAlertViewSet,
+    basename="api-telegram-price-alerts",
+)
 
 urlpatterns = [
     path(
         "channels/",
         api_views.TelegramChannelListAPIView.as_view(),
         name="api-telegram-channels",
+    ),
+    path(
+        "webhook/<int:bot_id>/",
+        api_views.TelegramCustomerWebhookAPIView.as_view(),
+        name="api-telegram-customer-webhook",
     ),
     path(
         "send-message/",

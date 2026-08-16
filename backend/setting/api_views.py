@@ -75,6 +75,7 @@ def _public_site_settings_fallback():
         "ui_font_filename_rtl": "",
         "ui_font_filename_ltr": "",
         "prices_webhook_url": "",
+        "telegram_webhook_base_url": "",
     }
 
 

@@ -376,4 +376,10 @@ CELERY_ENABLE_UTC = USE_TZ
 CELERY_TASK_TIME_LIMIT = int(os.environ.get("CELERY_TASK_TIME_LIMIT", "120"))
 CELERY_TASK_SOFT_TIME_LIMIT = int(os.environ.get("CELERY_TASK_SOFT_TIME_LIMIT", "90"))
 CELERY_RESULT_EXPIRES = int(os.environ.get("CELERY_RESULT_EXPIRES", "3600"))
+CELERY_BEAT_SCHEDULE = {
+    "telegram-check-price-alerts": {
+        "task": "telegram_app.check_price_alerts",
+        "schedule": float(os.environ.get("TELEGRAM_ALERT_CHECK_SECONDS", "120")),
+    },
+}
 FINALIZE_TASK_WAIT_TIMEOUT = int(os.environ.get("FINALIZE_TASK_WAIT_TIMEOUT", "75"))

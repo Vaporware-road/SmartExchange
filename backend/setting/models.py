@@ -145,6 +145,16 @@ class SiteSettings(models.Model):
         default="",
         help_text="If set, the panel POSTs a JSON prices snapshot to this URL after each price update.",
     )
+    telegram_webhook_base_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text=(
+            "Public HTTPS origin for customer-bot webhooks "
+            "(e.g. https://panel.example.com). When set, active bots can register "
+            "/api/telegram/webhook/<bot_id>/ with Telegram."
+        ),
+    )
 
     class Meta:
         verbose_name = "Site Settings"
