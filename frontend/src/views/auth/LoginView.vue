@@ -109,8 +109,8 @@ async function handleSubmit() {
   loading.value = true
   try {
     await auth.login(username.value, password.value)
-    const redirect = route.query.redirect || '/'
-    router.push(redirect)
+    const redirect = route.query.redirect
+    router.push(redirect || (auth.shouldOpenProgrammerHub ? '/programmer' : '/'))
   } catch (err) {
     error.value = getApiErrorDetails(err).message
   } finally {

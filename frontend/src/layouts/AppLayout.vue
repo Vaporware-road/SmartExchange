@@ -6,6 +6,17 @@
       class="flex min-h-0 flex-1 flex-col min-w-0 overflow-x-hidden transition-[padding] duration-300 ease-in-out pb-16 md:pb-0 w-full"
       :class="['md:ps-16', sidebarStore.isCollapsed ? 'lg:ps-16' : 'lg:ps-64']"
     >
+      <div
+        v-if="auth.isImpersonating"
+        class="flex items-center justify-between gap-3 px-4 py-2 bg-amber-500/20 text-amber-200 text-sm"
+      >
+        <span>
+          {{ $t('programmerHub.viewingAs', { name: auth.user?.username }) }}
+        </span>
+        <button type="button" class="btn-luxury-outline !py-1 !px-3 text-xs" @click="exitImpersonation">
+          {{ $t('programmerHub.exit') }}
+        </button>
+      </div>
       <AppHeader @toggle-drawer="drawerOpen = !drawerOpen" />
       <main
         class="flex min-w-0 flex-1 flex-col overflow-x-hidden"
@@ -39,17 +50,25 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { AppSidebar, AppHeader, AppDrawer, AppFooter, AppBreadcrumb, AppBottomNav } from '@/components/layout'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useSidebarStore } from '@/stores/sidebar'
+import { useAuthStore } from '@/stores/auth'
 
 const route = useRoute()
+const router = useRouter()
 const drawerOpen = ref(false)
 const siteSettings = useSiteSettingsStore()
 const sidebarStore = useSidebarStore()
+const auth = useAuthStore()
 
 const isTemplateEditorLayout = computed(() => Boolean(route.meta.templateEditorLayout))
+
+async function exitImpersonation() {
+  await auth.stopImpersonating()
+  router.push('/programmer')
+}
 
 onMounted(() => {
   siteSettings.fetch()

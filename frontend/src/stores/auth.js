@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { authApi } from '@/services/api'
 import { can as canPermission, ROLES, PERMISSIONS } from '@/config/permissions'
+import { useTelegramHubStore } from '@/stores/telegramHub'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
@@ -51,6 +52,15 @@ export const useAuthStore = defineStore('auth', {
     canDeleteItems() {
       return canPermission(this.role, 'deleteItems')
     },
+    canAccessProgrammerHub() {
+      return canPermission(this.role, 'programmerHub')
+    },
+    isImpersonating() {
+      return Boolean(this.user?.impersonated_by)
+    },
+    shouldOpenProgrammerHub() {
+      return this.canAccessProgrammerHub && !this.isImpersonating
+    },
   },
 
   actions: {
@@ -84,7 +94,10 @@ export const useAuthStore = defineStore('auth', {
         const { data } = await authApi.login(username, password)
         if (data.access) localStorage.setItem('access_token', data.access)
         if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
+        sessionStorage.removeItem('programmer_access_token')
+        sessionStorage.removeItem('programmer_refresh_token')
         this.user = data.user ?? data
+        useTelegramHubStore().clearSession()
         return this.user
       } finally {
         this.loading = false
@@ -97,7 +110,10 @@ export const useAuthStore = defineStore('auth', {
         const { data } = await authApi.demoLogin()
         if (data.access) localStorage.setItem('access_token', data.access)
         if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
+        sessionStorage.removeItem('programmer_access_token')
+        sessionStorage.removeItem('programmer_refresh_token')
         this.user = data.user ?? data
+        useTelegramHubStore().clearSession()
         return this.user
       } finally {
         this.loading = false
@@ -106,16 +122,48 @@ export const useAuthStore = defineStore('auth', {
 
     async logout() {
       const refresh = localStorage.getItem('refresh_token')
-      // Clear session state immediately so UI can transition to unauthenticated mode
-      // and avoid firing protected requests during the logout window.
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
+      sessionStorage.removeItem('programmer_access_token')
+      sessionStorage.removeItem('programmer_refresh_token')
       this.user = null
+      useTelegramHubStore().clearSession()
       try {
         await authApi.logout(refresh)
       } catch {
         // Ignore network/logout endpoint failures; client session is already cleared.
       }
+    },
+
+    async impersonate(userId) {
+      const programmerUsername = this.username
+      const { data } = await authApi.impersonate(userId)
+      sessionStorage.setItem('programmer_access_token', localStorage.getItem('access_token') || '')
+      sessionStorage.setItem('programmer_refresh_token', localStorage.getItem('refresh_token') || '')
+      if (data.access) localStorage.setItem('access_token', data.access)
+      if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
+      const nextUser = data.user ?? data
+      this.user = nextUser?.impersonated_by
+        ? nextUser
+        : { ...nextUser, impersonated_by: { username: programmerUsername } }
+      useTelegramHubStore().clearSession()
+      return this.user
+    },
+
+    async stopImpersonating() {
+      const access = sessionStorage.getItem('programmer_access_token')
+      const refresh = sessionStorage.getItem('programmer_refresh_token')
+      sessionStorage.removeItem('programmer_access_token')
+      sessionStorage.removeItem('programmer_refresh_token')
+      if (access) localStorage.setItem('access_token', access)
+      if (refresh) localStorage.setItem('refresh_token', refresh)
+      if (!access) {
+        this.user = null
+        useTelegramHubStore().clearSession()
+        return null
+      }
+      useTelegramHubStore().clearSession()
+      return this.fetchUser()
     },
 
     ensureInitialized() {

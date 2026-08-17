@@ -355,7 +355,7 @@ def finalize_category(request, category_id):
         # ============================================
         # STEP 2: ارسال قیمت‌ها به تلگرام
         # ============================================
-        publisher = PricePublisherService()
+        publisher = PricePublisherService(acting_user=request.user)
         message_sent = False
         image_caption = None
         publication_response = ""
@@ -539,7 +539,7 @@ def finalize_special_price(request, special_price_history_id):
         
         notes_text = notes.strip() if notes else None
 
-        publisher = PricePublisherService()
+        publisher = PricePublisherService(acting_user=request.user)
         message_sent = False
         image_caption = None
         publication_response = ""

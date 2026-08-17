@@ -14,6 +14,8 @@ import jdatetime
 
 from PIL import Image
 
+from accounts.models import CustomUser
+from accounts.plans import allowed_plans_for, user_plan
 from price_publisher.models import PriceTemplate
 from price_publisher.services.image_renderer import (
     PriceEntry,
@@ -229,8 +231,18 @@ class PublicationResult:
 class PricePublisherService:
     """Coordinates rendering price cards and sending them to Telegram."""
 
-    def __init__(self, renderer: Optional[PriceImageRenderer] = None) -> None:
+    def __init__(
+        self,
+        renderer: Optional[PriceImageRenderer] = None,
+        acting_user: Optional[CustomUser] = None,
+    ) -> None:
         self._renderer = renderer or PriceImageRenderer()
+        self._acting_user = acting_user
+
+    def _plan_filter(self):
+        if not self._acting_user:
+            return {}
+        return {"plan__in": allowed_plans_for(user_plan(self._acting_user))}
 
     # ------------------------------------------------------------------
     # Public API
@@ -424,7 +436,9 @@ class PricePublisherService:
         # Honor pinned template only when it belongs to the same category.
         pinned_id = _safe_last_used_template_id(category)
         if pinned_id:
-            pinned = Template.objects.filter(pk=pinned_id, category=category).first()
+            pinned = Template.objects.filter(
+                pk=pinned_id, category=category, **self._plan_filter()
+            ).first()
             if pinned:
                 return pinned
             logger.warning(
@@ -435,7 +449,9 @@ class PricePublisherService:
             )
 
         active = list(
-            Template.objects.filter(category=category, is_active=True).order_by(
+            Template.objects.filter(
+                category=category, is_active=True, **self._plan_filter()
+            ).order_by(
                 "publish_order", "id"
             )
         )
@@ -653,7 +669,7 @@ class PricePublisherService:
     ) -> PublicationResult:
         stream = self._prepare_stream(image.stream, fallback_name="prices.png")
 
-        service = TelegramService(channel.bot.token)
+        service = TelegramService(channel.bot.get_plain_token())
         success, response = service.send_photo(
             channel.chat_id,
             stream,
@@ -731,6 +747,7 @@ class PricePublisherService:
                 template_type=PriceTemplate.TemplateType.CATEGORY,
                 category=category,
                 is_active=True,
+                **self._plan_filter(),
             )
             .select_related("category")
             .first()
@@ -750,6 +767,7 @@ class PricePublisherService:
                 template_type=PriceTemplate.TemplateType.SPECIAL,
                 special_price_type=special_price_type,
                 is_active=True,
+                **self._plan_filter(),
             )
             .select_related("special_price_type")
             .first()
@@ -765,6 +783,7 @@ class PricePublisherService:
             PriceTemplate.objects.filter(
                 template_type=PriceTemplate.TemplateType.DEFAULT,
                 is_active=True,
+                **self._plan_filter(),
             )
             .order_by("name")
             .first()

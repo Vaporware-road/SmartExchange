@@ -370,6 +370,7 @@ class FinalizeCategoryAPIView(APIView):
                 "channel_id": channel.id,
                 "notes": notes_text,
                 "price_history_ids": [price_history.id for _, price_history in price_items],
+                "user_id": request.user.id,
             }
         )
         publication = _wait_for_publication_task(publish_async)
@@ -662,6 +663,8 @@ class FinalizeAllAPIView(APIView):
                         "special_price_history_id": special_price_history.id,
                         "channel_id": channel.id,
                         "notes": notes_text,
+                        "user_id": request.user.id,
+                        "user_id": request.user.id,
                     }
                 )
                 publication = _wait_for_publication_task(publish_async)
@@ -791,6 +794,7 @@ class FinalizeAllAPIView(APIView):
                 "channel_id": channel.id,
                 "notes": notes_text,
                 "price_history_ids": [price_history.id for _, price_history in price_items],
+                "user_id": request.user.id,
             }
         )
         publication = _wait_for_publication_task(publish_async)

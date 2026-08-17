@@ -4,13 +4,16 @@ DRF API views for price publisher templates (PriceTemplate).
 from pathlib import Path
 
 from django.conf import settings
-from rest_framework import status
+from django.conf import settings
+from django.shortcuts import get_object_or_404
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 
+from accounts.plans import filter_templates_queryset, user_may_use_template
 from category.models import Category
 from special_price.models import SpecialPriceType
 
@@ -18,15 +21,31 @@ from .models import PriceTemplate
 from .serializers import PriceTemplateSerializer
 
 
+def _assert_plan(request, template):
+    if not user_may_use_template(request.user, template, request=request):
+        raise PermissionDenied("This template is not included in your plan.")
+
+
 class PriceTemplateViewSet(ModelViewSet):
     """CRUD for PriceTemplate."""
 
     permission_classes = [IsAuthenticated]
-    queryset = PriceTemplate.objects.select_related(
-        "category", "special_price_type"
-    ).order_by("template_type", "name")
     serializer_class = PriceTemplateSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_queryset(self):
+        qs = PriceTemplate.objects.select_related(
+            "category", "special_price_type"
+        ).order_by("template_type", "name")
+        return filter_templates_queryset(qs, self.request)
+
+    def get_object(self):
+        obj = get_object_or_404(
+            PriceTemplate.objects.select_related("category", "special_price_type"),
+            pk=self.kwargs[self.lookup_field],
+        )
+        _assert_plan(self.request, obj)
+        return obj
 
 
 class PriceTemplateDashboardAPIView(APIView):
@@ -38,9 +57,12 @@ class PriceTemplateDashboardAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        templates = PriceTemplate.objects.select_related(
-            "category", "special_price_type"
-        ).order_by("template_type", "name")
+        templates = filter_templates_queryset(
+            PriceTemplate.objects.select_related(
+                "category", "special_price_type"
+            ).order_by("template_type", "name"),
+            request,
+        )
 
         categories_without_template = (
             Category.objects.order_by("name").filter(price_template__isnull=True)

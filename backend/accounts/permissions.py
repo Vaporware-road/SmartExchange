@@ -34,6 +34,18 @@ def _normalize_role(role):
     return key
 
 
+class IsProgrammer(permissions.BasePermission):
+    """developer or super_admin — programmer hub APIs only."""
+
+    def has_permission(self, request, view):
+        if not request.user or not request.user.is_authenticated:
+            return False
+        if getattr(request.user, "is_superuser", False):
+            return True
+        role = _normalize_role(getattr(request.user, "role", None))
+        return role in ("developer", "super_admin")
+
+
 class IsSuperAdmin(permissions.BasePermission):
     """
     Allows access only to users with role super_admin.

@@ -30,6 +30,7 @@ services:
       sh -c "mkdir -p /app/backend/data /app/backend/public/media /app/backend/public/staticfiles &&
              cd /app/backend &&
              python manage.py migrate --noinput &&
+             rm -rf /app/backend/public/staticfiles/vue &&
              python manage.py collectstatic --noinput &&
              python manage.py ensure_default_admin --username admin --password admin &&
              python manage.py ensure_demo_user &&
@@ -48,6 +49,11 @@ services:
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
       VITE_API_PROXY_TARGET: "http://127.0.0.1:8000"
+      # Host maps 5250->5173; HMR websocket must use the browser-visible port.
+      VITE_DEV_SERVER_PORT: "5173"
+      VITE_HMR_CLIENT_PORT: "5250"
+      VITE_HMR_HOST: "localhost"
+      VITE_DEV_ORIGIN: "http://localhost:5250"
     volumes:
       - ./backend:/app/backend
       - ./frontend:/app/frontend

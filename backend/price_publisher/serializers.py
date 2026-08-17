@@ -24,6 +24,7 @@ class PriceTemplateSerializer(serializers.ModelSerializer):
             "logo_image",
             "watermark_image",
             "is_active",
+            "plan",
             "notes",
             "created_at",
             "updated_at",
@@ -45,3 +46,11 @@ class PriceTemplateSerializer(serializers.ModelSerializer):
 
     def validate_watermark_image(self, value):
         return self._validate_image_field(value)
+
+    def validate_plan(self, value):
+        from accounts.plans import can_assign_template_plan
+
+        request = self.context.get("request")
+        if not can_assign_template_plan(request):
+            raise serializers.ValidationError("Only programmers can assign template plans.")
+        return value

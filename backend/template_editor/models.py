@@ -2,6 +2,8 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from accounts.plans import PLAN_BRONZE, PLAN_CHOICES
+
 
 class Layer(models.Model):
     """Editor layer (PixelCast-style); default layer holds synced widgets."""
@@ -119,6 +121,7 @@ class Template(models.Model):
         default=True,
         help_text=_("If false, excluded from round-robin publishing for this category/special."),
     )
+    plan = models.CharField(max_length=16, choices=PLAN_CHOICES, default=PLAN_BRONZE)
     publish_order = models.PositiveSmallIntegerField(
         default=0,
         help_text=_("Lower values are used first in round-robin order within the same category."),

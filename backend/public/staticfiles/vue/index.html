@@ -3,14 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SmartExchange Panel</title>
+  <title>Mr Exchange</title>
   <meta name="theme-color" content="#FFD700">
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SmartExchange">
+  <meta name="apple-mobile-web-app-title" content="Mr Exchange">
   <script>
     (function() {
-      const stored = localStorage.getItem('smartexchange-theme');
+      const stored = localStorage.getItem('mrexchange-theme') || localStorage.getItem('smartexchange-theme');
       const prefersLight = window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
       if (stored === 'light' || (stored === undefined && prefersLight)) {
         document.documentElement.classList.remove('dark');
@@ -18,7 +19,7 @@
         document.documentElement.classList.add('dark');
       }
       // Restore locale direction (only 'en' and 'fa' are supported)
-      var locale = localStorage.getItem('smartexchange-locale') || 'en';
+      var locale = localStorage.getItem('mrexchange-locale') || localStorage.getItem('smartexchange-locale') || 'en';
       if (locale !== 'en' && locale !== 'fa') locale = 'en';
       document.documentElement.lang = locale;
       document.documentElement.dir = locale === 'fa' ? 'rtl' : 'ltr';
@@ -26,12 +27,12 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="icon" type="image/png" href="/favicon.png">
-  <link rel="apple-touch-icon" href="/pwa-192x192.png">
+  <link rel="icon" type="image/svg+xml" href="/static/vue/favicon.svg">
+  <link rel="apple-touch-icon" href="/static/vue/apple-touch-icon.png">
   <link rel="manifest" href="/static/vue/manifest.json">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-  <script type="module" crossorigin src="/static/vue/assets/index-C-AapqmN.js"></script>
-  <link rel="stylesheet" crossorigin href="/static/vue/assets/index-mKuLFL3Q.css">
+  <script type="module" crossorigin src="/static/vue/assets/index-BloBh38d.js"></script>
+  <link rel="stylesheet" crossorigin href="/static/vue/assets/index-DPCaRk-a.css">
 <link rel="manifest" href="/static/vue/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/static/vue/registerSW.js"></script></head>
 <body>
   <div id="app"></div>

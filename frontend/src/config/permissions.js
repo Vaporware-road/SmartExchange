@@ -50,6 +50,7 @@ export const PERMISSIONS = {
   deleteItems: SUPER_ADMIN_OR_MANAGEMENT,
   /** مدیریت کاربران / ادمین‌ها (اضافه، ویرایش، حذف، لاگ فعالیت) — IsSuperAdmin */
   adminManagement: SUPER_ADMIN_ONLY,
+  programmerHub: [ROLES.DEVELOPER, ROLES.SUPER_ADMIN],
 }
 
 function normalizeRole(role) {

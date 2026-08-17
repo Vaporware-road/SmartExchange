@@ -46,6 +46,7 @@ def publish_category_prices_task(
     channel_id: int,
     notes: Optional[str],
     price_history_ids: list[int],
+    user_id: Optional[int] = None,
 ):
     """
     Render + publish category prices to Telegram in worker process.
@@ -77,8 +78,14 @@ def publish_category_prices_task(
     if not price_items:
         raise PricePublicationError("No price entries were provided for publication.")
 
+    acting_user = None
+    if user_id:
+        from accounts.models import CustomUser
+
+        acting_user = CustomUser.objects.filter(pk=user_id).first()
+
     try:
-        publication = PricePublisherService().publish_category_prices(
+        publication = PricePublisherService(acting_user=acting_user).publish_category_prices(
             category=category,
             price_items=price_items,
             channel=channel,
@@ -114,6 +121,7 @@ def publish_special_price_task(
     special_price_history_id: int,
     channel_id: int,
     notes: Optional[str],
+    user_id: Optional[int] = None,
 ):
     """
     Render + publish special price to Telegram in worker process.
@@ -140,7 +148,13 @@ def publish_special_price_task(
     ).get(id=special_price_history_id)
     channel = TelegramChannel.objects.select_related("bot").get(id=channel_id, is_active=True)
 
-    publication = PricePublisherService().publish_special_price(
+    acting_user = None
+    if user_id:
+        from accounts.models import CustomUser
+
+        acting_user = CustomUser.objects.filter(pk=user_id).first()
+
+    publication = PricePublisherService(acting_user=acting_user).publish_special_price(
         special_price_type=special_price_history.special_price_type,
         price_history=special_price_history,
         channel=channel,

@@ -3,6 +3,8 @@ from __future__ import annotations
 from django.core.exceptions import ValidationError
 from django.db import models
 
+from accounts.plans import PLAN_BRONZE, PLAN_CHOICES
+
 
 class PriceTemplate(models.Model):
     """Configurable assets used when rendering Telegram price images."""
@@ -52,6 +54,7 @@ class PriceTemplate(models.Model):
     )
 
     is_active = models.BooleanField(default=True)
+    plan = models.CharField(max_length=16, choices=PLAN_CHOICES, default=PLAN_BRONZE)
     notes = models.TextField(blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)

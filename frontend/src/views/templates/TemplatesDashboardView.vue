@@ -85,6 +85,11 @@
             </div>
             <!-- Badge: category / special_price_type / Default -->
             <span
+              class="absolute top-2 start-2 px-2 py-0.5 rounded-lg text-xs font-medium border backdrop-blur-sm template-badge"
+            >
+              {{ t.plan || 'bronze' }}
+            </span>
+            <span
               class="absolute top-2 end-2 px-2 py-0.5 rounded-lg text-xs font-medium border backdrop-blur-sm template-badge"
             >
               {{ getTemplateBadgeLabel(t) }}

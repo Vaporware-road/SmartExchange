@@ -17,23 +17,28 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+import { developerNavLinks, navLinkIsActive } from '@/config/navLinks'
 
 const route = useRoute()
+const auth = useAuthStore()
 
-const items = [
+const staffItems = [
   { to: '/', labelKey: 'sidebar.dashboard', icon: 'fas fa-tachometer-alt', exact: true },
   { to: '/update', labelKey: 'sidebar.priceHub', icon: 'fas fa-dollar-sign', exact: false },
   { to: '/finalize', labelKey: 'sidebar.finalize', icon: 'fas fa-check-circle', exact: false },
 ]
 
-function isActive(item) {
-  if (item.exact) return route.path === item.to
-  if (item.to === '/update') {
-    return route.path === '/update' ||
-      (route.path.startsWith('/prices/category/') && route.path.endsWith('/update')) ||
-      (route.path.startsWith('/prices/special/') && route.path.endsWith('/update'))
+const items = computed(() => {
+  if (auth.shouldOpenProgrammerHub) {
+    return developerNavLinks.slice(0, 3)
   }
-  return route.path.startsWith(item.to)
+  return staffItems
+})
+
+function isActive(item) {
+  return navLinkIsActive(route, item)
 }
 </script>

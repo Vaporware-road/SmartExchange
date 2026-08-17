@@ -48,6 +48,42 @@ const routes = [
         meta: { titleKey: 'routes.dashboard' },
       },
       {
+        path: 'programmer',
+        name: 'programmer',
+        component: () => import('@/views/programmer/ProgrammerHubView.vue'),
+        meta: {
+          titleKey: 'routes.programmerHub',
+          roles: ['super_admin', 'developer'],
+        },
+      },
+      {
+        path: 'programmer/register',
+        name: 'programmer-register',
+        component: () => import('@/views/programmer/ProgrammerRegisterView.vue'),
+        meta: {
+          titleKey: 'routes.programmerRegister',
+          roles: ['super_admin', 'developer'],
+        },
+      },
+      {
+        path: 'programmer/users/:id',
+        name: 'programmer-user',
+        component: () => import('@/views/programmer/ProgrammerUserDetailView.vue'),
+        meta: {
+          titleKey: 'routes.programmerUser',
+          roles: ['super_admin', 'developer'],
+        },
+      },
+      {
+        path: 'programmer/templates',
+        name: 'programmer-templates',
+        component: () => import('@/views/programmer/ProgrammerTemplatesView.vue'),
+        meta: {
+          titleKey: 'routes.programmerTemplates',
+          roles: ['super_admin', 'developer'],
+        },
+      },
+      {
         path: 'update',
         name: 'update',
         component: () => import('@/views/prices/PriceManagementView.vue'),
@@ -284,7 +320,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (to.meta.public) {
     if (auth.isAuthenticated && to.name === 'login') {
-      next({ name: 'dashboard' })
+      next({ name: auth.shouldOpenProgrammerHub ? 'programmer' : 'dashboard' })
     } else {
       next()
     }
@@ -299,6 +335,16 @@ router.beforeEach(async (to, from, next) => {
       next({ name: 'error-403' })
     } else if (to.meta.roles && !to.meta.roles.includes(auth.role)) {
       next({ name: 'error-403' })
+    } else if (to.name === 'dashboard' && auth.shouldOpenProgrammerHub) {
+      next({ name: 'programmer' })
+    } else if (
+      (to.name === 'programmer' ||
+        to.name === 'programmer-templates' ||
+        to.name === 'programmer-register' ||
+        to.name === 'programmer-user') &&
+      auth.isImpersonating
+    ) {
+      next({ name: 'dashboard' })
     } else {
       next()
     }

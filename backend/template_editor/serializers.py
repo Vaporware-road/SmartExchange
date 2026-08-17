@@ -23,6 +23,7 @@ class TemplateSerializer(serializers.ModelSerializer):
             "canvas_height",
             "orientation",
             "is_active",
+            "plan",
             "publish_order",
             "telegram_caption_template",
             "telegram_buttons_json",
@@ -40,6 +41,14 @@ class TemplateSerializer(serializers.ModelSerializer):
                 validate_uploaded_image(value, max_size=MAX_ASSET_SIZE)
             except ValueError as e:
                 raise serializers.ValidationError(str(e))
+        return value
+
+    def validate_plan(self, value):
+        from accounts.plans import can_assign_template_plan
+
+        request = self.context.get("request")
+        if not can_assign_template_plan(request):
+            raise serializers.ValidationError("Only programmers can assign template plans.")
         return value
 
     def create(self, validated_data):

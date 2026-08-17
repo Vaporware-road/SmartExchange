@@ -13,5 +13,9 @@ urlpatterns = [
     path("users/", api_views.UserListCreateAPIView.as_view(), name="api-user-list"),
     path("users/<int:pk>/", api_views.UserDetailAPIView.as_view(), name="api-user-detail"),
     path("users/<int:pk>/force-logout/", api_views.ForceLogoutAPIView.as_view(), name="api-user-force-logout"),
+    path("programmer/users/", api_views.ProgrammerRegisterAPIView.as_view(), name="api-programmer-register"),
+    path("programmer/users/<int:pk>/", api_views.ProgrammerUserDetailAPIView.as_view(), name="api-programmer-user"),
+    path("programmer/templates/", api_views.ProgrammerTemplateLibraryAPIView.as_view(), name="api-programmer-templates"),
+    path("impersonate/<int:pk>/", api_views.ImpersonateAPIView.as_view(), name="api-impersonate"),
     path("activity/", api_views.ActivityLogListAPIView.as_view(), name="api-activity-list"),
 ]

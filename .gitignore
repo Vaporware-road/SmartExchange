@@ -3,6 +3,14 @@
 graphify-out/
 __pycache__/
 *.pyc
+node_modules/
+venv/
+
+# Local databases and logs
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+backend/logs/
 
 # macOS AppleDouble junk
 ._*

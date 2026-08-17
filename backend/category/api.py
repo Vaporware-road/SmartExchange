@@ -11,8 +11,12 @@ from django.shortcuts import get_object_or_404
 from change_price.prefetch_helpers import prefetch_price_histories_latest
 
 from core.exceptions import error_response
-from orders.models import OrderIntake
 from .models import Category, Currency, PriceType
+
+try:
+    from orders.models import OrderIntake
+except ImportError:
+    OrderIntake = None
 from .serializers import (
     CategorySerializer,
     CategoryListSerializer,
@@ -33,7 +37,11 @@ class CurrencyListAPIView(APIView):
 class CategoryViewSet(viewsets.ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
-        order_count = OrderIntake.objects.filter(category=instance).count()
+        order_count = (
+            OrderIntake.objects.filter(category=instance).count()
+            if OrderIntake is not None
+            else 0
+        )
         if order_count:
             return error_response(
                 "This category is linked to existing orders and cannot be deleted. "

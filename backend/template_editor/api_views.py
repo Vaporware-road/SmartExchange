@@ -13,7 +13,7 @@ from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from django.utils.text import get_valid_filename, slugify
 from rest_framework import status
-from rest_framework.exceptions import ValidationError as DRFValidationError
+from rest_framework.exceptions import PermissionDenied, ValidationError as DRFValidationError
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -22,6 +22,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from accounts.auth import JWTAuthenticationWithTokenVersion
 from accounts.permissions import IsSuperAdmin, IsSuperAdminOrManagement
+from accounts.plans import filter_templates_queryset, user_may_use_template
 from category.models import PriceType
 from change_price.prefetch_helpers import prefetch_price_histories_latest
 from finalize.models import Finalization
@@ -161,9 +162,18 @@ class TemplateViewSet(ModelViewSet):
     """CRUD for Template (template_editor.Template)."""
 
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
-    queryset = Template.objects.select_related("category").order_by("-created_at")
     serializer_class = TemplateSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
+
+    def get_queryset(self):
+        qs = Template.objects.select_related("category").order_by("-created_at")
+        return filter_templates_queryset(qs, self.request)
+
+    def get_object(self):
+        obj = Template.objects.select_related("category").get(pk=self.kwargs[self.lookup_field])
+        if not user_may_use_template(self.request.user, obj, request=self.request):
+            raise PermissionDenied("This template is not included in your plan.")
+        return obj
 
     def perform_create(self, serializer):
         instance = serializer.save()
@@ -182,6 +192,8 @@ class TemplateConfigUpdateAPIView(APIView):
 
     def put(self, request, pk):
         template = get_object_or_404(Template, pk=pk)
+        if not user_may_use_template(request.user, template, request=request):
+            raise PermissionDenied("This template is not included in your plan.")
         config = request.data.get("config")
         config_json = request.data.get("config_json")
         has_canvas = any(
@@ -408,6 +420,8 @@ class TemplatePreviewAPIView(APIView):
         from .views import PreviewView
 
         template = get_object_or_404(Template, pk=pk)
+        if not user_may_use_template(request.user, template, request=request):
+            raise PermissionDenied("This template is not included in your plan.")
         preview_view = PreviewView()
         preview_view.request = request
         response = preview_view._render_preview(request, pk)

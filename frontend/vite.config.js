@@ -118,7 +118,12 @@ export default defineConfig(({ command, mode }) => {
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+        // Keep precache lean; oversized chunks skip rather than bloating the SW.
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        // Never precache HTML — SPAView / network must own the shell after deploys.
+        globPatterns: ['assets/**/*.{js,css}', '**/*.{ico,svg,woff,woff2}'],
+        // Default would bind NavigationRoute to index.html even when HTML is not precached.
+        navigateFallback: null,
         runtimeCaching: [
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -135,15 +140,6 @@ export default defineConfig(({ command, mode }) => {
             options: {
               cacheName: 'gstatic-fonts-cache',
               expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-          {
-            urlPattern: /\/api\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 5 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },

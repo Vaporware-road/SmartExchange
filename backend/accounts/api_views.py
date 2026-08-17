@@ -11,15 +11,108 @@ from rest_framework_simplejwt.exceptions import TokenError
 
 from core.exceptions import error_response
 from .models import CustomUser, UserActivityLog
+from .plans import allowed_plans_for, is_impersonating, user_plan
+from .tokens import issue_tokens_for_user
 from .serializers import (
     LoginSerializer,
     UserSerializer,
     UserCreateSerializer,
     UserUpdateSerializer,
+    ProgrammerRegisterSerializer,
+    ProgrammerUserUpdateSerializer,
     UserActivityLogSerializer,
 )
 from .utils import get_client_ip, get_user_agent, log_activity
-from .permissions import IsSuperAdminOrManagement, IsSuperAdmin
+from .permissions import IsSuperAdminOrManagement, IsSuperAdmin, IsProgrammer
+
+
+def _mask_bot_token(plain: str) -> str:
+    if not plain:
+        return ""
+    if len(plain) <= 8:
+        return "••••"
+    return f"{plain[:4]}…{plain[-4:]}"
+
+
+def programmer_user_account_payload(user, request):
+    """Detail payload for programmer hub account tabs."""
+    from price_publisher.models import PriceTemplate
+    from price_publisher.serializers import PriceTemplateSerializer
+    from template_editor.models import Template
+    from template_editor.serializers import TemplateSerializer
+
+    bots = []
+    for bot in user.telegram_bots.prefetch_related("channels").order_by("-created_at"):
+        channels = [
+            {
+                "id": ch.id,
+                "name": ch.name,
+                "chat_id": ch.chat_id,
+                "is_active": ch.is_active,
+            }
+            for ch in bot.channels.all()
+        ]
+        bots.append(
+            {
+                "id": bot.id,
+                "name": bot.name,
+                "display_name": bot.display_name,
+                "is_active": bot.is_active,
+                "token_masked": _mask_bot_token(bot.get_plain_token()),
+                "restrict_to_known_channels": bot.restrict_to_known_channels,
+                "log_all_messages": bot.log_all_messages,
+                "default_exchange_ttl_minutes": bot.default_exchange_ttl_minutes,
+                "created_at": bot.created_at,
+                "updated_at": bot.updated_at,
+                "channels": channels,
+            }
+        )
+
+    audit_logs = UserActivityLogSerializer(
+        UserActivityLog.objects.filter(user=user).order_by("-created_at")[:100],
+        many=True,
+    ).data
+
+    plan_keys = allowed_plans_for(user_plan(user))
+    price = PriceTemplate.objects.filter(plan__in=plan_keys).order_by("name")
+    editor = (
+        Template.objects.filter(plan__in=plan_keys)
+        .select_related("category")
+        .order_by("name")
+    )
+
+    return {
+        "user": UserSerializer(user).data,
+        "bots": bots,
+        "audit_logs": audit_logs,
+        "templates": {
+            "price_templates": PriceTemplateSerializer(
+                price, many=True, context={"request": request}
+            ).data,
+            "editor_templates": TemplateSerializer(
+                editor, many=True, context={"request": request}
+            ).data,
+        },
+        "telegram_analytics": _telegram_analytics_for_user(user),
+    }
+
+
+def _telegram_analytics_for_user(user):
+    """Condensed dashboard metrics for each owned bot (programmer profile tab)."""
+    from telegram_app.models import TelegramBot
+    from telegram_app.services.analytics_service import build_profile_analytics_summary
+
+    result = []
+    for bot in TelegramBot.objects.filter(owner=user).order_by("-created_at"):
+        result.append(
+            {
+                "bot_id": bot.id,
+                "bot_name": bot.display_name or bot.name,
+                "is_active": bot.is_active,
+                "analytics": build_profile_analytics_summary(bot),
+            }
+        )
+    return result
 
 
 class LoginAPIView(APIView):
@@ -44,8 +137,7 @@ class LoginAPIView(APIView):
 
         login(request, user)
 
-        refresh = RefreshToken.for_user(user)
-        refresh.access_token['token_version'] = user.token_version
+        refresh = issue_tokens_for_user(user)
 
         log_activity(user, UserActivityLog.ACTION_LOGIN_SUCCESS, request)
 
@@ -93,9 +185,7 @@ class DemoLoginAPIView(APIView):
 
         login(request, user)
 
-        refresh = RefreshToken.for_user(user)
-        if hasattr(user, 'token_version'):
-            refresh.access_token['token_version'] = user.token_version
+        refresh = issue_tokens_for_user(user)
 
         log_activity(user, UserActivityLog.ACTION_LOGIN_SUCCESS, request, details="demo_login")
 
@@ -131,18 +221,180 @@ class MeAPIView(APIView):
         if not request.user.is_authenticated:
             # JSON ``null`` (DRF Response(None) renders an empty body and breaks clients expecting JSON).
             return JsonResponse(None, safe=False)
-        return Response(UserSerializer(request.user).data)
+        payload = UserSerializer(request.user).data
+        token = getattr(request, "auth", None)
+        if token is not None:
+            impersonator_id = token.get("impersonator_id")
+            if impersonator_id:
+                payload["impersonated_by"] = {
+                    "id": impersonator_id,
+                    "username": token.get("impersonator_username"),
+                }
+        return Response(payload)
 
 
 class UserListCreateAPIView(ListCreateAPIView):
-    """GET: list users. POST: create user. Super Admin only."""
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    """GET: list users (programmers). POST: create user (super admin)."""
+
+    pagination_class = None
     queryset = CustomUser.objects.all().order_by('-date_joined')
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [IsAuthenticated(), IsProgrammer()]
+        return [IsAuthenticated(), IsSuperAdmin()]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return UserCreateSerializer
         return UserSerializer
+
+
+class ProgrammerRegisterAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsProgrammer]
+
+    def post(self, request):
+        serializer = ProgrammerRegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+        payload = UserSerializer(user).data
+        payload["generated_password"] = user._generated_password
+        return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class ProgrammerUserDetailAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsProgrammer]
+
+    def get(self, request, pk):
+        try:
+            user = CustomUser.objects.get(pk=pk)
+        except CustomUser.DoesNotExist:
+            return error_response(
+                "User not found.",
+                code="user_not_found",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+        return Response(programmer_user_account_payload(user, request))
+
+    def patch(self, request, pk):
+        try:
+            user = CustomUser.objects.get(pk=pk)
+        except CustomUser.DoesNotExist:
+            return error_response(
+                "User not found.",
+                code="user_not_found",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+        serializer = ProgrammerUserUpdateSerializer(user, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(UserSerializer(user).data)
+
+
+class ProgrammerTemplateLibraryAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsProgrammer]
+
+    def get(self, request):
+        from price_publisher.models import PriceTemplate
+        from price_publisher.serializers import PriceTemplateSerializer
+        from template_editor.models import Template
+        from template_editor.serializers import TemplateSerializer
+
+        price = PriceTemplate.objects.order_by("name")
+        editor = Template.objects.select_related("category").order_by("name")
+        return Response({
+            "price_templates": PriceTemplateSerializer(
+                price, many=True, context={"request": request}
+            ).data,
+            "editor_templates": TemplateSerializer(
+                editor, many=True, context={"request": request}
+            ).data,
+        })
+
+    def patch(self, request):
+        from accounts.plans import PLAN_RANK, normalize_plan
+        from price_publisher.models import PriceTemplate
+        from template_editor.models import Template
+
+        kind = str(request.data.get("kind") or "").strip()
+        pk = request.data.get("id")
+        plan = normalize_plan(request.data.get("plan"))
+        if kind not in ("price", "editor"):
+            return error_response(
+                "kind must be price or editor.",
+                code="invalid_template_kind",
+            )
+        if plan not in PLAN_RANK:
+            return error_response("Invalid plan.", code="invalid_plan")
+        try:
+            pk = int(pk)
+        except (TypeError, ValueError):
+            return error_response("Invalid template id.", code="invalid_template_id")
+        if kind == "price":
+            try:
+                obj = PriceTemplate.objects.get(pk=pk)
+            except PriceTemplate.DoesNotExist:
+                return error_response(
+                    "Template not found.",
+                    code="template_not_found",
+                    status_code=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            try:
+                obj = Template.objects.get(pk=pk)
+            except Template.DoesNotExist:
+                return error_response(
+                    "Template not found.",
+                    code="template_not_found",
+                    status_code=status.HTTP_404_NOT_FOUND,
+                )
+        obj.plan = plan
+        obj.save(update_fields=["plan"])
+        return Response({"id": obj.id, "kind": kind, "plan": obj.plan})
+
+
+class ImpersonateAPIView(APIView):
+    permission_classes = [IsAuthenticated, IsProgrammer]
+
+    def post(self, request, pk):
+        if is_impersonating(request):
+            return error_response(
+                "Already impersonating. Exit first.",
+                code="already_impersonating",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        try:
+            target = CustomUser.objects.get(pk=pk)
+        except CustomUser.DoesNotExist:
+            return error_response(
+                "User not found.",
+                code="user_not_found",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+        if target.pk == request.user.pk:
+            return error_response(
+                "Cannot impersonate yourself.",
+                code="cannot_impersonate_self",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        if not target.is_active:
+            return error_response(
+                "User is inactive.",
+                code="user_inactive",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        refresh = issue_tokens_for_user(target, impersonator=request.user)
+        log_activity(
+            request.user,
+            UserActivityLog.ACTION_IMPERSONATE_START,
+            request,
+            details=f"target_id={target.pk} username={target.username}",
+        )
+        return Response({
+            "user": UserSerializer(target).data,
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+        })
 
 
 class UserDetailAPIView(RetrieveUpdateAPIView):

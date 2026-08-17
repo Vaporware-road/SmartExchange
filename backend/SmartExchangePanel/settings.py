@@ -164,27 +164,53 @@ WSGI_APPLICATION = 'SmartExchangePanel.wsgi.application'
 
 # Database
 #
-# SQLite is shared by three processes writing the same file (Django, celery-worker,
-# celery-beat — see docker-compose.yml). With the defaults that means a rollback
-# journal and a 5s lock timeout, which surfaces as "database is locked" during
-# finalize/publish bursts. WAL lets readers run while a writer holds the lock, and
-# the longer busy timeout absorbs the remaining contention.
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.environ.get('SQLITE_PATH', str(BASE_DIR / 'db.sqlite3')),
-        'OPTIONS': {
-            'timeout': int(os.environ.get('SQLITE_TIMEOUT', '30')),
-            'init_command': (
-                'PRAGMA journal_mode=WAL;'
-                'PRAGMA synchronous=NORMAL;'
-                'PRAGMA busy_timeout=30000;'
-                'PRAGMA foreign_keys=ON;'
+# Production: set POSTGRES_DB (or DATABASE_URL) for PostgreSQL.
+# Development default: SQLite with WAL (see docker-compose.yml).
+def _database_config():
+    database_url = os.environ.get("DATABASE_URL", "").strip()
+    if database_url.startswith("postgres://") or database_url.startswith("postgresql://"):
+        from urllib.parse import unquote, urlparse
+
+        parsed = urlparse(database_url)
+        return {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": unquote(parsed.path.lstrip("/")),
+            "USER": unquote(parsed.username or ""),
+            "PASSWORD": unquote(parsed.password or ""),
+            "HOST": parsed.hostname or "localhost",
+            "PORT": str(parsed.port or 5432),
+            "CONN_MAX_AGE": int(os.environ.get("POSTGRES_CONN_MAX_AGE", "60")),
+        }
+
+    postgres_db = os.environ.get("POSTGRES_DB", "").strip()
+    if postgres_db:
+        return {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": postgres_db,
+            "USER": os.environ.get("POSTGRES_USER", "postgres"),
+            "PASSWORD": os.environ.get("POSTGRES_PASSWORD", ""),
+            "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+            "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+            "CONN_MAX_AGE": int(os.environ.get("POSTGRES_CONN_MAX_AGE", "60")),
+        }
+
+    return {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": os.environ.get("SQLITE_PATH", str(BASE_DIR / "db.sqlite3")),
+        "OPTIONS": {
+            "timeout": int(os.environ.get("SQLITE_TIMEOUT", "30")),
+            "init_command": (
+                "PRAGMA journal_mode=WAL;"
+                "PRAGMA synchronous=NORMAL;"
+                "PRAGMA busy_timeout=30000;"
+                "PRAGMA foreign_keys=ON;"
             ),
-            'transaction_mode': 'IMMEDIATE',
+            "transaction_mode": "IMMEDIATE",
         },
     }
-}
+
+
+DATABASES = {"default": _database_config()}
 
 # Caching - Removed: No caching is used in this application
 
@@ -380,6 +406,22 @@ CELERY_BEAT_SCHEDULE = {
     "telegram-check-price-alerts": {
         "task": "telegram_app.check_price_alerts",
         "schedule": float(os.environ.get("TELEGRAM_ALERT_CHECK_SECONDS", "120")),
+    },
+    "telegram-snapshot-daily-usage": {
+        "task": "telegram_app.snapshot_daily_bot_usage",
+        "schedule": float(os.environ.get("TELEGRAM_SNAPSHOT_DAILY_SECONDS", "86400")),
+    },
+    "telegram-snapshot-customer-growth": {
+        "task": "telegram_app.snapshot_customer_growth",
+        "schedule": float(os.environ.get("TELEGRAM_SNAPSHOT_GROWTH_SECONDS", "86400")),
+    },
+    "telegram-snapshot-channel-members": {
+        "task": "telegram_app.snapshot_channel_members",
+        "schedule": float(os.environ.get("TELEGRAM_SNAPSHOT_CHANNEL_SECONDS", "86400")),
+    },
+    "telegram-run-reengage-campaigns": {
+        "task": "telegram_app.run_due_reengage_campaigns",
+        "schedule": float(os.environ.get("TELEGRAM_CAMPAIGN_CHECK_SECONDS", "3600")),
     },
 }
 FINALIZE_TASK_WAIT_TIMEOUT = int(os.environ.get("FINALIZE_TASK_WAIT_TIMEOUT", "75"))

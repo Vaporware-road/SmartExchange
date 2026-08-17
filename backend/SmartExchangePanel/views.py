@@ -5,8 +5,9 @@ from pathlib import Path
 
 from django.conf import settings
 from django.shortcuts import render
-from django.http import Http404, HttpResponse, HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound
 from django.views.generic import View
+from django.views.static import serve as django_static_serve
 
 
 def handler404(request, exception):
@@ -29,19 +30,62 @@ def favicon_view(request):
     return HttpResponse(status=204)
 
 
+_NO_CACHE_STATIC_NAMES = frozenset(
+    {
+        "sw.js",
+        "registerSW.js",
+        "manifest.webmanifest",
+        "manifest.json",
+        "index.html",
+    }
+)
+
+
+def serve_static_with_cache(request, path, document_root=None, show_indexes=False):
+    """
+    Serve STATIC_ROOT files with cache policy suited to the Vue SPA:
+
+    - Service worker / manifest / shell → no-cache (always revalidate)
+    - Content-hashed /static/vue/assets/* → long-lived immutable
+    """
+    response = django_static_serve(
+        request, path, document_root=document_root, show_indexes=show_indexes
+    )
+    if response.status_code != 200:
+        return response
+
+    normalized = path.replace("\\", "/").lstrip("/")
+    basename = Path(normalized).name
+
+    if basename in _NO_CACHE_STATIC_NAMES or normalized.endswith("/index.html"):
+        response["Cache-Control"] = "no-cache, must-revalidate"
+    elif normalized.startswith("vue/assets/"):
+        response["Cache-Control"] = "public, max-age=31536000, immutable"
+
+    return response
+
+
 class SPAView(View):
     """
     Serve the Vue SPA index.html for client-side routing.
     All non-API, non-admin routes are handled by the Vue app.
+
+    Prefer the collectstatic copy under STATIC_ROOT so the shell matches
+    assets served from /static/vue/; fall back to the build output dir.
     """
 
     def get(self, request, *args, **kwargs):
-        index_path = Path(settings.BASE_DIR) / "static" / "vue" / "index.html"
-        if not index_path.exists():
+        candidates = [
+            Path(settings.STATIC_ROOT) / "vue" / "index.html",
+            Path(settings.BASE_DIR) / "static" / "vue" / "index.html",
+        ]
+        index_path = next((p for p in candidates if p.exists()), None)
+        if index_path is None:
             return HttpResponse(
                 "<h1>Vue app not built</h1><p>Run: cd frontend && npm run build</p>",
                 status=503,
                 content_type="text/html",
             )
-        return HttpResponse(index_path.read_text(), content_type="text/html")
-
+        response = HttpResponse(index_path.read_text(), content_type="text/html")
+        response["Cache-Control"] = "no-store, no-cache, must-revalidate"
+        return response
