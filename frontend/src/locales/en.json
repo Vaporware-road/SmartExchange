@@ -816,7 +816,7 @@
         "new": "New",
         "pending": "New",
         "successful": "Successful",
-        "cancelled": "Canceled",
+        "cancelled": "Canceled"
       },
       "publish": {
         "title": "Publish Currency System",
@@ -834,13 +834,21 @@
       },
       "exchangeRequests": {
         "title": "Exchange Requests",
-        "hint": "Successful = status notified. New members = channel growth + bot DM users.",
+        "hint": "Select a request to change state or hold TTL. Successful, Canceled, and New are stored on the request.",
         "newMembers": "New members ({months} mo)",
         "mostRequested": "Most requested currencies",
         "pair": "Pair",
         "amount": "Amount",
+        "ttl": "TTL (min)",
+        "customer": "Customer",
         "successful": "Successful",
-        "pending": "Pending",
+        "pending": "New",
+        "new": "New",
+        "canceled": "Canceled",
+        "changeState": "Change state",
+        "hold": "Confirm (Hold the request)",
+        "holdOk": "TTL increase : {ttl}",
+        "stateUpdated": "Request state updated.",
         "loadError": "Could not load exchange requests."
       },
       "customerAnalysis": {
@@ -849,7 +857,11 @@
         "returned": "Returned",
         "inactive": "Inactive (30d)",
         "vipRatio": "VIP / ordinary request rate",
-        "peakHours": "Peak request hours"
+        "peakHours": "Peak request hours",
+        "setTag": "Set customer tag",
+        "prompt": "Write any userid or chose from the list:",
+        "userid": "Telegram user id",
+        "requests": "Requests"
       },
       "reengage": {
         "title": "Customer re-engagement",

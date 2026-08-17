@@ -359,7 +359,7 @@ class InBotAdminPanelTests(TestCase):
         out = self.engine.process_update(self.admin_session, text="Exchange Requests")
         self.assertIn("Choose a filter", out["text"])
         out = self.engine.process_update(self.admin_session, text="Pending Requests")
-        self.assertIn("Pending", out["text"])
+        self.assertIn("New", out["text"])
         out = self.engine.process_update(self.admin_session, text="Back to Analytics")
         out = self.engine.process_update(self.admin_session, text="New members")
         out = self.engine.process_update(self.admin_session, text="Last month")

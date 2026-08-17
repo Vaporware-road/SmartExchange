@@ -498,11 +498,11 @@ class ExchangeRequest(models.Model):
         ordering = ["-created_at"]
         indexes = [
             models.Index(
-                fields=["bot", "status", "-created_at"],
+                fields=["bot", "status", "created_at"],
                 name="exreq_bot_stat_created_idx",
             ),
             models.Index(
-                fields=["customer", "-created_at"],
+                fields=["customer", "created_at"],
                 name="exreq_cust_created_idx",
             ),
         ]
@@ -517,7 +517,7 @@ class ExchangeRequest(models.Model):
         return self.created_at + timedelta(minutes=int(self.ttl_minutes or 0))
 
     def is_running(self, *, now=None) -> bool:
-        """Pending/notified and still within TTL."""
+        """New and still within TTL."""
         if self.status != self.Status.NEW:
             return False
         return self.expires_at() > (now or timezone.now())

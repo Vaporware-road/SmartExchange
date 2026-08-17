@@ -481,6 +481,7 @@ class CustomerProfileViewSet(ModelViewSet):
     queryset = CustomerProfile.objects.all().order_by("-updated_at")
     serializer_class = CustomerProfileSerializer
     http_method_names = ["get", "patch", "head", "options"]
+    pagination_class = None
 
     def get_permissions(self):
         return [IsAuthenticated(), IsSuperAdminOrManagement()]

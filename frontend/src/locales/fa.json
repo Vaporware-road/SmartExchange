@@ -763,7 +763,8 @@
       "tags": {
         "global": "عمومی",
         "vip": "VIP",
-        "special": "ویژه"
+        "special": "ویژه",
+        "admin": "ادمین"
       }
     },
     "settings": {
@@ -809,12 +810,12 @@
       },
       "reports": {
         "title": "گزارش تبادل",
-        "hint": "درخواست موفق = وضعیت notified.",
+        "hint": "وضعیت‌ها را اپراتور روی New، Canceled و Successful می‌گذارد.",
         "running": "در حال اجرا",
-        "pending": "در انتظار",
-        "successful": "موفق (notified)",
-        "cancelled": "لغو شده",
-        "closed": "بسته"
+        "new": "جدید",
+        "pending": "جدید",
+        "successful": "موفق",
+        "cancelled": "لغو شده"
       },
       "publish": {
         "title": "سامانه انتشار ارز",
@@ -832,13 +833,21 @@
       },
       "exchangeRequests": {
         "title": "درخواست‌های تبادل",
-        "hint": "موفق = notified. اعضای جدید = رشد کانال + کاربران DM ربات.",
+        "hint": "درخواست را انتخاب کنید تا وضعیت عوض شود یا TTL تمدید شود.",
         "newMembers": "اعضای جدید ({months} ماه)",
         "mostRequested": "پرخواست‌ترین ارزها",
         "pair": "جفت",
         "amount": "مبلغ",
+        "ttl": "TTL (دقیقه)",
+        "customer": "مشتری",
         "successful": "موفق",
-        "pending": "در انتظار",
+        "pending": "جدید",
+        "new": "جدید",
+        "canceled": "لغو شده",
+        "changeState": "تغییر وضعیت",
+        "hold": "تأیید (نگه‌داشتن درخواست)",
+        "holdOk": "TTL increase : {ttl}",
+        "stateUpdated": "وضعیت درخواست به‌روز شد.",
         "loadError": "بارگذاری درخواست‌های تبادل ناموفق بود."
       },
       "customerAnalysis": {
@@ -847,7 +856,11 @@
         "returned": "بازگشته",
         "inactive": "غیرفعال (۳۰ روز)",
         "vipRatio": "نسبت درخواست VIP / عادی",
-        "peakHours": "ساعات اوج درخواست"
+        "peakHours": "ساعات اوج درخواست",
+        "setTag": "تنظیم برچسب مشتری",
+        "prompt": "Write any userid or chose from the list:",
+        "userid": "آیدی تلگرام",
+        "requests": "درخواست‌ها"
       },
       "reengage": {
         "title": "بازگردانی مشتری",

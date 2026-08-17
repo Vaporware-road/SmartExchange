@@ -84,14 +84,14 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="exchangerequest",
             index=models.Index(
-                fields=["bot", "status", "-created_at"],
+                fields=["bot", "status", "created_at"],
                 name="exreq_bot_stat_created_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="exchangerequest",
             index=models.Index(
-                fields=["customer", "-created_at"],
+                fields=["customer", "created_at"],
                 name="exreq_cust_created_idx",
             ),
         ),

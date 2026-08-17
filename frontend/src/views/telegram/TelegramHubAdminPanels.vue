@@ -64,6 +64,7 @@
     </div>
 
     <!-- Analytics -->
+    <div v-else-if="section === 'analytics'" class="card-luxury px-4 py-4 space-y-4">
       <h2 class="text-lg font-semibold text-gold">{{ $t('telegram.admin.analytics.title') }}</h2>
       <div class="rounded-xl bg-white/5 border border-white/10 px-3 py-3">
         <p class="text-sm font-medium">{{ $t('telegram.admin.analytics.dailyUsage') }}</p>
