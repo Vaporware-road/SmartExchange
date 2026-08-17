@@ -67,4 +67,44 @@ urlpatterns = [
         api_views.AutomationSettingsAPIView.as_view(),
         name="api-telegram-automation-settings",
     ),
+    path(
+        "admin/verify-bot/",
+        api_views.VerifyBotAPIView.as_view(),
+        name="api-telegram-admin-verify-bot",
+    ),
+    path(
+        "admin/dashboard/",
+        api_views.DashboardAPIView.as_view(),
+        name="api-telegram-admin-dashboard",
+    ),
+    path(
+        "admin/reengage/",
+        api_views.ReengageAPIView.as_view(),
+        name="api-telegram-admin-reengage",
+    ),
+    path(
+        "admin/campaigns/",
+        api_views.ReengageCampaignListCreateAPIView.as_view(),
+        name="api-telegram-admin-campaigns",
+    ),
+    path(
+        "admin/campaigns/<int:pk>/",
+        api_views.ReengageCampaignDetailAPIView.as_view(),
+        name="api-telegram-admin-campaign-detail",
+    ),
+    path(
+        "admin/offers/",
+        api_views.ReengageOfferListCreateAPIView.as_view(),
+        name="api-telegram-admin-offers",
+    ),
+    path(
+        "admin/offers/<int:pk>/",
+        api_views.ReengageOfferDetailAPIView.as_view(),
+        name="api-telegram-admin-offers-detail",
+    ),
+    path(
+        "admin/snapshots/channel-members/",
+        api_views.ChannelMemberSnapshotsAPIView.as_view(),
+        name="api-telegram-admin-channel-snapshots",
+    ),
 ] + router.urls

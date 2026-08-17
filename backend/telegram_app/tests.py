@@ -297,6 +297,171 @@ class ConversationEnginePhase2Tests(TestCase):
         self.assertEqual(self.session.state, BotSession.State.ALERT_MENU)
 
 
+class InBotAdminPanelTests(TestCase):
+    def setUp(self):
+        self.owner = CustomUser.objects.create_user(
+            username="botowner",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+            telegram_id="6296044948",
+        )
+        self.bot = TelegramBot.objects.create(
+            name="Owned Bot",
+            token="999:ADMIN",
+            is_active=True,
+            owner=self.owner,
+        )
+        self.engine = ConversationEngine(self.bot)
+        self.admin_session = self.engine.get_or_create_session(6296044948)
+        self.customer_session = self.engine.get_or_create_session(111)
+
+    def test_admin_start_opens_admin_panel(self):
+        out = self.engine.process_update(self.admin_session, text="/start")
+        self.admin_session.refresh_from_db()
+        self.assertEqual(self.admin_session.state, BotSession.State.ADMIN_MENU)
+        self.assertIn("Admin panel", out["text"])
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("Pending requests", labels)
+        self.assertIn("Analytics Dashboard", labels)
+        self.assertNotIn("Customer menu", labels)
+
+    def test_admin_analytics_dashboard(self):
+        self.engine.process_update(self.admin_session, text="/start")
+        out = self.engine.process_update(self.admin_session, text="Analytics Dashboard")
+        self.admin_session.refresh_from_db()
+        self.assertEqual(self.admin_session.state, BotSession.State.ADMIN_ANALYTICS)
+        self.assertIn("Analytics", out["text"])
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("Exchange Requests", labels)
+
+    def test_admin_customer_analysis(self):
+        self.engine.process_update(self.admin_session, text="/start")
+        out = self.engine.process_update(self.admin_session, text="Customer Analysis")
+        self.assertIn("Customer Analysis", out["text"])
+        self.assertIn("Inactive", out["text"])
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("Set customer tag", labels)
+        self.assertIn("Admin menu", labels)
+
+    def test_admin_analytics_exchange_and_members(self):
+        customer = CustomerProfile.objects.create(telegram_user_id=222, tag="global")
+        ExchangeRequest.objects.create(
+            customer=customer,
+            bot=self.bot,
+            source_currency="USD",
+            target_currency="EUR",
+            amount="50",
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.NEW,
+        )
+        self.engine.process_update(self.admin_session, text="/start")
+        self.engine.process_update(self.admin_session, text="Analytics Dashboard")
+        out = self.engine.process_update(self.admin_session, text="Exchange Requests")
+        self.assertIn("Choose a filter", out["text"])
+        out = self.engine.process_update(self.admin_session, text="Pending Requests")
+        self.assertIn("Pending", out["text"])
+        out = self.engine.process_update(self.admin_session, text="Back to Analytics")
+        out = self.engine.process_update(self.admin_session, text="New members")
+        out = self.engine.process_update(self.admin_session, text="Last month")
+        self.assertIn("Channel subscribers gained", out["text"])
+        self.assertIn("New bot DM users", out["text"])
+
+    def test_customer_start_stays_customer_menu(self):
+        out = self.engine.process_update(self.customer_session, text="/start")
+        self.customer_session.refresh_from_db()
+        self.assertEqual(self.customer_session.state, BotSession.State.MAIN_MENU)
+        self.assertEqual(out["buttons"], MAIN_MENU_BUTTONS)
+
+    def test_admin_can_list_and_change_pending_state(self):
+        customer = CustomerProfile.objects.create(telegram_user_id=111, tag="global")
+        req = ExchangeRequest.objects.create(
+            customer=customer,
+            bot=self.bot,
+            source_currency="USD",
+            target_currency="EUR",
+            amount="100",
+            price_at_request=None,
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.NEW,
+        )
+        self.engine.process_update(self.admin_session, text="/start")
+        out = self.engine.process_update(self.admin_session, text="Pending requests")
+        self.assertIn(f"Req #{req.pk}", out["text"])
+        out = self.engine.process_update(
+            self.admin_session, text=f"Req #{req.pk} USD→EUR"
+        )
+        self.assertIn(f"Request #{req.pk}", out["text"])
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("Change state", labels)
+        self.assertIn("Confirm (Hold the request)", labels)
+        self.assertIn("Admin menu", labels)
+        out = self.engine.process_update(self.admin_session, text="Change state")
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("New", labels)
+        self.assertIn("Canceled", labels)
+        self.assertIn("Successful", labels)
+        self.assertIn("Back", labels)
+        out = self.engine.process_update(self.admin_session, text="Successful")
+        req.refresh_from_db()
+        self.assertEqual(req.status, ExchangeRequest.Status.SUCCESSFUL)
+        self.assertIn("Successful", out["text"])
+
+    def test_admin_hold_extends_ttl(self):
+        customer = CustomerProfile.objects.create(telegram_user_id=112, tag="global")
+        req = ExchangeRequest.objects.create(
+            customer=customer,
+            bot=self.bot,
+            source_currency="USD",
+            target_currency="EUR",
+            amount="10",
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.NEW,
+        )
+        self.engine.process_update(self.admin_session, text="/start")
+        self.engine.process_update(self.admin_session, text="Pending requests")
+        self.engine.process_update(
+            self.admin_session, text=f"Req #{req.pk} USD→EUR"
+        )
+        out = self.engine.process_update(
+            self.admin_session, text="Confirm (Hold the request)"
+        )
+        req.refresh_from_db()
+        self.assertEqual(req.ttl_minutes, 10)
+        self.assertIn("TTL increase : 10", out["text"])
+
+    def test_set_customer_tag_from_analysis(self):
+        CustomerProfile.objects.create(
+            telegram_user_id=111, username="alice", tag="global"
+        )
+        self.engine.process_update(self.admin_session, text="/start")
+        self.engine.process_update(self.admin_session, text="Customer Analysis")
+        out = self.engine.process_update(self.admin_session, text="Set customer tag")
+        self.assertIn("Write any userid or chose from the list:", out["text"])
+        self.assertIn("111", out["text"])
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("Admin menu", labels)
+        out = self.engine.process_update(self.admin_session, text="111")
+        self.assertIn("Choose a tag", out["text"])
+        out = self.engine.process_update(self.admin_session, text="Tag: VIP")
+        profile = CustomerProfile.objects.get(telegram_user_id=111)
+        self.assertEqual(profile.tag, "vip")
+        self.assertIn("vip", out["text"])
+
+    def test_non_owner_management_denied(self):
+        other = CustomUser.objects.create_user(
+            username="othermgmt",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+            telegram_id="555555",
+        )
+        session = self.engine.get_or_create_session(555555)
+        out = self.engine.process_update(session, text="/admin")
+        self.assertIn("not registered", out["text"].lower())
+        self.assertEqual(session.state, BotSession.State.START)
+        _ = other  # created for telegram_id uniqueness
+
+
+
 class CustomerWebhookPhase2Tests(APITestCase):
     def setUp(self):
         from telegram_app.bot import factory as bot_factory
@@ -626,7 +791,7 @@ class ExchangeAndAlertFlowTests(TestCase):
             target_currency="EUR",
             amount=Decimal("50"),
             ttl_minutes=30,
-            status=ExchangeRequest.Status.PENDING,
+            status=ExchangeRequest.Status.NEW,
         )
         ExchangeRequest.objects.create(
             customer=customer,
@@ -635,7 +800,7 @@ class ExchangeAndAlertFlowTests(TestCase):
             target_currency="USD",
             amount=Decimal("10"),
             ttl_minutes=1,
-            status=ExchangeRequest.Status.PENDING,
+            status=ExchangeRequest.Status.NEW,
             created_at=timezone.now() - timedelta(minutes=5),
         )
         # Force created_at on expired row (auto_now_add ignored on create above for second?)
@@ -707,7 +872,7 @@ class AdminNotifyTests(TestCase):
         self.assertEqual(ids, {"111", "222"})
 
     @patch("telegram_app.services.admin_notify.TelegramService")
-    def test_notify_marks_notified_when_at_least_one_send_ok(self, service_cls):
+    def test_notify_keeps_new_status_when_send_ok(self, service_cls):
         CustomUser.objects.create_user(
             username="sa2",
             password="x",
@@ -718,7 +883,7 @@ class AdminNotifyTests(TestCase):
         result = notify_staff_of_exchange_request(self.req, bot=self.bot)
         self.assertEqual(result["sent"], 1)
         self.req.refresh_from_db()
-        self.assertEqual(self.req.status, ExchangeRequest.Status.NOTIFIED)
+        self.assertEqual(self.req.status, ExchangeRequest.Status.NEW)
 
 
 class AlertCheckerMathTests(TestCase):
@@ -799,8 +964,19 @@ class CustomerTagApiTests(APITestCase):
             password="pass12345",
             role=CustomUser.ROLE_EMPLOYEE,
         )
+        self.bot = TelegramBot.objects.create(
+            name="mgmt-bot",
+            token="123456:AA-test-token-mgmt",
+            owner=self.mgmt,
+            is_active=True,
+        )
         self.customer = CustomerProfile.objects.create(
             telegram_user_id=55, username="c1", tag="global"
+        )
+        BotSession.objects.create(
+            telegram_user_id=55,
+            bot=self.bot,
+            state=BotSession.State.MAIN_MENU,
         )
 
     def test_management_can_patch_tag(self):
@@ -830,3 +1006,640 @@ class CustomerTagApiTests(APITestCase):
             format="json",
         )
         self.assertEqual(r.status_code, 403)
+
+    def test_staff_customer_tag_is_admin_and_locked(self):
+        CustomUser.objects.create_user(
+            username="staff-cust",
+            password="pass12345",
+            role=CustomUser.ROLE_SUPER_ADMIN,
+            telegram_id="55",
+        )
+        self.client.force_authenticate(self.mgmt)
+        listed = self.client.get("/api/telegram/customers/")
+        self.assertEqual(listed.status_code, 200, listed.content)
+        rows = listed.json()
+        if isinstance(rows, dict):
+            rows = rows.get("results", [])
+        match = next(row for row in rows if row["telegram_user_id"] == 55)
+        self.assertTrue(match["is_admin"])
+        self.assertEqual(match["display_tag"], "admin")
+        r = self.client.patch(
+            f"/api/telegram/customers/{self.customer.pk}/",
+            {"tag": "vip"},
+            format="json",
+        )
+        self.assertEqual(r.status_code, 400, r.content)
+        self.customer.refresh_from_db()
+        self.assertEqual(self.customer.tag, "global")
+
+
+class TelegramAdminVerifyApiTests(APITestCase):
+    def setUp(self):
+        self.mgmt = CustomUser.objects.create_user(
+            username="hub-mgmt",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.other = CustomUser.objects.create_user(
+            username="hub-other",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+
+    def test_verify_no_owned_bot_returns_404(self):
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post("/api/telegram/admin/verify-bot/", {}, format="json")
+        self.assertEqual(r.status_code, 404, r.content)
+        body = r.json()
+        self.assertFalse(body.get("ok", True))
+        self.assertEqual(body.get("code"), "no_bot")
+
+    @patch("telegram_app.admin_api.TelegramService")
+    def test_verify_get_me_ok(self, service_cls):
+        bot = TelegramBot.objects.create(
+            name="Owned",
+            token="111:AAA",
+            owner=self.mgmt,
+            is_active=True,
+            default_exchange_ttl_minutes=7,
+        )
+        service_cls.return_value.get_me.return_value = (
+            True,
+            {"id": 99, "username": "owned_bot", "first_name": "Owned", "is_bot": True},
+            None,
+        )
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post("/api/telegram/admin/verify-bot/", {}, format="json")
+        self.assertEqual(r.status_code, 200, r.content)
+        body = r.json()
+        self.assertTrue(body["ok"])
+        self.assertEqual(body["bot"]["id"], bot.id)
+        self.assertEqual(body["bot"]["default_exchange_ttl_minutes"], 7)
+        self.assertEqual(body["bot"]["username"], "owned_bot")
+        service_cls.assert_called_once()
+        service_cls.return_value.get_me.assert_called_once()
+
+    @patch("telegram_app.admin_api.TelegramService")
+    def test_verify_get_me_fail(self, service_cls):
+        TelegramBot.objects.create(
+            name="Owned",
+            token="111:AAA",
+            owner=self.mgmt,
+            is_active=True,
+        )
+        service_cls.return_value.get_me.return_value = (
+            False,
+            None,
+            "Unauthorized",
+        )
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post("/api/telegram/admin/verify-bot/", {}, format="json")
+        self.assertEqual(r.status_code, 400, r.content)
+        body = r.json()
+        self.assertFalse(body.get("ok", True))
+        self.assertEqual(body.get("code"), "get_me_failed")
+
+
+class TelegramAdminDashboardApiTests(APITestCase):
+    def setUp(self):
+        self.mgmt = CustomUser.objects.create_user(
+            username="dash-mgmt",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.other = CustomUser.objects.create_user(
+            username="dash-other",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.bot = TelegramBot.objects.create(
+            name="DashBot",
+            token="222:BBB",
+            owner=self.mgmt,
+            is_active=True,
+        )
+        self.other_bot = TelegramBot.objects.create(
+            name="OtherBot",
+            token="333:CCC",
+            owner=self.other,
+            is_active=True,
+        )
+        self.mine = CustomerProfile.objects.create(
+            telegram_user_id=1001, username="mine", tag="vip"
+        )
+        self.theirs = CustomerProfile.objects.create(
+            telegram_user_id=1002, username="theirs", tag="global"
+        )
+        BotSession.objects.create(
+            telegram_user_id=1001,
+            bot=self.bot,
+            state=BotSession.State.MAIN_MENU,
+        )
+        BotSession.objects.create(
+            telegram_user_id=1002,
+            bot=self.other_bot,
+            state=BotSession.State.MAIN_MENU,
+        )
+        ExchangeRequest.objects.create(
+            customer=self.mine,
+            bot=self.bot,
+            source_currency="USD",
+            target_currency="IRR",
+            amount=Decimal("10"),
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.SUCCESSFUL,
+        )
+        ExchangeRequest.objects.create(
+            customer=self.theirs,
+            bot=self.other_bot,
+            source_currency="EUR",
+            target_currency="IRR",
+            amount=Decimal("20"),
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.NEW,
+        )
+
+    def test_dashboard_scoped_to_owned_bot(self):
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.get("/api/telegram/admin/dashboard/")
+        self.assertEqual(r.status_code, 200, r.content)
+        body = r.json()
+        self.assertEqual(body["bot"]["id"], self.bot.id)
+        self.assertEqual(body["customers_status"]["by_tag"]["vip"], 1)
+        self.assertEqual(body["customers_status"]["by_tag"]["total"], 1)
+        self.assertEqual(body["reports"]["new"], 0)
+        self.assertEqual(body["reports"]["pending"], 0)
+        self.assertEqual(body["reports"]["successful"], 1)
+        currencies = {
+            row["currency"] for row in body["exchange_requests"]["most_requested_currencies"]
+        }
+        self.assertIn("USD", currencies)
+        self.assertNotIn("EUR", currencies)
+        self.assertTrue(body["analytics"]["channel_views"]["stub"])
+
+    def test_dashboard_forbidden_other_bot_id(self):
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.get(
+            f"/api/telegram/admin/dashboard/?bot_id={self.other_bot.id}"
+        )
+        self.assertEqual(r.status_code, 403, r.content)
+
+    def _exchange_list_ids(self, response):
+        body = response.json()
+        items = body["results"] if isinstance(body, dict) and "results" in body else body
+        return [row["id"] for row in items]
+
+    def test_exchange_requests_filter_by_bot_id(self):
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.get(f"/api/telegram/exchange-requests/?bot_id={self.bot.id}")
+        self.assertEqual(r.status_code, 200, r.content)
+        ids = self._exchange_list_ids(r)
+        mine = list(
+            ExchangeRequest.objects.filter(bot=self.bot).values_list("id", flat=True)
+        )
+        theirs = list(
+            ExchangeRequest.objects.filter(bot=self.other_bot).values_list(
+                "id", flat=True
+            )
+        )
+        self.assertTrue(mine)
+        for pk in mine:
+            self.assertIn(pk, ids)
+        for pk in theirs:
+            self.assertNotIn(pk, ids)
+
+        default = self.client.get("/api/telegram/exchange-requests/")
+        self.assertEqual(default.status_code, 200, default.content)
+        default_ids = self._exchange_list_ids(default)
+        for pk in theirs:
+            self.assertNotIn(pk, default_ids)
+
+    def test_exchange_requests_forbidden_other_bot_id(self):
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.get(
+            f"/api/telegram/exchange-requests/?bot_id={self.other_bot.id}"
+        )
+        self.assertEqual(r.status_code, 403, r.content)
+
+    def test_exchange_requests_invalid_bot_id(self):
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.get("/api/telegram/exchange-requests/?bot_id=not-a-number")
+        self.assertEqual(r.status_code, 400, r.content)
+
+    def test_dashboard_and_exchange_list_include_new_request_for_bot(self):
+        self.client.force_authenticate(self.mgmt)
+        customer = CustomerProfile.objects.create(
+            telegram_user_id=1099, username="newreq"
+        )
+        req = ExchangeRequest.objects.create(
+            customer=customer,
+            bot=self.bot,
+            source_currency="GBP",
+            target_currency="IRR",
+            amount=Decimal("5"),
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.NEW,
+        )
+        other_req = ExchangeRequest.objects.create(
+            customer=self.theirs,
+            bot=self.other_bot,
+            source_currency="TRY",
+            target_currency="IRR",
+            amount=Decimal("8"),
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.NEW,
+        )
+
+        dash = self.client.get(f"/api/telegram/admin/dashboard/?bot_id={self.bot.id}")
+        self.assertEqual(dash.status_code, 200, dash.content)
+        dash_ids = [item["id"] for item in dash.json()["exchange_requests"]["items"]]
+        self.assertIn(req.id, dash_ids)
+        self.assertNotIn(other_req.id, dash_ids)
+
+        listed = self.client.get(
+            f"/api/telegram/exchange-requests/?bot_id={self.bot.id}"
+        )
+        self.assertEqual(listed.status_code, 200, listed.content)
+        list_ids = self._exchange_list_ids(listed)
+        self.assertIn(req.id, list_ids)
+        self.assertNotIn(other_req.id, list_ids)
+
+    def test_exchange_request_patch_status_and_hold(self):
+        self.client.force_authenticate(self.mgmt)
+        customer = CustomerProfile.objects.create(telegram_user_id=2100)
+        req = ExchangeRequest.objects.create(
+            customer=customer,
+            bot=self.bot,
+            source_currency="USD",
+            target_currency="EUR",
+            amount=Decimal("3"),
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.NEW,
+        )
+        patched = self.client.patch(
+            f"/api/telegram/exchange-requests/{req.pk}/",
+            {"status": "successful"},
+            format="json",
+        )
+        self.assertEqual(patched.status_code, 200, patched.content)
+        self.assertEqual(patched.json()["status"], "successful")
+        req.refresh_from_db()
+        self.assertEqual(req.status, ExchangeRequest.Status.SUCCESSFUL)
+
+        held = self.client.post(f"/api/telegram/exchange-requests/{req.pk}/hold/")
+        self.assertEqual(held.status_code, 200, held.content)
+        self.assertEqual(held.json()["ttl_minutes"], 10)
+        req.refresh_from_db()
+        self.assertEqual(req.ttl_minutes, 10)
+
+
+class TelegramAdminReengageApiTests(APITestCase):
+    def setUp(self):
+        self.mgmt = CustomUser.objects.create_user(
+            username="re-mgmt",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.other = CustomUser.objects.create_user(
+            username="re-other",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.bot = TelegramBot.objects.create(
+            name="ReBot",
+            token="444:DDD",
+            owner=self.mgmt,
+            is_active=True,
+        )
+        self.other_bot = TelegramBot.objects.create(
+            name="ReOther",
+            token="555:EEE",
+            owner=self.other,
+            is_active=True,
+        )
+        CustomerProfile.objects.create(
+            telegram_user_id=2001, username="vip1", tag="vip"
+        )
+        CustomerProfile.objects.create(
+            telegram_user_id=2002, username="g1", tag="global"
+        )
+        BotSession.objects.create(
+            telegram_user_id=2001,
+            bot=self.bot,
+            state=BotSession.State.MAIN_MENU,
+        )
+        BotSession.objects.create(
+            telegram_user_id=2002,
+            bot=self.bot,
+            state=BotSession.State.MAIN_MENU,
+        )
+
+    @patch("telegram_app.services.reengage_service.TelegramService")
+    def test_reengage_vip_audience(self, service_cls):
+        service_cls.return_value.send_message.return_value = (True, "ok", 1)
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post(
+            "/api/telegram/admin/reengage/",
+            {"audience": "vip", "message": "Hello VIP"},
+            format="json",
+        )
+        self.assertEqual(r.status_code, 200, r.content)
+        body = r.json()
+        self.assertEqual(body["sent"], 1)
+        self.assertEqual(body["failed"], 0)
+        service_cls.return_value.send_message.assert_called_once_with(
+            chat_id=2001, text="Hello VIP", parse_mode=None
+        )
+
+    def test_reengage_forbidden_other_bot(self):
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post(
+            "/api/telegram/admin/reengage/",
+            {
+                "bot_id": self.other_bot.id,
+                "audience": "global",
+                "message": "Nope",
+            },
+            format="json",
+        )
+        self.assertEqual(r.status_code, 403, r.content)
+
+    @patch("telegram_app.services.reengage_service.TelegramService")
+    def test_reengage_inactive_audience(self, service_cls):
+        service_cls.return_value.send_message.return_value = (True, "ok", 1)
+        past = timezone.now() - timedelta(days=45)
+        BotSession.objects.filter(telegram_user_id=2002, bot=self.bot).update(
+            last_activity=past
+        )
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post(
+            "/api/telegram/admin/reengage/",
+            {"audience": "inactive", "message": "Miss you"},
+            format="json",
+        )
+        self.assertEqual(r.status_code, 200, r.content)
+        body = r.json()
+        self.assertEqual(body["sent"], 1)
+        service_cls.return_value.send_message.assert_called_once_with(
+            chat_id=2002, text="Miss you", parse_mode=None
+        )
+
+
+class AnalyticsServiceTests(TestCase):
+    def setUp(self):
+        self.bot = TelegramBot.objects.create(name="AnalyticsBot", token="777:GGG")
+        self.customer = CustomerProfile.objects.create(
+            telegram_user_id=9001, tag=CustomerProfile.Tag.VIP
+        )
+        BotSession.objects.create(
+            telegram_user_id=9001,
+            bot=self.bot,
+            state=BotSession.State.MAIN_MENU,
+        )
+        ExchangeRequest.objects.create(
+            customer=self.customer,
+            bot=self.bot,
+            source_currency="USD",
+            target_currency="EUR",
+            amount=Decimal("1"),
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.SUCCESSFUL,
+        )
+
+    def test_daily_usage_backfill(self):
+        from telegram_app.services.analytics_service import (
+            backfill_daily_usage,
+            daily_usage_rows,
+        )
+
+        backfill_daily_usage(self.bot, days=7)
+        rows = daily_usage_rows(self.bot)
+        self.assertTrue(len(rows) >= 1)
+
+    def test_new_members_dual(self):
+        from telegram_app.models import BotCustomerGrowthSnapshot, TelegramChannel
+        from telegram_app.services.analytics_service import new_members_dual
+
+        ch = TelegramChannel.objects.create(
+            bot=self.bot, name="News", chat_id="-1001", bot_admin_verified=True, last_member_count=1100
+        )
+        from telegram_app.models import ChannelMemberSnapshot
+
+        past = timezone.now() - timedelta(days=35)
+        snap = ChannelMemberSnapshot.objects.create(
+            channel=ch, member_count=1000, bot_is_admin=True
+        )
+        ChannelMemberSnapshot.objects.filter(pk=snap.pk).update(sampled_at=past)
+        BotCustomerGrowthSnapshot.objects.create(
+            bot=self.bot, date=timezone.now().date(), new_customers=3
+        )
+        dual = new_members_dual(self.bot, 1)
+        self.assertGreaterEqual(dual["channel_growth"], 100)
+        self.assertGreaterEqual(dual["bot_dm_growth"], 0)
+
+    def test_customer_analysis_vip_ratio_and_peak(self):
+        from telegram_app.services.analytics_service import customer_analysis
+
+        global_customer = CustomerProfile.objects.create(
+            telegram_user_id=9002, tag=CustomerProfile.Tag.GLOBAL
+        )
+        BotSession.objects.create(
+            telegram_user_id=9002,
+            bot=self.bot,
+            state=BotSession.State.MAIN_MENU,
+        )
+        ExchangeRequest.objects.create(
+            customer=global_customer,
+            bot=self.bot,
+            source_currency="EUR",
+            target_currency="USD",
+            amount=Decimal("1"),
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.SUCCESSFUL,
+        )
+        analysis = customer_analysis(self.bot)
+        self.assertIn("peak_hours", analysis)
+        self.assertEqual(len(analysis["peak_hours"]), 24)
+        self.assertIsNotNone(analysis["vip_vs_ordinary_request_ratio"])
+
+
+class ChannelMemberSnapshotTests(TestCase):
+    @patch("telegram_app.services.telegram_client.TelegramService")
+    def test_snapshot_channel_members_for_bot(self, service_cls):
+        from telegram_app.models import ChannelMemberSnapshot, TelegramChannel
+        from telegram_app.services.analytics_service import snapshot_channel_members_for_bot
+
+        bot = TelegramBot.objects.create(name="SnapBot", token="111:AAA")
+        ch = TelegramChannel.objects.create(bot=bot, name="Main", chat_id="-10099")
+        service_cls.return_value.get_me.return_value = (True, {"id": 42}, None)
+        service_cls.return_value.get_chat_member.return_value = (
+            True,
+            {"status": "administrator"},
+            None,
+        )
+        service_cls.return_value.get_chat_member_count.return_value = (True, 1500, None)
+
+        result = snapshot_channel_members_for_bot(bot)
+        self.assertEqual(result["sampled"], 1)
+        ch.refresh_from_db()
+        self.assertEqual(ch.last_member_count, 1500)
+        self.assertTrue(ch.bot_admin_verified)
+        self.assertEqual(ChannelMemberSnapshot.objects.filter(channel=ch).count(), 1)
+
+
+class ReengageCampaignRunnerTests(TestCase):
+    @patch("telegram_app.services.reengage_service.TelegramService")
+    def test_run_due_campaigns(self, service_cls):
+        from telegram_app.models import CampaignDeliveryLog, ReengageCampaign
+        from telegram_app.services.reengage_service import run_due_campaigns
+
+        bot = TelegramBot.objects.create(name="CampRun", token="222:BBB")
+        CustomerProfile.objects.create(telegram_user_id=5001, tag="global")
+        BotSession.objects.create(
+            telegram_user_id=5001,
+            bot=bot,
+            state=BotSession.State.MAIN_MENU,
+        )
+        service_cls.return_value.send_message.return_value = (True, "ok", 1)
+        ReengageCampaign.objects.create(
+            bot=bot,
+            audience="global",
+            message="Hello",
+            schedule=ReengageCampaign.Schedule.DAILY,
+            is_active=True,
+            next_run_at=timezone.now() - timedelta(minutes=1),
+        )
+        summary = run_due_campaigns()
+        self.assertEqual(summary["campaigns_run"], 1)
+        self.assertEqual(summary["total_sent"], 1)
+        self.assertEqual(CampaignDeliveryLog.objects.count(), 1)
+
+
+class ReengageCampaignApiTests(APITestCase):
+    def setUp(self):
+        self.mgmt = CustomUser.objects.create_user(
+            username="camp-mgmt",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.bot = TelegramBot.objects.create(
+            name="CampBot",
+            token="888:HHH",
+            owner=self.mgmt,
+            is_active=True,
+        )
+
+    def test_create_and_list_campaign(self):
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post(
+            "/api/telegram/admin/campaigns/",
+            {
+                "bot_id": self.bot.id,
+                "audience": "global",
+                "message": "Weekly hello",
+                "schedule": "weekly",
+                "is_active": True,
+            },
+            format="json",
+        )
+        self.assertEqual(r.status_code, 201, r.content)
+        r2 = self.client.get(f"/api/telegram/admin/campaigns/?bot_id={self.bot.id}")
+        self.assertEqual(r2.status_code, 200)
+        self.assertEqual(len(r2.json()), 1)
+
+    @patch("telegram_app.services.reengage_service.TelegramService")
+    def test_create_offer_send_now(self, service_cls):
+        service_cls.return_value.send_message.return_value = (True, "ok", 1)
+        CustomerProfile.objects.create(telegram_user_id=3001, tag="global")
+        BotSession.objects.create(
+            telegram_user_id=3001,
+            bot=self.bot,
+            state=BotSession.State.MAIN_MENU,
+        )
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post(
+            "/api/telegram/admin/offers/",
+            {
+                "bot_id": self.bot.id,
+                "title": "Deal",
+                "body": "10% off",
+                "audience": "global",
+                "send_now": True,
+            },
+            format="json",
+        )
+        self.assertEqual(r.status_code, 201, r.content)
+        self.assertEqual(r.json()["send_result"]["sent"], 1)
+
+
+class DashboardSnapshotApiTests(APITestCase):
+    def setUp(self):
+        self.mgmt = CustomUser.objects.create_user(
+            username="snap-mgmt",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.bot = TelegramBot.objects.create(
+            name="SnapBot",
+            token="999:III",
+            owner=self.mgmt,
+            is_active=True,
+        )
+
+    def test_dashboard_includes_channel_members(self):
+        from telegram_app.models import BotDailyUsageSnapshot
+
+        BotDailyUsageSnapshot.objects.create(
+            bot=self.bot,
+            date=timezone.now().date(),
+            active_users=5,
+        )
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.get("/api/telegram/admin/dashboard/")
+        self.assertEqual(r.status_code, 200, r.content)
+        body = r.json()
+        self.assertIn("channel_members", body["analytics"])
+        self.assertIn("new_members_detail", body["exchange_requests"])
+
+    def test_channel_snapshots_endpoint(self):
+        from telegram_app.models import TelegramChannel
+
+        ch = TelegramChannel.objects.create(
+            bot=self.bot,
+            name="Snap Ch",
+            chat_id="-1001",
+            bot_admin_verified=True,
+            last_member_count=500,
+        )
+        from telegram_app.models import ChannelMemberSnapshot
+
+        ChannelMemberSnapshot.objects.create(
+            channel=ch, member_count=400, bot_is_admin=True
+        )
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.get("/api/telegram/admin/snapshots/channel-members/?months=1")
+        self.assertEqual(r.status_code, 200, r.content)
+        body = r.json()
+        self.assertIn("growth", body)
+        self.assertIn("history", body)
+        self.assertEqual(len(body["history"]), 1)
+
+
+class DuplicateBotTokenTests(TestCase):
+    def test_poller_keeps_one_row_per_token(self):
+        from telegram_app.management.commands.poll_telegram_bots import bots_one_per_token
+
+        keeper = TelegramBot.objects.create(name="Keep", token="111:AAA", is_active=True)
+        duplicate = TelegramBot.objects.create(name="Dup", token="111:AAA", is_active=True)
+        other = TelegramBot.objects.create(name="Other", token="222:BBB", is_active=True)
+        keepers, skipped = bots_one_per_token([keeper, duplicate, other])
+        self.assertEqual([b.pk for b in keepers], [keeper.pk, other.pk])
+        self.assertEqual([(d.pk, k.pk) for d, k in skipped], [(duplicate.pk, keeper.pk)])
+
+    def test_detail_serializer_rejects_duplicate_token(self):
+        from telegram_app.serializers import TelegramBotDetailSerializer
+
+        TelegramBot.objects.create(name="Keep", token="111:AAA", is_active=True)
+        ser = TelegramBotDetailSerializer(data={"name": "Dup", "token": "111:AAA"})
+        self.assertFalse(ser.is_valid())
+        self.assertIn("token", ser.errors)

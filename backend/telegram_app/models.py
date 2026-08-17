@@ -117,6 +117,22 @@ class TelegramChannel(models.Model):
         verbose_name="Active",
         help_text="Whether this channel is currently active",
     )
+    last_member_count = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name="Last Member Count",
+        help_text="Cached subscriber count from the latest snapshot job.",
+    )
+    last_member_sampled_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Last Member Sampled At",
+    )
+    bot_admin_verified = models.BooleanField(
+        default=False,
+        verbose_name="Bot Admin Verified",
+        help_text="Whether the bot was an administrator at the last snapshot.",
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
@@ -327,6 +343,9 @@ class CustomerProfile(models.Model):
         verbose_name = "Customer Profile"
         verbose_name_plural = "Customer Profiles"
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["tag"], name="customerprofile_tag_idx"),
+        ]
 
     def __str__(self):
         label = self.username or self.first_name or str(self.telegram_user_id)
@@ -351,6 +370,19 @@ class BotSession(models.Model):
         ALERT_TARGET = "ALERT_TARGET", "Alert Target"
         ALERT_PRICE = "ALERT_PRICE", "Alert Price"
         ALERT_SUMMARY = "ALERT_SUMMARY", "Alert Summary"
+        ADMIN_MENU = "ADMIN_MENU", "Admin Menu"
+        ADMIN_REQUEST_LIST = "ADMIN_REQUEST_LIST", "Admin Request List"
+        ADMIN_REQUEST_DETAIL = "ADMIN_REQUEST_DETAIL", "Admin Request Detail"
+        ADMIN_CHANGE_STATE = "ADMIN_CHANGE_STATE", "Admin Change State"
+        ADMIN_SET_TAG = "ADMIN_SET_TAG", "Admin Set Tag"
+        ADMIN_ANALYTICS = "ADMIN_ANALYTICS", "Admin Analytics"
+        ADMIN_ANALYTICS_EXCHANGE = "ADMIN_ANALYTICS_EXCHANGE", "Admin Analytics Exchange"
+        ADMIN_ANALYTICS_MEMBERS = "ADMIN_ANALYTICS_MEMBERS", "Admin Analytics Members"
+        ADMIN_REENGAGE = "ADMIN_REENGAGE", "Admin Re-engage"
+        ADMIN_REENGAGE_AUDIENCE = "ADMIN_REENGAGE_AUDIENCE", "Admin Re-engage Audience"
+        ADMIN_REENGAGE_COMPOSE = "ADMIN_REENGAGE_COMPOSE", "Admin Re-engage Compose"
+        ADMIN_REENGAGE_SCHEDULE = "ADMIN_REENGAGE_SCHEDULE", "Admin Re-engage Schedule"
+        ADMIN_OFFER_CREATE = "ADMIN_OFFER_CREATE", "Admin Offer Create"
 
     telegram_user_id = models.BigIntegerField(
         verbose_name="Telegram User ID",
@@ -385,6 +417,12 @@ class BotSession(models.Model):
         verbose_name = "Bot Session"
         verbose_name_plural = "Bot Sessions"
         ordering = ["-last_activity"]
+        indexes = [
+            models.Index(
+                fields=["bot", "last_activity"],
+                name="botsess_bot_activity_idx",
+            ),
+        ]
         constraints = [
             models.UniqueConstraint(
                 fields=["telegram_user_id", "bot"],
@@ -400,10 +438,9 @@ class ExchangeRequest(models.Model):
     """Customer exchange registration submitted via the bot."""
 
     class Status(models.TextChoices):
-        PENDING = "pending", "Pending"
-        NOTIFIED = "notified", "Notified"
-        CANCELLED = "cancelled", "Cancelled"
-        CLOSED = "closed", "Closed"
+        NEW = "new", "New"
+        CANCELLED = "cancelled", "Canceled"
+        SUCCESSFUL = "successful", "Successful"
 
     customer = models.ForeignKey(
         CustomerProfile,
@@ -448,7 +485,7 @@ class ExchangeRequest(models.Model):
     status = models.CharField(
         max_length=16,
         choices=Status.choices,
-        default=Status.PENDING,
+        default=Status.NEW,
         verbose_name="Status",
         db_index=True,
     )
@@ -459,6 +496,16 @@ class ExchangeRequest(models.Model):
         verbose_name = "Exchange Request"
         verbose_name_plural = "Exchange Requests"
         ordering = ["-created_at"]
+        indexes = [
+            models.Index(
+                fields=["bot", "status", "-created_at"],
+                name="exreq_bot_stat_created_idx",
+            ),
+            models.Index(
+                fields=["customer", "-created_at"],
+                name="exreq_cust_created_idx",
+            ),
+        ]
 
     def __str__(self):
         return (
@@ -471,7 +518,7 @@ class ExchangeRequest(models.Model):
 
     def is_running(self, *, now=None) -> bool:
         """Pending/notified and still within TTL."""
-        if self.status not in (self.Status.PENDING, self.Status.NOTIFIED):
+        if self.status != self.Status.NEW:
             return False
         return self.expires_at() > (now or timezone.now())
 
@@ -532,3 +579,223 @@ class PriceAlert(models.Model):
             f"{self.direction} {self.source_currency}/{self.target_currency} "
             f"@ {self.target_price}"
         )
+
+
+class BotDailyUsageSnapshot(models.Model):
+    """Daily count of distinct active bot users (from BotSession.last_activity)."""
+
+    bot = models.ForeignKey(
+        TelegramBot,
+        on_delete=models.CASCADE,
+        related_name="daily_usage_snapshots",
+        verbose_name="Bot",
+    )
+    date = models.DateField(verbose_name="Date", db_index=True)
+    active_users = models.PositiveIntegerField(default=0, verbose_name="Active Users")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    class Meta:
+        verbose_name = "Bot Daily Usage Snapshot"
+        verbose_name_plural = "Bot Daily Usage Snapshots"
+        ordering = ["-date"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["bot", "date"],
+                name="unique_bot_daily_usage_per_date",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.bot_id} {self.date}: {self.active_users} users"
+
+
+class ChannelMemberSnapshot(models.Model):
+    """Historical channel subscriber counts sampled via getChatMemberCount."""
+
+    channel = models.ForeignKey(
+        TelegramChannel,
+        on_delete=models.CASCADE,
+        related_name="member_snapshots",
+        verbose_name="Channel",
+    )
+    member_count = models.PositiveIntegerField(verbose_name="Member Count")
+    bot_is_admin = models.BooleanField(default=False, verbose_name="Bot Is Admin")
+    sampled_at = models.DateTimeField(auto_now_add=True, verbose_name="Sampled At", db_index=True)
+
+    class Meta:
+        verbose_name = "Channel Member Snapshot"
+        verbose_name_plural = "Channel Member Snapshots"
+        ordering = ["-sampled_at"]
+
+    def __str__(self):
+        return f"{self.channel_id} @ {self.sampled_at}: {self.member_count}"
+
+
+class BotCustomerGrowthSnapshot(models.Model):
+    """Daily count of new bot DM users (first BotSession on this bot)."""
+
+    bot = models.ForeignKey(
+        TelegramBot,
+        on_delete=models.CASCADE,
+        related_name="customer_growth_snapshots",
+        verbose_name="Bot",
+    )
+    date = models.DateField(verbose_name="Date", db_index=True)
+    new_customers = models.PositiveIntegerField(default=0, verbose_name="New Customers")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    class Meta:
+        verbose_name = "Bot Customer Growth Snapshot"
+        verbose_name_plural = "Bot Customer Growth Snapshots"
+        ordering = ["-date"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["bot", "date"],
+                name="unique_bot_customer_growth_per_date",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.bot_id} {self.date}: +{self.new_customers}"
+
+
+class ReengageCampaign(models.Model):
+    """Scheduled audience re-engagement DM campaign."""
+
+    class Audience(models.TextChoices):
+        GLOBAL = "global", "Global"
+        VIP = "vip", "VIP"
+        SPECIAL = "special", "Special"
+        INACTIVE = "inactive", "Inactive"
+
+    class Schedule(models.TextChoices):
+        DAILY = "daily", "Daily"
+        WEEKLY = "weekly", "Weekly"
+        MONTHLY = "monthly", "Monthly"
+
+    bot = models.ForeignKey(
+        TelegramBot,
+        on_delete=models.CASCADE,
+        related_name="reengage_campaigns",
+        verbose_name="Bot",
+    )
+    audience = models.CharField(
+        max_length=16,
+        choices=Audience.choices,
+        verbose_name="Audience",
+    )
+    message = models.TextField(verbose_name="Message")
+    schedule = models.CharField(
+        max_length=16,
+        choices=Schedule.choices,
+        default=Schedule.WEEKLY,
+        verbose_name="Schedule",
+    )
+    is_active = models.BooleanField(default=True, verbose_name="Active")
+    next_run_at = models.DateTimeField(verbose_name="Next Run At", db_index=True)
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reengage_campaigns",
+        verbose_name="Created By",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
+
+    class Meta:
+        verbose_name = "Re-engage Campaign"
+        verbose_name_plural = "Re-engage Campaigns"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.bot_id} {self.audience} ({self.schedule})"
+
+
+class ReengageOffer(models.Model):
+    """Reusable offer template for re-engagement."""
+
+    class Audience(models.TextChoices):
+        GLOBAL = "global", "Global"
+        VIP = "vip", "VIP"
+        SPECIAL = "special", "Special"
+        INACTIVE = "inactive", "Inactive"
+
+    bot = models.ForeignKey(
+        TelegramBot,
+        on_delete=models.CASCADE,
+        related_name="reengage_offers",
+        verbose_name="Bot",
+    )
+    title = models.CharField(max_length=255, verbose_name="Title")
+    body = models.TextField(verbose_name="Body")
+    audience = models.CharField(
+        max_length=16,
+        choices=Audience.choices,
+        default=Audience.GLOBAL,
+        verbose_name="Audience",
+    )
+    valid_until = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Valid Until",
+    )
+    is_active = models.BooleanField(default=True, verbose_name="Active")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reengage_offers",
+        verbose_name="Created By",
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
+
+    class Meta:
+        verbose_name = "Re-engage Offer"
+        verbose_name_plural = "Re-engage Offers"
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return self.title
+
+
+class CampaignDeliveryLog(models.Model):
+    """Audit trail for campaign or offer send runs."""
+
+    bot = models.ForeignKey(
+        TelegramBot,
+        on_delete=models.CASCADE,
+        related_name="campaign_delivery_logs",
+        verbose_name="Bot",
+    )
+    campaign = models.ForeignKey(
+        ReengageCampaign,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="delivery_logs",
+        verbose_name="Campaign",
+    )
+    offer = models.ForeignKey(
+        ReengageOffer,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="delivery_logs",
+        verbose_name="Offer",
+    )
+    sent = models.PositiveIntegerField(default=0, verbose_name="Sent")
+    failed = models.PositiveIntegerField(default=0, verbose_name="Failed")
+    skipped = models.PositiveIntegerField(default=0, verbose_name="Skipped")
+    run_at = models.DateTimeField(auto_now_add=True, verbose_name="Run At", db_index=True)
+
+    class Meta:
+        verbose_name = "Campaign Delivery Log"
+        verbose_name_plural = "Campaign Delivery Logs"
+        ordering = ["-run_at"]
+
+    def __str__(self):
+        return f"bot={self.bot_id} sent={self.sent} @ {self.run_at}"

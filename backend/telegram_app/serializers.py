@@ -9,6 +9,7 @@ from .models import (
     TelegramBot,
     TelegramChannel,
 )
+from .services.customer_tags import display_name, effective_tag, is_admin_customer
 
 
 class TelegramBotSerializer(serializers.ModelSerializer):
@@ -47,7 +48,36 @@ class TelegramBotDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        extra_kwargs = {"token": {"write_only": True}}
+        extra_kwargs = {
+            "token": {"write_only": True, "required": False, "allow_blank": True},
+        }
+
+    def validate(self, attrs):
+        attrs = super().validate(attrs)
+        if self.instance is None and not (attrs.get("token") or "").strip():
+            raise serializers.ValidationError({"token": "Bot token is required."})
+        return attrs
+
+    def validate_token(self, value):
+        token = (value or "").strip()
+        if not token:
+            return value
+        others = TelegramBot.objects.all()
+        if self.instance is not None:
+            others = others.exclude(pk=self.instance.pk)
+        for other in others:
+            if (other.get_plain_token() or "").strip() == token:
+                raise serializers.ValidationError(
+                    f"This token is already used by bot id={other.pk} ({other.name}). "
+                    "Each Telegram bot needs its own token from @BotFather."
+                )
+        return value
+
+    def update(self, instance, validated_data):
+        token = validated_data.pop("token", None)
+        if token:
+            validated_data["token"] = token
+        return super().update(instance, validated_data)
 
 
 class TelegramChannelSerializer(serializers.ModelSerializer):
@@ -168,6 +198,11 @@ class AutoPostConfigSerializer(serializers.ModelSerializer):
 
 
 class CustomerProfileSerializer(serializers.ModelSerializer):
+    is_admin = serializers.SerializerMethodField()
+    display_tag = serializers.SerializerMethodField()
+    display_name = serializers.SerializerMethodField()
+    request_count = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomerProfile
         fields = [
@@ -178,6 +213,10 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "last_name",
             "language",
             "tag",
+            "is_admin",
+            "display_tag",
+            "display_name",
+            "request_count",
             "created_at",
             "updated_at",
         ]
@@ -188,9 +227,28 @@ class CustomerProfileSerializer(serializers.ModelSerializer):
             "first_name",
             "last_name",
             "language",
+            "is_admin",
+            "display_tag",
+            "display_name",
+            "request_count",
             "created_at",
             "updated_at",
         ]
+
+    def get_is_admin(self, obj):
+        return is_admin_customer(obj.telegram_user_id)
+
+    def get_display_tag(self, obj):
+        return effective_tag(obj)
+
+    def get_display_name(self, obj):
+        return display_name(obj)
+
+    def get_request_count(self, obj):
+        value = getattr(obj, "request_count", None)
+        if value is not None:
+            return value
+        return obj.exchange_requests.count()
 
 
 class CustomerTagUpdateSerializer(serializers.ModelSerializer):
@@ -209,6 +267,7 @@ class ExchangeRequestSerializer(serializers.ModelSerializer):
     customer_telegram_user_id = serializers.IntegerField(
         source="customer.telegram_user_id", read_only=True
     )
+    customer_name = serializers.SerializerMethodField()
 
     class Meta:
         model = ExchangeRequest
@@ -216,6 +275,7 @@ class ExchangeRequestSerializer(serializers.ModelSerializer):
             "id",
             "customer",
             "customer_telegram_user_id",
+            "customer_name",
             "bot",
             "source_currency",
             "target_currency",
@@ -226,7 +286,24 @@ class ExchangeRequestSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = fields
+        read_only_fields = [
+            "id",
+            "customer",
+            "customer_telegram_user_id",
+            "customer_name",
+            "bot",
+            "source_currency",
+            "target_currency",
+            "amount",
+            "price_at_request",
+            "ttl_minutes",
+            "created_at",
+            "updated_at",
+        ]
+
+    def get_customer_name(self, obj):
+        customer = obj.customer
+        return display_name(customer) if customer else ""
 
 
 class PriceAlertSerializer(serializers.ModelSerializer):

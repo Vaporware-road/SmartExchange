@@ -478,5 +478,104 @@ class TelegramService:
             lambda: self._delete_webhook_async(drop_pending_updates=drop_pending_updates)
         )
 
+    async def _get_me_async(self):
+        try:
+            me = await self.bot.get_me()
+            info = {
+                "id": me.id,
+                "is_bot": bool(me.is_bot),
+                "first_name": me.first_name or "",
+                "username": me.username or "",
+                "can_join_groups": getattr(me, "can_join_groups", None),
+                "can_read_all_group_messages": getattr(
+                    me, "can_read_all_group_messages", None
+                ),
+                "supports_inline_queries": getattr(me, "supports_inline_queries", None),
+            }
+            return True, info, None
+        except TelegramBadRequest as e:
+            error_msg = f"Bad request: {e}"
+            logger.error(error_msg)
+            return False, None, error_msg
+        except TelegramNetworkError as e:
+            error_msg = f"Network error: {e}"
+            logger.error(error_msg)
+            return False, None, error_msg
+        except TelegramAPIError as e:
+            error_msg = f"Telegram error: {e}"
+            logger.error(error_msg)
+            return False, None, error_msg
+        except Exception as e:
+            error_msg = f"Unexpected error: {e}"
+            logger.exception(error_msg)
+            return False, None, error_msg
+        finally:
+            try:
+                await self.bot.session.close()
+            except Exception:
+                pass
+
+    def get_me(self):
+        """
+        Call Telegram getMe to validate the token and return bot identity.
+
+        Returns:
+            tuple: (success: bool, info: dict | None, error: str | None)
+        """
+        return _run_coroutine_sync(lambda: self._get_me_async())
+
+    async def _get_chat_member_count_async(self, chat_id):
+        try:
+            count = await self.bot.get_chat_member_count(chat_id)
+            return True, int(count), None
+        except TelegramBadRequest as e:
+            return False, None, f"Bad request: {e}"
+        except TelegramNetworkError as e:
+            return False, None, f"Network error: {e}"
+        except TelegramAPIError as e:
+            return False, None, f"Telegram error: {e}"
+        except Exception as e:
+            logger.exception("get_chat_member_count failed: %s", e)
+            return False, None, str(e)
+        finally:
+            try:
+                await self.bot.session.close()
+            except Exception:
+                pass
+
+    def get_chat_member_count(self, chat_id):
+        """Return subscriber count for a channel/supergroup."""
+        return _run_coroutine_sync(
+            lambda: self._get_chat_member_count_async(chat_id)
+        )
+
+    async def _get_chat_member_async(self, chat_id, user_id):
+        try:
+            member = await self.bot.get_chat_member(chat_id, user_id)
+            status = getattr(member, "status", None)
+            if hasattr(status, "value"):
+                status = status.value
+            return True, {"status": str(status)}, None
+        except TelegramBadRequest as e:
+            return False, None, f"Bad request: {e}"
+        except TelegramNetworkError as e:
+            return False, None, f"Network error: {e}"
+        except TelegramAPIError as e:
+            return False, None, f"Telegram error: {e}"
+        except Exception as e:
+            logger.exception("get_chat_member failed: %s", e)
+            return False, None, str(e)
+        finally:
+            try:
+                await self.bot.session.close()
+            except Exception:
+                pass
+
+    def get_chat_member(self, chat_id, user_id):
+        """Check membership/admin status of a user in a chat."""
+        return _run_coroutine_sync(
+            lambda: self._get_chat_member_async(chat_id, user_id)
+        )
+
     async def aclose(self):
         await self.bot.session.close()

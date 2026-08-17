@@ -22,6 +22,12 @@ from ..models import (
     TelegramBot,
 )
 from . import currency_catalog
+from .admin_conversation import (
+    go_admin_menu,
+    handle_admin_action,
+    handle_admin_text,
+    resolve_admin_label,
+)
 from .admin_notify import notify_staff_of_exchange_request
 
 logger = logging.getLogger(__name__)
@@ -124,6 +130,7 @@ CANCEL_ROW = [[{"text": BTN_CANCEL}]]
 CMD_PROFILE = "/profile"
 CMD_EXCHANGE = "/exchange"
 CMD_NOTIFICATIONS = "/notifications"
+CMD_ADMIN = "/admin"
 
 
 def _btn(*labels: str) -> list[list[dict[str, str]]]:
@@ -346,13 +353,28 @@ class ConversationEngine:
 
         # Reply-keyboard taps arrive as plain text messages.
         if callback_data is None and text and not text.strip().lower().startswith("/"):
-            mapped = _resolve_label_action(session, text)
-            if mapped is not None:
-                callback_data = mapped
+            admin_mapped = resolve_admin_label(text)
+            if admin_mapped is not None:
+                callback_data = admin_mapped
                 text = None
+            else:
+                mapped = _resolve_label_action(session, text)
+                if mapped is not None:
+                    callback_data = mapped
+                    text = None
 
         cmd = _normalize_command(text)
-        if cmd == "/start":
+        if cmd in ("/start", CMD_ADMIN):
+            admin_home = go_admin_menu(session)
+            if admin_home is not None:
+                return admin_home
+            if cmd == CMD_ADMIN:
+                return _reply(
+                    "You are not registered as an admin for this bot.\n"
+                    "Ask a developer to set your numeric Telegram ID on a "
+                    "super_admin or management account that owns this bot.",
+                    buttons=MAIN_MENU_BUTTONS,
+                )
             return self._go_main_menu(session)
         if cmd == CMD_PROFILE:
             return self._show_profile(session)
@@ -361,7 +383,26 @@ class ConversationEngine:
         if cmd == CMD_NOTIFICATIONS:
             return self._show_alert_menu(session)
 
+        # In-bot admin panel (staff Telegram IDs — no login button)
+        if (
+            callback_data
+            and str(callback_data).startswith("admin:")
+        ) or str(session.state).startswith("ADMIN"):
+            if text and not callback_data:
+                text_result = handle_admin_text(session, text)
+                if text_result is not None:
+                    return text_result
+            admin_result = handle_admin_action(session, callback_data)
+            if isinstance(admin_result, dict) and admin_result.get("_switch_customer"):
+                return self._go_main_menu(session)
+            if admin_result is not None:
+                return admin_result
+
         if callback_data == CB_MENU_HOME:
+            # Staff landing on "Back to menu" from customer flows → admin home
+            admin_home = go_admin_menu(session)
+            if admin_home is not None:
+                return admin_home
             return self._go_main_menu(session)
 
         if callback_data == CB_MENU_PROFILE:
@@ -437,10 +478,7 @@ class ConversationEngine:
     def _list_running_exchanges(self, customer: CustomerProfile) -> list[ExchangeRequest]:
         qs = ExchangeRequest.objects.filter(
             customer=customer,
-            status__in=(
-                ExchangeRequest.Status.PENDING,
-                ExchangeRequest.Status.NOTIFIED,
-            ),
+            status=ExchangeRequest.Status.NEW,
         ).filter(Q(bot=self.bot) | Q(bot__isnull=True)).order_by("-created_at")[:40]
         return [req for req in qs if req.is_running()][:10]
 
@@ -829,7 +867,7 @@ class ConversationEngine:
                 amount=Decimal(str(draft["amount"])),
                 price_at_request=None,
                 ttl_minutes=self._bot_ttl_minutes(),
-                status=ExchangeRequest.Status.PENDING,
+                status=ExchangeRequest.Status.NEW,
             )
             currency_catalog.clear_currency_cache()
         except Exception:

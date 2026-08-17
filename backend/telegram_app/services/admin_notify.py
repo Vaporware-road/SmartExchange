@@ -4,9 +4,7 @@ Notify panel staff on Telegram when a customer confirms an exchange request.
 Recipients: active CustomUser with role super_admin or management and a
 non-empty telegram_id. Failures are logged; callers must not crash the customer flow.
 
-Status policy: mark ExchangeRequest ``notified`` when at least one staff DM
-succeeds. If every send fails (or there are no recipients), leave status as
-``pending``.
+The request stays ``new`` until an operator changes state. Notify is a side effect.
 """
 
 from __future__ import annotations
@@ -17,6 +15,7 @@ from django.contrib.auth import get_user_model
 
 from accounts.models import CustomUser
 from ..models import ExchangeRequest, TelegramBot
+from .staff_access import normalize_telegram_id
 from .telegram_client import TelegramService
 
 logger = logging.getLogger(__name__)
@@ -50,7 +49,9 @@ def _format_request_message(req: ExchangeRequest) -> str:
         f"Amount: {req.amount}\n"
         f"Price at request: {price_display}\n"
         f"TTL: {req.ttl_minutes} min\n"
-        f"Request id: {req.pk}"
+        f"Request id: {req.pk}\n\n"
+        "Open admin panel in this bot: /admin\n"
+        "Then Pending requests to change state or hold TTL."
     )
 
 
@@ -84,9 +85,14 @@ def notify_staff_of_exchange_request(
     sent = 0
     failed = 0
     for user in recipients:
-        chat_id = str(user.telegram_id).strip()
+        chat_id = normalize_telegram_id(user.telegram_id)
+        if not chat_id:
+            failed += 1
+            continue
         try:
-            ok, detail, _ = client.send_message(chat_id=chat_id, text=text, parse_mode=None)
+            ok, detail, _ = client.send_message(
+                chat_id=chat_id, text=text, parse_mode=None
+            )
         except Exception as exc:
             ok, detail = False, str(exc)
         if ok:
@@ -99,9 +105,5 @@ def notify_staff_of_exchange_request(
                 chat_id,
                 detail,
             )
-
-    if sent > 0 and req.status == ExchangeRequest.Status.PENDING:
-        req.status = ExchangeRequest.Status.NOTIFIED
-        req.save(update_fields=["status", "updated_at"])
 
     return {"sent": sent, "failed": failed, "recipients": len(recipients)}

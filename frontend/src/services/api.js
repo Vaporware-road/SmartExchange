@@ -97,6 +97,11 @@ api.interceptors.response.use(
 
       localStorage.removeItem('access_token')
       localStorage.removeItem('refresh_token')
+      try {
+        sessionStorage.removeItem('telegramHubSession')
+      } catch {
+        // ignore
+      }
       const isSessionCheck = url.includes('/auth/me')
       const onPublicRoute = router.currentRoute?.value?.meta?.public === true
       // Never force a full reload to /login while already on a public route (login, landing, …).
@@ -125,6 +130,8 @@ api.interceptors.response.use(
         error.config?.skipGlobalErrorRedirect === true ||
         requestUrl.includes('/analysis/dashboard') ||
         requestUrl.includes('/dashboard/summary') ||
+        requestUrl.includes('/telegram/admin/dashboard') ||
+        requestUrl.includes('/telegram/exchange-requests') ||
         requestUrl.includes('/categories') ||
         requestUrl.includes('/prices/') ||
         requestUrl.includes('/special-prices') ||
@@ -277,6 +284,14 @@ export const authApi = {
     update: (id, data) => api.patch(`/auth/users/${id}/`, data),
     forceLogout: (id) => api.post(`/auth/users/${id}/force-logout/`),
   },
+  impersonate: (id) => api.post(`/auth/impersonate/${id}/`),
+  programmer: {
+    register: (data) => api.post('/auth/programmer/users/', data),
+    get: (id) => api.get(`/auth/programmer/users/${id}/`),
+    update: (id, data) => api.patch(`/auth/programmer/users/${id}/`, data),
+    templates: () => api.get('/auth/programmer/templates/'),
+    setTemplatePlan: (payload) => api.patch('/auth/programmer/templates/', payload),
+  },
   activity: (params) => api.get('/auth/activity/', { params }),
 }
 
@@ -366,6 +381,7 @@ export const telegramApi = {
     list: () => api.get('/telegram/bots/'),
     create: (data) => api.post('/telegram/bots/', data),
     update: (id, data) => api.put(`/telegram/bots/${id}/`, data),
+    patch: (id, data) => api.patch(`/telegram/bots/${id}/`, data),
     delete: (id) => api.delete(`/telegram/bots/${id}/`),
     testConnection: (id, data) =>
       api.post(`/telegram/bots/${id}/test-connection/`, data),
@@ -385,6 +401,43 @@ export const telegramApi = {
   automationSettings: {
     get: () => api.get('/telegram/automation-settings/'),
     update: (data) => api.put('/telegram/automation-settings/', data),
+  },
+  customers: {
+    list: (params = {}) => api.get('/telegram/customers/', { params }),
+    updateTag: (id, data) => api.patch(`/telegram/customers/${id}/`, data),
+  },
+  exchangeRequests: {
+    list: (params = {}) =>
+      api.get('/telegram/exchange-requests/', {
+        params,
+        skipGlobalErrorRedirect: true,
+      }),
+    patch: (id, data) => api.patch(`/telegram/exchange-requests/${id}/`, data),
+    hold: (id) => api.post(`/telegram/exchange-requests/${id}/hold/`),
+  },
+  admin: {
+    verifyBot: (data = {}) => api.post('/telegram/admin/verify-bot/', data),
+    dashboard: (params = {}) =>
+      api.get('/telegram/admin/dashboard/', {
+        params,
+        skipGlobalErrorRedirect: true,
+      }),
+    reengage: (data) => api.post('/telegram/admin/reengage/', data),
+    channelSnapshots: (params = {}) =>
+      api.get('/telegram/admin/snapshots/channel-members/', { params }),
+    campaigns: {
+      list: (params = {}) => api.get('/telegram/admin/campaigns/', { params }),
+      create: (data) => api.post('/telegram/admin/campaigns/', data),
+      patch: (id, data) => api.patch(`/telegram/admin/campaigns/${id}/`, data),
+      delete: (id) => api.delete(`/telegram/admin/campaigns/${id}/`),
+    },
+    offers: {
+      list: (params = {}) => api.get('/telegram/admin/offers/', { params }),
+      create: (data) => api.post('/telegram/admin/offers/', data),
+      patch: (id, data) => api.patch(`/telegram/admin/offers/${id}/`, data),
+      delete: (id) => api.delete(`/telegram/admin/offers/${id}/`),
+      send: (id) => api.post(`/telegram/admin/offers/${id}/`),
+    },
   },
 }
 

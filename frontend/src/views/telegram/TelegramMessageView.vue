@@ -1,27 +1,112 @@
 <template>
-  <div class="w-full min-w-0 overflow-hidden">
-    <h1 class="text-2xl font-bold text-gold mb-6 animate-fade-in-up">
-      {{ $t('telegram.hubTitle') }}
-    </h1>
-
-    <!-- Tabs -->
-    <div class="card-luxury mb-6 px-3 py-2 flex flex-wrap gap-2 items-center rtl:flex-row-reverse min-w-0">
-      <button
-        v-for="tab in tabs"
-        :key="tab.id"
-        type="button"
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all"
-        :class="activeTab === tab.id ? 'btn-luxury' : 'btn-luxury-outline bg-transparent'"
-        @click="activeTab = tab.id"
-      >
-        <i :class="tab.icon" />
-        <span>{{ $t(tab.labelKey) }}</span>
-      </button>
+  <div class="relative w-full min-w-0 overflow-hidden">
+    <!-- Token gate: block hub until getMe succeeds (management / super_admin) -->
+    <div
+      v-if="requiresGate && hubLocked"
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+    >
+      <div class="card-luxury max-w-md w-[90%] px-6 py-8 text-center space-y-4">
+        <template v-if="verifyLoading">
+          <LoadingSpinner class="w-12 h-12 text-gold mx-auto" />
+          <p class="text-[var(--text-primary)] font-medium">{{ $t('telegram.admin.gate.verifying') }}</p>
+          <p class="text-sm text-[var(--text-secondary)]">{{ $t('telegram.admin.gate.verifyingHint') }}</p>
+        </template>
+        <template v-else>
+          <p class="text-lg font-semibold text-gold">{{ $t('telegram.admin.gate.failedTitle') }}</p>
+          <p class="text-sm text-[var(--text-secondary)]">{{ verifyError || $t('telegram.admin.gate.failedHint') }}</p>
+          <button type="button" class="btn-luxury-gradient min-h-[44px]" @click="runVerify">
+            {{ $t('telegram.admin.gate.retry') }}
+          </button>
+        </template>
+      </div>
     </div>
 
-    <!-- Tab content -->
-    <Transition name="fade-slide" mode="out-in">
-      <div :key="activeTab">
+    <div :class="{ 'pointer-events-none select-none opacity-40': requiresGate && hubLocked }">
+      <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
+        <h1 class="text-2xl font-bold text-gold animate-fade-in-up">
+          {{ $t('telegram.hubTitle') }}
+        </h1>
+        <div v-if="verifiedBot" class="flex flex-wrap items-center gap-2">
+          <select
+            v-if="hubBotOptions.length"
+            class="input-luxury py-1.5 text-sm min-w-[10rem]"
+            :aria-label="$t('telegram.channels.selectBot')"
+            :value="verifiedBot.id"
+            @change="onHubBotChange"
+          >
+            <option v-for="b in hubBotOptions" :key="b.id" :value="b.id">
+              {{ botSelectLabel(b) }}
+            </option>
+          </select>
+          <p class="text-sm text-[var(--text-secondary)]">
+            {{ $t('telegram.admin.gate.scopedTo', { name: verifiedBot.username || verifiedBot.name }) }}
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-col lg:flex-row gap-6 items-start min-w-0">
+        <!-- Admin category nav -->
+        <aside
+          v-if="showAdminNav"
+          class="card-luxury w-full lg:w-56 shrink-0 px-2 py-3 space-y-1 rtl:lg:order-2"
+        >
+          <p class="px-3 py-1 text-xs uppercase tracking-wide text-gray-500">
+            {{ $t('telegram.admin.navLabel') }}
+          </p>
+          <button
+            v-for="cat in adminCategories"
+            :key="cat.id"
+            type="button"
+            class="w-full text-left rtl:text-right px-3 py-2 rounded-lg text-sm transition-all"
+            :class="adminSection === cat.id ? 'btn-luxury' : 'hover:bg-white/5 text-[var(--text-secondary)]'"
+            @click="selectAdminSection(cat.id)"
+          >
+            <i :class="[cat.icon, 'me-2']" />
+            {{ $t(cat.labelKey) }}
+          </button>
+        </aside>
+
+        <div class="flex-1 min-w-0 w-full">
+          <div
+            v-if="dashboardError && showAdminNav && !hubLocked"
+            class="card-luxury mb-4 px-4 py-3 flex flex-wrap items-center justify-between gap-3"
+          >
+            <p class="text-sm text-amber-300">{{ dashboardError }}</p>
+            <button type="button" class="btn-luxury-outline text-sm" @click="loadDashboard">
+              {{ $t('common.refresh') }}
+            </button>
+          </div>
+          <!-- Admin panels -->
+          <TelegramHubAdminPanels
+            v-if="showAdminNav && adminSection !== 'tools'"
+            :section="adminSection"
+            :dashboard="dashboard"
+            :verified-bot="verifiedBot"
+            @open-tools="openToolsTab"
+            @select-section="selectAdminSection"
+            @bot-updated="onBotUpdated"
+            @refresh-dashboard="loadDashboard"
+          />
+
+          <template v-else>
+            <!-- Tabs -->
+            <div class="card-luxury mb-6 px-3 py-2 flex flex-wrap gap-2 items-center rtl:flex-row-reverse min-w-0">
+              <button
+                v-for="tab in tabs"
+                :key="tab.id"
+                type="button"
+                class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all"
+                :class="activeTab === tab.id ? 'btn-luxury' : 'btn-luxury-outline bg-transparent'"
+                @click="activeTab = tab.id"
+              >
+                <i :class="tab.icon" />
+                <span>{{ $t(tab.labelKey) }}</span>
+              </button>
+            </div>
+
+            <!-- Tab content -->
+            <Transition name="fade-slide" mode="out-in">
+              <div :key="activeTab">
         <!-- Tab 1: Messenger -->
         <div
           v-if="activeTab === 'messenger'"
@@ -645,7 +730,11 @@
                     <td class="py-3 px-2">{{ c.username || '—' }}</td>
                     <td class="py-3 px-2">{{ [c.first_name, c.last_name].filter(Boolean).join(' ') || '—' }}</td>
                     <td class="py-3 px-2">
+                      <span v-if="c.is_admin || c.display_tag === 'admin'" class="text-sm">
+                        {{ $t('telegram.customers.tags.admin') }}
+                      </span>
                       <select
+                        v-else
                         class="input-luxury py-1 text-sm min-w-[8rem]"
                         :value="c.tag"
                         :disabled="customerTagSavingId === c.id"
@@ -666,24 +755,201 @@
           </div>
         </div>
       </div>
-    </Transition>
+            </Transition>
+          </template>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { telegramApi, categoryApi, specialPriceApi } from '@/services/api'
 import { createAppDateTimeFormat } from '@/utils/localeFormat.js'
-import { useAuthStore } from '@/stores/auth'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
+import { useAuthStore } from '@/stores/auth'
+import { useTelegramHubStore } from '@/stores/telegramHub'
+import TelegramHubAdminPanels from './TelegramHubAdminPanels.vue'
 
 const { t, locale } = useI18n()
 const toast = useToast()
 const auth = useAuthStore()
+const telegramHub = useTelegramHubStore()
+
+const requiresGate = computed(() => auth.isSuperAdmin || auth.isManager)
+const showAdminNav = computed(() => requiresGate.value)
+const hubLocked = ref(requiresGate.value && !telegramHub.isSessionValid)
+const verifyLoading = ref(false)
+const verifyError = ref('')
+const verifiedBot = ref(telegramHub.isSessionValid ? telegramHub.verifiedBot : null)
+const dashboard = ref(telegramHub.isSessionValid ? telegramHub.lastDashboard : null)
+const dashboardError = ref('')
+const adminSection = ref(
+  telegramHub.lastAdminSection === 'publish'
+    ? 'customersStatus'
+    : (telegramHub.lastAdminSection || 'customersStatus')
+)
+
+const DASHBOARD_REFRESH_SECTIONS = new Set([
+  'customersStatus',
+  'notifications',
+  'exchangeRequests',
+  'reports',
+  'analytics',
+  'customerAnalysis',
+])
+const DASHBOARD_REFRESH_DEBOUNCE_MS = 300
+let dashboardRefreshTimer = null
+
+const adminCategories = [
+  { id: 'customersStatus', labelKey: 'telegram.admin.nav.customersStatus', icon: 'fas fa-user-tag' },
+  { id: 'notifications', labelKey: 'telegram.admin.nav.notifications', icon: 'fas fa-bell' },
+  { id: 'reports', labelKey: 'telegram.admin.nav.reports', icon: 'fas fa-chart-pie' },
+  { id: 'analytics', labelKey: 'telegram.admin.nav.analytics', icon: 'fas fa-chart-line' },
+  { id: 'exchangeRequests', labelKey: 'telegram.admin.nav.exchangeRequests', icon: 'fas fa-exchange-alt' },
+  { id: 'customerAnalysis', labelKey: 'telegram.admin.nav.customerAnalysis', icon: 'fas fa-user-clock' },
+  { id: 'reengage', labelKey: 'telegram.admin.nav.reengage', icon: 'fas fa-paper-plane' },
+  { id: 'botSettings', labelKey: 'telegram.admin.nav.botSettings', icon: 'fas fa-sliders-h' },
+  { id: 'tools', labelKey: 'telegram.admin.nav.tools', icon: 'fas fa-tools' },
+]
+
+function selectAdminSection(id) {
+  adminSection.value = id
+  telegramHub.setAdminSection(id)
+  if (id === 'tools' && !['messenger', 'bot', 'channels', 'automation', 'customers'].includes(activeTab.value)) {
+    activeTab.value = 'messenger'
+  }
+  if (!DASHBOARD_REFRESH_SECTIONS.has(id)) return
+  if (dashboardRefreshTimer) clearTimeout(dashboardRefreshTimer)
+  dashboardRefreshTimer = setTimeout(() => {
+    loadDashboard()
+  }, DASHBOARD_REFRESH_DEBOUNCE_MS)
+}
+
+function openToolsTab(tabId) {
+  adminSection.value = 'tools'
+  telegramHub.setAdminSection('tools')
+  activeTab.value = tabId
+  if (tabId === 'customers') loadCustomers()
+}
+
+function botSelectLabel(bot) {
+  if (!bot) return ''
+  const handle = bot.username ? `@${bot.username}` : ''
+  return handle || bot.display_name || bot.name || `Bot #${bot.id}`
+}
+
+async function onHubBotChange(event) {
+  const id = Number(event?.target?.value)
+  if (!id || Number(verifiedBot.value?.id) === id) return
+  const fromList = botsList.value.find((b) => Number(b.id) === id) || { id }
+  telegramHub.setVerifiedBot({
+    ...fromList,
+    id,
+    username: fromList.username || '',
+  })
+  verifiedBot.value = telegramHub.verifiedBot
+  dashboard.value = null
+  telegramHub.setDashboard(null)
+  await loadDashboard()
+}
+
+function onBotUpdated(data) {
+  if (!data) return
+  verifiedBot.value = {
+    ...(verifiedBot.value || {}),
+    ...data,
+    username: verifiedBot.value?.username || '',
+  }
+  telegramHub.setVerifiedBot(verifiedBot.value)
+}
+
+async function runVerify() {
+  await unlockHub({ force: true })
+}
+
+async function unlockHub({ force = false } = {}) {
+  if (!requiresGate.value) {
+    hubLocked.value = false
+    await loadHubToolsData()
+    return
+  }
+  const showGate = force || !telegramHub.isSessionValid
+  if (showGate) {
+    verifyLoading.value = true
+    verifyError.value = ''
+    hubLocked.value = true
+  }
+  try {
+    const result = await telegramHub.ensureVerified({
+      force,
+      botId: telegramHub.verifiedBot?.id ?? null,
+      userId: auth.user?.id ?? null,
+    })
+    if (!result?.ok || !result?.bot) {
+      throw new Error(t('telegram.admin.gate.failedHint'))
+    }
+    verifiedBot.value = result.bot
+    hubLocked.value = false
+    if (result.fromCache) {
+      dashboard.value = telegramHub.lastDashboard
+      loadHubToolsData()
+      loadDashboard()
+      return
+    }
+    await loadDashboard()
+    await loadHubToolsData()
+  } catch (err) {
+    telegramHub.clearSession()
+    hubLocked.value = true
+    verifiedBot.value = null
+    dashboard.value = null
+    verifyError.value =
+      err?.response?.data?.message ||
+      err?.response?.data?.detail ||
+      err?.message ||
+      t('telegram.admin.gate.failedHint')
+  } finally {
+    verifyLoading.value = false
+  }
+}
+
+async function loadHubToolsData() {
+  try {
+    const { data } = await telegramApi.channels()
+    channels.value = data ?? []
+  } catch {
+    channels.value = []
+  }
+  loadBots()
+  loadManageChannels()
+  loadCategoriesAndSpecialPrices()
+  loadSchedules()
+  loadAutomationSettings()
+}
+
+async function loadDashboard() {
+  if (!verifiedBot.value?.id) return
+  dashboardError.value = ''
+  try {
+    const { data } = await telegramApi.admin.dashboard({ bot_id: verifiedBot.value.id })
+    dashboard.value = data
+    telegramHub.setDashboard(data)
+  } catch (err) {
+    dashboardError.value =
+      err?.response?.data?.message ||
+      err?.response?.data?.detail ||
+      t('telegram.admin.gate.dashboardError')
+    if (!dashboard.value) {
+      telegramHub.setDashboard(null)
+    }
+  }
+}
 
 const tabs = computed(() => {
   const base = [
@@ -707,7 +973,13 @@ const activeTab = ref('messenger')
 const route = useRoute()
 
 watch(() => route.query.tab, (tab) => {
-  if (tab === 'botSetup') activeTab.value = 'bot'
+  if (tab === 'botSetup') {
+    activeTab.value = 'bot'
+    if (showAdminNav.value) {
+      adminSection.value = 'tools'
+      telegramHub.setAdminSection('tools')
+    }
+  }
 }, { immediate: true })
 
 const channels = ref([])
@@ -718,6 +990,15 @@ const submitting = ref(false)
 const botsList = ref([])
 const botDeleteConfirm = ref(null)
 const botDeleting = ref(false)
+
+const hubBotOptions = computed(() => {
+  const list = Array.isArray(botsList.value) ? [...botsList.value] : []
+  const current = verifiedBot.value
+  if (current?.id && !list.some((b) => Number(b.id) === Number(current.id))) {
+    list.unshift(current)
+  }
+  return list
+})
 
 const manageChannelsList = ref([])
 const manageChannelsLoading = ref(false)
@@ -811,17 +1092,11 @@ const previewTimestamp = computed(() => {
 })
 
 onMounted(async () => {
-  try {
-    const { data } = await telegramApi.channels()
-    channels.value = data ?? []
-  } catch {
-    channels.value = []
-  }
-  loadBots()
-  loadManageChannels()
-  loadCategoriesAndSpecialPrices()
-  loadSchedules()
-  loadAutomationSettings()
+  await unlockHub()
+})
+
+onUnmounted(() => {
+  if (dashboardRefreshTimer) clearTimeout(dashboardRefreshTimer)
 })
 
 watch(activeTab, (tab) => {
@@ -831,7 +1106,9 @@ watch(activeTab, (tab) => {
 async function loadCustomers() {
   customersLoading.value = true
   try {
-    const { data } = await telegramApi.customers.list()
+    const { data } = await telegramApi.customers.list({
+      bot_id: verifiedBot.value?.id,
+    })
     customersList.value = Array.isArray(data) ? data : (data?.results ?? [])
   } catch {
     customersList.value = []

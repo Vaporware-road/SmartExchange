@@ -3,6 +3,7 @@ DRF API views for Telegram app: channels, send message, default settings, bots,
 and auto-post configuration.
 """
 import json
+from django.db.models import Count
 from rest_framework import status, serializers as drf_serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -12,11 +13,23 @@ from accounts.permissions import (
     IsSuperAdminOrManagement,
     IsSuperAdminOrManagementOrEmployee,
 )
+from rest_framework.exceptions import MethodNotAllowed, NotFound, PermissionDenied, ValidationError
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import action
 
+from .admin_api import (
+    ChannelMemberSnapshotsAPIView,
+    DashboardAPIView,
+    ReengageAPIView,
+    ReengageCampaignDetailAPIView,
+    ReengageCampaignListCreateAPIView,
+    ReengageOfferDetailAPIView,
+    ReengageOfferListCreateAPIView,
+    VerifyBotAPIView,
+)
 from .models import (
     AutoPostConfig,
+    BotSession,
     CustomerProfile,
     DefaultMessageSettings,
     ExchangeRequest,
@@ -24,6 +37,14 @@ from .models import (
     TelegramBot,
     TelegramChannel,
 )
+from .ownership import (
+    bots_queryset_for_user,
+    resolve_bot_for_user,
+    user_is_management,
+    user_is_super_admin,
+)
+from .services.customer_tags import AdminTagImmutable, set_customer_tag
+from .services.exchange_ops import hold_request, set_request_status
 from .services.telegram_client import TelegramService
 from setting.utils import (
     log_telegram_event,
@@ -55,6 +76,7 @@ class TelegramChannelListAPIView(APIView):
             TelegramChannel.objects.filter(
                 is_active=True,
                 bot__is_active=True,
+                bot_id__in=bots_queryset_for_user(request.user).values("id"),
             )
             .select_related("bot")
             .order_by("-created_at")
@@ -166,7 +188,9 @@ class DefaultMessageSettingsListAPIView(APIView):
 
     def get(self, request):
         bot_id = request.query_params.get("bot")
-        qs = DefaultMessageSettings.objects.select_related("bot").order_by("-updated_at")
+        qs = DefaultMessageSettings.objects.select_related("bot").filter(
+            bot_id__in=bots_queryset_for_user(request.user).values("id")
+        ).order_by("-updated_at")
         if bot_id:
             qs = qs.filter(bot_id=bot_id)
         serializer = DefaultMessageSettingsSerializer(qs, many=True)
@@ -248,11 +272,19 @@ class TelegramBotViewSet(ModelViewSet):
     queryset = TelegramBot.objects.all().order_by("-created_at")
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
+    def get_queryset(self):
+        return bots_queryset_for_user(self.request.user).order_by("-created_at")
+
     def get_serializer_class(self):
         if self.action in ("create", "update", "partial_update"):
             return TelegramBotDetailSerializer
         return TelegramBotSerializer
 
+    def perform_create(self, serializer):
+        owner = self.request.user if user_is_management(self.request.user) else None
+        if user_is_super_admin(self.request.user):
+            owner = self.request.user
+        serializer.save(owner=owner)
     @action(detail=True, methods=["post"], url_path="test-connection")
     def test_connection(self, request, pk=None):
         """
@@ -331,6 +363,15 @@ class TelegramChannelViewSet(ModelViewSet):
     serializer_class = TelegramChannelSerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
+    def get_queryset(self):
+        return (
+            TelegramChannel.objects.filter(
+                bot_id__in=bots_queryset_for_user(self.request.user).values("id")
+            )
+            .select_related("bot")
+            .order_by("-created_at")
+        )
+
 
 class AutoPostConfigViewSet(ModelViewSet):
     """
@@ -346,6 +387,16 @@ class AutoPostConfigViewSet(ModelViewSet):
     serializer_class = AutoPostConfigSerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
+    def get_queryset(self):
+        return (
+            AutoPostConfig.objects.filter(
+                channel__bot_id__in=bots_queryset_for_user(self.request.user).values(
+                    "id"
+                )
+            )
+            .select_related("channel", "category", "special_price_type")
+            .all()
+        )
 
 class AutomationSettingsSerializer(drf_serializers.Serializer):
     auto_post_on_update = drf_serializers.BooleanField(required=False, default=False)
@@ -434,6 +485,31 @@ class CustomerProfileViewSet(ModelViewSet):
     def get_permissions(self):
         return [IsAuthenticated(), IsSuperAdminOrManagement()]
 
+    def get_queryset(self):
+        qs = CustomerProfile.objects.annotate(
+            request_count=Count("exchange_requests")
+        )
+        bot_id = self.request.query_params.get("bot_id")
+        if bot_id is not None and str(bot_id).strip() != "":
+            bot, code, message = resolve_bot_for_user(
+                self.request.user, bot_id=bot_id
+            )
+            if bot is None:
+                if code in ("bot_not_found", "no_bot"):
+                    raise NotFound(detail=message)
+                if code == "bot_forbidden":
+                    raise PermissionDenied(detail=message)
+                raise ValidationError({"bot_id": message})
+            user_ids = BotSession.objects.filter(bot=bot).values("telegram_user_id")
+            qs = qs.filter(telegram_user_id__in=user_ids)
+        elif not user_is_super_admin(self.request.user):
+            bot_ids = bots_queryset_for_user(self.request.user).values("id")
+            user_ids = BotSession.objects.filter(bot_id__in=bot_ids).values_list(
+                "telegram_user_id", flat=True
+            )
+            qs = qs.filter(telegram_user_id__in=user_ids)
+        return qs.order_by("-request_count", "telegram_user_id")
+
     def get_serializer_class(self):
         if self.action in ("partial_update", "update"):
             return CustomerTagUpdateSerializer
@@ -445,19 +521,78 @@ class CustomerProfileViewSet(ModelViewSet):
             customer, data=request.data, partial=True
         )
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        try:
+            set_customer_tag(customer, serializer.validated_data["tag"])
+        except AdminTagImmutable as exc:
+            raise ValidationError({"tag": str(exc)}) from exc
+        customer.refresh_from_db()
         return Response(CustomerProfileSerializer(customer).data)
 
 
-class ExchangeRequestViewSet(ReadOnlyModelViewSet):
+class ExchangeRequestViewSet(ModelViewSet):
     queryset = ExchangeRequest.objects.select_related("customer", "bot").order_by(
         "-created_at"
     )
     serializer_class = ExchangeRequestSerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    http_method_names = ["get", "patch", "post", "head", "options"]
+
+    def get_queryset(self):
+        qs = ExchangeRequest.objects.select_related("customer", "bot").order_by(
+            "-created_at"
+        )
+        bot_id = self.request.query_params.get("bot_id")
+        if bot_id is not None and str(bot_id).strip() != "":
+            bot, code, message = resolve_bot_for_user(
+                self.request.user, bot_id=bot_id
+            )
+            if bot is None:
+                if code in ("bot_not_found", "no_bot"):
+                    raise NotFound(detail=message)
+                if code == "bot_forbidden":
+                    raise PermissionDenied(detail=message)
+                raise ValidationError({"bot_id": message})
+            return qs.filter(bot=bot)
+        if user_is_super_admin(self.request.user):
+            return qs
+        return qs.filter(bot_id__in=bots_queryset_for_user(self.request.user).values("id"))
+
+    def create(self, request, *args, **kwargs):
+        raise MethodNotAllowed("POST")
+
+    def partial_update(self, request, *args, **kwargs):
+        req = self.get_object()
+        status_value = request.data.get("status")
+        if not status_value:
+            raise ValidationError({"status": "This field is required."})
+        try:
+            set_request_status(req, status_value)
+        except ValueError as exc:
+            raise ValidationError({"status": str(exc)}) from exc
+        req.refresh_from_db()
+        return Response(ExchangeRequestSerializer(req).data)
+
+    @action(detail=True, methods=["post"])
+    def hold(self, request, pk=None):
+        req = self.get_object()
+        ttl = hold_request(req)
+        req.refresh_from_db()
+        payload = ExchangeRequestSerializer(req).data
+        payload["ttl_minutes"] = ttl
+        return Response(payload)
 
 
 class PriceAlertViewSet(ReadOnlyModelViewSet):
     queryset = PriceAlert.objects.select_related("customer").order_by("-created_at")
     serializer_class = PriceAlertSerializer
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+
+    def get_queryset(self):
+        qs = PriceAlert.objects.select_related("customer").order_by("-created_at")
+        if user_is_super_admin(self.request.user):
+            return qs
+        bot_ids = bots_queryset_for_user(self.request.user).values("id")
+        user_ids = BotSession.objects.filter(bot_id__in=bot_ids).values_list(
+            "telegram_user_id", flat=True
+        )
+        return qs.filter(customer__telegram_user_id__in=user_ids)

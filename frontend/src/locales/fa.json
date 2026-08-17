@@ -41,7 +41,8 @@
     "description": "توضیحات",
     "date": "تاریخ",
     "logout": "خروج",
-    "login": "ورود"
+    "login": "ورود",
+    "refresh": "تازه‌سازی"
   },
   "header": {
     "openMenu": "باز کردن منو",
@@ -149,6 +150,7 @@
     "userCenter": "مدیریت ادمین‌ها",
     "programmerHub": "مدیریت کاربران",
     "programmerRegister": "ثبت کاربر",
+    "programmerUser": "حساب کاربر",
     "programmerTemplates": "پلن‌ها"
   },
   "instagramHub": {
@@ -767,6 +769,118 @@
     "settings": {
       "description": "ربات‌ها و کانال‌های تلگرام را برای ارسال نرخ ارز تنظیم کنید.",
       "openHub": "باز کردن هاب تلگرام"
+    },
+    "admin": {
+      "navLabel": "مدیریت",
+      "nav": {
+        "customersStatus": "وضعیت مشتریان",
+        "notifications": "اعلان‌ها",
+        "reports": "گزارش‌ها",
+        "publish": "انتشار نرخ",
+        "analytics": "تحلیل‌ها",
+        "exchangeRequests": "درخواست‌های تبادل",
+        "customerAnalysis": "تحلیل مشتری",
+        "reengage": "بازگردانی مشتری",
+        "botSettings": "تنظیمات ربات",
+        "tools": "ابزارهای هاب"
+      },
+      "gate": {
+        "verifying": "در حال تأیید توکن ربات…",
+        "verifyingHint": "فراخوانی getMe تلگرام. تا موفقیت، هاب قفل می‌ماند.",
+        "failedTitle": "تأیید ربات ناموفق بود",
+        "failedHint": "توکن ربات تأیید نشد. مالکیت و توکن را بررسی کنید و دوباره تلاش کنید.",
+        "retry": "تلاش مجدد",
+        "scopedTo": "محدود به @{name}",
+        "dashboardError": "بارگذاری داشبورد ناموفق بود. اگر بعد از استقرار ادامه داشت، python manage.py migrate را اجرا کنید (telegram_app 0010)."
+      },
+      "customersStatus": {
+        "title": "وضعیت مشتریان",
+        "hint": "شمارش برچسب برای مشتریانی که با این ربات جلسه دارند.",
+        "total": "کل",
+        "manageTags": "مدیریت برچسب‌ها"
+      },
+      "notifications": {
+        "title": "هشدار قیمت",
+        "total": "کل: {n}",
+        "active": "فعال: {n}",
+        "customer": "مشتری",
+        "pair": "جفت",
+        "direction": "جهت"
+      },
+      "reports": {
+        "title": "گزارش تبادل",
+        "hint": "درخواست موفق = وضعیت notified.",
+        "running": "در حال اجرا",
+        "pending": "در انتظار",
+        "successful": "موفق (notified)",
+        "cancelled": "لغو شده",
+        "closed": "بسته"
+      },
+      "publish": {
+        "title": "سامانه انتشار ارز",
+        "hint": "از پیام‌رسان، کانال‌ها، فاینالایز و استودیوی موجود استفاده کنید — ناشر جدید نیست.",
+        "finalize": "فاینالایز",
+        "channels": "کانال‌های این ربات"
+      },
+      "analytics": {
+        "title": "تحلیل‌ها",
+        "dailyUsage": "کاربران یکتا روزانه (۳۰ روز اخیر)",
+        "channelMembers": "اعضای کانال (آخرین نمونه)",
+        "publishActivity": "{n} انتشار",
+        "channelViews": "بازدید کانال",
+        "channelViewsStub": "از طریق Bot API در دسترس نیست."
+      },
+      "exchangeRequests": {
+        "title": "درخواست‌های تبادل",
+        "hint": "موفق = notified. اعضای جدید = رشد کانال + کاربران DM ربات.",
+        "newMembers": "اعضای جدید ({months} ماه)",
+        "mostRequested": "پرخواست‌ترین ارزها",
+        "pair": "جفت",
+        "amount": "مبلغ",
+        "successful": "موفق",
+        "pending": "در انتظار",
+        "loadError": "بارگذاری درخواست‌های تبادل ناموفق بود."
+      },
+      "customerAnalysis": {
+        "title": "تحلیل مشتری",
+        "hint": "غیرفعال = بدون فعالیت BotSession در ۳۰ روز برای این ربات.",
+        "returned": "بازگشته",
+        "inactive": "غیرفعال (۳۰ روز)",
+        "vipRatio": "نسبت درخواست VIP / عادی",
+        "peakHours": "ساعات اوج درخواست"
+      },
+      "reengage": {
+        "title": "بازگردانی مشتری",
+        "hint": "پیام یک‌باره به مخاطبان (با سقف ارسال). کمپین دوره‌ای و پیشنهاد بعداً.",
+        "audience": "مخاطب",
+        "inactive": "غیرفعال (۳۰ روز)",
+        "message": "پیام",
+        "send": "ارسال الآن",
+        "sentOk": "ارسال بازگردانی انجام شد.",
+        "result": "ارسال {sent}، ناموفق {failed}، رد شده {skipped}"
+      },
+      "botSettings": {
+        "title": "تنظیمات ربات",
+        "hint": "ویرایش TTL و وضعیت فعال برای ربات تأییدشده."
+      },
+      "campaigns": {
+        "daily": "روزانه",
+        "weekly": "هفتگی",
+        "monthly": "ماهانه",
+        "save": "ذخیره کمپین"
+      },
+      "offers": {
+        "saveAndSend": "ذخیره و ارسال",
+        "validUntil": "اعتبار تا (اختیاری)"
+      },
+      "stubs": {
+        "periodicTitle": "پیام‌های دوره‌ای",
+        "offerTitle": "ایجاد پیشنهاد",
+        "comingSoon": "به‌زودی — در این نسخه در دسترس نیست.",
+        "schedulePlaceholder": "زمان‌بندی (غیرفعال)",
+        "messagePlaceholder": "پیام کمپین (غیرفعال)",
+        "offerPlaceholder": "عنوان پیشنهاد (غیرفعال)"
+      }
     }
   },
   "telegramStudio": {
@@ -849,6 +963,50 @@
     "templates": "پلن‌ها",
     "templatesTitle": "پلن‌ها",
     "templatesHint": "مشخص کنید هر تصویر برای برنز، نقره یا طلا است.",
+    "userDetail": "حساب کاربر",
+    "enterAs": "ورود به‌عنوان کاربر",
+    "userUpdated": "کاربر به‌روزرسانی شد",
+    "userNotFound": "کاربر یافت نشد",
+    "active": "فعال",
+    "inactive": "غیرفعال",
+    "noBots": "رباتی به این حساب متصل نیست.",
+    "noChannels": "کانالی ثبت نشده است.",
+    "noAuditLogs": "هنوز لاگ ممیزی ثبت نشده است.",
+    "noTemplates": "قالبی برای این پلن در دسترس نیست.",
+    "userTemplatesHint": "قالب‌هایی که این پلن می‌تواند استفاده کند (فقط خواندنی).",
+    "channels": "کانال‌ها",
+    "ttlMinutes": "TTL پیش‌فرض (دقیقه)",
+    "restrictChannels": "محدود به کانال‌های شناخته‌شده",
+    "logMessages": "ثبت همه پیام‌ها",
+    "actionType": "عملیات",
+    "details": "جزئیات",
+    "ip": "IP",
+    "currentBotToken": "توکن فعلی",
+    "botTokenOptional": "توکن جدید ربات تلگرام (اختیاری)",
+    "tabs": {
+      "registered": "اطلاعات ثبت‌نام",
+      "botAccess": "دسترسی ربات",
+      "botAnalytics": "تحلیل ربات",
+      "audit": "لاگ ممیزی",
+      "templates": "قالب‌ها"
+    },
+    "botAnalyticsHint": "معیارهای فقط‌خواندنی از نمونه‌های ذخیره‌شده (همان داده‌های پنل تلگرام).",
+    "peakHour": "ساعت اوج",
+    "returnedUsers": "کاربران بازگشته",
+    "inactiveUsers": "کاربران غیرفعال",
+    "vipRatio": "نسبت VIP / عادی",
+    "actionTypes": {
+      "login_success": "ورود موفق",
+      "login_failed": "ورود ناموفق",
+      "logout": "خروج",
+      "price_update": "بروزرسانی قیمت",
+      "bulk_price_update": "بروزرسانی گروهی قیمت",
+      "special_price_update": "بروزرسانی قیمت ویژه",
+      "template_change": "تغییر قالب",
+      "finalize": "نهایی‌سازی",
+      "impersonate_start": "شروع جعل هویت",
+      "other": "سایر"
+    },
     "firstName": "نام",
     "exchangeName": "نام صرافی",
     "country": "کشور",

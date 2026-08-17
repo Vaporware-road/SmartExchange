@@ -6,11 +6,17 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from .models import (
+    BotCustomerGrowthSnapshot,
+    BotDailyUsageSnapshot,
     BotSession,
+    CampaignDeliveryLog,
+    ChannelMemberSnapshot,
     CustomerProfile,
     DefaultMessageSettings,
     ExchangeRequest,
     PriceAlert,
+    ReengageCampaign,
+    ReengageOffer,
     TelegramBot,
     TelegramChannel,
 )
@@ -53,7 +59,7 @@ class TelegramBotAdmin(admin.ModelAdmin):
 class TelegramChannelAdmin(admin.ModelAdmin):
     """Admin interface for TelegramChannel model."""
     
-    list_display = ('name', 'bot', 'chat_id', 'is_active', 'created_at')
+    list_display = ('name', 'bot', 'chat_id', 'is_active', 'last_member_count', 'bot_admin_verified', 'created_at')
     list_filter = ('bot', 'is_active', 'created_at', 'updated_at')
     search_fields = ('name', 'bot__name', 'chat_id')
     readonly_fields = ('created_at', 'updated_at')
@@ -61,7 +67,10 @@ class TelegramChannelAdmin(admin.ModelAdmin):
     
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'bot', 'chat_id', 'is_active')
+            'fields': (
+                'name', 'bot', 'chat_id', 'is_active',
+                'last_member_count', 'last_member_sampled_at', 'bot_admin_verified',
+            )
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -235,3 +244,49 @@ class PriceAlertAdmin(admin.ModelAdmin):
     )
     readonly_fields = ("created_at", "updated_at")
     list_select_related = ("customer",)
+
+
+@admin.register(BotDailyUsageSnapshot)
+class BotDailyUsageSnapshotAdmin(admin.ModelAdmin):
+    list_display = ("bot", "date", "active_users", "created_at")
+    list_filter = ("bot", "date")
+    date_hierarchy = "date"
+
+
+@admin.register(BotCustomerGrowthSnapshot)
+class BotCustomerGrowthSnapshotAdmin(admin.ModelAdmin):
+    list_display = ("bot", "date", "new_customers", "created_at")
+    list_filter = ("bot", "date")
+    date_hierarchy = "date"
+
+
+@admin.register(ChannelMemberSnapshot)
+class ChannelMemberSnapshotAdmin(admin.ModelAdmin):
+    list_display = ("channel", "member_count", "bot_is_admin", "sampled_at")
+    list_filter = ("bot_is_admin", "channel__bot")
+    date_hierarchy = "sampled_at"
+    list_select_related = ("channel", "channel__bot")
+
+
+@admin.register(ReengageCampaign)
+class ReengageCampaignAdmin(admin.ModelAdmin):
+    list_display = ("bot", "audience", "schedule", "is_active", "next_run_at", "updated_at")
+    list_filter = ("audience", "schedule", "is_active", "bot")
+    search_fields = ("message",)
+    list_select_related = ("bot", "created_by")
+
+
+@admin.register(ReengageOffer)
+class ReengageOfferAdmin(admin.ModelAdmin):
+    list_display = ("title", "bot", "audience", "is_active", "valid_until", "updated_at")
+    list_filter = ("audience", "is_active", "bot")
+    search_fields = ("title", "body")
+    list_select_related = ("bot", "created_by")
+
+
+@admin.register(CampaignDeliveryLog)
+class CampaignDeliveryLogAdmin(admin.ModelAdmin):
+    list_display = ("bot", "campaign", "offer", "sent", "failed", "skipped", "run_at")
+    list_filter = ("bot", "run_at")
+    date_hierarchy = "run_at"
+    list_select_related = ("bot", "campaign", "offer")

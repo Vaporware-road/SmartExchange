@@ -14,12 +14,33 @@ from __future__ import annotations
 import asyncio
 import signal
 
-from aiogram.exceptions import TelegramAPIError
+from aiogram.exceptions import TelegramAPIError, TelegramConflictError
 from django.core.management.base import BaseCommand
 
 from telegram_app.bot.factory import close_cached_bots, get_bot_and_dispatcher
 from telegram_app.models import TelegramBot
 from telegram_app.services.dispatcher import sync_webhooks_from_site_settings
+
+
+def bots_one_per_token(bots: list[TelegramBot]) -> tuple[list[TelegramBot], list[tuple[TelegramBot, TelegramBot]]]:
+    """Telegram allows one getUpdates client per BotFather token.
+
+    Keep the lowest-id row for each distinct token; return skipped (duplicate, keeper) pairs.
+    """
+    keepers: list[TelegramBot] = []
+    skipped: list[tuple[TelegramBot, TelegramBot]] = []
+    seen: dict[str, TelegramBot] = {}
+    for bot in bots:
+        token = (bot.get_plain_token() or "").strip()
+        if not token:
+            continue
+        keeper = seen.get(token)
+        if keeper is not None:
+            skipped.append((bot, keeper))
+            continue
+        seen[token] = bot
+        keepers.append(bot)
+    return keepers, skipped
 
 
 class Command(BaseCommand):
@@ -73,12 +94,43 @@ class Command(BaseCommand):
             return
 
         qs = TelegramBot.objects.filter(is_active=True).order_by("id")
-        if options["bot_id"] is not None:
-            qs = qs.filter(pk=options["bot_id"])
+        requested_id = options["bot_id"]
+        if requested_id is not None:
+            qs = qs.filter(pk=requested_id)
         bots = list(qs)
         if not bots:
             self.stderr.write(self.style.ERROR("No active Telegram bots found."))
             return
+
+        if requested_id is None:
+            bots, skipped = bots_one_per_token(bots)
+            for duplicate, keeper in skipped:
+                self.stderr.write(
+                    self.style.WARNING(
+                        f"Skipping bot_id={duplicate.pk} ({duplicate.name!r}): same BotFather "
+                        f"token as bot_id={keeper.pk} ({keeper.name!r}). Telegram allows only "
+                        "one getUpdates client per token. Give this bot its own token, or "
+                        f"poll one of them with --bot-id {keeper.pk}."
+                    )
+                )
+            if not bots:
+                self.stderr.write(self.style.ERROR("No unique bot tokens to poll."))
+                return
+        else:
+            token = (bots[0].get_plain_token() or "").strip()
+            siblings = [
+                other
+                for other in TelegramBot.objects.filter(is_active=True).exclude(pk=requested_id)
+                if token and (other.get_plain_token() or "").strip() == token
+            ]
+            if siblings:
+                names = ", ".join(f"bot_id={b.pk} ({b.name!r})" for b in siblings)
+                self.stderr.write(
+                    self.style.WARNING(
+                        f"bot_id={requested_id} shares a BotFather token with {names}. "
+                        "Do not run another poller for those rows."
+                    )
+                )
 
         stop = {"flag": False}
 
@@ -129,6 +181,15 @@ class Command(BaseCommand):
                     timeout=timeout,
                     limit=100,
                 )
+            except TelegramConflictError as exc:
+                self.stderr.write(
+                    f"getUpdates bot_id={bot_row.pk} conflict: {exc}. "
+                    "Another process is already polling this token "
+                    "(second poller, duplicate bot row, or a remote instance). "
+                    "Retrying in 5s."
+                )
+                await asyncio.sleep(5)
+                continue
             except TelegramAPIError as exc:
                 self.stderr.write(f"getUpdates bot_id={bot_row.pk} failed: {exc}")
                 await asyncio.sleep(1)
