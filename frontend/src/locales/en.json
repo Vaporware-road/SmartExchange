@@ -513,7 +513,32 @@
     },
     "processing": "Processing...",
     "completed": "Finalization completed successfully",
-    "failed": "Finalization failed"
+    "failed": "Finalization failed",
+    "noChannelsHint": "No Telegram channels yet. Add one in Telegram Hub → Channels, then come back here.",
+    "addChannelLink": "Add Telegram channel",
+    "wizard": {
+      "noChannelTitle": "No Telegram channel linked",
+      "noChannelHint": "Your bot must be linked to at least one active channel before you can finalize and publish.",
+      "chooseCategory": "Choose a category to publish",
+      "select": "Select",
+      "backToCategories": "Back to categories",
+      "backToFinalize": "Back to Finalize",
+      "details": "Details",
+      "telegramContentTitle": "Telegram content",
+      "telegramContentHint": "Review the message that will be posted. Confirm to continue, or edit it in Telegram Content.",
+      "confirmContent": "Confirm",
+      "confirmed": "Confirmed",
+      "editContent": "Edit",
+      "publishTitle": "Publish to Telegram",
+      "publish": "Publish",
+      "stepChoose": "Category",
+      "stepReview": "Review",
+      "stepPublish": "Publish",
+      "updatePricesHint": "Update prices for a category first, then return here to publish.",
+      "publishingHint": "Publishing to Telegram… this can take a few seconds.",
+      "publishedSuccessfully": "Published successfully",
+      "publishTelegramFailed": "Saved, but Telegram did not receive the post. Check the bot is admin in the channel and try again."
+    }
   },
   "search": {
     "placeholder": "Search prices, categories, settings...",

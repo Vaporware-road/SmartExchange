@@ -345,11 +345,12 @@ export const specialPriceApi = {
 
 export const finalizeApi = {
   dashboard: () => api.get('/finalize/dashboard/'),
-  finalizeCategory: (categoryId, data) =>
-    api.post(`/finalize/category/${categoryId}/`, data),
-  finalizeSpecialPrice: (specialPriceId, data) =>
-    api.post(`/finalize/special-price/${specialPriceId}/`, data),
-  finalizeAll: (data) => api.post('/finalize/all/', data),
+  finalizeCategory: (categoryId, data, config = {}) =>
+    api.post(`/finalize/category/${categoryId}/`, data, { timeout: 180000, ...config }),
+  finalizeSpecialPrice: (specialPriceId, data, config = {}) =>
+    api.post(`/finalize/special-price/${specialPriceId}/`, data, { timeout: 180000, ...config }),
+  finalizeAll: (data, config = {}) =>
+    api.post('/finalize/all/', data, { timeout: 300000, ...config }),
 }
 
 export const instagramHubApi = {
