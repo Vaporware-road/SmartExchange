@@ -982,6 +982,23 @@ watch(() => route.query.tab, (tab) => {
   }
 }, { immediate: true })
 
+watch(() => route.query.section, (section) => {
+  if (section && adminCategories.some((c) => c.id === section)) {
+    adminSection.value = section
+    telegramHub.setAdminSection(section)
+  }
+}, { immediate: true })
+
+watch(
+  () => route.query.requestId,
+  (requestId) => {
+    if (!requestId) return
+    adminSection.value = 'exchangeRequests'
+    telegramHub.setAdminSection('exchangeRequests')
+  },
+  { immediate: true },
+)
+
 const channels = ref([])
 const channelId = ref('')
 const message = ref('')

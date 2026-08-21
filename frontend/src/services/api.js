@@ -297,6 +297,7 @@ export const authApi = {
 
 export const dashboardApi = {
   summary: (config = {}) => api.get('/dashboard/summary/', config),
+  telegramStats: (config = {}) => api.get('/dashboard/telegram-stats/', config),
 }
 
 export const categoryApi = {
