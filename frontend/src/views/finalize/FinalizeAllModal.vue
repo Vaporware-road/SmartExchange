@@ -28,10 +28,19 @@
 
       <div class="mb-4 w-full max-w-xs">
         <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('finalize.channel') }}</label>
-        <select v-model="channelId" class="input-luxury w-full" required>
+        <select v-model="channelId" class="input-luxury w-full" required :disabled="!channels.length">
           <option value="">{{ $t('finalize.selectChannel') }}</option>
           <option v-for="ch in channels" :key="ch.id" :value="ch.id">{{ ch.name }}</option>
         </select>
+        <p v-if="!channels.length" class="mt-2 text-sm text-amber-400 text-start">
+          {{ $t('finalize.noChannelsHint') }}
+          <router-link
+            to="/telegram/send?section=tools&tab=channels"
+            class="underline text-gold hover:opacity-80 ms-1"
+          >
+            {{ $t('finalize.addChannelLink') }}
+          </router-link>
+        </p>
       </div>
 
       <div class="flex gap-3 justify-center">
@@ -106,7 +115,7 @@ const enabledDestinations = computed(() =>
 onMounted(async () => {
   try {
     const { data } = await telegramApi.channels()
-    channels.value = data ?? []
+    channels.value = Array.isArray(data) ? data : (data?.results ?? [])
   } catch {
     channels.value = []
   }

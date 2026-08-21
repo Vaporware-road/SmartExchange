@@ -54,10 +54,19 @@
     <form @submit.prevent="openConfirmModal" class="card-luxury max-w-lg w-full space-y-4">
       <div>
         <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('finalize.channel') }}</label>
-        <select v-model="channelId" class="input-luxury" required>
+        <select v-model="channelId" class="input-luxury" required :disabled="!channels.length">
           <option value="">{{ $t('finalize.selectChannel') }}</option>
           <option v-for="ch in channels" :key="ch.id" :value="ch.id">{{ ch.name }}</option>
         </select>
+        <p v-if="!channels.length" class="mt-2 text-sm text-amber-400">
+          {{ $t('finalize.noChannelsHint') }}
+          <router-link
+            to="/telegram/send?section=tools&tab=channels"
+            class="underline text-gold hover:opacity-80 ms-1"
+          >
+            {{ $t('finalize.addChannelLink') }}
+          </router-link>
+        </p>
       </div>
       <div>
         <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('finalize.notes') }}</label>
@@ -186,7 +195,7 @@ onMounted(async () => {
       sp => String(sp.price_history_id) === String(id)
     )
     specialItem.value = item ?? null
-    channels.value = chRes.data ?? []
+    channels.value = Array.isArray(chRes.data) ? chRes.data : (chRes.data?.results ?? [])
   } catch {
     channels.value = []
   } finally {
