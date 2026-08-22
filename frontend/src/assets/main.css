@@ -574,3 +574,227 @@ html:not(.dark) .price-card-sell {
   border-top-width: 3px;
   border-top-color: var(--color-sell);
 }
+/* —— About page (PipelineHQ vapor-about) —— */
+.vapor-about {
+  --space: #03010a;
+  --nebula: #12082a;
+  --silver: #a8a3b8;
+  --brand: #ff0090;
+  --signal: #00f5ff;
+  --star: #e8e4f5;
+
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2.5rem 1.25rem;
+  color: var(--star);
+  background: var(--space);
+}
+
+.vapor-about__space,
+.vapor-about__nebula,
+.vapor-about__stars,
+.vapor-about__grid,
+.vapor-about__crt,
+.vapor-about__scan {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+}
+
+.vapor-about__space {
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 70% 45% at 50% 0%, rgba(18, 8, 42, 0.9) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 30% at 15% 70%, rgba(255, 0, 144, 0.08) 0%, transparent 55%),
+    radial-gradient(ellipse 35% 28% at 88% 55%, rgba(0, 245, 255, 0.07) 0%, transparent 50%),
+    var(--space);
+}
+
+.vapor-about__nebula {
+  z-index: 1;
+  opacity: 0.55;
+  background:
+    radial-gradient(ellipse 500px 280px at 30% 25%, rgba(80, 20, 120, 0.35), transparent 70%),
+    radial-gradient(ellipse 420px 260px at 75% 40%, rgba(20, 60, 120, 0.28), transparent 70%);
+  filter: blur(2px);
+  animation: vapor-nebula-drift 18s ease-in-out infinite alternate;
+}
+
+.vapor-about__stars {
+  z-index: 1;
+  background-image:
+    radial-gradient(1px 1px at 8% 18%, rgba(232, 228, 245, 0.9), transparent),
+    radial-gradient(1px 1px at 22% 62%, rgba(232, 228, 245, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 40% 28%, rgba(0, 245, 255, 0.7), transparent),
+    radial-gradient(1px 1px at 58% 12%, rgba(232, 228, 245, 0.75), transparent),
+    radial-gradient(1px 1px at 72% 48%, rgba(255, 0, 144, 0.55), transparent),
+    radial-gradient(1.5px 1.5px at 86% 22%, rgba(232, 228, 245, 0.85), transparent),
+    radial-gradient(1px 1px at 14% 84%, rgba(232, 228, 245, 0.45), transparent),
+    radial-gradient(1px 1px at 93% 78%, rgba(0, 245, 255, 0.5), transparent),
+    radial-gradient(1px 1px at 48% 76%, rgba(232, 228, 245, 0.4), transparent);
+  animation: vapor-stars-twinkle 7s ease-in-out infinite;
+}
+
+.vapor-about__grid {
+  z-index: 1;
+  top: 62%;
+  background-image:
+    linear-gradient(rgba(0, 245, 255, 0.12) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 0, 144, 0.1) 1px, transparent 1px);
+  background-size: 56px 56px;
+  transform: perspective(480px) rotateX(64deg);
+  transform-origin: center top;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.75), transparent 80%);
+  animation: vapor-grid-rush 4.5s linear infinite;
+}
+
+.vapor-about__crt {
+  z-index: 5;
+  background: radial-gradient(ellipse at center, transparent 48%, rgba(0, 0, 0, 0.72) 100%);
+}
+
+.vapor-about__scan {
+  z-index: 6;
+  opacity: 0.28;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 3px,
+    rgba(0, 0, 0, 0.35) 3px,
+    rgba(0, 0, 0, 0.35) 4px
+  );
+}
+
+.vapor-about__frame {
+  position: relative;
+  z-index: 4;
+  width: min(100%, 44rem);
+  text-align: center;
+  padding: 3rem 1.5rem 2.5rem;
+  border: 1px solid rgba(0, 245, 255, 0.18);
+  background: rgba(3, 1, 10, 0.72);
+  box-shadow:
+    0 0 0 1px rgba(255, 0, 144, 0.12),
+    0 0 80px rgba(255, 0, 144, 0.08),
+    0 24px 60px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(12px);
+}
+
+.vapor-about__tag {
+  margin: 0 auto 2.25rem;
+  max-width: 28rem;
+  font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+  color: var(--silver);
+  text-wrap: balance;
+}
+
+.vapor-about__title {
+  position: relative;
+  display: inline-block;
+  margin: 0 0 2.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 9vw, 4.6rem);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  line-height: 1.05;
+  color: var(--star);
+  transition: transform 160ms linear;
+}
+
+.vapor-about__title-base {
+  position: relative;
+  z-index: 1;
+  text-shadow:
+    0 0 24px rgba(255, 0, 144, 0.45),
+    0 0 48px rgba(255, 0, 144, 0.2);
+}
+
+.vapor-about__title-channel {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  white-space: nowrap;
+  transition: opacity 120ms linear, transform 120ms linear;
+}
+
+.vapor-about__title-channel--magenta {
+  color: var(--brand);
+  mix-blend-mode: screen;
+  text-shadow: 0 0 12px rgba(255, 0, 144, 0.8);
+}
+
+.vapor-about__title-channel--cyan {
+  color: var(--signal);
+  mix-blend-mode: screen;
+  text-shadow: 0 0 12px rgba(0, 245, 255, 0.8);
+}
+
+.vapor-about__links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.85rem 1.4rem;
+}
+
+.vapor-about__links a {
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--signal);
+  border-bottom: 1px solid rgba(0, 245, 255, 0.28);
+  padding-bottom: 0.15rem;
+  transition: color 0.15s, border-color 0.15s, text-shadow 0.15s;
+}
+
+.vapor-about__links a:hover {
+  color: var(--brand);
+  border-color: rgba(255, 0, 144, 0.55);
+  text-shadow: 0 0 12px rgba(255, 0, 144, 0.45);
+}
+
+@keyframes vapor-nebula-drift {
+  from {
+    transform: translate3d(-1.5%, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5%, 1%, 0) scale(1.04);
+  }
+}
+
+@keyframes vapor-stars-twinkle {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes vapor-grid-rush {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 56px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vapor-about__nebula,
+  .vapor-about__stars,
+  .vapor-about__grid {
+    animation: none !important;
+  }
+
+  .vapor-about__title-channel {
+    opacity: 0 !important;
+  }
+}
