@@ -1,5 +1,6 @@
 from io import BytesIO
 from unittest.mock import AsyncMock, MagicMock, patch
+import asyncio
 import logging
 
 from django.core.cache import cache
@@ -8,6 +9,7 @@ from django.test import TestCase
 from rest_framework.test import APITestCase
 
 from accounts.models import CustomUser
+from accounts.plans import PLAN_GOLD
 from setting.models import SiteSettings
 from telegram_app.services.conversation import (
     CB_ALERT_CONFIRM,
@@ -148,10 +150,16 @@ class ReplyKeyboardBuilderTests(TestCase):
         self.assertEqual(markup.keyboard[1][0].text, "Cancel")
 
 
+def _stub_aiogram_bot(bot_cls):
+    instance = bot_cls.return_value
+    instance.session.close = AsyncMock()
+    return instance
+
+
 class TelegramServiceOptionalCaptionTest(TestCase):
     @patch("telegram_app.services.telegram_client.Bot")
     def test_send_photo_without_caption_uses_no_parse_mode(self, bot_cls):
-        bot_instance = bot_cls.return_value
+        bot_instance = _stub_aiogram_bot(bot_cls)
         bot_instance.send_photo = AsyncMock(return_value=None)
 
         service = TelegramService("token")
@@ -164,6 +172,60 @@ class TelegramServiceOptionalCaptionTest(TestCase):
         bot_instance.send_photo.assert_awaited_once()
         call = bot_instance.send_photo.await_args
         self.assertIsNone(call.kwargs.get("parse_mode"))
+        from aiogram.types import BufferedInputFile
+
+        photo_arg = call.kwargs.get("photo")
+        self.assertIsInstance(photo_arg, BufferedInputFile)
+
+
+class TelegramServiceBotLifecycleTests(TestCase):
+    @patch("telegram_app.services.telegram_client.Bot")
+    def test_bot_is_constructed_inside_send_not_init(self, bot_cls):
+        bot_instance = _stub_aiogram_bot(bot_cls)
+        bot_instance.send_message = AsyncMock(return_value=MagicMock(message_id=7))
+
+        service = TelegramService("token")
+        bot_cls.assert_not_called()
+
+        ok, _msg, mid = service.send_message(chat_id=1, text="hi", parse_mode=None)
+        self.assertTrue(ok)
+        self.assertEqual(mid, 7)
+        bot_cls.assert_called_once()
+        self.assertEqual(bot_cls.call_args.kwargs.get("token") or bot_cls.call_args.args[0], "token")
+        bot_instance.session.close.assert_awaited()
+
+    @patch("telegram_app.services.telegram_client.Bot")
+    def test_bot_is_constructed_when_loop_already_running(self, bot_cls):
+        bot_instance = _stub_aiogram_bot(bot_cls)
+        bot_instance.send_message = AsyncMock(return_value=MagicMock(message_id=8))
+
+        async def _inside_running_loop():
+            service = TelegramService("token")
+            bot_cls.assert_not_called()
+            ok, _msg, _mid = service.send_message(chat_id=1, text="hi", parse_mode=None)
+            return ok
+
+        self.assertTrue(asyncio.run(_inside_running_loop()))
+        bot_cls.assert_called_once()
+        self.assertEqual(bot_cls.call_args.kwargs.get("token") or bot_cls.call_args.args[0], "token")
+        bot_instance.send_message.assert_awaited()
+
+    @patch("telegram_app.services.telegram_client.Bot")
+    def test_send_message_surfaces_telegram_error(self, bot_cls):
+        from aiogram.exceptions import TelegramBadRequest
+
+        bot_instance = _stub_aiogram_bot(bot_cls)
+        bot_instance.send_message = AsyncMock(
+            side_effect=TelegramBadRequest(
+                method=MagicMock(),
+                message="can't parse entities: unsupported start tag",
+            )
+        )
+        service = TelegramService("token")
+        ok, err, mid = service.send_message(chat_id=1, text="<b>hi", parse_mode=None)
+        self.assertFalse(ok)
+        self.assertIsNone(mid)
+        self.assertIn("can't parse entities", err)
 
 
 class AutomationSettingsApiTests(APITestCase):
@@ -171,22 +233,40 @@ class AutomationSettingsApiTests(APITestCase):
 
     def setUp(self):
         cache.delete("site_settings")
-        self.user = CustomUser.objects.create_user(
+        self.employee = CustomUser.objects.create_user(
             username="automation_tester",
             password="pass12345",
             role=CustomUser.ROLE_EMPLOYEE,
         )
+        self.owner = CustomUser.objects.create_user(
+            username="automation_owner",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
 
     def test_get_automation_settings_ok(self):
-        self.client.force_authenticate(self.user)
+        self.client.force_authenticate(self.employee)
         r = self.client.get("/api/telegram/automation-settings/")
         self.assertEqual(r.status_code, 200, r.content)
         self.assertIn("auto_post_on_update", r.json())
         self.assertIsInstance(r.json()["auto_post_on_update"], bool)
 
+    def test_put_automation_settings_requires_client_owner(self):
+        self.client.force_authenticate(self.employee)
+        r = self.client.put(
+            "/api/telegram/automation-settings/",
+            {"auto_post_on_update": True},
+            format="json",
+        )
+        self.assertEqual(r.status_code, 403, r.content)
+
     def test_put_automation_settings_updates_flag(self):
-        self.client.force_authenticate(self.user)
-        r = self.client.put("/api/telegram/automation-settings/", {"auto_post_on_update": True}, format="json")
+        self.client.force_authenticate(self.owner)
+        r = self.client.put(
+            "/api/telegram/automation-settings/",
+            {"auto_post_on_update": True},
+            format="json",
+        )
         self.assertEqual(r.status_code, 200, r.content)
         self.assertTrue(r.json()["auto_post_on_update"])
         self.assertTrue(SiteSettings.objects.get(pk=1).auto_post_on_update)
@@ -197,7 +277,7 @@ class AutomationSettingsApiTests(APITestCase):
     )
     def test_get_automation_settings_returns_200_when_site_settings_db_unreadable(self, _mock_load):
         """Regression: avoid 500 when ORM cannot read SiteSettings (stale schema)."""
-        self.client.force_authenticate(self.user)
+        self.client.force_authenticate(self.employee)
         # Intentional OperationalError: mute logger.exception noise from the safe reader.
         logging.disable(logging.CRITICAL)
         try:
@@ -215,7 +295,7 @@ class AutomationSettingsApiTests(APITestCase):
         side_effect=OperationalError("no such column: setting_sitesettings.prices_webhook_url"),
     )
     def test_put_automation_settings_returns_400_when_site_settings_db_unreadable(self, _mock_load):
-        self.client.force_authenticate(self.user)
+        self.client.force_authenticate(self.owner)
         logging.disable(logging.CRITICAL)
         try:
             r = self.client.put(
@@ -303,6 +383,7 @@ class InBotAdminPanelTests(TestCase):
             username="botowner",
             password="pass12345",
             role=CustomUser.ROLE_MANAGEMENT,
+            plan=PLAN_GOLD,
             telegram_id="6296044948",
         )
         self.bot = TelegramBot.objects.create(
@@ -341,6 +422,14 @@ class InBotAdminPanelTests(TestCase):
         self.assertIn("Inactive", out["text"])
         labels = {b["text"] for row in out["buttons"] for b in row}
         self.assertIn("Set customer tag", labels)
+        self.assertIn("Admin menu", labels)
+
+    def test_admin_reengage_audience_label_is_special(self):
+        self.engine.process_update(self.admin_session, text="/start")
+        out = self.engine.process_update(self.admin_session, text="Re-engagement")
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("Audience: Special", labels)
+        self.assertNotIn("Audience: Special currencies", labels)
         self.assertIn("Admin menu", labels)
 
     def test_admin_analytics_exchange_and_members(self):
@@ -446,6 +535,111 @@ class InBotAdminPanelTests(TestCase):
         profile = CustomerProfile.objects.get(telegram_user_id=111)
         self.assertEqual(profile.tag, "vip")
         self.assertIn("vip", out["text"])
+
+    def test_sub_role_operator_menu_is_limited(self):
+        from accounts.models import CustomUser
+        from telegram_app.services.bot_admins import sync_bot_admins_for_owner
+
+        operator = CustomUser.objects.create_user(
+            username="tg_sub_op",
+            password=None,
+            role=CustomUser.ROLE_EMPLOYEE,
+            owner=self.owner,
+            sub_role=CustomUser.SUB_ROLE_OPERATOR,
+            telegram_username="subop",
+            telegram_id="700001",
+            first_name="Sub",
+            last_name="Op",
+        )
+        operator.set_unusable_password()
+        operator.save(update_fields=["password"])
+        sync_bot_admins_for_owner(self.owner)
+        session = self.engine.get_or_create_session(700001)
+        out = self.engine.process_update(session, text="/start")
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("Pending requests", labels)
+        self.assertIn("Recent requests", labels)
+        self.assertNotIn("Analytics Dashboard", labels)
+        self.assertNotIn("Re-engagement", labels)
+
+    def test_sub_role_operator_cannot_bypass_analytics_callback(self):
+        from accounts.models import CustomUser
+        from telegram_app.services.admin_conversation import (
+            CB_ADMIN_ANALYTICS_EXCHANGE,
+            handle_admin_action,
+        )
+        from telegram_app.services.bot_admins import sync_bot_admins_for_owner
+
+        operator = CustomUser.objects.create_user(
+            username="tg_sub_op_cb",
+            password=None,
+            role=CustomUser.ROLE_EMPLOYEE,
+            owner=self.owner,
+            sub_role=CustomUser.SUB_ROLE_OPERATOR,
+            telegram_username="subopcb",
+            telegram_id="700003",
+            first_name="Sub",
+            last_name="Op",
+        )
+        operator.set_unusable_password()
+        operator.save(update_fields=["password"])
+        sync_bot_admins_for_owner(self.owner)
+        session = self.engine.get_or_create_session(700003)
+        self.engine.process_update(session, text="/start")
+        out = handle_admin_action(session, CB_ADMIN_ANALYTICS_EXCHANGE)
+        session.refresh_from_db()
+        self.assertEqual(session.state, BotSession.State.ADMIN_MENU)
+        self.assertIn("Admin panel", out["text"])
+
+    def test_sub_role_operator_cannot_bypass_typed_analytics_label(self):
+        from accounts.models import CustomUser
+        from telegram_app.services.admin_conversation import BTN_ADMIN_EXCHANGE_REQUESTS
+        from telegram_app.services.bot_admins import sync_bot_admins_for_owner
+
+        operator = CustomUser.objects.create_user(
+            username="tg_sub_op_label",
+            password=None,
+            role=CustomUser.ROLE_EMPLOYEE,
+            owner=self.owner,
+            sub_role=CustomUser.SUB_ROLE_OPERATOR,
+            telegram_username="suboplabel",
+            telegram_id="700004",
+            first_name="Sub",
+            last_name="Op",
+        )
+        operator.set_unusable_password()
+        operator.save(update_fields=["password"])
+        sync_bot_admins_for_owner(self.owner)
+        session = self.engine.get_or_create_session(700004)
+        self.engine.process_update(session, text="/start")
+        out = self.engine.process_update(session, text=BTN_ADMIN_EXCHANGE_REQUESTS)
+        session.refresh_from_db()
+        self.assertEqual(session.state, BotSession.State.ADMIN_MENU)
+        self.assertIn("Admin panel", out["text"])
+
+    def test_sub_role_head_operator_has_reengage_not_analytics(self):
+        from accounts.models import CustomUser
+        from telegram_app.services.bot_admins import sync_bot_admins_for_owner
+
+        head = CustomUser.objects.create_user(
+            username="tg_sub_head",
+            password=None,
+            role=CustomUser.ROLE_EMPLOYEE,
+            owner=self.owner,
+            sub_role=CustomUser.SUB_ROLE_HEAD_OPERATOR,
+            telegram_username="subhead",
+            telegram_id="700002",
+            first_name="Sub",
+            last_name="Head",
+        )
+        head.set_unusable_password()
+        head.save(update_fields=["password"])
+        sync_bot_admins_for_owner(self.owner)
+        session = self.engine.get_or_create_session(700002)
+        out = self.engine.process_update(session, text="/start")
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("Re-engagement", labels)
+        self.assertNotIn("Analytics Dashboard", labels)
 
     def test_non_owner_management_denied(self):
         other = CustomUser.objects.create_user(
@@ -652,7 +846,12 @@ class ExchangeAndAlertFlowTests(TestCase):
         out = self.engine.process_update(
             self.session, callback_data=CB_EXCH_CONFIRM, message_id=5
         )
-        self.assertEqual(out["text"], "The Operator will contact you very soon")
+        self.assertEqual(
+            out["text"],
+            "🎉✅ Request received!\n\n"
+            "We're on it — an operator will contact you very soon. "
+            "Thank you for choosing us! 🙏",
+        )
         self.assertEqual(out["buttons"], MAIN_MENU_BUTTONS)
         req = ExchangeRequest.objects.get(customer__telegram_user_id=9001)
         self.assertEqual(req.source_currency, "USD")
@@ -882,6 +1081,26 @@ class AdminNotifyTests(TestCase):
         service_cls.return_value.send_message.return_value = (True, "ok", None)
         result = notify_staff_of_exchange_request(self.req, bot=self.bot)
         self.assertEqual(result["sent"], 1)
+        self.req.refresh_from_db()
+        self.assertEqual(self.req.status, ExchangeRequest.Status.NEW)
+
+    @patch("telegram_app.services.admin_notify.TelegramService")
+    def test_notify_keeps_new_status_when_send_fails(self, service_cls):
+        CustomUser.objects.create_user(
+            username="sa3",
+            password="x",
+            role=CustomUser.ROLE_SUPER_ADMIN,
+            telegram_id="998",
+        )
+        service_cls.return_value.send_message.return_value = (
+            False,
+            "can't parse entities: unsupported start tag",
+            None,
+        )
+        result = notify_staff_of_exchange_request(self.req, bot=self.bot)
+        self.assertEqual(result["sent"], 0)
+        self.assertEqual(result["failed"], 1)
+        self.assertIn("can't parse entities", result["last_error"])
         self.req.refresh_from_db()
         self.assertEqual(self.req.status, ExchangeRequest.Status.NEW)
 
@@ -1292,6 +1511,47 @@ class TelegramAdminDashboardApiTests(APITestCase):
         req.refresh_from_db()
         self.assertEqual(req.ttl_minutes, 10)
 
+        req.status = ExchangeRequest.Status.NEW
+        req.ttl_minutes = 10
+        req.save(update_fields=["status", "ttl_minutes"])
+        patched_hold = self.client.patch(
+            f"/api/telegram/exchange-requests/{req.pk}/",
+            {"action": "hold"},
+            format="json",
+        )
+        self.assertEqual(patched_hold.status_code, 200, patched_hold.content)
+        req.refresh_from_db()
+        self.assertEqual(req.ttl_minutes, 15)
+
+    def test_employee_cannot_patch_or_hold_exchange_request(self):
+        employee = CustomUser.objects.create_user(
+            username="dash-emp",
+            password="pass12345",
+            role=CustomUser.ROLE_EMPLOYEE,
+        )
+        customer = CustomerProfile.objects.create(telegram_user_id=2101)
+        req = ExchangeRequest.objects.create(
+            customer=customer,
+            bot=self.bot,
+            source_currency="USD",
+            target_currency="EUR",
+            amount=Decimal("3"),
+            ttl_minutes=5,
+            status=ExchangeRequest.Status.NEW,
+        )
+        self.client.force_authenticate(employee)
+        patched = self.client.patch(
+            f"/api/telegram/exchange-requests/{req.pk}/",
+            {"status": "successful"},
+            format="json",
+        )
+        self.assertEqual(patched.status_code, 403)
+        held = self.client.post(f"/api/telegram/exchange-requests/{req.pk}/hold/")
+        self.assertEqual(held.status_code, 403)
+        req.refresh_from_db()
+        self.assertEqual(req.status, ExchangeRequest.Status.NEW)
+        self.assertEqual(req.ttl_minutes, 5)
+
 
 class TelegramAdminReengageApiTests(APITestCase):
     def setUp(self):
@@ -1351,6 +1611,27 @@ class TelegramAdminReengageApiTests(APITestCase):
             chat_id=2001, text="Hello VIP", parse_mode=None
         )
 
+    @patch("telegram_app.services.reengage_service.TelegramService")
+    def test_reengage_excludes_staff_admin_ids(self, service_cls):
+        CustomUser.objects.create_user(
+            username="vip-admin",
+            password="pass12345",
+            role=CustomUser.ROLE_SUPER_ADMIN,
+            telegram_id="2001",
+        )
+        service_cls.return_value.send_message.return_value = (True, "ok", 1)
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post(
+            "/api/telegram/admin/reengage/",
+            {"audience": "vip", "message": "Hello VIP"},
+            format="json",
+        )
+        self.assertEqual(r.status_code, 200, r.content)
+        body = r.json()
+        self.assertEqual(body["sent"], 0)
+        self.assertEqual(body["failed"], 0)
+        service_cls.return_value.send_message.assert_not_called()
+
     def test_reengage_forbidden_other_bot(self):
         self.client.force_authenticate(self.mgmt)
         r = self.client.post(
@@ -1383,6 +1664,25 @@ class TelegramAdminReengageApiTests(APITestCase):
         service_cls.return_value.send_message.assert_called_once_with(
             chat_id=2002, text="Miss you", parse_mode=None
         )
+
+    @patch("telegram_app.services.reengage_service.TelegramService")
+    def test_reengage_surfaces_send_error(self, service_cls):
+        service_cls.return_value.send_message.return_value = (
+            False,
+            "can't parse entities: unsupported start tag",
+            None,
+        )
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.post(
+            "/api/telegram/admin/reengage/",
+            {"audience": "vip", "message": "<b>broken"},
+            format="json",
+        )
+        self.assertEqual(r.status_code, 200, r.content)
+        body = r.json()
+        self.assertEqual(body["sent"], 0)
+        self.assertEqual(body["failed"], 1)
+        self.assertIn("can't parse entities", body["last_error"])
 
 
 class AnalyticsServiceTests(TestCase):
@@ -1643,3 +1943,21 @@ class DuplicateBotTokenTests(TestCase):
         ser = TelegramBotDetailSerializer(data={"name": "Dup", "token": "111:AAA"})
         self.assertFalse(ser.is_valid())
         self.assertIn("token", ser.errors)
+
+
+class BotfatherTokenValidationTests(TestCase):
+    def test_rejects_placeholder_without_colon(self):
+        from telegram_app.services.telegram_token import is_valid_botfather_token
+
+        self.assertFalse(is_valid_botfather_token("token_ig"))
+        self.assertFalse(is_valid_botfather_token(""))
+        self.assertFalse(is_valid_botfather_token(None))
+
+    def test_accepts_botfather_shape(self):
+        from telegram_app.services.telegram_token import is_valid_botfather_token
+
+        self.assertTrue(
+            is_valid_botfather_token(
+                "123456789:AAHabcdefghijklmnopqrstuvwxyz0123456789"
+            )
+        )

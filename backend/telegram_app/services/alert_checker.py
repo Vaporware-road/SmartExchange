@@ -69,11 +69,16 @@ def _pick_send_bot() -> TelegramBot | None:
 
 def _dm_customer(alert: PriceAlert, current: Decimal, bot: TelegramBot) -> bool:
     chat_id = alert.customer.telegram_user_id
+    if alert.direction == PriceAlert.Direction.INCREASE:
+        headline = "📈 Price rise alert — target hit!"
+    else:
+        headline = "📉 Price drop alert — target hit!"
     text = (
-        f"Price alert ({alert.direction})\n"
-        f"{alert.source_currency}/{alert.target_currency}\n"
-        f"Target: {alert.target_price}\n"
-        f"Current: {current}"
+        f"🎉 {headline}\n\n"
+        f"💱 Pair: {alert.source_currency}/{alert.target_currency}\n"
+        f"🎯 Your target: {alert.target_price}\n"
+        f"💵 Current price: {current}\n\n"
+        "Thanks for using our alerts — happy trading! ✨"
     )
     try:
         client = TelegramService(bot.get_plain_token())

@@ -24,14 +24,17 @@ from ..models import (
     CustomerProfile,
     ExchangeRequest,
     PriceAlert,
+    ReengageCampaign,
     TelegramBot,
     TelegramChannel,
 )
+from .customer_tags import display_name, telegram_display_name, telegram_username
 
 INACTIVE_DAYS = 30
 DAILY_USAGE_DAYS = 30
 EXCHANGE_LIST_LIMIT = 50
 ALERT_LIST_LIMIT = 50
+EVENT_FEED_LIMIT = 30
 MEMBER_PERIOD_MONTHS = {
     1: "Last month",
     3: "Last 3 months",
@@ -359,13 +362,13 @@ def format_analytics_dashboard_summary(bot: TelegramBot) -> str:
         or "  (no channels configured)"
     )
     return (
-        f"Analytics — {bot.name}\n\n"
-        f"Daily bot usage (30d):\n"
-        f"  Total active user-days: {total_30d}\n"
-        f"  Today: {today_users} users\n\n"
-        f"Channel members (latest):\n{channel_lines}\n\n"
-        f"Note: Channel post view counts are not available via Bot API.\n\n"
-        f"Top currencies:\n{currency_lines}"
+        f"📈 Analytics — {bot.name}\n\n"
+        f"📅 Daily bot usage (30d):\n"
+        f"  🔥 Total active user-days: {total_30d}\n"
+        f"  ☀️ Today: {today_users} users\n\n"
+        f"📣 Channel members (latest):\n{channel_lines}\n\n"
+        f"ℹ️ Note: Channel post view counts are not available via Bot API.\n\n"
+        f"💱 Top currencies:\n{currency_lines}"
     )
 
 
@@ -376,16 +379,16 @@ def format_customer_analysis(bot: TelegramBot) -> str:
     ratio = data["vip_vs_ordinary_request_ratio"]
     ratio_text = f"{ratio}x" if ratio is not None else "N/A"
     return (
-        f"Customer Analysis — {bot.name}\n\n"
-        f"Returned users (active again after {INACTIVE_DAYS}d idle): "
+        f"👥 Customer Analysis — {bot.name}\n\n"
+        f"🔄 Returned users (active again after {INACTIVE_DAYS}d idle): "
         f"{data['returned']}\n"
-        f"Inactive users (no activity in {INACTIVE_DAYS}d): {data['inactive']}\n\n"
-        f"Peak exchange hour: {top_hour['hour']:02d}:00 "
+        f"😴 Inactive users (no activity in {INACTIVE_DAYS}d): {data['inactive']}\n\n"
+        f"⏰ Peak exchange hour: {top_hour['hour']:02d}:00 "
         f"({top_hour['count']} requests)\n\n"
-        f"VIP users submit ~{ratio_text} more exchange requests than "
+        f"⭐ VIP users submit ~{ratio_text} more exchange requests than "
         f"ordinary users on average.\n"
-        f"  VIP avg: {data['vip_avg_requests']}\n"
-        f"  Global avg: {data['ordinary_avg_requests']}"
+        f"  💎 VIP avg: {data['vip_avg_requests']}\n"
+        f"  🌐 Global avg: {data['ordinary_avg_requests']}"
     )
 
 
@@ -397,17 +400,81 @@ def format_exchange_requests(bot: TelegramBot, *, kind: str) -> str:
     else:
         n = counts.get(ExchangeRequest.Status.NEW, 0)
         label = "New"
-    return f"Exchange Requests — {label}\n\nCount: {n}"
+    return f"💱 Exchange Requests — {label}\n\n📊 Count: {n}"
 
 
 def format_new_members(bot: TelegramBot, months: int) -> str:
     dual = new_members_dual(bot, months)
     return (
-        f"New members — {dual['label']}\n\n"
-        f"Channel subscribers gained: {dual['channel_growth']}\n"
-        f"New bot DM users: {dual['bot_dm_growth']}\n"
-        f"Combined: {dual['channel_growth'] + dual['bot_dm_growth']}"
+        f"👋 New members — {dual['label']}\n\n"
+        f"📣 Channel subscribers gained: {dual['channel_growth']}\n"
+        f"💬 New bot DM users: {dual['bot_dm_growth']}\n"
+        f"✨ Combined: {dual['channel_growth'] + dual['bot_dm_growth']}"
     )
+
+
+def _exchange_event_row(req: ExchangeRequest, event_type: str) -> dict:
+    customer = req.customer
+    if customer:
+        name = telegram_display_name(customer) or display_name(customer)
+        username = telegram_username(customer)
+    else:
+        name = ""
+        username = ""
+    return {
+        "id": req.id,
+        "event_type": event_type,
+        "request_id": req.id,
+        "customer_telegram_user_id": customer.telegram_user_id if customer else None,
+        "customer_name": name,
+        "customer_username": username,
+        "source_currency": req.source_currency,
+        "target_currency": req.target_currency,
+        "amount": str(req.amount),
+        "status": req.status,
+        "occurred_at": req.updated_at.isoformat(),
+    }
+
+
+def _campaign_event_row(campaign: ReengageCampaign) -> dict:
+    return {
+        "id": f"campaign-{campaign.id}",
+        "event_type": "campaign_created",
+        "campaign_id": campaign.id,
+        "audience": campaign.audience,
+        "schedule": campaign.schedule,
+        "is_active": campaign.is_active,
+        "occurred_at": campaign.created_at.isoformat(),
+    }
+
+
+def build_event_feed(bot: TelegramBot, *, limit: int = EVENT_FEED_LIMIT) -> list[dict]:
+    """Build a merged event feed of recent exchange request events + new campaigns."""
+    # Recent exchange requests (new/updated) — ordered by most recent activity
+    recent_exchanges = (
+        ExchangeRequest.objects.filter(bot=bot)
+        .select_related("customer")
+        .order_by("-updated_at")[:limit]
+    )
+
+    events = []
+    for req in recent_exchanges:
+        # Classify: if created_at and updated_at are within 5 seconds → new submission
+        age = abs((req.updated_at - req.created_at).total_seconds())
+        event_type = "request_created" if age < 5 else f"request_{req.status}"
+        events.append((_exchange_event_row(req, event_type), req.updated_at))
+
+    # Recent campaigns created
+    recent_campaigns = (
+        ReengageCampaign.objects.filter(bot=bot)
+        .order_by("-created_at")[:10]
+    )
+    for campaign in recent_campaigns:
+        events.append((_campaign_event_row(campaign), campaign.created_at))
+
+    # Merge by occurred_at descending
+    events.sort(key=lambda x: x[1], reverse=True)
+    return [e[0] for e in events[:limit]]
 
 
 def build_dashboard_payload(
@@ -460,9 +527,10 @@ def build_dashboard_payload(
             "definitions": {"inactive_days": INACTIVE_DAYS},
         },
         "notifications": {
-            "total": alerts_qs.count(),
-            "active": alerts_qs.filter(is_active=True).count(),
-            "items": alert_serializer(alerts_qs[:ALERT_LIST_LIMIT], many=True).data,
+            "events": build_event_feed(bot),
+            "unread_count": ExchangeRequest.objects.filter(
+                bot=bot, status=ExchangeRequest.Status.NEW
+            ).count(),
         },
         "reports": {
             "running": running,

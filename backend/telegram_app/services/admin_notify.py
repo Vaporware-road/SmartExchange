@@ -22,7 +22,11 @@ logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
-STAFF_ROLES = (CustomUser.ROLE_SUPER_ADMIN, CustomUser.ROLE_MANAGEMENT)
+STAFF_ROLES = (
+    CustomUser.ROLE_SUPER_ADMIN,
+    CustomUser.ROLE_DEVELOPER,
+    CustomUser.ROLE_MANAGEMENT,
+)
 
 
 def staff_notify_recipients():
@@ -42,16 +46,16 @@ def _format_request_message(req: ExchangeRequest) -> str:
         str(req.price_at_request) if req.price_at_request is not None else "N/A"
     )
     return (
-        "New exchange request\n"
-        f"Customer: {who} (tg:{customer.telegram_user_id})\n"
-        f"Tag: {tag}\n"
-        f"Pair: {req.source_currency} → {req.target_currency}\n"
-        f"Amount: {req.amount}\n"
-        f"Price at request: {price_display}\n"
-        f"TTL: {req.ttl_minutes} min\n"
-        f"Request id: {req.pk}\n\n"
-        "Open admin panel in this bot: /admin\n"
-        "Then Pending requests to change state or hold TTL."
+        "🎉 New exchange request!\n"
+        f"👤 Customer: {who} (tg:{customer.telegram_user_id})\n"
+        f"🏷 Tag: {tag}\n"
+        f"💱 Pair: {req.source_currency} → {req.target_currency}\n"
+        f"💵 Amount: {req.amount}\n"
+        f"💰 Price at request: {price_display}\n"
+        f"⏱ TTL: {req.ttl_minutes} min\n"
+        f"🆔 Request id: {req.pk}\n\n"
+        "🛠 Open admin panel in this bot: /admin\n"
+        "Then Pending requests to change state or hold TTL. You've got this! ✨"
     )
 
 
@@ -84,6 +88,7 @@ def notify_staff_of_exchange_request(
     text = _format_request_message(req)
     sent = 0
     failed = 0
+    last_error = ""
     for user in recipients:
         chat_id = normalize_telegram_id(user.telegram_id)
         if not chat_id:
@@ -99,6 +104,7 @@ def notify_staff_of_exchange_request(
             sent += 1
         else:
             failed += 1
+            last_error = str(detail or "")
             logger.warning(
                 "admin_notify: send failed user_id=%s chat_id=%s detail=%s",
                 user.pk,
@@ -106,4 +112,7 @@ def notify_staff_of_exchange_request(
                 detail,
             )
 
-    return {"sent": sent, "failed": failed, "recipients": len(recipients)}
+    result = {"sent": sent, "failed": failed, "recipients": len(recipients)}
+    if last_error:
+        result["last_error"] = last_error
+    return result

@@ -14,6 +14,8 @@ from decimal import Decimal, InvalidOperation
 from django.db.models import Count, Q
 from django.utils import timezone
 
+from accounts.plans import bot_has_ability
+
 from ..models import (
     BotSession,
     CustomerProfile,
@@ -117,13 +119,62 @@ MAIN_MENU_BUTTONS = [
     [{"text": BTN_NOTIFICATIONS}],
 ]
 
+MAIN_MENU_ABILITY_MAP = {
+    BTN_PROFILE: "customer_profile",
+    BTN_EXCHANGE: "exchange_requests",
+    BTN_NOTIFICATIONS: "price_alerts",
+}
+
 MAIN_MENU_TEXT = (
-    "Welcome. Choose an option from the keyboard below "
+    "👋 Welcome! Great to have you here.\n\n"
+    "Choose an option from the keyboard below "
     "(or open the Menu button next to the message field):\n\n"
-    "1. Customer profile\n"
-    "2. Registering for exchange\n"
-    "3. Notification System"
+    "1. 👤 Customer profile\n"
+    "2. 💱 Registering for exchange\n"
+    "3. 🔔 Notification System"
 )
+
+
+def main_menu_buttons_for_bot(bot: TelegramBot) -> list[list[dict[str, str]]]:
+    rows = []
+    for row in MAIN_MENU_BUTTONS:
+        label = row[0]["text"]
+        ability = MAIN_MENU_ABILITY_MAP.get(label)
+        if ability and not bot_has_ability(bot, ability):
+            continue
+        rows.append(row)
+    return rows or [[{"text": BTN_HOME}]]
+
+
+def main_menu_text_for_bot(bot: TelegramBot) -> str:
+    lines = [
+        "👋 Welcome! Great to have you here.",
+        "",
+        "Choose an option from the keyboard below "
+        "(or open the Menu button next to the message field):",
+        "",
+    ]
+    n = 1
+    if bot_has_ability(bot, "customer_profile"):
+        lines.append(f"{n}. 👤 Customer profile")
+        n += 1
+    if bot_has_ability(bot, "exchange_requests"):
+        lines.append(f"{n}. 💱 Registering for exchange")
+        n += 1
+    if bot_has_ability(bot, "price_alerts"):
+        lines.append(f"{n}. 🔔 Notification System")
+        n += 1
+    if n == 1:
+        lines.append("😔 No customer features are enabled on this plan yet.")
+    return "\n".join(lines)
+
+
+def _ability_denied_reply(bot: TelegramBot) -> dict:
+    return _reply(
+        "This feature isn't included in your exchange plan yet. 💬",
+        buttons=main_menu_buttons_for_bot(bot),
+    )
+
 
 CANCEL_ROW = [[{"text": BTN_CANCEL}]]
 
@@ -274,7 +325,7 @@ def _resolve_label_action(session: BotSession, text: str) -> str | None:
 def _currency_keyboard(page: int, *, cancel_label: str = BTN_CANCEL) -> tuple[str, list]:
     items, page_index, has_prev, has_next = currency_catalog.paginate(page)
     total_pages = max(1, currency_catalog.page_count())
-    lines = [f"Choose a currency (page {page_index + 1}/{total_pages}):"]
+    lines = [f"🌍 Choose a currency (page {page_index + 1}/{total_pages}):"]
     rows: list[list[dict[str, str]]] = []
     pair: list[dict[str, str]] = []
     for cur in items:
@@ -302,10 +353,10 @@ def _exchange_currency_picker(*, role: str) -> tuple[str, list]:
     """
     top = currency_catalog.top_exchanged_currencies(10)
     lines = [
-        f"Select {role} currency",
+        f"💱 Select {role} currency",
         "",
-        "Top 10 most exchanged — tap one, or type a code/name",
-        "(typos are OK, e.g. \"dolr\" → USD):",
+        "🔥 Top 10 most exchanged — tap one, or type a code/name",
+        '(typos are OK, e.g. "dolr" → USD):',
         "",
     ]
     for i, cur in enumerate(top, start=1):
@@ -370,17 +421,23 @@ class ConversationEngine:
                 return admin_home
             if cmd == CMD_ADMIN:
                 return _reply(
-                    "You are not registered as an admin for this bot.\n"
-                    "Ask a developer to set your numeric Telegram ID on a "
-                    "super_admin or management account that owns this bot.",
-                    buttons=MAIN_MENU_BUTTONS,
+                    "🔒 You are not registered as an admin for this bot.\n"
+                    "Ask your exchange owner to add your Telegram username "
+                    "under Admin Management (Operator / Head of Operator / Admin).",
+                    buttons=main_menu_buttons_for_bot(self.bot),
                 )
             return self._go_main_menu(session)
         if cmd == CMD_PROFILE:
+            if not bot_has_ability(self.bot, "customer_profile"):
+                return _ability_denied_reply(self.bot)
             return self._show_profile(session)
         if cmd == CMD_EXCHANGE:
+            if not bot_has_ability(self.bot, "exchange_requests"):
+                return _ability_denied_reply(self.bot)
             return self._start_exchange(session)
         if cmd == CMD_NOTIFICATIONS:
+            if not bot_has_ability(self.bot, "price_alerts"):
+                return _ability_denied_reply(self.bot)
             return self._show_alert_menu(session)
 
         # In-bot admin panel (staff Telegram IDs — no login button)
@@ -406,12 +463,18 @@ class ConversationEngine:
             return self._go_main_menu(session)
 
         if callback_data == CB_MENU_PROFILE:
+            if not bot_has_ability(self.bot, "customer_profile"):
+                return _ability_denied_reply(self.bot)
             return self._show_profile(session)
 
         if callback_data == CB_MENU_EXCHANGE:
+            if not bot_has_ability(self.bot, "exchange_requests"):
+                return _ability_denied_reply(self.bot)
             return self._start_exchange(session)
 
         if callback_data == CB_MENU_NOTIFICATIONS:
+            if not bot_has_ability(self.bot, "price_alerts"):
+                return _ability_denied_reply(self.bot)
             return self._show_alert_menu(session)
 
         if session.state == BotSession.State.PROFILE or callback_data in (
@@ -464,14 +527,17 @@ class ConversationEngine:
         _clear_draft(session)
         session.state = BotSession.State.MAIN_MENU
         _persist(session, fields=["state", "context"])
-        return _reply(MAIN_MENU_TEXT, buttons=MAIN_MENU_BUTTONS)
+        return _reply(
+            main_menu_text_for_bot(self.bot),
+            buttons=main_menu_buttons_for_bot(self.bot),
+        )
 
     def _show_profile(self, session: BotSession) -> dict:
         session.state = BotSession.State.PROFILE
         _persist(session, fields=["state"])
         customer = self._customer(session)
         tag = customer.tag if customer else CustomerProfile.Tag.GLOBAL
-        body = f"Customer profile\nTag: {tag}"
+        body = f"👤 Customer profile\n🏷 Tag: {tag}"
         buttons = _btn(BTN_HISTORY, BTN_RUNNING, BTN_MOST, BTN_ID, BTN_HOME)
         return _reply(body, buttons=buttons)
 
@@ -491,11 +557,11 @@ class ConversationEngine:
         customer = self._customer(session)
         back = _btn(BTN_BACK)
         if customer is None:
-            return _reply("No running exchanges.", buttons=back)
+            return _reply("✨ No running exchanges right now — you're all caught up!", buttons=back)
         running = self._list_running_exchanges(customer)
         if not running:
-            return _reply("No running exchanges.", buttons=back)
-        lines = ["Current running exchanges:", "Tap Cancel #id to cancel one.", ""]
+            return _reply("✨ No running exchanges right now — you're all caught up!", buttons=back)
+        lines = ["⏳ Current running exchanges:", "👆 Tap Cancel #id to cancel one.", ""]
         rows: list[list[dict[str, str]]] = []
         for req in running:
             mins_left = max(
@@ -524,15 +590,16 @@ class ConversationEngine:
         )
         if req is None or not req.is_running():
             out = self._show_running_exchanges(session)
-            out["text"] = "That exchange is not running (or already ended).\n\n" + (
-                out["text"] or ""
+            out["text"] = (
+                "That exchange is not running (or already ended). ⏱\n\n"
+                + (out["text"] or "")
             )
             return out
         req.status = ExchangeRequest.Status.CANCELLED
         req.save(update_fields=["status", "updated_at"])
         out = self._show_running_exchanges(session)
         out["text"] = (
-            f"Cancelled #{req.pk} ({req.source_currency}→{req.target_currency}).\n\n"
+            f"✅ Cancelled #{req.pk} ({req.source_currency}→{req.target_currency}).\n\n"
             + (out["text"] or "")
         )
         return out
@@ -556,20 +623,26 @@ class ConversationEngine:
         back = _btn(BTN_BACK)
         if callback_data == CB_PROFILE_ID:
             return _reply(
-                f"Your Telegram ID: {session.telegram_user_id}",
+                f"🆔 Your Telegram ID:\n{session.telegram_user_id}",
                 buttons=back,
             )
 
         if callback_data == CB_PROFILE_HISTORY:
             customer = self._customer(session)
             if customer is None:
-                return _reply("No requests yet.", buttons=back)
+                return _reply(
+                    "📭 No requests yet — your history will show up here soon!",
+                    buttons=back,
+                )
             qs = ExchangeRequest.objects.filter(customer=customer).order_by("-created_at")[
                 :10
             ]
             if not qs:
-                return _reply("No requests yet.", buttons=back)
-            lines = ["History Of Requests:"]
+                return _reply(
+                    "📭 No requests yet — your history will show up here soon!",
+                    buttons=back,
+                )
+            lines = ["📋 History Of Requests:"]
             for req in qs:
                 price_bit = (
                     f" @ {req.price_at_request}"
@@ -585,7 +658,10 @@ class ConversationEngine:
         if callback_data == CB_PROFILE_MOST:
             customer = self._customer(session)
             if customer is None:
-                return _reply("No data yet.", buttons=back)
+                return _reply(
+                    "📊 No data yet — exchange a little to see your stats here!",
+                    buttons=back,
+                )
             rows = (
                 ExchangeRequest.objects.filter(customer=customer)
                 .values("source_currency", "target_currency")
@@ -593,8 +669,11 @@ class ConversationEngine:
                 .order_by("-c")[:5]
             )
             if not rows:
-                return _reply("No data yet.", buttons=back)
-            lines = ["Most Requested Currencies:"]
+                return _reply(
+                    "📊 No data yet — exchange a little to see your stats here!",
+                    buttons=back,
+                )
+            lines = ["📊 Most Requested Currencies:"]
             for row in rows:
                 lines.append(
                     f"• {row['source_currency']}→{row['target_currency']} ({row['c']})"
@@ -613,7 +692,10 @@ class ConversationEngine:
         session.state = BotSession.State.EXCHANGE_SOURCE
         _persist(session, fields=["state", "context"])
         body, buttons = _exchange_currency_picker(role="source")
-        return _reply(body, buttons=buttons)
+        return _reply(
+            "💱 Let's get your exchange started!\n\n" + body,
+            buttons=buttons,
+        )
 
     def _ask_currency(
         self, session: BotSession, *, prompt: str, page: int
@@ -663,7 +745,7 @@ class ConversationEngine:
                 label = f"{cur.code} — {cur.name}" if cur else code
                 body, buttons = _exchange_currency_picker(role="target")
                 return _reply(
-                    f"Source set to {label}.\n\n{body}",
+                    f"✅ Source set to {label}.\n\n{body}",
                     buttons=buttons,
                 )
             if session.state == BotSession.State.EXCHANGE_TARGET:
@@ -676,7 +758,7 @@ class ConversationEngine:
                 cur = currency_catalog.get_currency(code)
                 label = f"{cur.code} — {cur.name}" if cur else code
                 return _reply(
-                    f"Target set to {label}.\nEnter amount:",
+                    f"✅ Target set to {label}.\n💵 Enter amount:",
                     buttons=CANCEL_ROW,
                 )
             if session.state == BotSession.State.ALERT_SOURCE:
@@ -691,7 +773,7 @@ class ConversationEngine:
                 label = f"{cur.code} — {cur.name}" if cur else code
                 body, buttons = _exchange_currency_picker(role="target")
                 return _reply(
-                    f"Source set to {label}.\n\n{body}",
+                    f"✅ Source set to {label}.\n\n{body}",
                     buttons=buttons,
                 )
             if session.state == BotSession.State.ALERT_TARGET:
@@ -704,7 +786,7 @@ class ConversationEngine:
                 cur = currency_catalog.get_currency(code)
                 label = f"{cur.code} — {cur.name}" if cur else code
                 return _reply(
-                    f"Target set to {label}.\nEnter target price:",
+                    f"✅ Target set to {label}.\n🎯 Enter target price:",
                     buttons=CANCEL_ROW,
                 )
             return None
@@ -715,9 +797,9 @@ class ConversationEngine:
             BotSession.State.EXCHANGE_SOURCE,
             BotSession.State.ALERT_SOURCE,
         ):
-            prompt = "Select source currency:"
+            prompt = "💰 Select source currency:"
         else:
-            prompt = "Select target currency:"
+            prompt = "🎯 Select target currency:"
         return self._ask_currency(session, prompt=prompt, page=page)
 
     def _show_exchange_summary(self, session: BotSession) -> dict:
@@ -725,10 +807,10 @@ class ConversationEngine:
         session.state = BotSession.State.EXCHANGE_SUMMARY
         _persist(session, fields=["state", "context"])
         body = (
-            "Exchange request summary:\n"
-            f"Source: {draft.get('source_currency')}\n"
-            f"Target: {draft.get('target_currency')}\n"
-            f"Amount: {draft.get('amount')}"
+            "📝 Exchange request summary:\n"
+            f"💰 Source: {draft.get('source_currency')}\n"
+            f"🎯 Target: {draft.get('target_currency')}\n"
+            f"💵 Amount: {draft.get('amount')}"
         )
         buttons = [
             [{"text": BTN_CONFIRM}, {"text": BTN_EDIT}],
@@ -755,7 +837,7 @@ class ConversationEngine:
             return self._show_exchange_summary(session)
         session.state = BotSession.State.EXCHANGE_AMOUNT
         _persist(session, fields=["state", "context"])
-        return _reply("Enter amount:", buttons=CANCEL_ROW)
+        return _reply("💵 Enter amount:", buttons=CANCEL_ROW)
 
     def _handle_exchange(
         self, session: BotSession, text: str | None, callback_data: str | None
@@ -776,7 +858,7 @@ class ConversationEngine:
                 BTN_EXCH_AMOUNT,
                 BTN_BACK_SUMMARY,
             )
-            return _reply("What do you want to edit?", buttons=buttons)
+            return _reply("✏️ What do you want to edit?", buttons=buttons)
 
         if callback_data == CB_EXCH_SUMMARY:
             return self._show_exchange_summary(session)
@@ -786,20 +868,20 @@ class ConversationEngine:
             draft["currency_page"] = 0
             session.state = BotSession.State.EXCHANGE_SOURCE
             _persist(session, fields=["state", "context"])
-            return self._ask_currency(session, prompt="Select source currency:", page=0)
+            return self._ask_currency(session, prompt="💰 Select source currency:", page=0)
 
         if callback_data == CB_EXCH_EDIT_TARGET:
             draft["editing"] = "target"
             draft["currency_page"] = 0
             session.state = BotSession.State.EXCHANGE_TARGET
             _persist(session, fields=["state", "context"])
-            return self._ask_currency(session, prompt="Select target currency:", page=0)
+            return self._ask_currency(session, prompt="🎯 Select target currency:", page=0)
 
         if callback_data == CB_EXCH_EDIT_AMOUNT:
             draft["editing"] = "amount"
             session.state = BotSession.State.EXCHANGE_AMOUNT
             _persist(session, fields=["state", "context"])
-            return _reply("Enter amount:", buttons=CANCEL_ROW)
+            return _reply("💵 Enter amount:", buttons=CANCEL_ROW)
 
         if callback_data == CB_EXCH_CONFIRM:
             if session.state != BotSession.State.EXCHANGE_SUMMARY:
@@ -810,7 +892,7 @@ class ConversationEngine:
             amount = _parse_decimal(text)
             if amount is None:
                 return _reply(
-                    "Invalid amount. Enter a positive number:",
+                    "😅 That amount doesn't look right. Enter a positive number:",
                     buttons=CANCEL_ROW,
                 )
             draft["amount"] = str(amount)
@@ -829,7 +911,7 @@ class ConversationEngine:
                 )
                 body, buttons = _exchange_currency_picker(role=role)
                 return _reply(
-                    f"Could not understand \"{text.strip()}\". "
+                    f"🤔 Couldn't understand \"{text.strip()}\". "
                     f"Tap a top currency or type a clearer code/name.\n\n{body}",
                     buttons=buttons,
                 )
@@ -873,7 +955,7 @@ class ConversationEngine:
         except Exception:
             logger.exception("exchange confirm failed user=%s", session.telegram_user_id)
             return _reply(
-                "Could not save the request. Please try again.",
+                "😔 Couldn't save the request. Please try again — we're here for you!",
                 buttons=MAIN_MENU_BUTTONS,
             )
 
@@ -886,7 +968,9 @@ class ConversationEngine:
         session.state = BotSession.State.MAIN_MENU
         _persist(session, fields=["state", "context"])
         return _reply(
-            "The Operator will contact you very soon",
+            "🎉✅ Request received!\n\n"
+            "We're on it — an operator will contact you very soon. "
+            "Thank you for choosing us! 🙏",
             buttons=MAIN_MENU_BUTTONS,
         )
 
@@ -896,7 +980,8 @@ class ConversationEngine:
         _persist(session, fields=["state", "context"])
         buttons = _btn(BTN_ALERT_INC, BTN_ALERT_DEC, BTN_HOME)
         return _reply(
-            "Notification System\nChoose an alert type:",
+            "🔔 Notification System\n"
+            "✨ Choose an alert type — we'll watch the price for you:",
             buttons=buttons,
         )
 
@@ -909,9 +994,9 @@ class ConversationEngine:
         session.state = BotSession.State.ALERT_SOURCE
         _persist(session, fields=["state", "context"])
         if direction == PriceAlert.Direction.INCREASE:
-            intro = "If the price Grow upper than the target the bot will Alarm you"
+            intro = "📈 We'll alert you when the price rises above your target."
         else:
-            intro = "If the price fall lower than the target the bot will Alarm you"
+            intro = "📉 We'll alert you when the price falls below your target."
         body, buttons = _exchange_currency_picker(role="source")
         return _reply(f"{intro}\n\n{body}", buttons=buttons)
 
@@ -920,11 +1005,11 @@ class ConversationEngine:
         session.state = BotSession.State.ALERT_SUMMARY
         _persist(session, fields=["state", "context"])
         body = (
-            "Alert summary:\n"
-            f"Direction: {draft.get('direction')}\n"
-            f"Source: {draft.get('source_currency')}\n"
-            f"Target: {draft.get('target_currency')}\n"
-            f"Target price: {draft.get('target_price')}"
+            "📝 Alert summary:\n"
+            f"📊 Direction: {draft.get('direction')}\n"
+            f"💰 Source: {draft.get('source_currency')}\n"
+            f"🎯 Target: {draft.get('target_currency')}\n"
+            f"💵 Target price: {draft.get('target_price')}"
         )
         buttons = [
             [{"text": BTN_CONFIRM}, {"text": BTN_EDIT}],
@@ -956,7 +1041,7 @@ class ConversationEngine:
                 BTN_ALERT_PRICE,
                 BTN_BACK_SUMMARY,
             )
-            return _reply("What do you want to edit?", buttons=buttons)
+            return _reply("✏️ What do you want to edit?", buttons=buttons)
 
         if callback_data == CB_ALERT_SUMMARY:
             return self._show_alert_summary(session)
@@ -966,20 +1051,20 @@ class ConversationEngine:
             draft["currency_page"] = 0
             session.state = BotSession.State.ALERT_SOURCE
             _persist(session, fields=["state", "context"])
-            return self._ask_currency(session, prompt="Select source currency:", page=0)
+            return self._ask_currency(session, prompt="💰 Select source currency:", page=0)
 
         if callback_data == CB_ALERT_EDIT_TARGET:
             draft["editing"] = "target"
             draft["currency_page"] = 0
             session.state = BotSession.State.ALERT_TARGET
             _persist(session, fields=["state", "context"])
-            return self._ask_currency(session, prompt="Select target currency:", page=0)
+            return self._ask_currency(session, prompt="🎯 Select target currency:", page=0)
 
         if callback_data == CB_ALERT_EDIT_PRICE:
             draft["editing"] = "price"
             session.state = BotSession.State.ALERT_PRICE
             _persist(session, fields=["state", "context"])
-            return _reply("Enter target price:", buttons=CANCEL_ROW)
+            return _reply("🎯 Enter target price:", buttons=CANCEL_ROW)
 
         if callback_data == CB_ALERT_CONFIRM:
             if session.state != BotSession.State.ALERT_SUMMARY:
@@ -990,7 +1075,7 @@ class ConversationEngine:
             price = _parse_decimal(text)
             if price is None:
                 return _reply(
-                    "Invalid price. Enter a positive number:",
+                    "😅 That price doesn't look right. Enter a positive number:",
                     buttons=CANCEL_ROW,
                 )
             draft["target_price"] = str(price)
@@ -1012,7 +1097,7 @@ class ConversationEngine:
                 )
                 body, buttons = _exchange_currency_picker(role=role)
                 return _reply(
-                    f"Could not understand \"{text.strip()}\". "
+                    f"🤔 Couldn't understand \"{text.strip()}\". "
                     f"Tap a top currency or type a clearer code/name.\n\n{body}",
                     buttons=buttons,
                 )
@@ -1045,7 +1130,7 @@ class ConversationEngine:
         except Exception:
             logger.exception("alert confirm failed user=%s", session.telegram_user_id)
             return _reply(
-                "Could not save the alert. Please try again.",
+                "😔 Couldn't save the alert. Please try again — we've got your back!",
                 buttons=MAIN_MENU_BUTTONS,
             )
 
@@ -1053,6 +1138,9 @@ class ConversationEngine:
         session.state = BotSession.State.MAIN_MENU
         _persist(session, fields=["state", "context"])
         return _reply(
-            "Confirmed.\n\n" + MAIN_MENU_TEXT,
+            "🎉✅ Confirmed!\n\n"
+            "We'll notify you the moment the price hits your target. "
+            "You're all set! 🔔✨\n\n"
+            + MAIN_MENU_TEXT,
             buttons=MAIN_MENU_BUTTONS,
         )

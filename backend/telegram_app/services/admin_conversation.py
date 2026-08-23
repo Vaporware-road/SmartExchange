@@ -5,6 +5,8 @@ from __future__ import annotations
 from django.db.models import Count
 from django.utils import timezone
 
+from accounts.plans import bot_has_ability
+
 from ..models import (
     BotSession,
     CustomerProfile,
@@ -27,7 +29,7 @@ from .customer_tags import (
 )
 from .exchange_ops import hold_request, set_request_status
 from .reengage_service import schedule_next_run, send_to_audience
-from .staff_access import is_bot_admin
+from .staff_access import get_effective_sub_role, is_bot_admin
 
 CB_ADMIN_HOME = "admin:home"
 CB_ADMIN_PENDING = "admin:pending"
@@ -91,7 +93,7 @@ BTN_ADMIN_REENGAGE_PERIODIC = "Periodic Campaigns"
 BTN_ADMIN_REENGAGE_OFFER = "Offer Creation"
 BTN_ADMIN_AUD_GLOBAL = "Audience: Global"
 BTN_ADMIN_AUD_VIP = "Audience: VIP"
-BTN_ADMIN_AUD_SPECIAL = "Audience: Special currencies"
+BTN_ADMIN_AUD_SPECIAL = "Audience: Special"
 BTN_ADMIN_AUD_INACTIVE = "Audience: Inactive"
 BTN_ADMIN_SCHED_DAILY = "Schedule: Daily"
 BTN_ADMIN_SCHED_WEEKLY = "Schedule: Weekly"
@@ -103,6 +105,57 @@ BTN_TAG_VIP = "Tag: VIP"
 BTN_TAG_SPECIAL = "Tag: Special"
 
 TAG_USER_PAGE_SIZE = 8
+
+_REQUEST_ACTIONS = frozenset({
+    CB_ADMIN_HOME,
+    CB_ADMIN_PENDING,
+    CB_ADMIN_RECENT,
+    CB_ADMIN_BACK_LIST,
+    CB_ADMIN_BACK_DETAIL,
+    CB_ADMIN_CHANGE_STATE,
+    CB_ADMIN_HOLD,
+    CB_ADMIN_CLOSE,
+})
+_REQUEST_PREFIXES = (CB_ADMIN_OPEN_PREFIX, CB_ADMIN_STATE_PREFIX)
+
+_REENGAGE_ACTIONS = frozenset({
+    CB_ADMIN_REENGAGE,
+    CB_ADMIN_REENGAGE_SEND,
+    CB_ADMIN_REENGAGE_PERIODIC,
+    CB_ADMIN_REENGAGE_OFFER,
+    CB_ADMIN_REENGAGE_CONFIRM,
+    CB_ADMIN_OFFER_SAVE,
+})
+_REENGAGE_PREFIXES = (CB_ADMIN_AUDIENCE_PREFIX, CB_ADMIN_SCHEDULE_PREFIX)
+
+
+def _action_matches_prefix(action: str, prefix: str) -> bool:
+    return bool(action) and str(action).startswith(prefix)
+
+
+def _admin_action_allowed(sub_role: str | None, action: str | None) -> bool:
+    """Enforce sub_role policy for every admin callback, not just top-level menus."""
+    if sub_role is None or sub_role == "admin":
+        return True
+    action = action or ""
+    if action in _REQUEST_ACTIONS:
+        return True
+    if any(_action_matches_prefix(action, prefix) for prefix in _REQUEST_PREFIXES):
+        return True
+    if sub_role == "head_operator":
+        if action in _REENGAGE_ACTIONS:
+            return True
+        if any(_action_matches_prefix(action, prefix) for prefix in _REENGAGE_PREFIXES):
+            return True
+    return False
+
+
+def _profile_for_bot(bot, telegram_user_id: int) -> CustomerProfile | None:
+    """Customer must have an active session on this bot (prevents cross-bot tag IDOR)."""
+    if not BotSession.objects.filter(bot=bot, telegram_user_id=telegram_user_id).exists():
+        return None
+    return CustomerProfile.objects.filter(telegram_user_id=telegram_user_id).first()
+
 
 ADMIN_LABEL_TO_CB: dict[str, str] = {
     BTN_ADMIN_PENDING: CB_ADMIN_PENDING,
@@ -154,6 +207,29 @@ ADMIN_MENU_BUTTONS = [
     [{"text": BTN_ADMIN_REENGAGE}],
     [{"text": BTN_ADMIN_STATS}],
 ]
+
+# Operator: only pending + recent requests
+OPERATOR_MENU_BUTTONS = [
+    [{"text": BTN_ADMIN_PENDING}],
+    [{"text": BTN_ADMIN_RECENT}],
+]
+
+# Head of Operator: pending, recent, + re-engagement
+HEAD_OPERATOR_MENU_BUTTONS = [
+    [{"text": BTN_ADMIN_PENDING}],
+    [{"text": BTN_ADMIN_RECENT}],
+    [{"text": BTN_ADMIN_REENGAGE}],
+]
+
+
+def _menu_buttons_for_staff(staff) -> list:
+    """Return the appropriate admin menu buttons based on sub_role."""
+    sub_role = get_effective_sub_role(staff)
+    if sub_role == "operator":
+        return OPERATOR_MENU_BUTTONS
+    if sub_role == "head_operator":
+        return HEAD_OPERATOR_MENU_BUTTONS
+    return ADMIN_MENU_BUTTONS
 
 ANALYTICS_MENU_BUTTONS = [
     [{"text": BTN_ADMIN_EXCHANGE_REQUESTS}],
@@ -208,14 +284,14 @@ CUSTOMER_ANALYSIS_BUTTONS = [
 ]
 
 ADMIN_MENU_TEXT = (
-    "Admin panel\n\n"
-    "You are recognized by your Telegram ID (no login).\n"
-    "Choose an option:"
+    "🛠 Admin panel\n\n"
+    "You're recognized by your Telegram username — no login needed. ✨\n"
+    "Choose an option below:"
 )
 
 LIVE_STATUSES = (ExchangeRequest.Status.NEW,)
 
-TAG_PROMPT = "Write any userid or chose from the list:"
+TAG_PROMPT = "✍️ Write any userid or chose from the list:"
 
 
 def _btn(*labels: str) -> list[list[dict[str, str]]]:
@@ -270,12 +346,24 @@ def resolve_admin_label(text: str | None) -> str | None:
 
 
 def staff_for_session(session: BotSession):
-    return is_bot_admin(session.telegram_user_id, session.bot)
+    username = None
+    profile = CustomerProfile.objects.filter(
+        telegram_user_id=session.telegram_user_id
+    ).only("username").first()
+    if profile and profile.username:
+        username = profile.username
+    return is_bot_admin(
+        session.telegram_user_id,
+        session.bot,
+        telegram_username=username,
+    )
 
 
 def go_admin_menu(session: BotSession) -> dict:
     staff = staff_for_session(session)
     if staff is None:
+        return None
+    if not bot_has_ability(session.bot, "admin_menu"):
         return None
     ctx = _ctx(session)
     for key in (
@@ -294,7 +382,7 @@ def go_admin_menu(session: BotSession) -> dict:
     _set_ctx(session, ctx)
     session.state = BotSession.State.ADMIN_MENU
     _persist(session, fields=["state", "context"])
-    return _reply(ADMIN_MENU_TEXT, buttons=ADMIN_MENU_BUTTONS)
+    return _reply(ADMIN_MENU_TEXT, buttons=_menu_buttons_for_staff(staff))
 
 
 def _format_request_line(req: ExchangeRequest) -> str:
@@ -321,9 +409,9 @@ def _show_request_list(session: BotSession, *, kind: str) -> dict:
     qs = _request_qs(session)
     if kind == "pending":
         qs = qs.filter(status__in=LIVE_STATUSES)
-        title = "Pending requests (New)"
+        title = "📥 Pending requests (New)"
     else:
-        title = "Recent requests (last 10)"
+        title = "🕐 Recent requests (last 10)"
         qs = qs[:10]
 
     rows = list(qs[:10])
@@ -336,12 +424,12 @@ def _show_request_list(session: BotSession, *, kind: str) -> dict:
 
     if not rows:
         return _reply(
-            f"{title}\n\nNo requests found.",
+            f"{title}\n\n✨ No requests found — you're all caught up!",
             buttons=_btn(),
         )
 
     lines = [title, ""] + [_format_request_line(r) for r in rows]
-    lines.append("\nTap a request button to open it.")
+    lines.append("\n👆 Tap a request button to open it.")
     buttons = [
         [{"text": f"Req #{r.pk} {r.source_currency}→{r.target_currency}"}]
         for r in rows
@@ -361,15 +449,15 @@ def _show_request_detail(session: BotSession, req: ExchangeRequest) -> dict:
     who = customer.username or customer.first_name or str(customer.telegram_user_id)
     price = str(req.price_at_request) if req.price_at_request is not None else "N/A"
     text = (
-        f"Request #{req.pk}\n"
-        f"Status: {req.get_status_display()}\n"
-        f"Customer: {who} (tg:{customer.telegram_user_id})\n"
-        f"Tag: {effective_tag(customer)}\n"
-        f"Pair: {req.source_currency} → {req.target_currency}\n"
-        f"Amount: {req.amount}\n"
-        f"Price: {price}\n"
-        f"TTL: {req.ttl_minutes} min\n"
-        f"Created: {req.created_at}"
+        f"📋 Request #{req.pk}\n"
+        f"📌 Status: {req.get_status_display()}\n"
+        f"👤 Customer: {who} (tg:{customer.telegram_user_id})\n"
+        f"🏷 Tag: {effective_tag(customer)}\n"
+        f"💱 Pair: {req.source_currency} → {req.target_currency}\n"
+        f"💵 Amount: {req.amount}\n"
+        f"💰 Price: {price}\n"
+        f"⏱ TTL: {req.ttl_minutes} min\n"
+        f"🗓 Created: {req.created_at}"
     )
     buttons = _btn(
         BTN_ADMIN_CHANGE_STATE,
@@ -386,8 +474,8 @@ def _show_change_state(session: BotSession) -> dict:
     session.state = BotSession.State.ADMIN_CHANGE_STATE
     _persist(session, fields=["state"])
     return _reply(
-        f"Request #{req.pk} current state: {req.get_status_display()}\n\n"
-        "Choose a state:",
+        f"🔄 Request #{req.pk} current state: {req.get_status_display()}\n\n"
+        "✨ Choose a state:",
         buttons=_btn(
             BTN_STATE_NEW,
             BTN_STATE_CANCELLED,
@@ -410,15 +498,16 @@ def _show_stats(session: BotSession) -> dict:
         .count()
     )
     text = (
-        f"Bot stats — {session.bot.name}\n\n"
-        f"Customers (sessions): {customers}\n"
-        f"New: {counts.get(ExchangeRequest.Status.NEW, 0)}\n"
-        f"Canceled: {counts.get(ExchangeRequest.Status.CANCELLED, 0)}\n"
-        f"Successful: {counts.get(ExchangeRequest.Status.SUCCESSFUL, 0)}"
+        f"📊 Bot stats — {session.bot.name}\n\n"
+        f"👥 Customers (sessions): {customers}\n"
+        f"🆕 New: {counts.get(ExchangeRequest.Status.NEW, 0)}\n"
+        f"❌ Canceled: {counts.get(ExchangeRequest.Status.CANCELLED, 0)}\n"
+        f"✅ Successful: {counts.get(ExchangeRequest.Status.SUCCESSFUL, 0)}"
     )
+    staff = staff_for_session(session)
     session.state = BotSession.State.ADMIN_MENU
     _persist(session, fields=["state"])
-    return _reply(text, buttons=ADMIN_MENU_BUTTONS)
+    return _reply(text, buttons=_menu_buttons_for_staff(staff) if staff else ADMIN_MENU_BUTTONS)
 
 
 def _show_analytics(session: BotSession) -> dict:
@@ -439,8 +528,8 @@ def _show_reengage_menu(session: BotSession) -> dict:
     session.state = BotSession.State.ADMIN_REENGAGE
     _persist(session, fields=["state"])
     return _reply(
-        "Re-engagement\n\n"
-        "Choose an audience for a one-shot send, or set up periodic campaigns / offers.",
+        "📣 Re-engagement\n\n"
+        "✨ Choose an audience for a one-shot send, or set up periodic campaigns / offers.",
         buttons=REENGAGE_MENU_BUTTONS,
     )
 
@@ -478,13 +567,13 @@ def _show_tag_user_list(session: BotSession) -> dict:
     _persist(session, fields=["state", "context"])
 
     lines = [
-        "Set customer tag",
+        "🏷 Set customer tag",
         "",
         TAG_PROMPT,
         "",
     ]
     if not chunk:
-        lines.append("No logged-in customers yet.")
+        lines.append("😔 No logged-in customers yet.")
         return _reply("\n".join(lines), buttons=_btn())
 
     for profile in chunk:
@@ -508,7 +597,7 @@ def _show_tag_user_list(session: BotSession) -> dict:
 def _show_tag_choices(session: BotSession, profile: CustomerProfile) -> dict:
     if effective_tag(profile) == "admin":
         return _reply(
-            f"User {profile.telegram_user_id} is Admin.\n"
+            f"🔒 User {profile.telegram_user_id} is Admin.\n"
             "That tag is not changeable.",
             buttons=_btn(BTN_ADMIN_TAG),
         )
@@ -519,9 +608,9 @@ def _show_tag_choices(session: BotSession, profile: CustomerProfile) -> dict:
     _persist(session, fields=["state", "context"])
     name = display_name(profile) or "—"
     return _reply(
-        f"User {profile.telegram_user_id} {name}\n"
-        f"Current tag: {effective_tag(profile)}\n\n"
-        "Choose a tag:",
+        f"👤 User {profile.telegram_user_id} {name}\n"
+        f"🏷 Current tag: {effective_tag(profile)}\n\n"
+        "✨ Choose a tag:",
         buttons=_btn(BTN_TAG_GLOBAL, BTN_TAG_VIP, BTN_TAG_SPECIAL),
     )
 
@@ -540,7 +629,7 @@ def _handle_reengage_text(session: BotSession, text: str) -> dict | None:
             session.state = BotSession.State.ADMIN_REENGAGE_SCHEDULE
             _persist(session, fields=["state", "context"])
             return _reply(
-                "Choose schedule for this campaign:",
+                "📆 Choose schedule for this campaign:",
                 buttons=SCHEDULE_BUTTONS,
             )
         session.state = BotSession.State.ADMIN_REENGAGE
@@ -552,11 +641,12 @@ def _handle_reengage_text(session: BotSession, text: str) -> dict | None:
         )
         extra = ""
         if result.get("last_error"):
-            extra = f"\nError: {result['last_error']}"
+            extra = f"\n⚠️ Error: {result['last_error']}"
         return _reply(
-            f"Sent: {result.get('sent', 0)}\n"
-            f"Failed: {result.get('failed', 0)}\n"
-            f"Skipped: {result.get('skipped', 0)}{extra}",
+            f"🎉 Campaign results\n"
+            f"✅ Sent: {result.get('sent', 0)}\n"
+            f"❌ Failed: {result.get('failed', 0)}\n"
+            f"⏭ Skipped: {result.get('skipped', 0)}{extra}",
             buttons=REENGAGE_MENU_BUTTONS,
         )
 
@@ -564,7 +654,7 @@ def _handle_reengage_text(session: BotSession, text: str) -> dict | None:
         ctx["offer_title"] = stripped
         ctx["reengage_mode"] = "offer_body"
         _set_ctx(session, ctx)
-        return _reply("Enter offer body text:", buttons=_btn())
+        return _reply("✍️ Enter offer body text:", buttons=_btn())
 
     if mode == "offer_body":
         ctx["offer_body"] = stripped
@@ -573,7 +663,7 @@ def _handle_reengage_text(session: BotSession, text: str) -> dict | None:
         session.state = BotSession.State.ADMIN_OFFER_CREATE
         _persist(session, fields=["state", "context"])
         return _reply(
-            f"Save offer?\n\nTitle: {ctx.get('offer_title')}\n\n{stripped}",
+            f"💾 Save offer?\n\n📌 Title: {ctx.get('offer_title')}\n\n{stripped}",
             buttons=_btn(BTN_ADMIN_OFFER_SAVE),
         )
 
@@ -588,6 +678,15 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
     staff = staff_for_session(session)
     if staff is None:
         return None
+
+    sub_role = get_effective_sub_role(staff)
+    if action not in (None, "") and not _admin_action_allowed(sub_role, action):
+        return go_admin_menu(session)
+
+    # Operator/Head of Operator cannot access analytics, stats, or customer analysis.
+    _analytics_restricted = sub_role in ("operator", "head_operator")
+    # Only Head of Operator and above can access re-engagement.
+    _reengage_restricted = sub_role == "operator"
 
     if action in (None, ""):
         if session.state.startswith("ADMIN"):
@@ -604,22 +703,30 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         return _show_request_list(session, kind="recent")
 
     if action == CB_ADMIN_STATS:
+        if _analytics_restricted:
+            return go_admin_menu(session)
         return _show_stats(session)
 
     if action == CB_ADMIN_ANALYTICS:
+        if _analytics_restricted:
+            return go_admin_menu(session)
         return _show_analytics(session)
 
     if action == CB_ADMIN_CUSTOMER_ANALYSIS:
+        if _analytics_restricted:
+            return go_admin_menu(session)
         return _show_customer_analysis(session)
 
     if action == CB_ADMIN_REENGAGE:
+        if _reengage_restricted:
+            return go_admin_menu(session)
         return _show_reengage_menu(session)
 
     if action == CB_ADMIN_ANALYTICS_EXCHANGE:
         session.state = BotSession.State.ADMIN_ANALYTICS_EXCHANGE
         _persist(session, fields=["state"])
         return _reply(
-            "Exchange Requests\n\nChoose a filter:",
+            "💱 Exchange Requests\n\n✨ Choose a filter:",
             buttons=EXCHANGE_MENU_BUTTONS,
         )
 
@@ -627,7 +734,7 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         session.state = BotSession.State.ADMIN_ANALYTICS_MEMBERS
         _persist(session, fields=["state"])
         return _reply(
-            "New members\n\nChoose a period:",
+            "👋 New members\n\n✨ Choose a period:",
             buttons=MEMBERS_MENU_BUTTONS,
         )
 
@@ -665,16 +772,16 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
             ctx["reengage_mode"] = "offer_title"
             _set_ctx(session, ctx)
             return _reply(
-                f"Audience: {audience}\n\nEnter offer title:",
+                f"👥 Audience: {audience}\n\n✍️ Enter offer title:",
                 buttons=_btn(),
             )
         _set_ctx(session, ctx)
         session.state = BotSession.State.ADMIN_REENGAGE_COMPOSE
         _persist(session, fields=["state", "context"])
         prompt = (
-            f"Audience: {audience}\n\nType campaign message:"
+            f"👥 Audience: {audience}\n\n✍️ Type campaign message:"
             if is_periodic
-            else f"Audience: {audience}\n\nType your message to send now:"
+            else f"👥 Audience: {audience}\n\n✍️ Type your message to send now:"
         )
         return _reply(prompt, buttons=_btn())
 
@@ -686,7 +793,7 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         session.state = BotSession.State.ADMIN_REENGAGE_AUDIENCE
         _persist(session, fields=["state", "context"])
         return _reply(
-            "Periodic campaign\n\nChoose audience first:",
+            "🔁 Periodic campaign\n\n✨ Choose audience first:",
             buttons=AUDIENCE_BUTTONS,
         )
 
@@ -698,9 +805,10 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         session.state = BotSession.State.ADMIN_OFFER_CREATE
         _persist(session, fields=["state", "context"])
         return _reply(
-            "Offer creation\n\nChoose audience (optional, default Global), "
+            "🎁 Offer creation\n\n"
+            "Choose audience (optional, default Global), "
             "then enter title on next message.\n\n"
-            "Tap an audience or type offer title:",
+            "✨ Tap an audience or type offer title:",
             buttons=AUDIENCE_BUTTONS,
         )
 
@@ -724,8 +832,10 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         ctx.pop("reengage_flow", None)
         _set_ctx(session, ctx)
         return _reply(
-            f"Campaign saved.\nAudience: {audience}\nSchedule: {schedule}\n"
-            f"Next run: {campaign.next_run_at}",
+            f"✅ Campaign saved!\n"
+            f"👥 Audience: {audience}\n"
+            f"📆 Schedule: {schedule}\n"
+            f"⏭ Next run: {campaign.next_run_at}",
             buttons=REENGAGE_MENU_BUTTONS,
         )
 
@@ -735,7 +845,7 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         body = (ctx.get("offer_body") or "").strip()
         audience = ctx.get("reengage_audience", "global")
         if not title or not body:
-            return _reply("Offer title and body required.", buttons=_btn())
+            return _reply("😅 Offer title and body required.", buttons=_btn())
         offer = ReengageOffer.objects.create(
             bot=session.bot,
             title=title,
@@ -747,7 +857,7 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         ctx.pop("offer_body", None)
         _set_ctx(session, ctx)
         return _reply(
-            f"Offer saved: {offer.title}\nAudience: {audience}",
+            f"🎉 Offer saved: {offer.title}\n👥 Audience: {audience}",
             buttons=REENGAGE_MENU_BUTTONS,
         )
 
@@ -772,7 +882,7 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
             .first()
         )
         if req is None:
-            return _reply("Request not found.", buttons=_btn())
+            return _reply("😔 Request not found.", buttons=_btn())
         return _show_request_detail(session, req)
 
     if action == CB_ADMIN_CHANGE_STATE:
@@ -785,7 +895,7 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         ttl = hold_request(req)
         req.refresh_from_db()
         out = _show_request_detail(session, req)
-        out["text"] = f"TTL increase : {ttl}\n\n" + (out.get("text") or "")
+        out["text"] = f"⏱ TTL increase : {ttl}\n\n" + (out.get("text") or "")
         return out
 
     if action.startswith(CB_ADMIN_STATE_PREFIX):
@@ -800,7 +910,7 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         req.refresh_from_db()
         out = _show_request_detail(session, req)
         out["text"] = (
-            f"Request #{req.pk} is now {req.get_status_display()}.\n\n"
+            f"✅ Request #{req.pk} is now {req.get_status_display()}.\n\n"
             + (out.get("text") or "")
         )
         return out
@@ -813,9 +923,9 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
             tid = int(action[len(CB_ADMIN_TAG_USER_PREFIX) :])
         except ValueError:
             return _show_tag_user_list(session)
-        profile = CustomerProfile.objects.filter(telegram_user_id=tid).first()
+        profile = _profile_for_bot(session.bot, tid)
         if profile is None:
-            return _reply("User not found.", buttons=_btn(BTN_ADMIN_TAG))
+            return _reply("😔 User not found.", buttons=_btn(BTN_ADMIN_TAG))
         return _show_tag_choices(session, profile)
 
     if action.startswith(CB_ADMIN_TAG_PREFIX):
@@ -824,14 +934,14 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         tid = ctx.get("admin_tag_telegram_id")
         if not tid:
             return _show_tag_user_list(session)
-        profile = CustomerProfile.objects.filter(telegram_user_id=tid).first()
+        profile = _profile_for_bot(session.bot, tid)
         if profile is None:
-            return _reply("User not found.", buttons=_btn(BTN_ADMIN_TAG))
+            return _reply("😔 User not found.", buttons=_btn(BTN_ADMIN_TAG))
         try:
             set_customer_tag(profile, tag)
         except AdminTagImmutable:
             return _reply(
-                "Admin tag cannot be changed.",
+                "🔒 Admin tag cannot be changed.",
                 buttons=_btn(BTN_ADMIN_TAG),
             )
         except ValueError:
@@ -840,7 +950,7 @@ def handle_admin_action(session: BotSession, action: str | None) -> dict | None:
         _set_ctx(session, ctx)
         _persist(session, fields=["context"])
         return _reply(
-            f"Tag updated.\nUser {profile.telegram_user_id} is now {tag}.",
+            f"✅ Tag updated!\n👤 User {profile.telegram_user_id} is now {tag}.",
             buttons=_btn(BTN_ADMIN_TAG),
         )
 
@@ -871,7 +981,7 @@ def handle_admin_text(session: BotSession, text: str) -> dict | None:
             ).first()
             if profile is None:
                 return _reply(
-                    f"User {stripped} not found.\n\n{TAG_PROMPT}",
+                    f"😔 User {stripped} not found.\n\n{TAG_PROMPT}",
                     buttons=_btn(BTN_ADMIN_TAG),
                 )
             return _show_tag_choices(session, profile)
