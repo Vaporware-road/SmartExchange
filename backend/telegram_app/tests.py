@@ -39,18 +39,23 @@ from telegram_app.services.alert_checker import (
     check_price_alerts,
 )
 from telegram_app.models import (
+    AutoPostConfig,
+    BotAdmin,
     BotSession,
     CustomerProfile,
     ExchangeRequest,
     PriceAlert,
     TelegramBot,
+    TelegramChannel,
 )
 from telegram_app.services import currency_catalog
+from telegram_app.services.auto_post import due_configs, run_due_auto_posts
 from decimal import Decimal
-from datetime import timedelta
+from datetime import time, timedelta
 from django.utils import timezone
 from category.models import Category, Currency, PriceType
 from change_price.models import PriceHistory
+from special_price.models import SpecialPriceHistory, SpecialPricePair, SpecialPriceType
 
 
 class CurrencyCatalogTests(TestCase):
@@ -654,6 +659,256 @@ class InBotAdminPanelTests(TestCase):
         self.assertEqual(session.state, BotSession.State.START)
         _ = other  # created for telegram_id uniqueness
 
+
+class BotAdminAutoSyncTests(TestCase):
+    """Signals keep BotAdmin delegation rows in sync without manual calls."""
+
+    def setUp(self):
+        self.owner = CustomUser.objects.create_user(
+            username="sync_owner",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+            plan=PLAN_GOLD,
+            telegram_id="610000001",
+        )
+        self.bot = TelegramBot.objects.create(
+            name="Sync Bot", token="611:SYNC", is_active=True, owner=self.owner
+        )
+
+    def _admin_ids(self):
+        return set(BotAdmin.objects.filter(bot=self.bot).values_list("user_id", flat=True))
+
+    def test_creating_bot_with_owner_grants_owner_row(self):
+        self.assertEqual(self._admin_ids(), {self.owner.id})
+
+    def test_creating_delegated_operator_auto_grants_on_owner_bots(self):
+        operator = CustomUser.objects.create_user(
+            username="sync_op",
+            password=None,
+            role=CustomUser.ROLE_EMPLOYEE,
+            owner=self.owner,
+            sub_role=CustomUser.SUB_ROLE_OPERATOR,
+            telegram_username="syncop",
+            telegram_id="610000002",
+        )
+        operator.set_unusable_password()
+        operator.save(update_fields=["password"])
+        self.assertIn(operator.id, self._admin_ids())
+
+        # The operator can actually open the (limited) admin panel via the engine.
+        engine = ConversationEngine(self.bot)
+        session = engine.get_or_create_session(610000002)
+        out = engine.process_update(session, text="/start")
+        labels = {b["text"] for row in out["buttons"] for b in row}
+        self.assertIn("Pending requests", labels)
+        self.assertNotIn("Analytics Dashboard", labels)
+
+    def test_revoking_sub_role_auto_removes_row(self):
+        operator = CustomUser.objects.create_user(
+            username="sync_revoke",
+            password=None,
+            role=CustomUser.ROLE_EMPLOYEE,
+            owner=self.owner,
+            sub_role=CustomUser.SUB_ROLE_OPERATOR,
+            telegram_username="syncrevoke",
+            telegram_id="610000003",
+        )
+        operator.set_unusable_password()
+        operator.save(update_fields=["password"])
+        self.assertIn(operator.id, self._admin_ids())
+
+        operator.sub_role = CustomUser.SUB_ROLE_ADMIN
+        operator.save(update_fields=["sub_role"])
+        self.assertNotIn(operator.id, self._admin_ids())
+
+    def test_moving_operator_removes_old_owner_access(self):
+        other_owner = CustomUser.objects.create_user(
+            username="sync_owner2",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+            telegram_id="610000004",
+        )
+        other_bot = TelegramBot.objects.create(
+            name="Other Bot", token="612:SYNC", is_active=True, owner=other_owner
+        )
+        operator = CustomUser.objects.create_user(
+            username="sync_mover",
+            password=None,
+            role=CustomUser.ROLE_EMPLOYEE,
+            owner=self.owner,
+            sub_role=CustomUser.SUB_ROLE_HEAD_OPERATOR,
+            telegram_username="syncmover",
+            telegram_id="610000005",
+        )
+        operator.set_unusable_password()
+        operator.save(update_fields=["password"])
+        self.assertIn(operator.id, self._admin_ids())
+        self.assertNotIn(operator.id, set(other_bot.admins.values_list("user_id", flat=True)))
+
+        operator.owner = other_owner
+        operator.save(update_fields=["owner"])
+        self.assertNotIn(operator.id, self._admin_ids())
+        self.assertIn(operator.id, set(other_bot.admins.values_list("user_id", flat=True)))
+
+    def test_reassigning_bot_owner_reconciles_its_admins(self):
+        other_owner = CustomUser.objects.create_user(
+            username="sync_owner3",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+            telegram_id="610000006",
+        )
+        self.bot.owner = other_owner
+        self.bot.save(update_fields=["owner"])
+        self.assertEqual(self._admin_ids(), {other_owner.id})
+
+
+class AutoPostSchedulerTests(TestCase):
+    def setUp(self):
+        self.bot = TelegramBot.objects.create(name="Auto Bot", token="620:AUTO", is_active=True)
+        self.channel = TelegramChannel.objects.create(
+            bot=self.bot, name="Auto Channel", chat_id="@auto_channel", is_active=True
+        )
+        self.category = Category.objects.create(name="Auto Category")
+        self.usdt, _ = Currency.objects.get_or_create(code="USDT", defaults={"name": "Tether"})
+        self.irr, _ = Currency.objects.get_or_create(code="IRR", defaults={"name": "Rial"})
+        self.price_type = PriceType.objects.create(
+            category=self.category,
+            name="Auto Buy",
+            source_currency=self.usdt,
+            target_currency=self.irr,
+            trade_type="buy",
+        )
+        self.history = PriceHistory.objects.create(
+            price_type=self.price_type, price=Decimal("99999")
+        )
+        self.spt = SpecialPriceType.objects.create(
+            name="Auto Special",
+            source_currency=self.usdt,
+            target_currency=self.irr,
+            trade_type="sell",
+        )
+        self.pair = SpecialPricePair.objects.create(
+            special_price_type=self.spt,
+            name="Auto Pair",
+            source_currency=self.usdt,
+            target_currency=self.irr,
+            trade_type="sell",
+        )
+        self.sp_history = SpecialPriceHistory.objects.create(
+            special_price_type=self.spt, pair=self.pair, price=Decimal("111")
+        )
+
+    def _config(self, **overrides):
+        defaults = {
+            "channel": self.channel,
+            "category": self.category,
+            "time_of_day": time(10, 0),
+            "timezone": "UTC",
+            "enabled": True,
+        }
+        defaults.update(overrides)
+        return AutoPostConfig.objects.create(**defaults)
+
+    def _now(self, hour=10, minute=0):
+        return timezone.now().replace(hour=hour, minute=minute, second=0, microsecond=0)
+
+    def test_due_configs_matches_time_of_day(self):
+        config = self._config()
+        self.assertEqual(due_configs(now=self._now(10, 0)), [config])
+        self.assertEqual(due_configs(now=self._now(10, 1)), [])
+
+    def test_due_configs_skips_disabled_and_inactive_channel(self):
+        self._config(enabled=False)
+        self.channel.is_active = False
+        self.channel.save(update_fields=["is_active"])
+        self.assertEqual(due_configs(now=self._now()), [])
+
+    def test_due_configs_respects_config_timezone(self):
+        config = self._config(timezone="Asia/Tehran", time_of_day=time(14, 30))
+        # 14:30 in Tehran == 11:00 UTC (IRST is UTC+3:30, no DST).
+        due = due_configs(now=self._now(11, 0))
+        self.assertEqual(due, [config])
+        self.assertEqual(due_configs(now=self._now(10, 0)), [])
+
+    def test_due_configs_skips_when_already_ran_today(self):
+        config = self._config()
+        config.last_run_at = timezone.now().replace(hour=9, minute=59)
+        config.save(update_fields=["last_run_at"])
+        self.assertEqual(due_configs(now=self._now(10, 0)), [])
+
+    @patch("telegram_app.services.auto_post.publish_category_prices_task.apply_async")
+    def test_run_due_auto_posts_publishes_category_and_persists_finalization(
+        self, mock_apply_async
+    ):
+        async_result = MagicMock()
+        async_result.get.return_value = {
+            "success": True,
+            "response": "ok",
+            "caption": "cap",
+            "publish_path": "ok",
+            "render_fallback_reason": None,
+        }
+        mock_apply_async.return_value = async_result
+        config = self._config()
+
+        summary = run_due_auto_posts(now=self._now())
+
+        self.assertEqual(summary["dispatched"], 1)
+        self.assertEqual(summary["published"], 1)
+        mock_apply_async.assert_called_once()
+        kwargs = mock_apply_async.call_args.kwargs["kwargs"]
+        self.assertEqual(kwargs["category_id"], self.category.id)
+        self.assertEqual(kwargs["channel_id"], self.channel.id)
+        self.assertEqual(kwargs["price_history_ids"], [self.history.id])
+
+        from finalize.models import Finalization, FinalizedPriceHistory
+
+        finalization = Finalization.objects.get(category=self.category)
+        self.assertTrue(finalization.message_sent)
+        self.assertEqual(finalization.channel_id, self.channel.id)
+        self.assertIsNone(finalization.finalized_by)
+        self.assertEqual(
+            list(finalization.finalized_prices.values_list("price_history_id", flat=True)),
+            [self.history.id],
+        )
+        config.refresh_from_db()
+        self.assertIsNotNone(config.last_run_at)
+
+    @patch("telegram_app.services.auto_post.publish_special_price_task.apply_async")
+    def test_run_due_auto_posts_publishes_special_price(self, mock_apply_async):
+        async_result = MagicMock()
+        async_result.get.return_value = {
+            "success": True,
+            "response": "ok",
+            "caption": "cap",
+            "publish_path": "ok",
+        }
+        mock_apply_async.return_value = async_result
+
+        self._config(category=None, special_price_type=self.spt)
+        summary = run_due_auto_posts(now=self._now())
+
+        self.assertEqual(summary["dispatched"], 1)
+        mock_apply_async.assert_called_once()
+        kwargs = mock_apply_async.call_args.kwargs["kwargs"]
+        self.assertEqual(kwargs["special_price_history_id"], self.sp_history.id)
+        self.assertEqual(kwargs["channel_id"], self.channel.id)
+
+        from finalize.models import SpecialPriceFinalization
+
+        finalization = SpecialPriceFinalization.objects.get(
+            special_price_history=self.sp_history
+        )
+        self.assertTrue(finalization.message_sent)
+
+    @patch("telegram_app.services.auto_post.publish_category_prices_task.apply_async")
+    def test_run_due_auto_posts_skips_config_that_ran_today(self, mock_apply_async):
+        config = self._config()
+        config.last_run_at = timezone.now()
+        config.save(update_fields=["last_run_at"])
+        summary = run_due_auto_posts(now=self._now())
+        self.assertEqual(summary["dispatched"], 0)
+        mock_apply_async.assert_not_called()
 
 
 class CustomerWebhookPhase2Tests(APITestCase):
