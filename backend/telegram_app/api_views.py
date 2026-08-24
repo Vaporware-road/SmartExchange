@@ -411,7 +411,14 @@ class AutomationSettingsAPIView(APIView):
     is handled elsewhere.
     """
 
+    # GET is available to any authenticated staff (dashboard reads it); only
+    # management / super_admin may flip the flag.
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
+
+    def get_permissions(self):
+        if self.request.method == "PUT":
+            return [IsAuthenticated(), IsSuperAdminOrManagement()]
+        return super().get_permissions()
 
     def get(self, request):
         payload = read_auto_post_on_update_safe()
@@ -563,6 +570,13 @@ class ExchangeRequestViewSet(ModelViewSet):
 
     def partial_update(self, request, *args, **kwargs):
         req = self.get_object()
+        action = request.data.get("action")
+        if action == "hold":
+            ttl = hold_request(req)
+            req.refresh_from_db()
+            payload = ExchangeRequestSerializer(req).data
+            payload["ttl_minutes"] = ttl
+            return Response(payload)
         status_value = request.data.get("status")
         if not status_value:
             raise ValidationError({"status": "This field is required."})

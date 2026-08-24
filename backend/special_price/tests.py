@@ -83,6 +83,16 @@ class SpecialPriceMultiCurrencyTests(APITestCase):
         self.assertIn("pair_inputs", response.data["errors"])
 
     def test_update_price_for_selected_pair(self):
+        # Price writes are management-only (mirrors the regular Price Hub RBAC).
+        from accounts.models import CustomUser
+
+        manager = CustomUser.objects.create_user(
+            username="vip_manager",
+            password="secret123",
+            role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.client.force_authenticate(manager)
+
         sp = SpecialPriceType.objects.create(
             name="VIP Update",
             source_currency=self.usdt,

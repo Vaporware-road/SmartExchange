@@ -54,7 +54,7 @@ class IsSuperAdmin(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
-            logger.info(
+            logger.debug(
                 "IsSuperAdmin: denied (user=%s, authenticated=%s)",
                 getattr(request.user, "username", None) if request.user else None,
                 getattr(request.user, "is_authenticated", False) if request.user else False,
@@ -64,7 +64,7 @@ class IsSuperAdmin(permissions.BasePermission):
             return True
         role = _normalize_role(getattr(request.user, "role", None))
         allowed = role == "super_admin"
-        logger.info(
+        logger.debug(
             "IsSuperAdmin: user=%s role=%r allowed=%s",
             request.user.username,
             role,
@@ -82,7 +82,7 @@ class IsSuperAdminOrManagement(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
-            logger.info(
+            logger.debug(
                 "IsSuperAdminOrManagement: denied (user=%s, authenticated=%s)",
                 getattr(request.user, "username", None) if request.user else None,
                 getattr(request.user, "is_authenticated", False) if request.user else False,
@@ -92,7 +92,7 @@ class IsSuperAdminOrManagement(permissions.BasePermission):
             return True
         role = _normalize_role(getattr(request.user, "role", None))
         allowed = role in ("super_admin", "management")
-        logger.info(
+        logger.debug(
             "IsSuperAdminOrManagement: user=%s role=%r allowed=%s",
             request.user.username,
             role,
@@ -110,7 +110,7 @@ class IsSuperAdminOrManagementOrEmployee(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if not request.user or not request.user.is_authenticated:
-            logger.info(
+            logger.debug(
                 "IsSuperAdminOrManagementOrEmployee: denied (user=%s, authenticated=%s)",
                 getattr(request.user, "username", None) if request.user else None,
                 getattr(request.user, "is_authenticated", False) if request.user else False,
@@ -120,7 +120,7 @@ class IsSuperAdminOrManagementOrEmployee(permissions.BasePermission):
             return True
         role = _normalize_role(getattr(request.user, "role", None))
         allowed = role in ("super_admin", "management", "employee")
-        logger.info(
+        logger.debug(
             "IsSuperAdminOrManagementOrEmployee: user=%s role=%r allowed=%s",
             request.user.username,
             role,

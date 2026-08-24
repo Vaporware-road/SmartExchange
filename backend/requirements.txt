@@ -9,11 +9,14 @@ djangorestframework-simplejwt>=5.3.0
 jdatetime>=4.1.0
 pillow>=10.0.0
 python-bidi>=0.4.2
+python-telegram-bot>=20.0
+# python-telegram-bot builds an httpx client that reads ALL_PROXY/HTTPS_PROXY. Without the
+# socks extra, a socks:// proxy makes Bot() raise "Unknown scheme for proxy URL" and every
+# publish task dies before it reaches Telegram.
+httpx[socks]>=0.27
 pytz>=2023.3
 requests>=2.31
 python-json-logger>=2.0.7
 gunicorn>=22.0.0
 celery>=5.4
 redis>=5.0
-psycopg[binary]>=3.1
-# Removed after aiogram cutover: python-telegram-bot, pyrogram, pyromod

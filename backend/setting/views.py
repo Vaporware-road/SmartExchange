@@ -39,7 +39,7 @@ def settings_view(request):
 
                 try:
                     client = TelegramService(bot.get_plain_token())
-                    success, response = client.send_message(channel.chat_id, message)
+                    success, response, _ = client.send_message(channel.chat_id, message)
 
                     if success:
                         # Log successful message send

@@ -1,9 +1,11 @@
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import ListAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from accounts.permissions import IsSuperAdminOrManagement
 from core.exceptions import error_response
 from core.prices_webhook import notify_prices_webhook
 from setting.utils import log_event
@@ -29,6 +31,8 @@ class SpecialPriceTypeViewSet(viewsets.ModelViewSet):
 
 class SpecialPriceUpdateAPIView(APIView):
     """Update the price for a special price type."""
+
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def post(self, request, pk):
         try:

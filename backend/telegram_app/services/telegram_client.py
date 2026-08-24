@@ -8,7 +8,9 @@ from __future__ import annotations
 
 import asyncio
 import concurrent.futures
+import io
 import logging
+import os
 from pathlib import Path
 from typing import Any, Iterable, List, Mapping, Optional
 
@@ -20,6 +22,7 @@ from aiogram.exceptions import (
     TelegramRetryAfter,
 )
 from aiogram.types import (
+    BufferedInputFile,
     FSInputFile,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
@@ -28,6 +31,28 @@ from aiogram.types import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+def resolve_proxy_url():
+    """Proxy for Telegram API calls: TELEGRAM_PROXY_URL, else standard proxy env vars.
+
+    aiogram (aiohttp) does not read ALL_PROXY/HTTPS_PROXY on its own, so a bot in
+    a proxied environment silently fails to reach Telegram. Normalise the ``socks://``
+    shorthand v2ray/xray clients export to the ``socks5://`` scheme aiohttp accepts.
+    """
+    url = (
+        os.environ.get("TELEGRAM_PROXY_URL")
+        or os.environ.get("HTTPS_PROXY")
+        or os.environ.get("https_proxy")
+        or os.environ.get("ALL_PROXY")
+        or os.environ.get("all_proxy")
+        or ""
+    ).strip()
+    if not url:
+        return None
+    if url.startswith("socks://"):
+        url = "socks5://" + url[len("socks://"):]
+    return url
 
 try:
     from setting.utils import log_telegram_event
@@ -74,7 +99,18 @@ class TelegramService:
         if not token:
             raise ValueError("Bot token is required")
         self.token = token
-        self.bot = Bot(token=token)
+        self._proxy = resolve_proxy_url()
+        # Lazy: Bot (and its aiohttp session) is only created on first use so a
+        # service instance never pins an event loop or a dead session. Sessions
+        # are closed after each call and the bot is dropped for the next one.
+        self._bot = None
+
+    @property
+    def bot(self) -> Bot:
+        if self._bot is None:
+            proxy = self._proxy
+            self._bot = Bot(token=self.token, proxy=proxy) if proxy else Bot(token=self.token)
+        return self._bot
 
 
     @staticmethod
@@ -169,6 +205,13 @@ class TelegramService:
             if path.exists():
                 return FSInputFile(path)
             return str(photo)
+        if isinstance(photo, (io.BytesIO, io.BufferedReader, io.BufferedIOBase)) or hasattr(
+            photo, "read"
+        ):
+            # aiogram uploads require bytes; file-like streams must be wrapped.
+            data = photo.read() if hasattr(photo, "read") else photo
+            filename = getattr(photo, "name", None)
+            return BufferedInputFile(data, filename=filename or "image.png")
         return photo
 
     async def _send_message_async(
@@ -266,6 +309,7 @@ class TelegramService:
                 await self.bot.session.close()
             except Exception:
                 pass
+            self._bot = None
 
     def send_message(self, chat_id, text, parse_mode="HTML", buttons=None, keyboard=None):
         """
@@ -514,6 +558,7 @@ class TelegramService:
                 await self.bot.session.close()
             except Exception:
                 pass
+            self._bot = None
 
     def get_me(self):
         """
@@ -542,6 +587,7 @@ class TelegramService:
                 await self.bot.session.close()
             except Exception:
                 pass
+            self._bot = None
 
     def get_chat_member_count(self, chat_id):
         """Return subscriber count for a channel/supergroup."""
@@ -570,6 +616,7 @@ class TelegramService:
                 await self.bot.session.close()
             except Exception:
                 pass
+            self._bot = None
 
     def get_chat_member(self, chat_id, user_id):
         """Check membership/admin status of a user in a chat."""
@@ -578,4 +625,9 @@ class TelegramService:
         )
 
     async def aclose(self):
-        await self.bot.session.close()
+        if self._bot is not None:
+            try:
+                await self._bot.session.close()
+            except Exception:
+                pass
+            self._bot = None
