@@ -271,6 +271,12 @@ class AutoPostConfig(models.Model):
         blank=True,
         verbose_name="Notes",
     )
+    last_run_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Last Run At",
+        help_text="When the scheduler last dispatched this auto-post (set by Celery beat).",
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
 
@@ -799,3 +805,36 @@ class CampaignDeliveryLog(models.Model):
 
     def __str__(self):
         return f"bot={self.bot_id} sent={self.sent} @ {self.run_at}"
+
+
+class BotAdmin(models.Model):
+    """Delegated in-bot admin access for a Telegram bot.
+
+    The bot's owner (management) always has access; this table grants access to
+    sub-operators (employee-role users with ``owner`` set) via
+    ``telegram_app.services.bot_admins.sync_bot_admins_for_owner``.
+    """
+
+    bot = models.ForeignKey(
+        TelegramBot,
+        on_delete=models.CASCADE,
+        related_name="admins",
+        verbose_name="Bot",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="bot_admin_memberships",
+        verbose_name="User",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = "Bot Admin"
+        verbose_name_plural = "Bot Admins"
+        constraints = [
+            models.UniqueConstraint(fields=["bot", "user"], name="uniq_bot_admin"),
+        ]
+
+    def __str__(self):
+        return f"{self.user} -> {self.bot}"

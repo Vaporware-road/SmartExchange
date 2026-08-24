@@ -183,11 +183,12 @@ class AutoPostConfigSerializer(serializers.ModelSerializer):
             "timezone",
             "enabled",
             "notes",
+            "last_run_at",
             "created_at",
             "updated_at",
             "target_type",
         ]
-        read_only_fields = ["id", "created_at", "updated_at", "target_type"]
+        read_only_fields = ["id", "last_run_at", "created_at", "updated_at", "target_type"]
 
     def get_target_type(self, obj):
         if obj.category_id:

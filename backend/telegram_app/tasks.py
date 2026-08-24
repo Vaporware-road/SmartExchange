@@ -7,7 +7,14 @@ from .services.analytics_service import (
     snapshot_customer_growth_for_bot,
     snapshot_daily_usage_for_bot,
 )
+from .services.auto_post import run_due_auto_posts
 from .services.reengage_service import run_due_campaigns
+
+
+@shared_task(name="telegram_app.auto_post_due_configs")
+def auto_post_due_configs_task():
+    """Celery beat entry: publish due AutoPostConfig records on their schedule."""
+    return run_due_auto_posts()
 
 
 @shared_task(name="telegram_app.check_price_alerts")
