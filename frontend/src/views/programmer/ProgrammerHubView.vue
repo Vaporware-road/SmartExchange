@@ -27,12 +27,24 @@
             <div class="min-w-0 flex-1">
               <p class="font-semibold text-[var(--text-primary)] truncate">
                 {{ displayName(u) }}
+                <span
+                  v-if="isDelegated(u)"
+                  class="ms-1 inline-block rounded px-1.5 py-0.5 align-middle text-[10px] font-medium border border-[var(--border-card)] text-[var(--text-secondary)]"
+                >
+                  <i class="fas fa-user-cog me-1" />{{ $t(`programmerHub.${u.sub_role}`) }}
+                </span>
               </p>
               <p class="text-sm text-[var(--text-secondary)] truncate">
                 {{ u.exchange_name || u.username }}
               </p>
               <p class="text-xs text-[var(--text-secondary)] mt-1 truncate">
                 {{ u.country }} · {{ u.email }}
+              </p>
+              <p
+                v-if="isDelegated(u)"
+                class="text-xs text-[var(--text-secondary)] mt-1 truncate"
+              >
+                <i class="fas fa-user-tie me-1" />{{ $t('programmerHub.ownerUsername') }}: {{ u.owner_username }}
               </p>
             </div>
           </div>
@@ -71,6 +83,10 @@ const users = ref([])
 
 function displayName(u) {
   return `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.full_name || u.username
+}
+
+function isDelegated(u) {
+  return u.sub_role === 'operator' || u.sub_role === 'head_operator'
 }
 
 function planIcon(plan) {

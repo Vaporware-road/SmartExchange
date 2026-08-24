@@ -15,8 +15,8 @@
     "userCenter": "Admin Management",
     "adminManagement": "Admin Management",
     "userManagement": "User Management",
-    "registerUser": "Register user",
-    "plans": "Plans"
+    "registerUser": "Register User",
+    "plans": "Plans & Templates"
   },
   "common": {
     "save": "Save",
@@ -28,12 +28,15 @@
     "submit": "Submit",
     "back": "Back",
     "loading": "Loading...",
+    "saving": "Saving…",
     "search": "Search...",
     "noData": "No data available",
-    "all": "All",
     "confirm": "Confirm",
     "close": "Close",
     "panel": "Management Panel",
+    "accessPanel": "Access Panel",
+    "backToApp": "Back to app",
+    "refresh": "Refresh",
     "yes": "Yes",
     "no": "No",
     "actions": "Actions",
@@ -43,7 +46,9 @@
     "date": "Date",
     "logout": "Logout",
     "login": "Login",
-    "refresh": "Refresh"
+    "history": "History",
+    "all": "All",
+    "aboutPage": "About"
   },
   "header": {
     "openMenu": "Open menu",
@@ -52,6 +57,67 @@
   "footer": {
     "copyright": "© {year} {name}. All rights reserved.",
     "support": "Support"
+  },
+  "landing": {
+    "badge": "Trusted by exchanges worldwide",
+    "learnMore": "Learn more",
+    "featuresTitle": "Everything you need",
+    "featuresSubtitle": "A complete exchange operations panel — from live prices to Telegram publishing.",
+    "features": {
+      "priceHub": {
+        "title": "Live Price Hub",
+        "desc": "Update buy/sell rates across all currencies in real time. Bulk update, history tracking, and instant validation."
+      },
+      "telegram": {
+        "title": "Telegram Integration",
+        "desc": "Connect your bots and channels. Send branded rate images directly to Telegram with one click."
+      },
+      "finalize": {
+        "title": "One-Click Finalize",
+        "desc": "Review pending prices, render a branded image, and publish to Telegram — all in a single workflow."
+      },
+      "templates": {
+        "title": "Visual Templates",
+        "desc": "Drag-and-drop template editor. Design custom price cards with your brand colors, logos, and fonts."
+      },
+      "analytics": {
+        "title": "Analytics Dashboard",
+        "desc": "Track price trends, Telegram engagement, and customer activity. Export data to Excel."
+      },
+      "multiUser": {
+        "title": "Multi-User RBAC",
+        "desc": "Role-based access control for super admins, managers, operators, and developers. Impersonate users."
+      }
+    },
+    "howItWorksTitle": "How it works",
+    "howItWorksSubtitle": "From setup to publishing in four simple steps.",
+    "steps": {
+      "setup": {
+        "title": "Setup",
+        "desc": "Configure your Telegram bot, channels, and currency categories."
+      },
+      "update": {
+        "title": "Update Prices",
+        "desc": "Enter live buy/sell rates or bulk-update an entire category at once."
+      },
+      "design": {
+        "title": "Design Template",
+        "desc": "Customize the price card image with your brand identity and layout."
+      },
+      "publish": {
+        "title": "Publish",
+        "desc": "Finalize and broadcast branded images to Telegram channels instantly."
+      }
+    },
+    "stats": {
+      "currencies": "Supported Currencies",
+      "channels": "Telegram Channels",
+      "uptime": "Uptime",
+      "support": "Support"
+    },
+    "ctaTitle": "Ready to get started?",
+    "ctaSubtitle": "Launch your exchange panel in minutes. Manage prices, design templates, and publish to Telegram — all from one place.",
+    "ctaButton": "Get Started"
   },
   "breadcrumb": {
     "home": "Home"
@@ -115,7 +181,9 @@
     "username": "Username",
     "password": "Password",
     "loginButton": "Login",
-    "loggingIn": "Logging in..."
+    "loggingIn": "Logging in...",
+    "exploreDemo": "Explore Demo",
+    "signingIn": "Signing in…"
   },
   "routes": {
     "dashboard": "Dashboard",
@@ -137,6 +205,7 @@
     "categoryNew": "New Category",
     "categoryEdit": "Edit Category",
     "priceTypeNew": "New Price Type",
+    "priceTypeEdit": "Edit Price Type",
     "settings": "Settings",
     "logs": "Logs",
     "analysis": "Analysis",
@@ -148,11 +217,8 @@
     "templateMediaLibrary": "Media library",
     "telegramStudio": "Telegram Message Studio",
     "instagramHub": "Instagram Hub",
-    "userCenter": "Admin Management",
-    "programmerHub": "User Management",
-    "programmerRegister": "Register user",
-    "programmerUser": "User account",
-    "programmerTemplates": "Plans"
+    "programmerHub": "Developer Hub",
+    "userCenter": "Admin Management"
   },
   "instagramHub": {
     "description": "Generate post and story images from your finalized prices. Choose a theme and categories, then preview before publishing to Instagram.",
@@ -173,12 +239,43 @@
   },
   "lang": {
     "fa": "فارسی",
-    "en": "English"
+    "en": "English",
+    "ar": "العربية",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "tr": "Türkçe"
   },
   "validation": {
-    "required": "This field is required"
+    "required": "This field is required",
+    "emailInvalid": "Enter a valid email address",
+    "phoneInvalid": "Enter a valid phone number",
+    "urlInvalid": "Enter a valid URL (e.g. https://example.com)",
+    "requiredMarkHint": "Starred fields are required"
+  },
+  "collaboration": {
+    "title": "How to work with us",
+    "hint": "Select the partnership model for this client",
+    "placeholder": "Select collaboration type",
+    "reseller": "Reseller",
+    "white_label": "White Label",
+    "agency": "Agency",
+    "direct": "Direct"
+  },
+  "onboarding": {
+    "backToList": "Back to Developer Hub",
+    "subtitle": "Create a new client account with access to the exchange panel.",
+    "basicInfo": "Basic Info",
+    "basicInfoDesc": "Personal and contact details of the client.",
+    "businessDetails": "Business Details",
+    "businessDetailsDesc": "Company information and partnership model.",
+    "systemAccess": "System Access",
+    "systemAccessDesc": "Telegram bot credentials and access level.",
+    "registeredBy": "Registered by",
+    "registeredByHint": "Automatically recorded as the logged-in admin."
   },
   "templateEditor": {
+    "back": "Back",
     "backToTemplates": "Back to Templates",
     "variableLibrary": "Variable Library",
     "addVariable": "Add variable",
@@ -197,6 +294,8 @@
     "fastPreview": "Fast preview",
     "renderRealPreview": "Render real preview",
     "saveConfig": "Save config",
+    "save": "Save",
+    "saving": "Saving…",
     "loading": "Loading...",
     "noTemplate": "Template not found",
     "noImage": "No background image",
@@ -211,6 +310,27 @@
     "unlockLayer": "Unlock layer",
     "hideLayer": "Hide layer",
     "showLayer": "Show layer",
+    "lastSave": "Last save:",
+    "saved": "Saved",
+    "unsavedChanges": "Unsaved changes",
+    "saveFailed": "Save failed",
+    "uploadBackgroundImage": "Upload background image",
+    "startDesignHint": "Start your design by setting a base canvas image.",
+    "canvas": "Canvas",
+    "fit": "Fit",
+    "sampleText": "Sample text",
+    "text": "Text",
+    "image": "Image",
+    "date": "Date",
+    "weekday": "Weekday",
+    "clock": "Clock",
+    "noCategory": "No category",
+    "templateSaved": "Template saved ({category})",
+    "backgroundUploaded": "Background image uploaded",
+    "backgroundUploadFailed": "Background upload failed",
+    "failedToLoadTemplate": "Failed to load template",
+    "missingTemplateId": "Missing template id",
+    "template": "Template",
     "stylePreset": "Style preset",
     "presetTitle": "Title",
     "presetPrice": "Price",
@@ -272,6 +392,7 @@
     "modalPlaceholder": "Create a new category from the full form, or integrate the form here later.",
     "openFullForm": "Open full form",
     "deleteConfirmTitle": "Delete category?",
+    "deleteConfirmAria": "Delete category confirmation",
     "deleteConfirmMessage": "Are you sure you want to delete \"{name}\"? This cannot be undone.",
     "deleteBlockedByOrders": "This category is linked to existing orders and cannot be deleted. Review or remove those orders first.",
     "hubPrices": "Prices",
@@ -284,6 +405,7 @@
     "priceTypeGuideTitle": "Next step: price type",
     "priceTypeGuideMessage": "Your category is ready. Add at least one price type (buy or sell) to start using it.",
     "priceTypeGuideDismiss": "Got it",
+    "addPriceType": "Add Price Type",
     "presetLabels": {
       "USD": "US Dollar",
       "EUR": "Euro",
@@ -317,7 +439,9 @@
       "RUB": "Preset category for Russian ruble related rates.",
       "USDT": "Preset category for Tether related rates.",
       "XAU": "Preset category for gold related rates."
-    }
+    },
+    "deletePriceTypeConfirm": "Delete price type '{name}'?",
+    "deleteBlockedByOrdersCount": "Cannot delete: {count} active orders use this category"
   },
   "bulkUpdate": {
     "backToCategories": "Back to Categories",
@@ -430,51 +554,33 @@
     "cashPrice": "Cash",
     "accountPrice": "Account",
     "exchangeRequests": "Exchange Requests",
-    "pendingExchangeRequests": "Exchange Requests",
-    "noPendingRequests": "No exchange requests",
-    "statusNew": "New",
-    "statusSuccessful": "Successful",
-    "statusCancelled": "Cancelled",
+    "last30Days": "Last 30 Days",
+    "viewAll": "View All",
     "customer": "Customer",
-    "pair": "Pair",
     "exchange": "Exchange",
     "amount": "Amount",
     "ttl": "TTL",
-    "min": "m",
-    "viewAll": "View All",
+    "noPendingRequests": "No pending exchange requests",
     "botStatus": "Bot Status",
-    "botActive": "Active",
-    "botInactive": "Inactive",
     "activeBot": "Active",
     "inactiveBot": "Inactive",
-    "noBots": "No bots configured",
-    "channels": "channels",
     "telegramAnalytics": "Telegram Analytics",
     "dailyActiveUsers": "Daily Active Users",
-    "usersYesterday": "users yesterday",
-    "last30Days": "Last 30 days",
+    "usersYesterday": "vs yesterday",
     "channelMembers": "Channel Members",
-    "totalMembers": "total members",
-    "acrossChannels": "across {count} channels",
+    "totalMembers": "Total",
     "channelViews": "Channel Views",
-    "channelViewsUnavailable": "Channel view stats not yet available",
-    "viewsNotAvailable": "Channel view tracking is not available",
+    "viewsNotAvailable": "View counts are not available. Connect a bot with channel analytics access to enable this metric.",
     "recentPriceUpdates": "Recent Price Updates",
-    "noRecentUpdates": "No recent price updates",
+    "noRecentUpdates": "No recent price updates.",
     "quickActions": "Quick Actions",
-    "lastPriceUpdateBy": "Last price update by",
-    "justNow": "Just now",
-    "ago": "ago",
-    "hr": "h",
-    "goToTelegram": "Telegram Hub",
+    "channels": "Channels",
     "goToAnalysis": "Analytics",
     "goToFinalize": "Finalize",
-    "goToSettings": "Settings",
-    "customerBreakdown": "Customer Breakdown",
-    "globalCustomers": "Global",
-    "vipCustomers": "VIP",
-    "specialCustomers": "Special",
-    "totalCustomers": "Total"
+    "goToTelegram": "Telegram",
+    "statusNew": "New",
+    "statusCancelled": "Cancelled",
+    "statusSuccessful": "Done"
   },
   "finalize": {
     "title": "Finalize Category",
@@ -513,31 +619,32 @@
     },
     "processing": "Processing...",
     "completed": "Finalization completed successfully",
+    "completedNoTelegram": "Prices finalized, but the Telegram post was not sent",
+    "telegramNotSent": "Telegram did not accept the post. Prices are finalized; resend from the Telegram hub.",
     "failed": "Finalization failed",
-    "noChannelsHint": "No Telegram channels yet. Add one in Telegram Hub → Channels, then come back here.",
-    "addChannelLink": "Add Telegram channel",
+    "addChannelLink": "Add a channel →",
+    "noChannelsHint": "Create channels in Telegram settings to enable finalization.",
     "wizard": {
-      "noChannelTitle": "No Telegram channel linked",
-      "noChannelHint": "Your bot must be linked to at least one active channel before you can finalize and publish.",
-      "chooseCategory": "Choose a category to publish",
-      "select": "Select",
-      "backToCategories": "Back to categories",
-      "backToFinalize": "Back to Finalize",
-      "details": "Details",
-      "telegramContentTitle": "Telegram content",
-      "telegramContentHint": "Review the message that will be posted. Confirm to continue, or edit it in Telegram Content.",
-      "confirmContent": "Confirm",
+      "backToCategories": "Back to Categories",
+      "chooseCategory": "Choose Category",
+      "confirmContent": "Confirm Content",
       "confirmed": "Confirmed",
-      "editContent": "Edit",
-      "publishTitle": "Publish to Telegram",
+      "details": "Details",
+      "editContent": "Edit Content",
+      "noChannelHint": "Add a Telegram channel first before publishing.",
+      "noChannelTitle": "No Channels Available",
       "publish": "Publish",
-      "stepChoose": "Category",
-      "stepReview": "Review",
+      "publishTitle": "Publish to Telegram",
+      "publishingHint": "The message will be sent to your Telegram channel.",
+      "select": "Select",
+      "telegramContentHint": "Edit the message that will be sent to your Telegram channel.",
+      "telegramContentTitle": "Telegram Content",
+      "updatePricesHint": "Update prices before proceeding to finalization.",
+      "publishedSuccessfully": "Published successfully!",
+      "publishTelegramFailed": "Publish to Telegram failed",
+      "stepChoose": "Choose",
       "stepPublish": "Publish",
-      "updatePricesHint": "Update prices for a category first, then return here to publish.",
-      "publishingHint": "Publishing to Telegram… this can take a few seconds.",
-      "publishedSuccessfully": "Published successfully",
-      "publishTelegramFailed": "Saved, but Telegram did not receive the post. Check the bot is admin in the channel and try again."
+      "stepReview": "Review"
     }
   },
   "search": {
@@ -551,6 +658,17 @@
     "settings": "Settings",
     "pages": "Pages",
     "clearRecent": "Clear"
+  },
+  "prices": {
+    "backToPrices": "Back to Prices",
+    "newPrice": "New Price",
+    "notesOptional": "Notes (optional)",
+    "optionalNotes": "Optional notes",
+    "priceType": "Price Type",
+    "category": "Category",
+    "pair": "Pair",
+    "latestPrice": "Latest Price",
+    "history": "History"
   },
   "pwa": {
     "installTitle": "Install App",
@@ -728,6 +846,112 @@
   },
   "telegram": {
     "hubTitle": "Telegram Management Hub",
+    "timezonePlaceholder": "Asia/Tehran",
+    "timezoneDefault": "Asia/Tehran",
+    "admin": {
+      "analytics": {
+        "title": "Analytics",
+        "channelMembers": "Channel Members",
+        "channelViews": "Channel Views",
+        "channelViewsStub": "Views data available after connecting analytics",
+        "dailyUsage": "Daily Usage",
+        "publishActivity": "Publish Activity"
+      },
+      "botSettings": {
+        "title": "Bot Settings",
+        "hint": "Configure default exchange TTL and behavior."
+      },
+      "campaigns": {
+        "daily": "Daily",
+        "weekly": "Weekly",
+        "monthly": "Monthly",
+        "save": "Save Campaign"
+      },
+      "customerAnalysis": {
+        "title": "Customer Analysis",
+        "hint": "Search user IDs and review interaction stats.",
+        "userid": "User ID",
+        "prompt": "Enter a Telegram user ID to analyze.",
+        "inactive": "Inactive Users",
+        "returned": "Returned Users",
+        "requests": "Requests",
+        "vipRatio": "VIP Ratio",
+        "peakHours": "Peak Hours",
+        "setTag": "Set Tag"
+      },
+      "customersStatus": {
+        "title": "Customers Status",
+        "hint": "Overview of customer tags and activity.",
+        "manageTags": "Manage Tags",
+        "total": "Total Customers"
+      },
+      "exchangeRequests": {
+        "title": "Exchange Requests",
+        "hint": "Manage and review incoming exchange requests.",
+        "new": "New",
+        "hold": "On Hold",
+        "successful": "Successful",
+        "canceled": "Canceled",
+        "changeState": "Change State",
+        "customer": "Customer",
+        "amount": "Amount",
+        "pair": "Pair",
+        "ttl": "TTL",
+        "mostRequested": "Most Requested",
+        "newMembers": "New Members",
+        "holdOk": "Request placed on hold ({ttl} minutes)",
+        "loadError": "Could not load exchange requests",
+        "stateUpdated": "Status updated"
+      },
+      "notifications": {
+        "title": "Notifications",
+        "total": "{n} total",
+        "active": "{n} active",
+        "customer": "Customer",
+        "pair": "Pair",
+        "direction": "Direction"
+      },
+      "offers": {
+        "validUntil": "Valid Until",
+        "saveAndSend": "Save & Send"
+      },
+      "reengage": {
+        "title": "Re-engage Users",
+        "hint": "Send targeted offers to inactive users.",
+        "message": "Message",
+        "inactive": "Inactive Users",
+        "audience": "Audience",
+        "send": "Send",
+        "result": "Result",
+        "sentOk": "Message sent"
+      },
+      "reports": {
+        "title": "Reports",
+        "hint": "View aggregated data and exports.",
+        "pending": "Pending Reports",
+        "cancelled": "Cancelled",
+        "new": "New",
+        "running": "Running",
+        "successful": "Done"
+      },
+      "stubs": {
+        "messagePlaceholder": "Campaign message",
+        "offerPlaceholder": "Offer title",
+        "offerTitle": "Offer Title",
+        "periodicTitle": "Periodic Offer",
+        "schedulePlaceholder": "Schedule (cron or time)"
+      },
+      "navLabel": "Admin Section",
+      "gate": {
+        "verifying": "Verifying permissions...",
+        "verifyingHint": "Confirming admin access...",
+        "failedTitle": "Access Denied",
+        "failedHint": "You do not have admin permissions.",
+        "retry": "Retry",
+        "scopedTo": "Scoped to {name}",
+        "dashboardError": "Could not load dashboard"
+      }
+    },
     "tabs": {
       "messenger": "Messenger",
       "botSetup": "Bot Setup",
@@ -759,7 +983,7 @@
       "name": "Bot name",
       "namePlaceholder": "e.g. MyExchangeRatesBot",
       "token": "Bot token",
-      "tokenPlaceholder": "Paste token from @BotFather",
+      "tokenPlaceholder": "Paste token from BotFather",
       "tokenPlaceholderChange": "Enter new token to replace",
       "hide": "Hide token",
       "reveal": "Reveal token",
@@ -770,8 +994,6 @@
       "isActive": "Active",
       "restrictChannels": "Restrict to allowed channels only",
       "logMessages": "Log sent messages",
-      "defaultExchangeTtl": "Default exchange TTL (minutes)",
-      "defaultExchangeTtlHint": "Applied to every exchange request from this bot. Default is 5. Bot users cannot change it.",
       "testConnection": "Test connection",
       "testSuccess": "Connection successful.",
       "testFailed": "Connection failed.",
@@ -781,7 +1003,9 @@
       "newBotTitle": "New Bot",
       "editBot": "Edit Bot",
       "deleteBotConfirm": "Are you sure you want to delete {name}? This cannot be undone.",
-      "tokenRequired": "Bot token is required"
+      "tokenRequired": "Bot token is required",
+      "defaultExchangeTtl": "Default Exchange TTL (minutes)",
+      "defaultExchangeTtlHint": "Automatically applied to exchange requests. Leave empty to keep per-request TTL."
     },
     "channels": {
       "title": "Channels",
@@ -790,14 +1014,15 @@
       "channelName": "Channel name",
       "channelNamePlaceholder": "e.g. Official Rates",
       "channelId": "Channel ID",
-      "channelIdPlaceholder": "@username or -1001234567890",
+      "channelIdPlaceholder": "e.g. channel username or -1001234567890",
       "bot": "Bot",
       "selectBot": "Select bot",
       "active": "Active",
       "inactive": "Inactive",
       "add": "Add",
       "editChannel": "Edit channel",
-      "noChannels": "No channels yet. Add a channel to start broadcasting rates."
+      "noChannels": "No channels yet. Add a channel to start broadcasting rates.",
+      "deleteConfirm": "Delete channel '{name}'?"
     },
     "automation": {
       "title": "Automation",
@@ -819,153 +1044,30 @@
       "add": "Add",
       "schedules": "Schedules",
       "noSchedules": "No schedules yet. Add a schedule to automate posting.",
-      "hint": "Automation is configuration-only in this phase. A future scheduler (Celery or cron) can read these configs and call the existing price publisher services."
-    },
-    "customers": {
-      "description": "Telegram customers who messaged the bot. Set Global, VIP, or Special tags for staff use.",
-      "staffTelegramHint": "Staff need a Telegram ID on their panel user account to receive exchange-request notifications.",
-      "telegramId": "Telegram ID",
-      "username": "Username",
-      "name": "Name",
-      "tag": "Tag",
-      "empty": "No customers yet. They appear after messaging the bot.",
-      "loadError": "Could not load customers.",
-      "tagUpdated": "Customer tag updated.",
-      "tagError": "Could not update tag.",
-      "tags": {
-        "global": "Global",
-        "vip": "VIP",
-        "special": "Special",
-        "admin": "Admin"
-      }
+      "hint": "Automation is configuration-only in this phase. A future scheduler (Celery or cron) can read these configs and call the existing price publisher services.",
+      "deleteScheduleConfirm": "Delete this schedule?"
     },
     "settings": {
       "description": "Configure Telegram bots and channels for broadcasting exchange rates.",
       "openHub": "Open Telegram Hub"
     },
-    "admin": {
-      "navLabel": "Admin",
-      "nav": {
-        "customersStatus": "Customers Status",
-        "notifications": "Notifications",
-        "reports": "Reports",
-        "publish": "Publish Currency",
-        "analytics": "Analytics",
-        "exchangeRequests": "Exchange Requests",
-        "customerAnalysis": "Customer Analysis",
-        "reengage": "Re-engagement",
-        "botSettings": "Bot Settings",
-        "tools": "Hub Tools"
+    "customers": {
+      "description": "Customer tags and Telegram profiles.",
+      "empty": "No customers found.",
+      "name": "Name",
+      "tag": "Tag",
+      "staffTelegramHint": "Staff Telegram ID (optional)",
+      "telegramId": "Telegram ID",
+      "username": "Username",
+      "tags": {
+        "admin": "Admin",
+        "global": "Global",
+        "special": "Special",
+        "vip": "VIP"
       },
-      "gate": {
-        "verifying": "Verifying bot token…",
-        "verifyingHint": "Calling Telegram getMe. The hub stays locked until this succeeds.",
-        "failedTitle": "Bot verification failed",
-        "failedHint": "Could not verify your bot token. Check ownership and token, then retry.",
-        "retry": "Retry verification",
-        "scopedTo": "Scoped to @{name}",
-        "dashboardError": "Could not load dashboard data. If this continues after a deploy, run python manage.py migrate (telegram_app 0010)."
-      },
-      "customersStatus": {
-        "title": "Customers Status",
-        "hint": "Tag counts for customers who have a session with this bot.",
-        "total": "Total",
-        "manageTags": "Manage tags"
-      },
-      "notifications": {
-        "title": "Price alerts",
-        "total": "Total: {n}",
-        "active": "Active: {n}",
-        "customer": "Customer",
-        "pair": "Pair",
-        "direction": "Direction"
-      },
-      "reports": {
-        "title": "Exchange reports",
-        "hint": "New, Canceled, and Successful are operator-set states.",
-        "running": "Running",
-        "new": "New",
-        "pending": "New",
-        "successful": "Successful",
-        "cancelled": "Canceled"
-      },
-      "publish": {
-        "title": "Publish Currency System",
-        "hint": "Use existing messenger, channels, finalize, and studio flows — not a new publisher.",
-        "finalize": "Finalize",
-        "channels": "Channels for this bot"
-      },
-      "analytics": {
-        "title": "Analytics",
-        "dailyUsage": "Daily distinct users (last 30 days)",
-        "channelMembers": "Channel members (latest snapshot)",
-        "publishActivity": "{n} publishes",
-        "channelViews": "Channel views",
-        "channelViewsStub": "Not available via the Bot API."
-      },
-      "exchangeRequests": {
-        "title": "Exchange Requests",
-        "hint": "Select a request to change state or hold TTL. Successful, Canceled, and New are stored on the request.",
-        "newMembers": "New members ({months} mo)",
-        "mostRequested": "Most requested currencies",
-        "pair": "Pair",
-        "amount": "Amount",
-        "ttl": "TTL (min)",
-        "customer": "Customer",
-        "successful": "Successful",
-        "pending": "New",
-        "new": "New",
-        "canceled": "Canceled",
-        "changeState": "Change state",
-        "hold": "Confirm (Hold the request)",
-        "holdOk": "TTL increase : {ttl}",
-        "stateUpdated": "Request state updated.",
-        "loadError": "Could not load exchange requests."
-      },
-      "customerAnalysis": {
-        "title": "Customer Analysis",
-        "hint": "Inactive = no BotSession activity in 30 days for this bot.",
-        "returned": "Returned",
-        "inactive": "Inactive (30d)",
-        "vipRatio": "VIP / ordinary request rate",
-        "peakHours": "Peak request hours",
-        "setTag": "Set customer tag",
-        "prompt": "Write any userid or chose from the list:",
-        "userid": "Telegram user id",
-        "requests": "Requests"
-      },
-      "reengage": {
-        "title": "Customer re-engagement",
-        "hint": "One-shot message to an audience (capped batch). Periodic campaigns and offers come later.",
-        "audience": "Audience",
-        "inactive": "Inactive (30d)",
-        "message": "Message",
-        "send": "Send now",
-        "sentOk": "Re-engagement send finished.",
-        "result": "Sent {sent}, failed {failed}, skipped {skipped}"
-      },
-      "botSettings": {
-        "title": "Bot settings",
-        "hint": "Edit TTL and active flag for the verified owned bot."
-      },
-      "campaigns": {
-        "daily": "Daily",
-        "weekly": "Weekly",
-        "monthly": "Monthly",
-        "save": "Save campaign"
-      },
-      "offers": {
-        "saveAndSend": "Save & send now",
-        "validUntil": "Valid until (optional)"
-      },
-      "stubs": {
-        "periodicTitle": "Periodic Messages",
-        "offerTitle": "Offer Creation",
-        "comingSoon": "Coming soon — not available in this release.",
-        "schedulePlaceholder": "Schedule (disabled)",
-        "messagePlaceholder": "Campaign message (disabled)",
-        "offerPlaceholder": "Offer title (disabled)"
-      }
+      "loadError": "Could not load customers",
+      "tagError": "Could not update tag",
+      "tagUpdated": "Tag updated"
     }
   },
   "telegramStudio": {
@@ -990,7 +1092,9 @@
     "saving": "Saving…",
     "categoryNotFound": "Category not found.",
     "previewImageError": "Image",
-    "incompleteMessage": "Media or message description is not set. The Telegram message may appear incomplete."
+    "incompleteMessage": "Media or message description is not set. The Telegram message may appear incomplete.",
+    "templateMediaHint": "Template ID:",
+    "commonVariables": "Common Variables"
   },
   "apiErrors": {
     "codes": {
@@ -1037,78 +1141,128 @@
     },
     "fields": {}
   },
-  "nav": {
-    "userManagement": "User Management",
-    "registerUser": "Register user",
-    "plans": "Plans"
-  },
-  "programmerHub": {
-    "title": "User Management",
-    "register": "Register user",
-    "templates": "Plans",
-    "templatesTitle": "Plans",
-    "templatesHint": "Mark which pictures belong to Bronze, Silver, or Gold.",
-    "userDetail": "User account",
-    "enterAs": "Enter as user",
-    "userUpdated": "User updated",
-    "userNotFound": "User not found",
-    "active": "Active",
-    "inactive": "Inactive",
-    "noBots": "No bots linked to this account.",
-    "noChannels": "No channels registered.",
-    "noAuditLogs": "No audit logs yet.",
-    "noTemplates": "No templates available on this plan.",
-    "userTemplatesHint": "Templates this plan can use (read-only).",
-    "channels": "Channels",
-    "ttlMinutes": "Default TTL (minutes)",
-    "restrictChannels": "Restrict to known channels",
-    "logMessages": "Log all messages",
-    "actionType": "Action",
+  "userCenter": {
+    "title": "Admin Management",
+    "users": "Users",
+    "activity": "Activity",
+    "manageUsers": "Manage users",
+    "addUser": "Add admin",
+    "editUser": "Edit admin",
+    "noUsers": "No users found.",
+    "noActivity": "No activity recorded.",
+    "fullName": "Full name",
+    "role": "Role",
+    "newPasswordOptional": "New password (optional)",
+    "leaveBlankToKeepCurrent": "Leave blank to keep current",
+    "user": "User",
     "details": "Details",
     "ip": "IP",
-    "currentBotToken": "Current token",
-    "botTokenOptional": "New Telegram bot token (optional)",
-    "tabs": {
-      "registered": "Registered information",
-      "botAccess": "Bot access",
-      "botAnalytics": "Bot analytics",
-      "audit": "Audit logs",
-      "templates": "Templates"
-    },
-    "botAnalyticsHint": "Read-only metrics from persisted snapshots (same data as Telegram Hub admin).",
-    "peakHour": "Peak hour",
-    "returnedUsers": "Returned users",
-    "inactiveUsers": "Inactive users",
-    "vipRatio": "VIP / ordinary ratio",
+    "actionType": "Action",
+    "allActions": "All actions",
+    "active": "Active",
+    "inactive": "Inactive",
+    "forceLogout": "Force logout",
+    "forceLogoutConfirm": "Force logout from all devices?",
+    "userLoggedOutAllDevices": "User logged out from all devices.",
+    "failedToForceLogout": "Failed to force logout.",
+    "userCreated": "User created successfully.",
+    "userUpdated": "User updated successfully.",
+    "failedToSave": "Failed to save user.",
     "actionTypes": {
-      "login_success": "Login success",
-      "login_failed": "Login failed",
+      "login": "Login",
       "logout": "Logout",
-      "price_update": "Price update",
-      "bulk_price_update": "Bulk price update",
-      "special_price_update": "Special price update",
-      "template_change": "Template change",
-      "finalize": "Finalize",
-      "impersonate_start": "Impersonate start",
-      "other": "Other"
+      "create": "Create",
+      "update": "Update",
+      "delete": "Delete",
+      "force_logout": "Force logout",
+      "other": "Other",
+      "bulk_price_update": "Bulk Price Update",
+      "login_failed": "Login Failed",
+      "login_success": "Login Success",
+      "price_update": "Price Update",
+      "special_price_update": "Special Price Update"
     },
-    "firstName": "First name",
-    "lastName": "Last name",
-    "exchangeName": "Exchange name",
+    "roles": {
+      "super_admin": "Super Admin",
+      "management": "Management",
+      "operator": "Operator",
+      "viewer": "Viewer",
+      "developer": "Developer",
+      "employee": "Employee"
+    }
+  },
+  "programmerHub": {
+    "title": "Developer Hub",
+    "register": "Register New User",
+    "userDetail": "User Details",
+    "empty": "No users registered yet.",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "exchangeName": "Exchange Name",
     "country": "Country",
     "email": "Email",
-    "phone": "Phone number",
+    "phone": "Phone",
     "telegramId": "Telegram ID",
-    "botToken": "Telegram bot token",
+    "botToken": "Bot Token",
+    "botTokenOptional": "Bot token (optional, to keep current leave empty)",
     "generatedPassword": "Generated password",
-    "created": "User created",
-    "empty": "No users yet. Register one to see a card here.",
-    "viewingAs": "Viewing as {name}",
+    "created": "User created successfully.",
+    "active": "Active",
+    "inactive": "Inactive",
     "exit": "Exit",
+    "enterAs": "Enter as this user",
+    "viewingAs": "Viewing as {name}",
+    "currentBotToken": "Current bot token",
+    "noBots": "No bots found.",
+    "noChannels": "No channels found.",
+    "noTemplates": "No templates found.",
+    "userNotFound": "User not found.",
+    "userUpdated": "User updated.",
+    "restrictChannels": "Restrict channels",
+    "logMessages": "Log messages",
+    "ttlMinutes": "TTL (minutes)",
+    "channels": "Channels",
+    "details": "Details",
+    "ip": "IP",
+    "actionType": "Action",
+    "inactiveUsers": "Inactive Users",
+    "returnedUsers": "Returned Users",
+    "vipRatio": "VIP Ratio",
+    "botAnalyticsHint": "Bot analytics overview",
+    "noAuditLogs": "No audit logs found.",
+    "templatesTitle": "Templates",
+    "templatesHint": "View and manage user templates.",
+    "userTemplatesHint": "Templates owned by this user.",
     "plans": {
       "bronze": "Bronze",
       "silver": "Silver",
-      "gold": "Gold"
-    }
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond"
+    },
+    "tabs": {
+      "overview": "Overview",
+      "bots": "Bots",
+      "channels": "Channels",
+      "templates": "Templates",
+      "audit": "Audit Log"
+    },
+    "plan": "Plan",
+    "saving": "Creating…",
+    "telegramIdHint": "Numeric Telegram ID or @username",
+    "website": "Website",
+    "websiteHint": "Optional",
+    "subRole": "Delegated Role",
+    "subRoleHint": "Delegated operators manage the in-bot admin panel of another user’s bot",
+    "operator": "Operator",
+    "ownerUsername": "Owner Username",
+    "ownerUsernameHint": "Username of the management account whose bot this operator manages",
+    "telegramUsername": "Telegram Username",
+    "ownerUsernameRequired": "Owner username is required for delegated operators",
+    "delegatedNoBotHint": "Delegated operators use the owner’s bot — no bot token needed.",
+    "delegationTitle": "Delegated Operator",
+    "delegationDesc": "Grant this user access to the in-bot admin panel of another account’s bot.",
+    "admin": "Admin",
+    "head_operator": "Head Operator"
   }
 }

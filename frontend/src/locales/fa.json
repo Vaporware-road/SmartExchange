@@ -16,7 +16,7 @@
     "adminManagement": "مدیریت ادمین",
     "userManagement": "مدیریت کاربران",
     "registerUser": "ثبت کاربر",
-    "plans": "پلن‌ها"
+    "plans": "طرح‌ها و قالب‌ها"
   },
   "common": {
     "save": "ذخیره",
@@ -42,7 +42,8 @@
     "date": "تاریخ",
     "logout": "خروج",
     "login": "ورود",
-    "refresh": "تازه‌سازی"
+    "all": "همه",
+    "aboutPage": "درباره ما"
   },
   "header": {
     "openMenu": "باز کردن منو",
@@ -51,6 +52,67 @@
   "footer": {
     "copyright": "© {year} {name}. تمامی حقوق محفوظ است.",
     "support": "پشتیبانی"
+  },
+  "landing": {
+    "badge": "مورد اعتماد صرافی‌ها در سراسر جهان",
+    "learnMore": "بیشتر بدانید",
+    "featuresTitle": "همه چیزی که نیاز دارید",
+    "featuresSubtitle": "پنل مدیریت کامل صرافی — از قیمت‌های لحظه‌ای تا انتشار در تلگرام.",
+    "features": {
+      "priceHub": {
+        "title": "مرکز قیمت زنده",
+        "desc": "نرخ‌های خرید و فروش را در تمام ارزها به‌صورت لحظه‌ای به‌روزرسانی کنید. به‌روزرسانی دسته‌ای، ردیابی تاریخچه و اعتبارسنجی فوری."
+      },
+      "telegram": {
+        "title": "اتصال تلگرام",
+        "desc": "بات‌ها و کانال‌های خود را متصل کنید. تصاویر برند قیمت را مستقیماً با یک کلیک به تلگرام ارسال کنید."
+      },
+      "finalize": {
+        "title": "انتشار با یک کلیک",
+        "desc": "قیمت‌های در انتظار را بررسی کنید، تصویر برند بسازید و به تلگرام منتشر کنید — همه در یک فرآیند."
+      },
+      "templates": {
+        "title": "قالب‌های بصری",
+        "desc": "ویرایشگر قالب کشیدن و رها کردن. کارت‌های قیمت سفارشی با رنگ‌ها، لوگو و فونت‌های برند خود طراحی کنید."
+      },
+      "analytics": {
+        "title": "داشبورد تحلیلی",
+        "desc": "روندهای قیمت، تعامل تلگرام و فعالیت مشتریان را ردیابی کنید. داده‌ها را به اکسل خروجی بگیرید."
+      },
+      "multiUser": {
+        "title": "مدیریت چند کاربره",
+        "desc": "کنترل دسترسی مبتنی بر نقش برای مدیران ارشد، مدیران، اپراتورها و توسعه‌دهندگان. جایگزینی کاربران."
+      }
+    },
+    "howItWorksTitle": "نحوه کار",
+    "howItWorksSubtitle": "از راه‌اندازی تا انتشار در چهار مرحله ساده.",
+    "steps": {
+      "setup": {
+        "title": "راه‌اندازی",
+        "desc": "بات تلگرام، کانال‌ها و دسته‌بندی ارزها را پیکربندی کنید."
+      },
+      "update": {
+        "title": "به‌روزرسانی قیمت",
+        "desc": "نرخ‌های خرید و فروش زنده را وارد کنید یا کل یک دسته را یکجا به‌روزرسانی کنید."
+      },
+      "design": {
+        "title": "طراحی قالب",
+        "desc": "تصویر کارت قیمت را با هویت بصری و چیدمان برند خود سفارشی کنید."
+      },
+      "publish": {
+        "title": "انتشار",
+        "desc": "تصاویر برند را نهایی کنید و فوراً به کانال‌های تلگرام ارسال کنید."
+      }
+    },
+    "stats": {
+      "currencies": "ارزهای پشتیبانی شده",
+      "channels": "کانال‌های تلگرام",
+      "uptime": "آپتایم",
+      "support": "پشتیبانی"
+    },
+    "ctaTitle": "آماده شروع هستید؟",
+    "ctaSubtitle": "پنل صرافی خود را در چند دقیقه راه‌اندازی کنید. قیمت‌ها را مدیریت کنید، قالب طراحی کنید و به تلگرام منتشر کنید — همه از یک مکان.",
+    "ctaButton": "شروع کنید"
   },
   "breadcrumb": {
     "home": "خانه"
@@ -136,6 +198,7 @@
     "categoryNew": "دسته‌بندی جدید",
     "categoryEdit": "ویرایش دسته‌بندی",
     "priceTypeNew": "نوع قیمت جدید",
+    "priceTypeEdit": "ویرایش نوع قیمت",
     "settings": "تنظیمات",
     "logs": "گزارش‌ها",
     "analysis": "تحلیل و بررسی",
@@ -148,10 +211,7 @@
     "telegramStudio": "استودیو پیام تلگرام",
     "instagramHub": "هاب اینستاگرام",
     "userCenter": "مدیریت ادمین‌ها",
-    "programmerHub": "مدیریت کاربران",
-    "programmerRegister": "ثبت کاربر",
-    "programmerUser": "حساب کاربر",
-    "programmerTemplates": "پلن‌ها"
+    "programmerHub": "هاب برنامه‌نویس"
   },
   "instagramHub": {
     "description": "تصاویر پست و استوری را از قیمت‌های نهایی شده بسازید. تم و دسته‌ها را انتخاب کنید و قبل از انتشار در اینستاگرام پیش‌نمایش ببینید.",
@@ -172,10 +232,19 @@
   },
   "lang": {
     "fa": "فارسی",
-    "en": "English"
+    "en": "English",
+    "ar": "العربية",
+    "de": "Deutsch",
+    "fr": "Français",
+    "es": "Español",
+    "tr": "Türkçe"
   },
   "validation": {
-    "required": "این فیلد الزامی است"
+    "required": "این فیلد الزامی است",
+    "emailInvalid": "ایمیل معتبر وارد کنید",
+    "phoneInvalid": "شماره تلفن معتبر وارد کنید",
+    "urlInvalid": "آدرس معتبر وارد کنید (مثال: https://example.com)",
+    "requiredMarkHint": "فیلدهای ستاره‌دار الزامی هستند"
   },
   "templateEditor": {
     "backToTemplates": "بازگشت به قالب‌ها",
@@ -271,6 +340,7 @@
     "modalPlaceholder": "دسته‌بندی جدید را از فرم کامل ایجاد کنید، یا بعداً فرم را اینجا قرار دهید.",
     "openFullForm": "باز کردن فرم کامل",
     "deleteConfirmTitle": "حذف دسته‌بندی؟",
+    "deleteConfirmAria": "تأیید حذف دسته‌بندی",
     "deleteConfirmMessage": "آیا از حذف «{name}» اطمینان دارید؟ این عمل قابل بازگشت نیست.",
     "deleteBlockedByOrders": "این دسته‌بندی به سفارش‌های ثبت‌شده متصل است و قابل حذف نیست. ابتدا سفارش‌ها را بررسی یا حذف کنید.",
     "hubPrices": "قیمت‌ها",
@@ -283,6 +353,7 @@
     "priceTypeGuideTitle": "قدم بعدی: نوع قیمت",
     "priceTypeGuideMessage": "دسته‌بندی شما ساخته شد. برای فعال‌سازی آن، حداقل یک نوع قیمت (خرید یا فروش) اضافه کنید.",
     "priceTypeGuideDismiss": "متوجه شدم",
+    "addPriceType": "افزودن نوع قیمت",
     "presetLabels": {
       "USD": "دلار آمریکا",
       "EUR": "یورو",
@@ -316,7 +387,9 @@
       "RUB": "دسته‌بندی آماده نرخ‌های مرتبط با روبل روسیه.",
       "USDT": "دسته‌بندی آماده نرخ‌های مرتبط با تتر.",
       "XAU": "دسته‌بندی آماده نرخ‌های مرتبط با طلا."
-    }
+    },
+    "deletePriceTypeConfirm": "حذف نوع قیمت «{name}»؟",
+    "deleteBlockedByOrdersCount": "امکان حذف نیست: {count} سفارش فعال از این دسته‌بندی استفاده می‌کنند"
   },
   "bulkUpdate": {
     "backToCategories": "بازگشت به دسته‌بندی‌ها",
@@ -428,52 +501,33 @@
     "connectionStatus": "اتصال",
     "cashPrice": "نقد",
     "accountPrice": "حساب",
-    "exchangeRequests": "درخواست‌های صرافی",
-    "pendingExchangeRequests": "درخواست‌های صرافی",
-    "noPendingRequests": "درخواست صرافی وجود ندارد",
-    "statusNew": "جدید",
-    "statusSuccessful": "موفق",
-    "statusCancelled": "لغو شده",
+    "exchangeRequests": "درخواست‌های تبادل",
+    "last30Days": "۳۰ روز گذشته",
+    "viewAll": "مشاهده همه",
     "customer": "مشتری",
-    "pair": "جفت ارز",
     "exchange": "تبادل",
     "amount": "مقدار",
-    "ttl": "مدت",
-    "min": "د",
-    "viewAll": "مشاهده همه",
-    "botStatus": "وضعیت ربات‌ها",
-    "botActive": "فعال",
-    "botInactive": "غیرفعال",
+    "ttl": "مدت اعتبار",
+    "noPendingRequests": "هیچ درخواست تبادلی در انتظار نیست",
+    "botStatus": "وضعیت بات",
     "activeBot": "فعال",
     "inactiveBot": "غیرفعال",
-    "noBots": "رباتی تنظیم نشده",
-    "channels": "کانال",
-    "telegramAnalytics": "آمار تلگرام",
-    "dailyActiveUsers": "کاربران روزانه فعال",
-    "usersYesterday": "کاربر دیروز",
-    "last30Days": "۳۰ روز اخیر",
+    "telegramAnalytics": "تحلیل تلگرام",
+    "dailyActiveUsers": "کاربران فعال روزانه",
+    "usersYesterday": "نسبت به دیروز",
     "channelMembers": "اعضای کانال",
-    "totalMembers": "عضو کل",
-    "acrossChannels": "در {count} کانال",
+    "totalMembers": "کل",
     "channelViews": "بازدید کانال",
-    "channelViewsUnavailable": "آمار بازدید کانال هنوز در دسترس نیست",
-    "viewsNotAvailable": "ردیابی بازدید کانال در دسترس نیست",
-    "recentPriceUpdates": "آخرین بروزرسانی قیمت‌ها",
-    "noRecentUpdates": "بروزرسانی قیمتی موجود نیست",
+    "viewsNotAvailable": "آمار بازدید در دسترس نیست. یک بات با دسترسی تحلیل کانال متصل کنید.",
+    "recentPriceUpdates": "آخرین به‌روزرسانی قیمت‌ها",
+    "noRecentUpdates": "هیچ به‌روزرسانی اخیری وجود ندارد.",
     "quickActions": "دسترسی سریع",
-    "lastPriceUpdateBy": "آخرین بروزرسانی قیمت توسط",
-    "justNow": "الان",
-    "ago": "پیش",
-    "hr": "ساعت",
-    "goToTelegram": "هاب تلگرام",
     "goToAnalysis": "تحلیل",
-    "goToFinalize": "نهایی‌سازی",
-    "goToSettings": "تنظیمات",
-    "customerBreakdown": "دسته‌بندی مشتریان",
-    "globalCustomers": "عمومی",
-    "vipCustomers": "ویژه",
-    "specialCustomers": "خاص",
-    "totalCustomers": "کل"
+    "goToFinalize": "پابلیش",
+    "goToTelegram": "تلگرام",
+    "statusNew": "جدید",
+    "statusCancelled": "لغو شده",
+    "statusSuccessful": "انجام شده"
   },
   "finalize": {
     "title": "نهایی‌سازی دسته‌بندی",
@@ -512,31 +566,32 @@
     },
     "processing": "در حال پردازش...",
     "completed": "نهایی‌سازی با موفقیت انجام شد",
+    "completedNoTelegram": "قیمت‌ها نهایی شد، اما پیام تلگرام ارسال نشد",
+    "telegramNotSent": "تلگرام پیام را نپذیرفت. قیمت‌ها نهایی شده‌اند؛ از بخش تلگرام دوباره ارسال کنید.",
     "failed": "خطا در نهایی‌سازی",
-    "noChannelsHint": "هنوز کانال تلگرامی ثبت نشده. در هاب تلگرام → کانال‌ها یکی اضافه کنید، بعد به اینجا برگردید.",
-    "addChannelLink": "افزودن کانال تلگرام",
+    "addChannelLink": "افزودن کانال ←",
+    "noChannelsHint": "برای فعال‌سازی نهایی‌سازی، در تنظیمات تلگرام کانال ایجاد کنید.",
     "wizard": {
-      "noChannelTitle": "هیچ کانال تلگرامی متصل نیست",
-      "noChannelHint": "قبل از نهایی‌سازی و انتشار، ربات باید حداقل به یک کانال فعال وصل باشد.",
-      "chooseCategory": "یک دسته‌بندی برای انتشار انتخاب کنید",
-      "select": "انتخاب",
-      "backToCategories": "بازگشت به دسته‌ها",
-      "backToFinalize": "بازگشت به نهایی‌سازی",
-      "details": "جزئیات",
-      "telegramContentTitle": "محتوای تلگرام",
-      "telegramContentHint": "پیامی که ارسال می‌شود را بررسی کنید. برای ادامه تأیید کنید یا در محتوای تلگرام ویرایش کنید.",
-      "confirmContent": "تأیید",
+      "backToCategories": "بازگشت به دسته‌بندی‌ها",
+      "chooseCategory": "انتخاب دسته‌بندی",
+      "confirmContent": "تأیید محتوا",
       "confirmed": "تأیید شد",
-      "editContent": "ویرایش",
-      "publishTitle": "انتشار در تلگرام",
+      "details": "جزئیات",
+      "editContent": "ویرایش محتوا",
+      "noChannelHint": "ابتدا یک کانال تلگرام اضافه کنید.",
+      "noChannelTitle": "کانالی موجود نیست",
       "publish": "انتشار",
-      "stepChoose": "دسته",
-      "stepReview": "بررسی",
+      "publishTitle": "انتشار در تلگرام",
+      "publishingHint": "پیام به کانال تلگرام شما ارسال خواهد شد.",
+      "select": "انتخاب",
+      "telegramContentHint": "پیامی که به کانال تلگرام ارسال می‌شود را ویرایش کنید.",
+      "telegramContentTitle": "محتوای تلگرام",
+      "updatePricesHint": "قبل از نهایی‌سازی، قیمت‌ها را به‌روزرسانی کنید.",
+      "publishedSuccessfully": "با موفقیت منتشر شد!",
+      "publishTelegramFailed": "انتشار در تلگرام ناموفق بود",
+      "stepChoose": "انتخاب",
       "stepPublish": "انتشار",
-      "updatePricesHint": "ابتدا قیمت یک دسته را به‌روز کنید، سپس برای انتشار به اینجا برگردید.",
-      "publishingHint": "در حال ارسال به تلگرام… ممکن است چند ثانیه طول بکشد.",
-      "publishedSuccessfully": "با موفقیت منتشر شد",
-      "publishTelegramFailed": "ذخیره شد، اما تلگرام پست را نگرفت. مطمئن شوید ربات در کانال ادمین است و دوباره تلاش کنید."
+      "stepReview": "بازبینی"
     }
   },
   "search": {
@@ -731,8 +786,7 @@
       "messenger": "پیام‌رسان",
       "botSetup": "تنظیمات ربات",
       "channels": "کانال‌ها",
-      "automation": "اتوماسیون",
-      "customers": "مشتریان"
+      "automation": "اتوماسیون"
     },
     "messenger": {
       "channelLabel": "کانال",
@@ -758,7 +812,7 @@
       "name": "نام ربات",
       "namePlaceholder": "مثال: ربات_نرخ_صرافی",
       "token": "توکن ربات",
-      "tokenPlaceholder": "توکن را از @BotFather کپی کنید",
+      "tokenPlaceholder": "توکن را از ربات BotFather کپی کنید",
       "tokenPlaceholderChange": "توکن جدید برای جایگزینی وارد کنید",
       "hide": "مخفی کردن توکن",
       "reveal": "نمایش توکن",
@@ -769,8 +823,6 @@
       "isActive": "فعال",
       "restrictChannels": "ارسال فقط به کانال‌های مجاز",
       "logMessages": "ثبت پیام‌های ارسالی",
-      "defaultExchangeTtl": "TTL پیش‌فرض درخواست مبادله (دقیقه)",
-      "defaultExchangeTtlHint": "برای هر درخواست مبادله از این ربات اعمال می‌شود. پیش‌فرض ۵ دقیقه است. کاربران ربات نمی‌توانند آن را تغییر دهند.",
       "testConnection": "تست اتصال",
       "testSuccess": "اتصال برقرار شد.",
       "testFailed": "اتصال برقرار نشد.",
@@ -780,7 +832,9 @@
       "newBotTitle": "ربات جدید",
       "editBot": "ویرایش ربات",
       "deleteBotConfirm": "آیا از حذف {name} اطمینان دارید؟ این عمل قابل بازگشت نیست.",
-      "tokenRequired": "توکن ربات الزامی است"
+      "tokenRequired": "توکن ربات الزامی است",
+      "defaultExchangeTtl": "مدت اعتبار پیش‌فرض تبادل (دقیقه)",
+      "defaultExchangeTtlHint": "به‌طور خودکار روی درخواست‌های تبادل اعمال می‌شود."
     },
     "channels": {
       "title": "کانال‌ها",
@@ -789,14 +843,15 @@
       "channelName": "نام کانال",
       "channelNamePlaceholder": "مثال: نرخ رسمی",
       "channelId": "شناسه کانال",
-      "channelIdPlaceholder": "@username یا -1001234567890",
+      "channelIdPlaceholder": "مثلاً نام کاربری کانال یا -1001234567890",
       "bot": "ربات",
       "selectBot": "انتخاب ربات",
       "active": "فعال",
       "inactive": "غیرفعال",
       "add": "افزودن",
       "editChannel": "ویرایش کانال",
-      "noChannels": "هنوز کانالی اضافه نشده. برای ارسال نرخ به کانال، یک کانال اضافه کنید."
+      "noChannels": "هنوز کانالی اضافه نشده. برای ارسال نرخ به کانال، یک کانال اضافه کنید.",
+      "deleteConfirm": "کانال «{name}» حذف شود؟"
     },
     "automation": {
       "title": "اتوماسیون",
@@ -818,153 +873,39 @@
       "add": "افزودن",
       "schedules": "زمان‌بندی‌ها",
       "noSchedules": "هنوز زمان‌بندی تعریف نشده. برای ارسال خودکار، یک زمان‌بندی اضافه کنید.",
-      "hint": "در این فاز اتوماسیون تنها به‌صورت تنظیمات است؛ اجرا از طریق زمان‌بند (مثل Celery یا Cron) انجام می‌شود."
-    },
-    "customers": {
-      "description": "مشتریان تلگرامی که با ربات گفتگو کرده‌اند. برچسب Global، VIP یا Special را تنظیم کنید.",
-      "staffTelegramHint": "برای دریافت اعلان درخواست‌های تبادل، شناسه تلگرام باید روی حساب کاربری پنل کارکنان تنظیم شده باشد.",
-      "telegramId": "آیدی تلگرام",
-      "username": "نام کاربری",
-      "name": "نام",
-      "tag": "برچسب",
-      "empty": "هنوز مشتری‌ای نیست. پس از پیام به ربات اینجا دیده می‌شوند.",
-      "loadError": "بارگذاری مشتریان ناموفق بود.",
-      "tagUpdated": "برچسب مشتری به‌روز شد.",
-      "tagError": "به‌روزرسانی برچسب ناموفق بود.",
-      "tags": {
-        "global": "عمومی",
-        "vip": "VIP",
-        "special": "ویژه",
-        "admin": "ادمین"
-      }
+      "hint": "در این فاز اتوماسیون تنها به‌صورت تنظیمات است؛ اجرا از طریق زمان‌بند (مثل Celery یا Cron) انجام می‌شود.",
+      "deleteScheduleConfirm": "این برنامه زمانی حذف شود؟"
     },
     "settings": {
       "description": "ربات‌ها و کانال‌های تلگرام را برای ارسال نرخ ارز تنظیم کنید.",
       "openHub": "باز کردن هاب تلگرام"
     },
     "admin": {
-      "navLabel": "مدیریت",
-      "nav": {
-        "customersStatus": "وضعیت مشتریان",
-        "notifications": "اعلان‌ها",
-        "reports": "گزارش‌ها",
-        "publish": "انتشار نرخ",
-        "analytics": "تحلیل‌ها",
-        "exchangeRequests": "درخواست‌های تبادل",
-        "customerAnalysis": "تحلیل مشتری",
-        "reengage": "بازگردانی مشتری",
-        "botSettings": "تنظیمات ربات",
-        "tools": "ابزارهای هاب"
-      },
-      "gate": {
-        "verifying": "در حال تأیید توکن ربات…",
-        "verifyingHint": "فراخوانی getMe تلگرام. تا موفقیت، هاب قفل می‌ماند.",
-        "failedTitle": "تأیید ربات ناموفق بود",
-        "failedHint": "توکن ربات تأیید نشد. مالکیت و توکن را بررسی کنید و دوباره تلاش کنید.",
-        "retry": "تلاش مجدد",
-        "scopedTo": "محدود به @{name}",
-        "dashboardError": "بارگذاری داشبورد ناموفق بود. اگر بعد از استقرار ادامه داشت، python manage.py migrate را اجرا کنید (telegram_app 0010)."
-      },
       "customersStatus": {
-        "title": "وضعیت مشتریان",
-        "hint": "شمارش برچسب برای مشتریانی که با این ربات جلسه دارند.",
-        "total": "کل",
-        "manageTags": "مدیریت برچسب‌ها"
-      },
-      "notifications": {
-        "title": "هشدار قیمت",
-        "total": "کل: {n}",
-        "active": "فعال: {n}",
-        "customer": "مشتری",
-        "pair": "جفت",
-        "direction": "جهت"
-      },
-      "reports": {
-        "title": "گزارش تبادل",
-        "hint": "وضعیت‌ها را اپراتور روی New، Canceled و Successful می‌گذارد.",
-        "running": "در حال اجرا",
-        "new": "جدید",
-        "pending": "جدید",
-        "successful": "موفق",
-        "cancelled": "لغو شده"
-      },
-      "publish": {
-        "title": "سامانه انتشار ارز",
-        "hint": "از پیام‌رسان، کانال‌ها، فاینالایز و استودیوی موجود استفاده کنید — ناشر جدید نیست.",
-        "finalize": "فاینالایز",
-        "channels": "کانال‌های این ربات"
-      },
-      "analytics": {
-        "title": "تحلیل‌ها",
-        "dailyUsage": "کاربران یکتا روزانه (۳۰ روز اخیر)",
-        "channelMembers": "اعضای کانال (آخرین نمونه)",
-        "publishActivity": "{n} انتشار",
-        "channelViews": "بازدید کانال",
-        "channelViewsStub": "از طریق Bot API در دسترس نیست."
+        "total": "کل مشتریان"
       },
       "exchangeRequests": {
-        "title": "درخواست‌های تبادل",
-        "hint": "درخواست را انتخاب کنید تا وضعیت عوض شود یا TTL تمدید شود.",
-        "newMembers": "اعضای جدید ({months} ماه)",
-        "mostRequested": "پرخواست‌ترین ارزها",
-        "pair": "جفت",
-        "amount": "مبلغ",
-        "ttl": "TTL (دقیقه)",
-        "customer": "مشتری",
-        "successful": "موفق",
-        "pending": "جدید",
-        "new": "جدید",
-        "canceled": "لغو شده",
-        "changeState": "تغییر وضعیت",
-        "hold": "تأیید (نگه‌داشتن درخواست)",
-        "holdOk": "TTL increase : {ttl}",
-        "stateUpdated": "وضعیت درخواست به‌روز شد.",
-        "loadError": "بارگذاری درخواست‌های تبادل ناموفق بود."
+        "holdOk": "درخواست با محدودیت {ttl} دقیقه نگه داشته شد",
+        "loadError": "خطا در بارگیری درخواست‌های تبادل",
+        "stateUpdated": "وضعیت بروزرسانی شد"
       },
-      "customerAnalysis": {
-        "title": "تحلیل مشتری",
-        "hint": "غیرفعال = بدون فعالیت BotSession در ۳۰ روز برای این ربات.",
-        "returned": "بازگشته",
-        "inactive": "غیرفعال (۳۰ روز)",
-        "vipRatio": "نسبت درخواست VIP / عادی",
-        "peakHours": "ساعات اوج درخواست",
-        "setTag": "تنظیم برچسب مشتری",
-        "prompt": "Write any userid or chose from the list:",
-        "userid": "آیدی تلگرام",
-        "requests": "درخواست‌ها"
+      "gate": {
+        "dashboardError": "خطا در بارگیری داشبورد"
       },
       "reengage": {
-        "title": "بازگردانی مشتری",
-        "hint": "پیام یک‌باره به مخاطبان (با سقف ارسال). کمپین دوره‌ای و پیشنهاد بعداً.",
-        "audience": "مخاطب",
-        "inactive": "غیرفعال (۳۰ روز)",
-        "message": "پیام",
-        "send": "ارسال الآن",
-        "sentOk": "ارسال بازگردانی انجام شد.",
-        "result": "ارسال {sent}، ناموفق {failed}، رد شده {skipped}"
+        "sentOk": "پیام ارسال شد"
       },
-      "botSettings": {
-        "title": "تنظیمات ربات",
-        "hint": "ویرایش TTL و وضعیت فعال برای ربات تأییدشده."
-      },
-      "campaigns": {
-        "daily": "روزانه",
-        "weekly": "هفتگی",
-        "monthly": "ماهانه",
-        "save": "ذخیره کمپین"
-      },
-      "offers": {
-        "saveAndSend": "ذخیره و ارسال",
-        "validUntil": "اعتبار تا (اختیاری)"
-      },
-      "stubs": {
-        "periodicTitle": "پیام‌های دوره‌ای",
-        "offerTitle": "ایجاد پیشنهاد",
-        "comingSoon": "به‌زودی — در این نسخه در دسترس نیست.",
-        "schedulePlaceholder": "زمان‌بندی (غیرفعال)",
-        "messagePlaceholder": "پیام کمپین (غیرفعال)",
-        "offerPlaceholder": "عنوان پیشنهاد (غیرفعال)"
+      "reports": {
+        "cancelled": "لغو شده",
+        "new": "جدید",
+        "running": "در حال اجرا",
+        "successful": "انجام شده"
       }
+    },
+    "customers": {
+      "loadError": "خطا در بارگیری مشتریان",
+      "tagError": "خطا در بروزرسانی برچسب",
+      "tagUpdated": "برچسب بروزرسانی شد"
     }
   },
   "telegramStudio": {
@@ -989,7 +930,8 @@
     "saving": "در حال ذخیره…",
     "categoryNotFound": "دسته‌بندی یافت نشد.",
     "previewImageError": "تصویر",
-    "incompleteMessage": "تصویر یا متن پیام کامل نیست. ممکن است پیام تلگرام ناقص ارسال شود."
+    "incompleteMessage": "تصویر یا متن پیام کامل نیست. ممکن است پیام تلگرام ناقص ارسال شود.",
+    "templateMediaHint": "شناسه قالب:"
   },
   "apiErrors": {
     "codes": {
@@ -1036,78 +978,149 @@
     },
     "fields": {}
   },
-  "nav": {
-    "userManagement": "مدیریت کاربران",
-    "registerUser": "ثبت کاربر",
-    "plans": "پلن‌ها"
-  },
-  "programmerHub": {
-    "title": "مدیریت کاربران",
-    "register": "ثبت کاربر",
-    "templates": "پلن‌ها",
-    "templatesTitle": "پلن‌ها",
-    "templatesHint": "مشخص کنید هر تصویر برای برنز، نقره یا طلا است.",
-    "userDetail": "حساب کاربر",
-    "enterAs": "ورود به‌عنوان کاربر",
-    "userUpdated": "کاربر به‌روزرسانی شد",
-    "userNotFound": "کاربر یافت نشد",
+  "userCenter": {
+    "title": "مدیریت ادمین‌ها",
+    "users": "کاربران",
+    "activity": "فعالیت‌ها",
+    "manageUsers": "مدیریت کاربران",
+    "addUser": "افزودن ادمین",
+    "editUser": "ویرایش ادمین",
+    "noUsers": "کاربری یافت نشد.",
+    "noActivity": "فعالیتی ثبت نشده است.",
+    "fullName": "نام کامل",
+    "role": "نقش",
+    "newPasswordOptional": "رمز جدید (اختیاری)",
+    "leaveBlankToKeepCurrent": "برای حفظ رمز فعلی، خالی بگذارید",
+    "user": "کاربر",
+    "details": "جزئیات",
+    "ip": "آی‌پی",
+    "actionType": "عملیات",
+    "allActions": "همه عملیات‌ها",
     "active": "فعال",
     "inactive": "غیرفعال",
-    "noBots": "رباتی به این حساب متصل نیست.",
-    "noChannels": "کانالی ثبت نشده است.",
-    "noAuditLogs": "هنوز لاگ ممیزی ثبت نشده است.",
-    "noTemplates": "قالبی برای این پلن در دسترس نیست.",
-    "userTemplatesHint": "قالب‌هایی که این پلن می‌تواند استفاده کند (فقط خواندنی).",
-    "channels": "کانال‌ها",
-    "ttlMinutes": "TTL پیش‌فرض (دقیقه)",
-    "restrictChannels": "محدود به کانال‌های شناخته‌شده",
-    "logMessages": "ثبت همه پیام‌ها",
-    "actionType": "عملیات",
-    "details": "جزئیات",
-    "ip": "IP",
-    "currentBotToken": "توکن فعلی",
-    "botTokenOptional": "توکن جدید ربات تلگرام (اختیاری)",
-    "tabs": {
-      "registered": "اطلاعات ثبت‌نام",
-      "botAccess": "دسترسی ربات",
-      "botAnalytics": "تحلیل ربات",
-      "audit": "لاگ ممیزی",
-      "templates": "قالب‌ها"
-    },
-    "botAnalyticsHint": "معیارهای فقط‌خواندنی از نمونه‌های ذخیره‌شده (همان داده‌های پنل تلگرام).",
-    "peakHour": "ساعت اوج",
-    "returnedUsers": "کاربران بازگشته",
-    "inactiveUsers": "کاربران غیرفعال",
-    "vipRatio": "نسبت VIP / عادی",
+    "forceLogout": "خروج اجباری",
+    "forceLogoutConfirm": "خروج اجباری از همه دستگاه‌ها؟",
+    "userLoggedOutAllDevices": "کاربر از همه دستگاه‌ها خارج شد.",
+    "failedToForceLogout": "خروج اجباری ناموفق بود.",
+    "userCreated": "کاربر با موفقیت ایجاد شد.",
+    "userUpdated": "کاربر با موفقیت به‌روزرسانی شد.",
+    "failedToSave": "ذخیره‌سازی کاربر ناموفق بود.",
     "actionTypes": {
-      "login_success": "ورود موفق",
-      "login_failed": "ورود ناموفق",
+      "login": "ورود",
       "logout": "خروج",
-      "price_update": "بروزرسانی قیمت",
-      "bulk_price_update": "بروزرسانی گروهی قیمت",
-      "special_price_update": "بروزرسانی قیمت ویژه",
-      "template_change": "تغییر قالب",
-      "finalize": "نهایی‌سازی",
-      "impersonate_start": "شروع جعل هویت",
-      "other": "سایر"
+      "create": "ایجاد",
+      "update": "به‌روزرسانی",
+      "delete": "حذف",
+      "force_logout": "خروج اجباری",
+      "other": "سایر",
+      "bulk_price_update": "به‌روزرسانی گروهی قیمت",
+      "login_failed": "ورود ناموفق",
+      "login_success": "ورود موفق",
+      "price_update": "به‌روزرسانی قیمت",
+      "special_price_update": "به‌روزرسانی قیمت ویژه"
     },
+    "roles": {
+      "super_admin": "مدیر کل",
+      "management": "مدیریت",
+      "operator": "اپراتور",
+      "viewer": "ناظر",
+      "developer": "توسعه‌دهنده",
+      "employee": "کارمند"
+    }
+  },
+  "programmerHub": {
+    "title": "هاب برنامه‌نویس",
+    "register": "ثبت کاربر جدید",
+    "userDetail": "جزئیات کاربر",
+    "empty": "هنوز کاربری ثبت نشده است.",
     "firstName": "نام",
+    "lastName": "نام خانوادگی",
     "exchangeName": "نام صرافی",
     "country": "کشور",
     "email": "ایمیل",
-    "phone": "شماره تلفن",
+    "phone": "تلفن",
     "telegramId": "آیدی تلگرام",
-    "botToken": "توکن ربات تلگرام",
-    "generatedPassword": "رمز ساخته‌شده",
-    "created": "کاربر ساخته شد",
-    "empty": "هنوز کاربری نیست. یکی ثبت کنید تا کارت اینجا دیده شود.",
-    "viewingAs": "در حال مشاهده به‌عنوان {name}",
+    "botToken": "توکن بات",
+    "botTokenOptional": "توکن بات (اختیاری، برای حفظ فعلی خالی بگذارید)",
+    "generatedPassword": "رمز تولید شده",
+    "created": "کاربر با موفقیت ایجاد شد.",
+    "active": "فعال",
+    "inactive": "غیرفعال",
     "exit": "خروج",
+    "enterAs": "ورود به عنوان این کاربر",
+    "viewingAs": "مشاهده به عنوان {name}",
+    "currentBotToken": "توکن بات فعلی",
+    "noBots": "باتی یافت نشد.",
+    "noChannels": "کانالی یافت نشد.",
+    "noTemplates": "قالبی یافت نشد.",
+    "userNotFound": "کاربر یافت نشد.",
+    "userUpdated": "کاربر به‌روزرسانی شد.",
+    "restrictChannels": "محدودیت کانال",
+    "logMessages": "ثبت پیام‌ها",
+    "ttlMinutes": "TTL (دقیقه)",
+    "channels": "کانال‌ها",
+    "details": "جزئیات",
+    "ip": "آی‌پی",
+    "actionType": "عملیات",
+    "inactiveUsers": "کاربران غیرفعال",
+    "returnedUsers": "کاربران بازگشته",
+    "vipRatio": "نسبت VIP",
+    "botAnalyticsHint": "نمای کلی تحلیل بات",
+    "noAuditLogs": "گزارش حسابرسی یافت نشد.",
+    "templatesTitle": "قالب‌ها",
+    "templatesHint": "مشاهده و مدیریت قالب‌های کاربران.",
+    "userTemplatesHint": "قالب‌های متعلق به این کاربر.",
     "plans": {
       "bronze": "برنز",
-      "silver": "نقره",
-      "gold": "طلا"
+      "silver": "نقره‌ای",
+      "gold": "طلایی",
+      "platinum": "پلاتینیوم",
+      "diamond": "الماس"
     },
-    "lastName": "نام خانوادگی"
+    "tabs": {
+      "overview": "نمای کلی",
+      "bots": "بات‌ها",
+      "channels": "کانال‌ها",
+      "templates": "قالب‌ها",
+      "audit": "گزارش حسابرسی"
+    },
+    "website": "آدرس وب‌سایت",
+    "websiteHint": "اختیاری",
+    "telegramIdHint": "آیدی عددی یا یوزرنیم تلگرام",
+    "plan": "طرح",
+    "saving": "در حال ایجاد…",
+    "subRole": "نقش تفویضی",
+    "subRoleHint": "اپراتورهای تفویضی پنل مدیریت داخل باتِ کاربر دیگر را مدیریت می‌کنند",
+    "operator": "اپراتور",
+    "ownerUsername": "نام کاربری مالک",
+    "ownerUsernameHint": "نام کاربری حساب مدیریتی که این اپراتور بات او را مدیریت می‌کند",
+    "telegramUsername": "نام کاربری تلگرام",
+    "ownerUsernameRequired": "نام کاربری مالک برای اپراتور تفویضی الزامی است",
+    "delegatedNoBotHint": "اپراتورهای تفویضی از بات مالک استفاده می‌کنند — توکن بات لازم نیست.",
+    "delegationTitle": "اپراتور تفویضی",
+    "delegationDesc": "دسترسی به پنل مدیریت داخل باتِ حساب کاربر دیگر را به این کاربر بدهید.",
+    "admin": "مدیر",
+    "head_operator": "سراپراتور"
+  },
+  "collaboration": {
+    "title": "نحوه همکاری",
+    "hint": "مدل مشارکت این مشتری را انتخاب کنید",
+    "placeholder": "انتخاب نوع همکاری",
+    "reseller": "نماینده فروش",
+    "white_label": "وایت لیبل",
+    "agency": "آژانس",
+    "direct": "مستقیم"
+  },
+  "onboarding": {
+    "backToList": "بازگشت به هاب برنامه‌نویس",
+    "subtitle": "یک حساب مشتری جدید با دسترسی به پنل صرافی ایجاد کنید.",
+    "basicInfo": "اطلاعات پایه",
+    "basicInfoDesc": "جزئیات شخصی و تماس مشتری.",
+    "businessDetails": "جزئیات کسب‌وکار",
+    "businessDetailsDesc": "اطلاعات شرکت و مدل مشارکت.",
+    "systemAccess": "دسترسی سیستم",
+    "systemAccessDesc": "اعتبارنامه ربات تلگرام و سطح دسترسی.",
+    "registeredBy": "ثبت‌شده توسط",
+    "registeredByHint": "به‌صورت خودکار به‌عنوان ادمین واردشده ثبت می‌شود."
   }
 }

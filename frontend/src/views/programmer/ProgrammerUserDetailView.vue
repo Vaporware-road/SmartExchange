@@ -59,17 +59,38 @@
         <input v-model="form.phone" class="input-luxury w-full" :placeholder="$t('programmerHub.phone')" required />
         <input v-model="form.telegram_id" class="input-luxury w-full" :placeholder="$t('programmerHub.telegramId')" />
         <input
+          v-model="form.telegram_username"
+          class="input-luxury w-full"
+          :placeholder="$t('programmerHub.telegramUsername')"
+        />
+        <input
+          v-if="!isDelegated"
           v-model="form.telegram_bot_token"
           class="input-luxury w-full"
           :placeholder="$t('programmerHub.botTokenOptional')"
           autocomplete="off"
         />
-        <p v-if="user.telegram_bot_token_masked" class="text-xs text-[var(--text-secondary)]">
+        <p
+          v-if="!isDelegated && user.telegram_bot_token_masked"
+          class="text-xs text-[var(--text-secondary)]"
+        >
           {{ $t('programmerHub.currentBotToken') }}: {{ user.telegram_bot_token_masked }}
         </p>
         <select v-model="form.plan" class="input-luxury w-full">
           <option v-for="p in plans" :key="p" :value="p">{{ $t(`programmerHub.plans.${p}`) }}</option>
         </select>
+        <select v-model="form.sub_role" class="input-luxury w-full">
+          <option v-for="r in subRoles" :key="r" :value="r">{{ $t(`programmerHub.${r}`) }}</option>
+        </select>
+        <input
+          v-if="isDelegated"
+          v-model="form.owner_username"
+          class="input-luxury w-full"
+          :placeholder="$t('programmerHub.ownerUsername')"
+        />
+        <p v-if="isDelegated" class="text-xs text-[var(--text-secondary)]">
+          {{ $t('programmerHub.ownerUsernameHint') }}
+        </p>
         <label class="flex items-center gap-2 text-sm text-[var(--text-secondary)]">
           <input v-model="form.is_active" type="checkbox" class="rounded border-[var(--border-card)]" />
           {{ $t('programmerHub.active') }}
@@ -314,6 +335,8 @@ const auditLogs = ref([])
 const priceTemplates = ref([])
 const editorTemplates = ref([])
 
+const subRoles = ['admin', 'operator', 'head_operator']
+
 const form = reactive({
   first_name: '',
   last_name: '',
@@ -322,10 +345,17 @@ const form = reactive({
   email: '',
   phone: '',
   telegram_id: '',
+  telegram_username: '',
   telegram_bot_token: '',
   plan: 'bronze',
+  sub_role: 'admin',
+  owner_username: '',
   is_active: true,
 })
+
+const isDelegated = computed(
+  () => form.sub_role === 'operator' || form.sub_role === 'head_operator'
+)
 
 const displayName = computed(() => {
   const u = user.value
@@ -365,8 +395,11 @@ function fillForm(u) {
   form.email = u.email || ''
   form.phone = u.phone || ''
   form.telegram_id = u.telegram_id || ''
+  form.telegram_username = u.telegram_username || ''
   form.telegram_bot_token = ''
   form.plan = u.plan || 'bronze'
+  form.sub_role = u.sub_role || 'admin'
+  form.owner_username = u.owner_username || ''
   form.is_active = u.is_active !== false
 }
 
@@ -415,10 +448,13 @@ async function saveRegistration() {
       email: form.email,
       phone: form.phone,
       telegram_id: form.telegram_id,
+      telegram_username: form.telegram_username,
+      sub_role: form.sub_role,
+      owner_username: form.owner_username,
       plan: form.plan,
       is_active: form.is_active,
     }
-    if (form.telegram_bot_token.trim()) {
+    if (!isDelegated.value && form.telegram_bot_token.trim()) {
       payload.telegram_bot_token = form.telegram_bot_token.trim()
     }
     const { data } = await authApi.programmer.update(route.params.id, payload)
@@ -445,7 +481,7 @@ async function enterAs() {
   entering.value = true
   try {
     await auth.impersonate(user.value.id)
-    router.push('/')
+    router.push('/panel')
   } catch (error) {
     toast.error(getApiErrorDetails(error).message)
   } finally {
