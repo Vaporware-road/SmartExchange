@@ -3,13 +3,30 @@ import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Security: Use environment variable for SECRET_KEY
-# Generate a new key with: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
-SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-j&hjb3ypz=33k0kr0g1t(qi^4pyz0dy**jm&y*qalq7q)q&o@g')
-
 # Security: DEBUG should be False in production
 # Set DJANGO_DEBUG=False in environment variables for production
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
+
+# Security: Use environment variable for SECRET_KEY
+# Generate a new key with: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+_SECRET_KEY_RAW = os.environ.get('DJANGO_SECRET_KEY', '')
+if not _SECRET_KEY_RAW:
+    if DEBUG:
+        import warnings
+        warnings.warn(
+            'DJANGO_SECRET_KEY not set — using insecure dev-only default. '
+            'Set the env var before deploying to production.',
+            stacklevel=1,
+        )
+        SECRET_KEY = 'django-insecure-dev-only-DO-NOT-USE-IN-PRODUCTION'
+    else:
+        raise ValueError(
+            'DJANGO_SECRET_KEY environment variable is required in production. '
+            'Generate one with: python -c "from django.core.management.utils '
+            'import get_random_secret_key; print(get_random_secret_key())"'
+        )
+else:
+    SECRET_KEY = _SECRET_KEY_RAW
 
 # Security: ALLOWED_HOSTS should only contain production domains
 # Set DJANGO_ALLOWED_HOSTS in environment (comma-separated) for production
@@ -282,10 +299,23 @@ EXTERNAL_API_URL = os.environ.get(
     'EXTERNAL_API_URL',
     'https://sarafipardis.co.uk/wp-json/pardis/v1/rates'
 )
-EXTERNAL_API_KEY = os.environ.get(
-    'EXTERNAL_API_KEY',
-    'PX9k7mN2qR8vL4jH6wE3tY1uI5oP0aS9dF7gK2mN8xZ4cV6bQ1wE3rT5yU8iO0pL'
-)
+_EXTERNAL_API_KEY_RAW = os.environ.get('EXTERNAL_API_KEY', '')
+if not _EXTERNAL_API_KEY_RAW:
+    if DEBUG:
+        import warnings
+        warnings.warn(
+            'EXTERNAL_API_KEY not set — external rates sync will fail. '
+            'Set the env var for production.',
+            stacklevel=1,
+        )
+        EXTERNAL_API_KEY = ''
+    else:
+        raise ValueError(
+            'EXTERNAL_API_KEY environment variable is required in production. '
+            'The previously hardcoded key must be rotated — it was exposed in source code.'
+        )
+else:
+    EXTERNAL_API_KEY = _EXTERNAL_API_KEY_RAW
 
 # Security settings
 # HTTP-only reverse proxies (e.g. Dokploy *.traefik.me preview URLs): set
@@ -403,6 +433,10 @@ CELERY_TASK_TIME_LIMIT = int(os.environ.get("CELERY_TASK_TIME_LIMIT", "120"))
 CELERY_TASK_SOFT_TIME_LIMIT = int(os.environ.get("CELERY_TASK_SOFT_TIME_LIMIT", "90"))
 CELERY_RESULT_EXPIRES = int(os.environ.get("CELERY_RESULT_EXPIRES", "3600"))
 CELERY_BEAT_SCHEDULE = {
+    "telegram-auto-post-due-configs": {
+        "task": "telegram_app.auto_post_due_configs",
+        "schedule": float(os.environ.get("TELEGRAM_AUTO_POST_CHECK_SECONDS", "60")),
+    },
     "telegram-check-price-alerts": {
         "task": "telegram_app.check_price_alerts",
         "schedule": float(os.environ.get("TELEGRAM_ALERT_CHECK_SECONDS", "120")),
