@@ -254,7 +254,7 @@ class ProgrammerRegisterAPIView(APIView):
     permission_classes = [IsAuthenticated, IsProgrammer]
 
     def post(self, request):
-        serializer = ProgrammerRegisterSerializer(data=request.data)
+        serializer = ProgrammerRegisterSerializer(data=request.data, context={"request": request})
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
         payload = UserSerializer(user).data

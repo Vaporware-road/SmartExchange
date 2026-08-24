@@ -4,7 +4,7 @@ from rest_framework.test import APITestCase
 from accounts.models import CustomUser, UserActivityLog
 from accounts.plans import PLAN_BRONZE, PLAN_GOLD
 from price_publisher.models import PriceTemplate
-from telegram_app.models import TelegramBot
+from telegram_app.models import BotAdmin, TelegramBot
 
 
 def _tiny_png():
@@ -175,3 +175,119 @@ class ProgrammerHubApiTests(APITestCase):
         self.assertEqual(denied.status_code, 403)
         ok = self.client.get(f"/api/templates/{bronze_tpl.id}/")
         self.assertEqual(ok.status_code, 200)
+
+
+class ProgrammerDelegatedOperatorApiTests(APITestCase):
+    """Registering/editing delegated sub-operators via the Programmer Hub."""
+
+    def setUp(self):
+        self.programmer = CustomUser.objects.create_user(
+            username="dev2",
+            password="pass12345",
+            role=CustomUser.ROLE_DEVELOPER,
+        )
+        self.owner = CustomUser.objects.create_user(
+            username="owner_client",
+            password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT,
+            plan=PLAN_GOLD,
+        )
+        self.bot = TelegramBot.objects.create(
+            name="Owner Bot",
+            token="333:owner-bot-token",
+            owner=self.owner,
+            is_active=True,
+        )
+
+    def _register_payload(self, **overrides):
+        payload = {
+            "first_name": "Sub",
+            "last_name": "Operator",
+            "exchange_name": "Sub FX",
+            "country": "IR",
+            "email": "subop@example.com",
+            "phone": "+98911",
+            "telegram_id": "999000111",
+            "telegram_username": "subop_tg",
+            "sub_role": CustomUser.SUB_ROLE_OPERATOR,
+            "owner_username": "owner_client",
+        }
+        payload.update(overrides)
+        return payload
+
+    def test_register_delegated_operator_grants_bot_admin(self):
+        self.client.force_authenticate(self.programmer)
+        r = self.client.post(
+            "/api/auth/programmer/users/", self._register_payload(), format="json"
+        )
+        self.assertEqual(r.status_code, 201, r.content)
+        data = r.json()
+        self.assertEqual(data["role"], CustomUser.ROLE_EMPLOYEE)
+        self.assertEqual(data["sub_role"], CustomUser.SUB_ROLE_OPERATOR)
+        self.assertEqual(data["owner"], self.owner.pk)
+        self.assertEqual(data["owner_name"], "owner_client")
+        self.assertEqual(data["telegram_username"], "subop_tg")
+
+        user = CustomUser.objects.get(email="subop@example.com")
+        self.assertEqual(user.owner_id, self.owner.pk)
+        # No bot is created for delegated operators (they use the owner's bot).
+        self.assertFalse(TelegramBot.objects.filter(owner=user).exists())
+        # Auto-synced BotAdmin row grants in-bot admin access.
+        self.assertTrue(BotAdmin.objects.filter(bot=self.bot, user=user).exists())
+
+    def test_register_client_account_still_requires_bot_token(self):
+        self.client.force_authenticate(self.programmer)
+        payload = self._register_payload(sub_role=CustomUser.SUB_ROLE_ADMIN, owner_username="")
+        r = self.client.post("/api/auth/programmer/users/", payload, format="json")
+        self.assertEqual(r.status_code, 400, r.content)
+        self.assertIn("telegram_bot_token", r.json()["errors"])
+
+    def test_register_delegated_operator_requires_owner(self):
+        self.client.force_authenticate(self.programmer)
+        payload = self._register_payload(owner_username="")
+        r = self.client.post("/api/auth/programmer/users/", payload, format="json")
+        self.assertEqual(r.status_code, 400, r.content)
+        self.assertIn("owner_username", r.json()["errors"])
+
+    def test_update_operator_owner_and_sub_role(self):
+        user = CustomUser.objects.create_user(
+            username="existing_op",
+            password="pass12345",
+            role=CustomUser.ROLE_EMPLOYEE,
+            sub_role=CustomUser.SUB_ROLE_ADMIN,
+        )
+        self.client.force_authenticate(self.programmer)
+        r = self.client.patch(
+            f"/api/auth/programmer/users/{user.pk}/",
+            {
+                "sub_role": CustomUser.SUB_ROLE_HEAD_OPERATOR,
+                "owner_username": "owner_client",
+                "telegram_username": "existing_op_tg",
+            },
+            format="json",
+        )
+        self.assertEqual(r.status_code, 200, r.content)
+        user.refresh_from_db()
+        self.assertEqual(user.sub_role, CustomUser.SUB_ROLE_HEAD_OPERATOR)
+        self.assertEqual(user.owner_id, self.owner.pk)
+        self.assertEqual(user.telegram_username, "existing_op_tg")
+        self.assertTrue(BotAdmin.objects.filter(bot=self.bot, user=user).exists())
+
+    def test_update_clears_owner_when_username_empty(self):
+        user = CustomUser.objects.create_user(
+            username="op_to_revoke",
+            password="pass12345",
+            role=CustomUser.ROLE_EMPLOYEE,
+            sub_role=CustomUser.SUB_ROLE_OPERATOR,
+            owner=self.owner,
+        )
+        self.client.force_authenticate(self.programmer)
+        r = self.client.patch(
+            f"/api/auth/programmer/users/{user.pk}/",
+            {"owner_username": "", "sub_role": CustomUser.SUB_ROLE_ADMIN},
+            format="json",
+        )
+        self.assertEqual(r.status_code, 200, r.content)
+        user.refresh_from_db()
+        self.assertIsNone(user.owner)
+        self.assertFalse(BotAdmin.objects.filter(bot=self.bot, user=user).exists())

@@ -18,6 +18,18 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         (ROLE_DEVELOPER, 'Developer'),
     )
 
+    # Sub-roles refine what a Telegram bot admin (including delegated employees)
+    # may do inside the in-bot admin panel. Full admins keep SUB_ROLE_ADMIN.
+    SUB_ROLE_ADMIN = 'admin'
+    SUB_ROLE_OPERATOR = 'operator'
+    SUB_ROLE_HEAD_OPERATOR = 'head_operator'
+
+    SUB_ROLE_CHOICES = (
+        (SUB_ROLE_ADMIN, 'Admin'),
+        (SUB_ROLE_OPERATOR, 'Operator'),
+        (SUB_ROLE_HEAD_OPERATOR, 'Head Operator'),
+    )
+
     username = models.CharField(max_length=150, unique=True)
     first_name = models.CharField(max_length=150, blank=True)
     last_name = models.CharField(max_length=150, blank=True)
@@ -27,6 +39,22 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(blank=True, null=True, unique=True)
     phone = models.CharField(max_length=40, blank=True)
     telegram_id = models.CharField(max_length=64, blank=True)
+    website = models.URLField(max_length=256, blank=True, default='')
+    collaboration_type = models.CharField(max_length=32, blank=True, default='', help_text='Partnership model / service tier')
+    registered_by = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='registered_users',
+        help_text='Admin who registered this user'
+    )
+    # Delegated Telegram bot admins: employee-role users granted access to the
+    # in-bot admin panel of their owner's bots via telegram_app.BotAdmin rows.
+    owner = models.ForeignKey(
+        'self', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='sub_users',
+        help_text='Panel user this delegated operator reports to'
+    )
+    sub_role = models.CharField(max_length=24, choices=SUB_ROLE_CHOICES, default=SUB_ROLE_ADMIN)
+    telegram_username = models.CharField(max_length=128, blank=True, default='')
     plan = models.CharField(max_length=16, choices=PLAN_CHOICES, default=PLAN_BRONZE)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=ROLE_EMPLOYEE)
 

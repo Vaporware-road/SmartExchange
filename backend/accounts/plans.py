@@ -1,5 +1,18 @@
 """Subscription plans that gate picture templates."""
 
+# Partnership / collaboration models for registered clients
+COLLABORATION_RESELLER = "reseller"
+COLLABORATION_WHITE_LABEL = "white_label"
+COLLABORATION_AGENCY = "agency"
+COLLABORATION_DIRECT = "direct"
+
+COLLABORATION_CHOICES = (
+    (COLLABORATION_RESELLER, "Reseller"),
+    (COLLABORATION_WHITE_LABEL, "White Label"),
+    (COLLABORATION_AGENCY, "Agency"),
+    (COLLABORATION_DIRECT, "Direct"),
+)
+
 PLAN_BRONZE = "bronze"
 PLAN_SILVER = "silver"
 PLAN_GOLD = "gold"
@@ -31,6 +44,43 @@ def allowed_plans_for(plan):
 
 def user_plan(user):
     return normalize_plan(getattr(user, "plan", None))
+
+
+# ── Customer-bot abilities gated by the bot owner's plan ─────────────────────
+# A TelegramBot row owned by a panel user inherits that user's plan. Bots with
+# no owner (e.g. internal/legacy bots) default to having every ability.
+CUSTOMER_PROFILE_ABILITY = "customer_profile"
+EXCHANGE_REQUESTS_ABILITY = "exchange_requests"
+PRICE_ALERTS_ABILITY = "price_alerts"
+ADMIN_MENU_ABILITY = "admin_menu"
+
+# Minimum plan required per customer-bot ability. Bronze covers the core
+# customer flows; the in-bot admin panel is a Silver+ feature.
+ABILITY_MIN_PLAN = {
+    CUSTOMER_PROFILE_ABILITY: PLAN_BRONZE,
+    EXCHANGE_REQUESTS_ABILITY: PLAN_BRONZE,
+    PRICE_ALERTS_ABILITY: PLAN_BRONZE,
+    ADMIN_MENU_ABILITY: PLAN_SILVER,
+}
+
+
+def bot_has_ability(bot, ability):
+    """Whether a TelegramBot may expose a customer-bot feature.
+
+    Gates on the bot owner's subscription plan. Bots without an owner are
+    treated as fully enabled so existing/internal bots never lose features;
+    unknown abilities are likewise allowed (forward-compatible).
+    """
+    if not ability:
+        return True
+    min_plan = ABILITY_MIN_PLAN.get(ability)
+    if min_plan is None:
+        return True
+    owner = getattr(bot, "owner", None)
+    if owner is None or not getattr(owner, "is_authenticated", False):
+        return True
+    owner_plan = normalize_plan(getattr(owner, "plan", None))
+    return PLAN_RANK[owner_plan] >= PLAN_RANK[min_plan]
 
 
 def is_impersonating(request):
