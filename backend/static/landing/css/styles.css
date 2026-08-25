@@ -1920,3 +1920,40 @@
             .demo-frame { height: 70vh; min-height: 440px; }
             .contact-form-wrap { padding: 1.5rem; }
         }
+
+        /* Two delivery tiers: the trial on our VPS, and the customer's own server. */
+        .hero-note {
+            margin-top: 0.85rem;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .delivery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.25rem;
+            margin-top: 2.5rem;
+        }
+
+        .delivery-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.75rem;
+            transition: background 0.25s ease, border-color 0.25s ease;
+        }
+
+        .delivery-card:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--glass-border);
+        }
+
+        .delivery-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .delivery-card p {
+            color: var(--text-muted);
+            line-height: 1.9;
+        }
