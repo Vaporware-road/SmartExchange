@@ -2,7 +2,7 @@ FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    DJANGO_SETTINGS_MODULE=SmartExchangePanel.settings
+    DJANGO_SETTINGS_MODULE=MrExchangePanel.settings
 
 WORKDIR /app/backend
 

@@ -1,5 +1,5 @@
 """
-URL configuration for SmartExchangePanel project.
+URL configuration for MrExchangePanel project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -29,7 +29,7 @@ handler404 = views.handler404
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('favicon.ico', views.favicon_view, name='favicon'),
-    path("api/", include("SmartExchangePanel.api_urls")),
+    path("api/", include("MrExchangePanel.api_urls")),
     path('', include('landing.urls', namespace='landing')),
     path('landingpage/', RedirectView.as_view(pattern_name='landing:home', permanent=True)),
     path('landing/', RedirectView.as_view(pattern_name='landing:home', permanent=True)),

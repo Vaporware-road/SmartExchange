@@ -1,5 +1,5 @@
 """
-Custom middleware for SmartExchangePanel project.
+Custom middleware for MrExchangePanel project.
 """
 from django.shortcuts import render
 from django.http import Http404

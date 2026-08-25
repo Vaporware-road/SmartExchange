@@ -62,7 +62,7 @@ services:
       - .env.docker
     command: >
       sh -c "cd /app/backend &&
-             celery -A SmartExchangePanel worker --loglevel=INFO --concurrency=2"
+             celery -A MrExchangePanel worker --loglevel=INFO --concurrency=2"
     environment:
       PYTHONUNBUFFERED: "1"
       PYTHONDONTWRITEBYTECODE: "1"
@@ -84,7 +84,7 @@ services:
       - .env.docker
     command: >
       sh -c "cd /app/backend &&
-             celery -A SmartExchangePanel beat --loglevel=INFO"
+             celery -A MrExchangePanel beat --loglevel=INFO"
     environment:
       PYTHONUNBUFFERED: "1"
       PYTHONDONTWRITEBYTECODE: "1"

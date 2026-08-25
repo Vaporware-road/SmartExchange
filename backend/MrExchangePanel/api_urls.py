@@ -1,5 +1,5 @@
 """
-Unified API router for SmartExchange Panel.
+Unified API router for MrExchange Panel.
 All DRF endpoints are mounted under /api/.
 """
 from django.urls import path, include

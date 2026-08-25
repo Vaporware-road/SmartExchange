@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────
-#  SmartExchange — Development Helper
+#  MrExchange — Development Helper
 #
 #  Usage:
 #    ./dev.sh          — Start dev environment (builds first time)
@@ -17,7 +17,7 @@ ACTION="${1:-up}"
 
 case "$ACTION" in
   up|start)
-    echo "🚀 Starting SmartExchange dev environment..."
+    echo "🚀 Starting MrExchange dev environment..."
     echo "   Frontend (HMR):  http://localhost:5252"
     echo "   Backend API:     http://localhost:5252/api/"
     echo "   Django Admin:    http://localhost:5252/admin/"

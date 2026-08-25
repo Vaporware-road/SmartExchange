@@ -1,5 +1,5 @@
 """
-Custom views for the SmartExchangePanel project.
+Custom views for the MrExchangePanel project.
 """
 from pathlib import Path
 
