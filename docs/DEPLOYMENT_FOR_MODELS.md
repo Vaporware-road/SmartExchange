@@ -19,6 +19,8 @@ Use `DEPLOYMENT_MODE=customer_server` for a dedicated installation: deploy the s
 
 The application code is shared; infrastructure ownership and account data are isolated.
 
+On our own infrastructure each trial signup gets its own isolated stack rather than a shared multi-tenant database; the `fleet` app provisions it. For the commercial path that takes a customer from a trial to their own server — access, license, data migration, DNS, smoke test, handover — follow `CUSTOMER_SERVER_ONBOARDING.md`.
+
 ## 3. Prerequisites
 
 - Docker Engine with Compose v2
@@ -194,8 +196,8 @@ docker compose down
 7. Do not publish Redis directly.
 8. Back up the SQLite database and media volume.
 9. Run migrations before declaring a new release healthy.
-11. Confirm frontend, API, worker, Beat, and Redis health after rollout.
-12. Have a rollback and database-backup plan before changing production data.
+10. Confirm frontend, API, worker, Beat, and Redis health after rollout.
+11. Have a rollback and database-backup plan before changing production data.
 
 ## 11. Common failures
 

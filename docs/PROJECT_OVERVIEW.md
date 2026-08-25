@@ -124,6 +124,14 @@ MrExchange/
 - Pillow image generator: 1080×1080 post + 1080×1920 story, dark-gold/light-blue themes.
 - Celery task chain after finalize (render → publish feed + story; never raises, always logs).
 
+### fleet — delivery tiers, licensing, fleet visibility
+- `CustomerDeployment` — one row per trial stack or customer-server install: type, slug, domain, license key, plan, status (pending → provisioning → active → expired/suspended/archived/failed), installed version, last check-in, renewal date. Partial unique constraints keep license keys unique and allow only one live trial per customer.
+- `provisioning.py` — renders `docker/trial-stack.compose.yml` into a per-trial stack directory with its own `.env` (fresh secret key, own volumes, own Traefik-routed subdomain), then `docker compose up`. Every Docker path is inert unless `TRIAL_PROVISIONING_ENABLED`.
+- `licensing.py` — `MREX-XXXX-XXXX-XXXX-XXXX` keys over a Crockford-style alphabet. A bearer identifier for support and renewals, not a secret protecting customer data.
+- Celery beat: pre-expiry reminders to staff (`TRIAL_REMINDER_DAYS`), teardown of trials past `TRIAL_GRACE_DAYS`, and the install's own daily check-in.
+- `POST /api/fleet/checkin/` — the single unauthenticated endpoint, throttled at 60/h. Accepts license key, app version and uptime and **rejects any other field**; unknown and archived keys get an identical 403 so a probe learns nothing.
+- Management commands `convert_trial` (export a trial as a bundle, issue the license) and `restore_trial_bundle` (restore it on the customer's own server, refusing to overwrite live data without `--force`).
+
 ### dashboard / landing / core
 - `dashboard`: classic + `dashboard2` HTML views (24h top-10 trends, category averages, recent updates timeline, histogram, 7-day frequency) + dashboard API.
 - `core`: public prices API (`AllowAny` + throttle), `prices_webhook.py` (daemon-thread POST of price snapshot), image magic-byte validation, price-formatting / Persian-digit utils.
@@ -149,12 +157,13 @@ Vue 3.5, Vite 6, Pinia, Vue Router 4, vue-i18n v12-alpha (`legacy: true`), Tailw
 - **templates:** dashboard, form, media library.
 - **instagram:** hub status/config/preview.
 - **users:** user management + activity (432 lines).
+- **fleet:** `/programmer/fleet` — trial customers with days remaining and extend/convert/provision actions; licensed installs with domain, plan, renewal, last check-in (amber past 48h) and license reissue.
 - **template editor:** `pages/templates/TemplateEditor.vue` (881 lines) + `WidgetLibraryPanel` + `TemplateInspectorPanel` — full-screen canvas editor with moveable widgets, text/date/clock/weekday/image preview widgets.
 
 ### Data layer
-- `src/services/api.js` (427 lines): axios instance with Bearer token injection, **single-flight JWT refresh + replay**, CSRF (`csrftoken` cookie / `X-CSRFToken`), silent-mode toasts, standardized error parsing (DRF + project `{error, message, code}` payloads), and exported API groups: `authApi`, `dashboardApi`, `categoryApi`, `priceTypeApi`, `priceApi`, `specialPriceApi`, `finalizeApi`, `instagramHubApi`, `settingsApi`, `analysisApi`, `telegramApi`, `templateApi`, `templateEditorApi`.
+- `src/services/api.js` (427 lines): axios instance with Bearer token injection, **single-flight JWT refresh + replay**, CSRF (`csrftoken` cookie / `X-CSRFToken`), silent-mode toasts, standardized error parsing (DRF + project `{error, message, code}` payloads), and exported API groups: `authApi`, `dashboardApi`, `categoryApi`, `priceTypeApi`, `priceApi`, `specialPriceApi`, `finalizeApi`, `instagramHubApi`, `settingsApi`, `analysisApi`, `telegramApi`, `templateApi`, `templateEditorApi`, `fleetApi`.
 - Pinia stores: `auth` (roles/permissions via `src/config/permissions.js`), `siteSettings` (branding, dynamic fonts), `templatesEditor`, `currencies`, `sidebar`, `theme`.
-- i18n: `en` + `fa`, both with identical 700-key structures; `fa` → RTL; locale/theme persisted in localStorage (`mrexchange-*` / `smartexchange-*` fallbacks).
+- i18n: `en`, `fa`, `ar`, `de`, `es`, `fr`, `tr` with identical key structures; `fa` → RTL; locale/theme persisted in localStorage (`mrexchange-*` / `smartexchange-*` fallbacks).
 
 ### Roles/permissions (must match backend `accounts/permissions.py`)
 - `super_admin`: everything (settings, admin management).
@@ -182,21 +191,23 @@ Design a 1920×1080 canvas with moveable widgets → `config_json` (percentage c
 
 ## 7. API Surface (prefix `/api/`)
 
-Groups: `auth`, `dashboard`, `categories`, `prices`, `special-prices`, `finalize`, `telegram`, `settings`, `analysis`, `templates`, `template-editor`, `instagram-hub`, plus public `api/public/prices/`.
+Groups: `auth`, `dashboard`, `categories`, `prices`, `special-prices`, `finalize`, `telegram`, `settings`, `analysis`, `templates`, `template-editor`, `instagram-hub`, `fleet`, plus public `api/public/prices/`.
 
 Error format (standard): `{ "error": true, "message": "...", "code": "validation_error" }`.
 
-Throttles: anon 100/h, user 1000/h, finalize 60/h, settings 200/h, public prices 2000/h.
+Throttles: anon 100/h, user 1000/h, finalize 60/h, settings 200/h, public prices 2000/h, fleet check-in 60/h.
 
 ---
 
 ## 8. Deployment & Ops
 
 - **Docker Compose:** `app` (Django + supervisord, runs migrate/collectstatic/ensure_default_admin/ensure_demo_user at start), `celery-worker` (concurrency 2), `celery-beat`, `redis:7-alpine`. Ports: backend `18000`, frontend Vite `5250`, redis `6379`.
-- **Env:** `.env.docker` / `.env.example` — Django secret/debug/hosts, Celery broker/limits, finalize timeouts/strict mode, Instagram base URL, external API URL/key, default admin credentials.
+- **Env:** `.env.docker` / `.env.example` — Django secret/debug/hosts, Celery broker/limits, finalize timeouts/strict mode, Instagram base URL, trial/provisioning and fleet check-in settings, default admin credentials.
 - **Production checklist** (from README): `DJANGO_DEBUG=False`, strict allowed hosts + CSRF origins, strong secret key, `DEFAULT_ADMIN_SYNC_PASSWORD=false`, HTTPS behind proxy.
 - **Known build note:** `vite-plugin-pwa` can fail on oversized PWA icons (Workbox max-size) — reduce `pwa-*.png` sizes.
 - **SQLite tuning** targets exactly 3 concurrent processes (Django + worker + beat) — WAL, 30s busy-timeout, IMMEDIATE transactions.
+
+- **Delivery tiers:** `DEPLOYMENT_MODE=cloud` is the hosted service, where each 14-day trial gets its own isolated Compose stack on our VPS; `DEPLOYMENT_MODE=customer_server` is a dedicated install on the customer's VPS and domain. Installs share no data and no credentials. Onboarding runbook: [CUSTOMER_SERVER_ONBOARDING.md](CUSTOMER_SERVER_ONBOARDING.md).
 
 ---
 

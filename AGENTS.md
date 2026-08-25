@@ -19,6 +19,25 @@ Exchange ops panel for MrExchange (`mrexchange.co.uk`). Operators update prices 
 
 ---
 
+## Delivery model
+
+Two tiers, one codebase. `DEPLOYMENT_MODE` picks which one a process is running as.
+
+| Tier | Where it runs | Isolation |
+|------|---------------|-----------|
+| **Trial** (`cloud`) | Our VPS, one Docker Compose stack per signup at `trial-<slug>.mrexchange.co.uk` | Own DB file, own volumes, own subdomain |
+| **Customer server** (`customer_server`) | The customer's VPS and domain | Everything. Installs share no data and no credentials — ever |
+
+`backend/fleet/` owns both sides: trial provisioning and teardown, license keys
+(`MREX-XXXX-XXXX-XXXX-XXXX`), and `POST /api/fleet/checkin/`, the one unauthenticated
+endpoint a customer-server install calls home on. It accepts a license key, an app
+version and an uptime number, and rejects anything else — never prices, never customer
+data. Keep it that way.
+
+Onboarding a paying customer: [docs/CUSTOMER_SERVER_ONBOARDING.md](docs/CUSTOMER_SERVER_ONBOARDING.md).
+
+---
+
 ## Boot
 
 ### Docker (recommended)
@@ -64,7 +83,7 @@ cd frontend && npm run build
 | Currencies, Categories, PriceTypes | `backend/category/` |
 | Regular prices + history | `backend/change_price/` |
 | Special (VIP) prices + history | `backend/special_price/` |
-| Finalize pipeline, external WordPress sync | `backend/finalize/` |
+| Finalize pipeline | `backend/finalize/` |
 | Publish service, Celery tasks, template models | `backend/price_publisher/` |
 | Telegram bots, channels, auto-post | `backend/telegram_app/` |
 | Site settings singleton, Logs | `backend/setting/` |
@@ -72,6 +91,7 @@ cd frontend && npm run build
 | Instagram OAuth + image gen + publish | `backend/instagram_hub/` |
 | Visual template editor (backend) | `backend/template_editor/` |
 | Public prices API, webhooks, utils | `backend/core/` |
+| Trial stacks, license keys, fleet check-in | `backend/fleet/` |
 | Vue SPA (all views, stores, services) | `frontend/src/` |
 | Iraniu ad-request system ONLY | `backend/Request-Manage-System/` |
 
@@ -107,7 +127,7 @@ update prices (change_price / special_price)
 ## Frontend patterns
 
 **API service** — all calls go through `frontend/src/services/api.js` (427 lines):
-- Exports: `authApi`, `dashboardApi`, `categoryApi`, `priceTypeApi`, `priceApi`, `specialPriceApi`, `finalizeApi`, `instagramHubApi`, `settingsApi`, `analysisApi`, `telegramApi`, `templateApi`, `templateEditorApi`
+- Exports: `authApi`, `dashboardApi`, `categoryApi`, `priceTypeApi`, `priceApi`, `specialPriceApi`, `finalizeApi`, `instagramHubApi`, `settingsApi`, `analysisApi`, `telegramApi`, `templateApi`, `templateEditorApi`, `fleetApi`
 - Auto-injects Bearer token, single-flight JWT refresh + replay, CSRF from cookie
 - Error format: `{ error: true, message: "...", code: "validation_error" }`
 

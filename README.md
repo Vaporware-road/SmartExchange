@@ -16,6 +16,7 @@ This repository also contains another Django app at `backend/Request-Manage-Syst
 ## Table of Contents
 
 - [Current Architecture](#current-architecture)
+- [Delivery Model](#delivery-model)
 - [Tech Stack](#tech-stack)
 - [Repository Layout](#repository-layout)
 - [Quick Start (Docker)](#quick-start-docker)
@@ -43,6 +44,26 @@ Frontend behavior:
 
 - In local dev, Vite serves the app and proxies `/api` and `/media` to Django.
 - In production-style mode, `npm run build` outputs to `backend/static/vue/`, and Django serves the built SPA.
+
+---
+
+## Delivery Model
+
+MrExchange ships in two tiers from one codebase, selected by `DEPLOYMENT_MODE`:
+
+| Tier | Runs on | What the customer gets |
+|------|---------|------------------------|
+| **Free trial** (`cloud`) | Our VPS | A 14-day trial on its own isolated Compose stack at `trial-<slug>.mrexchange.co.uk`, with its own database, volumes and subdomain |
+| **Customer server** (`customer_server`) | The customer's own VPS and domain | A dedicated install with their own secrets, backups and integrations |
+
+Installs never share data or credentials. The only thing a customer-server
+install sends back is a daily check-in carrying its license key, app version and
+uptime — never prices, never customer data.
+
+The `fleet` app owns both tiers: trial provisioning and teardown, license keys,
+the check-in endpoint, and the owner panel at `/programmer/fleet`. To take a
+customer from trial to their own server, follow
+[docs/CUSTOMER_SERVER_ONBOARDING.md](docs/CUSTOMER_SERVER_ONBOARDING.md).
 
 ---
 
@@ -78,6 +99,7 @@ MrExchangePanel/
 │   ├── change_price/
 │   ├── dashboard/
 │   ├── finalize/
+│   ├── fleet/
 │   ├── instagram_hub/
 │   ├── price_publisher/
 │   ├── setting/
@@ -233,6 +255,7 @@ See `.env.docker.example` for a template.
 - **Settings:** site branding/settings, logs, upload policy
 - **Analysis:** dashboard + pricing endpoints
 - **Instagram Hub (optional):** config/status/preview flow
+- **Fleet:** trial stacks, license keys, customer-server check-ins, owner panel
 
 ---
 
@@ -254,6 +277,7 @@ Common groups:
 - `/api/templates/`
 - `/api/template-editor/`
 - `/api/instagram-hub/`
+- `/api/fleet/`
 
 Auth model:
 
@@ -282,6 +306,7 @@ Error format:
 - Use strong `DJANGO_SECRET_KEY`
 - Disable automatic password re-sync for default admin (`DEFAULT_ADMIN_SYNC_PASSWORD=false`)
 - Serve behind HTTPS in real deployments
+- On a customer-server install, set `FLEET_LICENSE_KEY` and `APP_VERSION` so it appears in the fleet view; leaving the key empty is supported and simply keeps the install dark
 
 Frontend build note:
 
@@ -338,6 +363,7 @@ Optimize oversized PNG icons or update Vite PWA Workbox limits.
 
 ## Related Docs
 
+- `docs/CUSTOMER_SERVER_ONBOARDING.md`
 - `frontend/README.md`
 - `backend/template_editor/README.md`
 - `backend/landing/README.md`
