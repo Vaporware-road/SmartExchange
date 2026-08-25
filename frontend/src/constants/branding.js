@@ -1,5 +1,5 @@
 /** Default site / product name shown in UI, PWA, and document title. */
-export const DEFAULT_SITE_NAME = 'Mr Exchange'
+export const DEFAULT_SITE_NAME = 'MrExchange'
 
 /** GitHub org URL — used on the About page. */
 export const VAPORWARE_GITHUB_ORG = 'https://github.com/Vaporware-road'

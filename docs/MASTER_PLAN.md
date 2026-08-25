@@ -1,13 +1,13 @@
-# SmartExchange Panel – Master Plan
+# MrExchange Panel – Master Plan
 
 ## Phase 1: Rebranding & Cleanup ✅ COMPLETED
 
 ### 1.1 Global Rebrand
-- **README**: Pardis Panel → SmartExchange Panel
-- **Project structure docs**: PardisPanel → SmartExchangePanel
+- **README**: Pardis Panel → MrExchange Panel
+- **Project structure docs**: PardisPanel → MrExchangePanel
 - **Links**: Removed hardcoded sarafipardis.co.uk URLs; replaced with "configure in deployment"
 - **base.html**: Page title uses `{{ site_settings.site_name }} Panel`
-- **SiteSettings default**: `site_name = "SmartExchange"`
+- **SiteSettings default**: `site_name = "MrExchange"`
 - **Note**: Django project folder `SarafiPardis/` left unchanged to avoid breaking imports and deployments
 
 ### 1.2 UI Cleanup – Hardcoded Contact Data Removed

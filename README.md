@@ -1,6 +1,6 @@
-# SmartExchange Panel
+# MrExchange Panel
 
-SmartExchange Panel is a full-stack exchange operations platform:
+MrExchange Panel is a full-stack exchange operations platform:
 
 - Manage regular and special prices
 - Review/finalize changes before publishing
@@ -59,7 +59,7 @@ Frontend behavior:
 ## Repository Layout
 
 ```text
-SmartExchangePanel/
+MrExchangePanel/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
@@ -71,7 +71,7 @@ SmartExchangePanel/
 │   ├── package.json
 │   └── vite.config.js
 ├── backend/
-│   ├── SmartExchangePanel/        # Django project settings/urls
+│   ├── MrExchangePanel/        # Django project settings/urls
 │   ├── accounts/
 │   ├── analysis/
 │   ├── category/
@@ -167,8 +167,8 @@ The `ensure_demo_user` command creates the demo account (role=management, unusab
 In additional terminals (required for finalize/telegram background execution):
 
 ```bash
-celery -A SmartExchangePanel worker --loglevel=INFO
-celery -A SmartExchangePanel beat --loglevel=INFO
+celery -A MrExchangePanel worker --loglevel=INFO
+celery -A MrExchangePanel beat --loglevel=INFO
 ```
 
 ## Frontend

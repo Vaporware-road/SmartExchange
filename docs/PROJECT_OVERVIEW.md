@@ -1,6 +1,6 @@
-# SmartExchange Panel — Project Overview
+# MrExchange Panel — Project Overview
 
-A full-stack exchange (صرافی) operations platform for **Mr Exchange** (`mrexchange.co.uk`). It lets an exchange team manage currency prices, review and finalize changes, render branded price-board images, and auto-publish them to Telegram (and optionally Instagram and an external WordPress website).
+A full-stack exchange (صرافی) operations platform for **MrExchange** (`mrexchange.co.uk`). It lets an exchange team manage currency prices, review and finalize changes, render branded price-board images, and auto-publish them to Telegram (and optionally Instagram and an external WordPress website).
 
 > Note: the repo also bundles a second, unrelated Django app at `backend/Request-Manage-System/` ("Iraniu" — an ad-request management system). It is separate and has its own documentation.
 
@@ -38,9 +38,9 @@ The product answers one core workflow:
 ## 3. Repo Layout
 
 ```text
-SmartExchange/
+MrExchange/
 ├── backend/
-│   ├── SmartExchangePanel/   # Django project (settings, urls, celery, middleware, SPAView)
+│   ├── MrExchangePanel/   # Django project (settings, urls, celery, middleware, SPAView)
 │   ├── accounts/             # Users, roles, JWT auth, activity logs
 │   ├── analysis/             # Analytics dashboard + pricing API
 │   ├── category/             # Currencies, Categories, PriceTypes
@@ -204,7 +204,7 @@ Throttles: anon 100/h, user 1000/h, finalize 60/h, settings 200/h, public prices
 ## 9. Bundled-but-Separate Apps
 
 - **`backend/Request-Manage-System/` ("Iraniu")** — standalone Django 5.0.1 project: human-in-the-loop ad-request management with OpenAI moderation pre-scan, staff approve/reject, Telegram notifications with "Edit & Resubmit", Bootstrap 5 dark theme. Own settings, DB, docs.
-- **`landing page/`** — static Persian marketing page for Mr Exchange (with `Demo.mp4`, sitemap, robots.txt), separate from the `backend/landing` Django view which also renders a landing page.
+- **`landing page/`** — static Persian marketing page for MrExchange (with `Demo.mp4`, sitemap, robots.txt), separate from the `backend/landing` Django view which also renders a landing page.
 
 ---
 

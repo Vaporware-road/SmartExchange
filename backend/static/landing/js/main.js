@@ -1,5 +1,5 @@
 /**
- * mr. sarafi | آقای صرافی Landing Page JavaScript
+ * MrExchange | آقای صرافی Landing Page JavaScript
  * Handles language switching, RTL support, mobile menu, FAQ accordion, and smooth scrolling
  */
 
@@ -9,10 +9,14 @@
     // ============================================
     // Language Management
     // ============================================
-    const LANGUAGE_KEY = 'mrsarafi_language';
+    const LANGUAGE_KEY = 'mrexchange_language';
+    // Legacy key kept so a returning visitor's language survives the rebrand.
+    const LANGUAGE_KEY_LEGACY = 'mrsarafi_language';
     const DEFAULT_LANGUAGE = 'en';
     
-    let currentLanguage = localStorage.getItem(LANGUAGE_KEY) || DEFAULT_LANGUAGE;
+    let currentLanguage = localStorage.getItem(LANGUAGE_KEY)
+        || localStorage.getItem(LANGUAGE_KEY_LEGACY)
+        || DEFAULT_LANGUAGE;
     
     // Initialize language on page load
     function initLanguage() {
@@ -22,6 +26,7 @@
     function setLanguage(lang) {
         currentLanguage = lang;
         localStorage.setItem(LANGUAGE_KEY, lang);
+        localStorage.removeItem(LANGUAGE_KEY_LEGACY);
         
         const html = document.documentElement;
         const isRTL = lang === 'fa';
@@ -257,7 +262,7 @@
     // ============================================
     // Console Welcome Message
     // ============================================
-    console.log('%cmr. sarafi | آقای صرافی', 'color: #FFD700; font-size: 20px; font-weight: bold;');
+    console.log('%cMrExchange | آقای صرافی', 'color: #FFD700; font-size: 20px; font-weight: bold;');
     console.log('%cPremium Exchange Management System', 'color: #cccccc; font-size: 14px;');
     console.log('%cWelcome! This page supports English and Persian (RTL).', 'color: #888888; font-size: 12px;');
 

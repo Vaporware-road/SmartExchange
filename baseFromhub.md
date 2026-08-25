@@ -1,6 +1,6 @@
-# SmartExchange Panel — current structure
+# MrExchange Panel — current structure
 
-Snapshot of the app **as it exists in this repo now**. Git root is `sarraf`; almost all product code lives in `SmartExchange/`.
+Snapshot of the app **as it exists in this repo now**. Git root is `sarraf`; almost all product code lives in `MrExchange/`.
 
 This is an operations panel for currency exchange desks. Staff update buy/sell rates, managers finalize them, the backend renders branded price images, and posts go to Telegram (and optionally Instagram).
 
@@ -73,7 +73,7 @@ Docker (optional): `docker compose up --build` — panel `localhost:5250`, API `
 
 ```text
 sarraf/
-└── SmartExchange/
+└── MrExchange/
     ├── README.md
     ├── معرفی-پنل.md
     ├── baseFromhub.md          # this file
@@ -128,7 +128,7 @@ src/
 
 | App | Job |
 |-----|-----|
-| `SmartExchangePanel` | Settings, Celery, root URLs, `/api/` router |
+| `MrExchangePanel` | Settings, Celery, root URLs, `/api/` router |
 | `accounts` | CustomUser, JWT, activity logs, demo-login |
 | `category` | Currency, Category, PriceType |
 | `change_price` | Regular PriceHistory |
@@ -259,7 +259,7 @@ Auth endpoints: `POST /api/auth/login/`, `GET /api/auth/me/`, `POST /api/auth/lo
 
 ## Separate app: Iraniu (`backend/Request-Manage-System/`)
 
-Not part of the SmartExchange panel runtime. Own Django project, Bootstrap UI, SQLite.
+Not part of the MrExchange panel runtime. Own Django project, Bootstrap UI, SQLite.
 
 Flow: ad submissions → optional OpenAI moderation → staff approve/reject → Telegram notify (edit-and-resubmit links). Config in a `SiteConfiguration` singleton.
 
@@ -267,7 +267,7 @@ Flow: ad submissions → optional OpenAI moderation → staff approve/reject →
 
 ## How to run locally (no Docker)
 
-Three terminals, from `SmartExchange`.
+Three terminals, from `MrExchange`.
 
 **Backend**
 
@@ -286,9 +286,9 @@ python manage.py runserver
 ```bash
 cd backend
 source venv/bin/activate
-celery -A SmartExchangePanel worker --loglevel=INFO
+celery -A MrExchangePanel worker --loglevel=INFO
 # optional:
-celery -A SmartExchangePanel beat --loglevel=INFO
+celery -A MrExchangePanel beat --loglevel=INFO
 ```
 
 **Frontend**
@@ -306,7 +306,7 @@ Without Redis/Celery, login and price edits still work; finalize/Telegram backgr
 ### Docker
 
 ```bash
-cd SmartExchange
+cd MrExchange
 cp .env.example .env.docker
 docker compose up --build
 ```
@@ -320,7 +320,7 @@ Requires Docker Desktop running. Panel `http://localhost:5250`, API `http://loca
 - Default Django DB path is `backend/db.sqlite3` unless `SQLITE_PATH` is set.
 - A local superuser was created on that DB: username `samadmin`, password `SarrafLocal2026!`, role `super_admin`. Change this before any real deploy.
 - `orders` is referenced in category delete but the app is absent; import is optional so `runserver` works.
-- `docs/MASTER_PLAN.md` describes an older rebrand (Pardis → SmartExchange). Vue + DRF conversion is already the live architecture.
+- `docs/MASTER_PLAN.md` describes an older rebrand (Pardis → MrExchange). Vue + DRF conversion is already the live architecture.
 
 ---
 

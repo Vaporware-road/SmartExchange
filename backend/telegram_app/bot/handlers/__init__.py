@@ -1,4 +1,4 @@
-"""aiogram routers for SmartExchange customer bot."""
+"""aiogram routers for MrExchange customer bot."""
 
 from __future__ import annotations
 

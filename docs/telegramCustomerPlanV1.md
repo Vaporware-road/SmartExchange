@@ -1,9 +1,9 @@
 # Telegram customer bot — Plan V1
 
-Conversational Telegram customer bot inside SmartExchange that shares the panel SQLite DB with the webapp. Outbound price publishing stays as-is; this plan adds inbound conversation on top.
+Conversational Telegram customer bot inside MrExchange that shares the panel SQLite DB with the webapp. Outbound price publishing stays as-is; this plan adds inbound conversation on top.
 
 **Status:** V1 complete (Phases 1–7)  
-**Doc:** `SmartExchange/docs/telegramCustomerPlanV1.md`
+**Doc:** `MrExchange/docs/telegramCustomerPlanV1.md`
 
 ### Ops notes (panel staff)
 
@@ -16,7 +16,7 @@ Conversational Telegram customer bot inside SmartExchange that shares the panel 
 
 ## Locked decisions (all phases)
 
-- Live in SmartExchange (`telegram_app` + new models), same DB as the web panel (`backend/data/db.sqlite3`). Do **not** wire Iraniu’s separate DB.
+- Live in MrExchange (`telegram_app` + new models), same DB as the web panel (`backend/data/db.sqlite3`). Do **not** wire Iraniu’s separate DB.
 - Keep existing outbound price publishing unchanged.
 - Admin notify recipients: active `CustomUser` with role `super_admin` or `management` and non-empty `telegram_id` ([`accounts/models.py`](../backend/accounts/models.py)).
 - Customer **tag**: `global` | `vip` | `special`, default `global`, set only by panel staff; shown in profile as text (not a button).
@@ -32,7 +32,7 @@ flowchart TD
   dispatcher --> engine[ConversationEngine]
   engine --> session[(BotSession state+context)]
   engine --> models[(CustomerProfile ExchangeRequest PriceAlert)]
-  models --> sameDB[(SmartExchange SQLite)]
+  models --> sameDB[(MrExchange SQLite)]
   panel[Vue panel] --> sameDB
   engine -->|confirm request| notify[notify_panel_staff]
   notify --> staffTG[CustomUser.telegram_id]
@@ -78,7 +78,7 @@ Phases 3 and 4 can run in parallel after Phase 2. Phase 6 can start after Phase 
 
 ## Phase 1 — Data foundation
 
-**Goal:** Persist customers, sessions, requests, and alerts in the shared SmartExchange DB; ship a worldwide currency list with a load/paginate helper. No Telegram ingress yet.
+**Goal:** Persist customers, sessions, requests, and alerts in the shared MrExchange DB; ship a worldwide currency list with a load/paginate helper. No Telegram ingress yet.
 
 ### Deliverables
 
@@ -109,7 +109,7 @@ Phases 3 and 4 can run in parallel after Phase 2. Phase 6 can start after Phase 
    - `is_active`, `last_triggered_at` (nullable)
    - timestamps
 
-2. Django migrations applied cleanly against the SmartExchange DB.
+2. Django migrations applied cleanly against the MrExchange DB.
 
 3. File [`telegram_app/data/allCurrencies.txt`](../backend/telegram_app/data/allCurrencies.txt): ISO 4217 codes + English names, one per line: `USD|US Dollar`.
 

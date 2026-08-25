@@ -1,4 +1,4 @@
-# SmartExchange Panel – Frontend
+# MrExchange Panel – Frontend
 
 Vue 3 SPA with Vite.
 

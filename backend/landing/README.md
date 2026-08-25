@@ -1,4 +1,4 @@
-# mr. sarafi | آقای صرافی - Landing Page
+# MrExchange | آقای صرافی - Landing Page
 
 A premium, dark-themed landing page with dual language support (English/Persian) and RTL capabilities for the automated exchange management system.
 
@@ -8,7 +8,7 @@ A premium, dark-themed landing page with dual language support (English/Persian)
 ╔══════════════════════════════════════════════════════════════════════════╗
 ║                    FIXED NAVIGATION BAR (Top)                             ║
 ║  ┌──────────────────┐  [Features] [Pricing] [FAQ] [Contact] [EN/FA]    ║
-║  │ mr. sarafi        │  [Get Started]                                     ║
+║  │ MrExchange        │  [Get Started]                                     ║
 ║  │ آقای صرافی        │                                                     ║
 ║  └──────────────────┘                                                     ║
 ╚══════════════════════════════════════════════════════════════════════════╝
@@ -84,7 +84,7 @@ A premium, dark-themed landing page with dual language support (English/Persian)
 │  [Logo 1] [Logo 2] [Logo 3] [Logo 4] [Logo 5]                           │
 │                                                                           │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
-│  │ "mr. sarafi  │  │ "The Telegram│  │ "Best       │                  │
+│  │ "MrExchange  │  │ "The Telegram│  │ "Best       │                  │
 │  │  transformed │  │  integration │  │  investment" │                  │
 │  │  our ops..." │  │  is a game-  │  │              │                  │
 │  └──────────────┘  └──────────────┘  └──────────────┘                  │
@@ -117,11 +117,11 @@ A premium, dark-themed landing page with dual language support (English/Persian)
 ┌──────────────────────────────────────────────────────────────────────────┐
 │                              FOOTER                                       │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐│
-│  │ mr. sarafi   │  │   Product    │  │   Company    │  │    Legal     ││
+│  │ MrExchange   │  │   Product    │  │   Company    │  │    Legal     ││
 │  │ آقای صرافی  │  │   محصول      │  │   شرکت       │  │   قانونی     ││
 │  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘│
 │                                                                           │
-│  © 2025 mr. sarafi. All rights reserved.                                 │
+│  © 2025 MrExchange. All rights reserved.                                 │
 │  © 2025 آقای صرافی. تمامی حقوق محفوظ است.                              │
 └──────────────────────────────────────────────────────────────────────────┘
 ```
@@ -131,7 +131,7 @@ A premium, dark-themed landing page with dual language support (English/Persian)
 - **Dark Theme**: Pure black (#000000) background with luxurious gold (#FFD700) accents
 - **Dual Language**: Full English and Persian (Farsi) support with seamless switching
 - **RTL Support**: Automatic right-to-left text direction for Persian
-- **Premium Branding**: "mr. sarafi" in English and "آقای صرافی" in Persian
+- **Premium Branding**: "MrExchange" in English and "آقای صرافی" in Persian
 - **Responsive**: Fully responsive design (desktop, tablet, mobile)
 - **Modern**: Clean, minimal, professional design with smooth animations
 
@@ -191,7 +191,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 The URLs are already configured. Verify in your main `urls.py`:
 
 ```python
-# SmartExchangePanel/urls.py (or your main urls.py)
+# MrExchangePanel/urls.py (or your main urls.py)
 from django.urls import path, include
 
 urlpatterns = [
@@ -230,7 +230,7 @@ python manage.py collectstatic --noinput
 
 1. **Contact Information**:
    - Update Telegram link: `https://t.me/your_telegram_username`
-   - Update email: `support@mrsarafi.com` (or your actual email)
+   - Update email: `support@mrexchange.co.uk` (or your actual email)
 
 2. **Social Media Links**:
    - Update footer social links (Twitter, LinkedIn, Telegram)
@@ -392,4 +392,4 @@ For issues or questions:
 
 **Built with modern web standards** • **Dark + Gold Premium Theme** • **Dual Language Support** • **Production Ready**
 
-**mr. sarafi | آقای صرافی** - Premium Exchange Automation
+**MrExchange | آقای صرافی** - Premium Exchange Automation

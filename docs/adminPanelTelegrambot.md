@@ -1,6 +1,6 @@
 # In-bot Telegram admin panel
 
-Summary of work completed for the SmartExchange customer bot admin experience (no login button).
+Summary of work completed for the MrExchange customer bot admin experience (no login button).
 
 ## Source plan
 

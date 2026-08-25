@@ -1,4 +1,4 @@
-# SmartExchange — Agent Notes
+# MrExchange — Agent Notes
 
 > Full architecture: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)  
 > Parent workspace notes: [../AGENTS.md](../AGENTS.md)  
@@ -8,13 +8,13 @@
 
 ## One-line orientation
 
-Exchange ops panel for Mr Exchange (`mrexchange.co.uk`). Operators update prices → managers finalize → Celery renders branded images → publishes to Telegram (mandatory) + Instagram + external WordPress API.
+Exchange ops panel for MrExchange (`mrexchange.co.uk`). Operators update prices → managers finalize → Celery renders branded images → publishes to Telegram (mandatory) + Instagram + external WordPress API.
 
 **Two products in this repo — do not cross-import:**
 
 | Product | Root | Notes |
 |---------|------|-------|
-| **SmartExchange Panel** | `backend/` (all apps except below) + `frontend/` | This is what you work on |
+| **MrExchange Panel** | `backend/` (all apps except below) + `frontend/` | This is what you work on |
 | **Iraniu** | `backend/Request-Manage-System/` | Separate Django project, own DB, own bots |
 
 ---
@@ -40,8 +40,8 @@ python manage.py ensure_default_admin
 python manage.py runserver   # :8000
 
 # Celery (separate terminals)
-celery -A SmartExchangePanel worker --loglevel=INFO
-celery -A SmartExchangePanel beat --loglevel=INFO
+celery -A MrExchangePanel worker --loglevel=INFO
+celery -A MrExchangePanel beat --loglevel=INFO
 
 # Frontend
 cd frontend

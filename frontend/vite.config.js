@@ -103,8 +103,8 @@ export default defineConfig(({ command, mode }) => {
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'favicon.png', 'pwa-192x192.png', 'pwa-512x512.png', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Mr Exchange',
-        short_name: 'Mr Exchange',
+        name: 'MrExchange',
+        short_name: 'MrExchange',
         description: 'Exchange management panel',
         start_url: '/',
         display: 'standalone',

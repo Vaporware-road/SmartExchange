@@ -1,6 +1,6 @@
-# SmartExchange Deployment Guide for Coding Agents
+# MrExchange Deployment Guide for Coding Agents
 
-Use this guide to run SmartExchange locally or deploy it on a Docker host. The repository contains a separate `backend/Request-Manage-System/` product; deploy only the main SmartExchange stack unless explicitly asked otherwise.
+Use this guide to run MrExchange locally or deploy it on a Docker host. The repository contains a separate `backend/Request-Manage-System/` product; deploy only the main MrExchange stack unless explicitly asked otherwise.
 
 ## 1. What runs
 

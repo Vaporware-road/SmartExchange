@@ -97,7 +97,7 @@ pip install 'psycopg[binary]>=3.1'
 Run migrations:
 
 ```bash
-cd SmartExchange/backend
+cd MrExchange/backend
 python manage.py migrate telegram_app
 ```
 

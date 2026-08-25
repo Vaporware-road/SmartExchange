@@ -81,7 +81,7 @@ class SiteSettings(models.Model):
     Only one row should exist; use ``SiteSettings.load()`` to retrieve it.
     """
 
-    site_name = models.CharField(max_length=100, default="Mr Exchange")
+    site_name = models.CharField(max_length=100, default="MrExchange")
     tagline = models.CharField(max_length=200, default="Premium Exchange Panel")
     logo = models.ImageField(upload_to="branding/", null=True, blank=True)
     favicon = models.ImageField(upload_to="branding/", null=True, blank=True)

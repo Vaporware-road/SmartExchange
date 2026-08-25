@@ -1,4 +1,4 @@
-# mr. sarafi | آقای صرافی - Landing Page Visual Preview
+# MrExchange | آقای صرافی - Landing Page Visual Preview
 
 ## 🎨 Design Theme
 
@@ -24,7 +24,7 @@
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                    NAVIGATION (Fixed, Dark with Gold)                   │
 │                                                                          │
-│  [mr. sarafi]  [Features] [Pricing] [FAQ] [Contact] [EN/FA] [Get Started]
+│  [MrExchange]  [Features] [Pricing] [FAQ] [Contact] [EN/FA] [Get Started]
 │  [آقای صرافی]                                                           │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
@@ -120,7 +120,7 @@
 │  [Logo 1] [Logo 2] [Logo 3] [Logo 4] [Logo 5]                           │
 │                                                                          │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                 │
-│  │ "mr. sarafi  │  │ "The Telegram│  │ "Best        │                 │
+│  │ "MrExchange  │  │ "The Telegram│  │ "Best        │                 │
 │  │  transformed │  │  integration │  │  investment" │                 │
 │  │  our ops..." │  │  is a game-  │  │              │                 │
 │  │              │  │  changer..." │  │              │                 │
@@ -182,7 +182,7 @@
 │                              FOOTER                                       │
 │                                                                          │
 │  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐│
-│  │ mr. sarafi   │  │   Product    │  │   Company    │  │    Legal     ││
+│  │ MrExchange   │  │   Product    │  │   Company    │  │    Legal     ││
 │  │ آقای صرافی  │  │   محصول      │  │   شرکت       │  │   قانونی     ││
 │  │              │  │              │  │              │  │              ││
 │  │ Premium      │  │ • Features   │  │ • Contact    │  │ • Privacy    ││
@@ -193,7 +193,7 @@
 │  │ [Social]     │  │              │  │              │  │              ││
 │  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘│
 │                                                                          │
-│  © 2025 mr. sarafi. All rights reserved.                               │
+│  © 2025 MrExchange. All rights reserved.                               │
 │  © 2025 آقای صرافی. تمامی حقوق محفوظ است.                              │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -222,7 +222,7 @@
    - Language toggle animation
 
 5. **Brand Identity**
-   - "mr. sarafi" prominently displayed
+   - "MrExchange" prominently displayed
    - "آقای صرافی" in Persian
    - Consistent branding throughout
 

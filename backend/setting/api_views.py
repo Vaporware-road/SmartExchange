@@ -54,7 +54,7 @@ def _upload_settings_fallback():
 def _public_site_settings_fallback():
     """Shape must match SiteSettingsSerializer (used when DB schema is behind migrations)."""
     return {
-        "site_name": "Mr Exchange",
+        "site_name": "MrExchange",
         "tagline": "Premium Exchange Panel",
         "logo": None,
         "favicon": None,
