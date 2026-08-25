@@ -1,0 +1,98 @@
+# One isolated MrExchange stack per 14-day trial signup.
+#
+# This is master-plan option B: the same architecture already proven for a
+# customer-server install, hosted on our own VPS instead of the customer's.
+# Every trial gets its own SQLite file, its own media/static volumes and its
+# own subdomain, so no core data model has to become multi-tenant.
+#
+# Rendered and driven by backend/fleet/provisioning.py. All values come from
+# the per-stack .env written next to this file's copy in
+# TRIAL_STACKS_ROOT/<slug>/.
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    image: ${TRIAL_IMAGE}
+    env_file:
+      - .env
+    restart: unless-stopped
+    command: >
+      sh -c "mkdir -p /app/backend/data /app/backend/public/media /app/backend/public/staticfiles &&
+             cd /app/backend &&
+             python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             python manage.py ensure_default_admin &&
+             exec supervisord -c /etc/supervisor/conf.d/supervisord.conf"
+    volumes:
+      - trial_data:/app/backend/data
+      - trial_media:/app/backend/public/media
+      - trial_static:/app/backend/public/staticfiles
+    depends_on:
+      redis:
+        condition: service_healthy
+    labels:
+      # Subdomain automation: Traefik routes <slug>.<TRIAL_BASE_DOMAIN> here and
+      # provisions the certificate, so no per-stack host port is published.
+      - "traefik.enable=true"
+      - "traefik.http.routers.${TRIAL_SLUG}.rule=Host(`${TRIAL_DOMAIN}`)"
+      - "traefik.http.routers.${TRIAL_SLUG}.entrypoints=websecure"
+      - "traefik.http.routers.${TRIAL_SLUG}.tls.certresolver=${TRIAL_CERT_RESOLVER}"
+      - "traefik.http.services.${TRIAL_SLUG}.loadbalancer.server.port=8000"
+    networks:
+      - default
+      - edge
+
+  celery-worker:
+    image: ${TRIAL_IMAGE}
+    env_file:
+      - .env
+    restart: unless-stopped
+    command: >
+      sh -c "cd /app/backend &&
+             celery -A MrExchangePanel worker --loglevel=INFO --concurrency=1"
+    volumes:
+      - trial_data:/app/backend/data
+      - trial_media:/app/backend/public/media
+      - trial_static:/app/backend/public/staticfiles
+    depends_on:
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  celery-beat:
+    image: ${TRIAL_IMAGE}
+    env_file:
+      - .env
+    restart: unless-stopped
+    command: >
+      sh -c "cd /app/backend &&
+             celery -A MrExchangePanel beat --loglevel=INFO"
+    volumes:
+      - trial_data:/app/backend/data
+      - trial_media:/app/backend/public/media
+      - trial_static:/app/backend/public/staticfiles
+    depends_on:
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+volumes:
+  trial_data:
+  trial_media:
+  trial_static:
+
+networks:
+  edge:
+    external: true
+    name: ${TRIAL_EDGE_NETWORK}

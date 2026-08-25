@@ -31,6 +31,7 @@ class LoginSerializer(serializers.Serializer):
 
 class UserSerializer(serializers.ModelSerializer):
     telegram_bot_token_masked = serializers.SerializerMethodField()
+    trial_days_remaining = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
@@ -69,6 +70,11 @@ class UserSerializer(serializers.ModelSerializer):
     registered_by_name = serializers.SerializerMethodField()
     owner_name = serializers.SerializerMethodField()
     owner_username = serializers.SerializerMethodField()
+
+    def get_trial_days_remaining(self, obj):
+        from fleet.services import days_remaining
+
+        return days_remaining(obj)
 
     def get_registered_by_name(self, obj):
         staff = obj.registered_by

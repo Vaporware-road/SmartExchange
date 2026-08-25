@@ -20,4 +20,5 @@ urlpatterns = [
     path("templates/", include("price_publisher.api_urls")),
     path("template-editor/", include("template_editor.api_urls")),
     path("instagram-hub/", include("instagram_hub.api_urls")),
+    path("fleet/", include("fleet.api_urls")),
 ]

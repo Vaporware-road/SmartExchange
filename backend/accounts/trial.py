@@ -1,13 +1,18 @@
 from datetime import timedelta
 
+from django.conf import settings
 from django.utils import timezone
 
 TRIAL_PLAN = "free_trial"
-TRIAL_DURATION = timedelta(days=14)
+
+
+def trial_duration():
+    """Trial length, from INDIVIDUAL_TRIAL_DAYS. Fixed at 14 days by default."""
+    return timedelta(days=getattr(settings, "INDIVIDUAL_TRIAL_DAYS", 14))
 
 
 def trial_expires_at(started_at):
-    return started_at + TRIAL_DURATION
+    return started_at + trial_duration()
 
 
 def trial_is_expired(user, now=None):
@@ -27,4 +32,31 @@ def ensure_trial_started(user, now=None):
     user.trial_started_at = started
     user.trial_expires_at = trial_expires_at(started)
     user.save(update_fields=["trial_started_at", "trial_expires_at"])
+    _register_trial_deployment(user)
     return True
+
+
+def _register_trial_deployment(user):
+    """Record the trial's stack and queue provisioning.
+
+    Best effort by design: a Docker or broker problem must never stop an
+    account from getting its trial. The fleet view shows the record as pending
+    and the operator can re-queue provisioning from there.
+    """
+    try:
+        from django.db import transaction
+
+        from fleet.services import ensure_trial_deployment
+        from fleet.tasks import provision_trial_task
+
+        deployment, created = ensure_trial_deployment(user)
+        if created:
+            transaction.on_commit(
+                lambda: provision_trial_task.delay(deployment_id=deployment.pk)
+            )
+    except Exception:
+        import logging
+
+        logging.getLogger(__name__).exception(
+            "trial: could not register a fleet deployment for %s", user.pk
+        )

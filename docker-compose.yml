@@ -1,4 +1,4 @@
-name: smart-exchange
+name: mrexchange
 
 # BuildKit makes /etc/resolv.conf read-only during build; broken builder DNS then breaks pip/npm.
 # Static hosts for package indexes (Fastly/Cloudflare edges; update if downloads fail after CDN changes).

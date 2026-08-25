@@ -8,6 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
 DEPLOYMENT_MODE = os.environ.get('DEPLOYMENT_MODE', 'cloud').strip().lower()
 TRIAL_EXPIRY_CHECK_SECONDS = float(os.environ.get('TRIAL_EXPIRY_CHECK_SECONDS', '3600'))
+APP_VERSION = os.environ.get('APP_VERSION', '').strip()
 
 # Security: Use environment variable for SECRET_KEY
 # Generate a new key with: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
@@ -68,6 +69,7 @@ INSTALLED_APPS = [
     'analysis',
     'landing',
     'instagram_hub',
+    'fleet',
     # third-party apps
     'corsheaders',
     'rest_framework',
@@ -94,6 +96,9 @@ REST_FRAMEWORK = {
         'finalize': '60/hour',
         'settings': '200/hour',
         'public_prices': '2000/hour',
+        # One heartbeat a day per install; the headroom absorbs restarts and
+        # retries without letting an unknown key hammer the endpoint.
+        'fleet_checkin': '60/hour',
     },
 }
 
@@ -295,6 +300,51 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 DEMO_LOGIN_ENABLED = os.environ.get('DEMO_LOGIN_ENABLED', 'True').lower() in ('true', '1', 'yes')
 DEMO_USERNAME = (os.environ.get('DEMO_USERNAME', 'demo') or 'demo').strip()
 
+# -----------------------------
+# Trial tier — one isolated stack per signup, hosted on our own VPS
+# -----------------------------
+# Trial length itself lives in accounts/trial.py; these govern what happens
+# around it. INDIVIDUAL_TRIAL_DAYS is read here so a deployment can only ever
+# widen the window deliberately, never by accident.
+INDIVIDUAL_TRIAL_DAYS = int(os.environ.get('INDIVIDUAL_TRIAL_DAYS', '14'))
+# How many days before expiry the customer and staff get warned, once.
+TRIAL_REMINDER_DAYS = int(os.environ.get('TRIAL_REMINDER_DAYS', '3'))
+# Grace after expiry: access is already blocked, but the stack and its data
+# stay in place so a late conversion still finds them.
+TRIAL_GRACE_DAYS = int(os.environ.get('TRIAL_GRACE_DAYS', '7'))
+TRIAL_REMINDER_CHECK_SECONDS = float(os.environ.get('TRIAL_REMINDER_CHECK_SECONDS', '3600'))
+TRIAL_TEARDOWN_CHECK_SECONDS = float(os.environ.get('TRIAL_TEARDOWN_CHECK_SECONDS', '86400'))
+
+# Docker-touching provisioning is off unless this host is the trial host.
+TRIAL_PROVISIONING_ENABLED = os.environ.get(
+    'TRIAL_PROVISIONING_ENABLED', 'False'
+).lower() in ('true', '1', 'yes')
+TRIAL_BASE_DOMAIN = os.environ.get('TRIAL_BASE_DOMAIN', 'mrexchange.co.uk').strip()
+TRIAL_STACKS_ROOT = os.environ.get('TRIAL_STACKS_ROOT', '/srv/mrexchange/trials')
+TRIAL_ARCHIVE_ROOT = os.environ.get('TRIAL_ARCHIVE_ROOT', '/srv/mrexchange/trial-archives')
+TRIAL_COMPOSE_TEMPLATE = os.environ.get(
+    'TRIAL_COMPOSE_TEMPLATE',
+    str(BASE_DIR.parent / 'docker' / 'trial-stack.compose.yml'),
+)
+TRIAL_IMAGE = os.environ.get('TRIAL_IMAGE', 'mrexchange/panel:latest')
+TRIAL_CERT_RESOLVER = os.environ.get('TRIAL_CERT_RESOLVER', 'letsencrypt')
+TRIAL_EDGE_NETWORK = os.environ.get('TRIAL_EDGE_NETWORK', 'edge')
+TRIAL_ADMIN_USERNAME = os.environ.get('TRIAL_ADMIN_USERNAME', 'admin')
+DOCKER_COMPOSE_COMMAND = os.environ.get(
+    'DOCKER_COMPOSE_COMMAND', 'docker compose'
+).split()
+
+# -----------------------------
+# Fleet — how this install reports to the owner panel
+# -----------------------------
+# Set on every deployed install (trial container and customer server alike).
+# The check-in sends the license key, app version and uptime, and nothing else.
+FLEET_CHECKIN_URL = os.environ.get('FLEET_CHECKIN_URL', '').strip()
+FLEET_LICENSE_KEY = os.environ.get('FLEET_LICENSE_KEY', '').strip()
+FLEET_CHECKIN_SECONDS = float(os.environ.get('FLEET_CHECKIN_SECONDS', '86400'))
+# Default license term used when issuing or reissuing a key without an explicit date.
+LICENSE_TERM_DAYS = int(os.environ.get('LICENSE_TERM_DAYS', '365'))
+
 # Security settings
 # HTTP-only reverse proxies (e.g. Dokploy *.traefik.me preview URLs): set
 # DJANGO_USE_HTTP_BEHIND_PROXY=true so Django does not force HTTPS redirects
@@ -434,6 +484,18 @@ CELERY_BEAT_SCHEDULE = {
     "telegram-snapshot-channel-members": {
         "task": "telegram_app.snapshot_channel_members",
         "schedule": float(os.environ.get("TELEGRAM_SNAPSHOT_CHANNEL_SECONDS", "86400")),
+    },
+    "trial-expiry-reminders": {
+        "task": "fleet.tasks.send_trial_expiry_reminders_task",
+        "schedule": TRIAL_REMINDER_CHECK_SECONDS,
+    },
+    "trial-teardown-lapsed": {
+        "task": "fleet.tasks.teardown_lapsed_trials_task",
+        "schedule": TRIAL_TEARDOWN_CHECK_SECONDS,
+    },
+    "fleet-checkin": {
+        "task": "fleet.tasks.send_fleet_checkin_task",
+        "schedule": FLEET_CHECKIN_SECONDS,
     },
     "telegram-run-reengage-campaigns": {
         "task": "telegram_app.run_due_reengage_campaigns",
