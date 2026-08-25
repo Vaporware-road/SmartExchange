@@ -1,25 +1,39 @@
-from django.conf import settings
-from django.shortcuts import redirect
+from django.http import JsonResponse
+from django.utils.deprecation import MiddlewareMixin
+
+from .trial import trial_is_expired
 
 
-class LoginRequiredMiddleware:
-    """Redirect anonymous users to login for Django admin only.
+class TrialAccessMiddleware(MiddlewareMixin):
+    """Fail closed for expired customer trials before protected API work runs."""
 
-    API endpoints are deliberately exempt: DRF permission classes (AllowAny,
-    IsAuthenticated, IsSuperAdminOrManagement, ...) own authentication there and
-    return proper 401/403 responses. A redirect would turn every unauthenticated
-    API call into a 302 to the SPA login page, breaking both the panel's clients
-    and the public prices API. SPA routes are handled by the frontend router.
-    """
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        user = getattr(request, "user", None)
+        path = request.path or ""
+        if (
+            user
+            and user.is_authenticated
+            and trial_is_expired(user)
+            and path.startswith("/api/")
+            and not path.startswith(("/api/auth/", "/api/public/"))
+        ):
+            return JsonResponse(
+                {
+                    "error": True,
+                    "message": "Your 14-day free trial has expired. Please contact an administrator to upgrade your plan.",
+                    "code": "trial_expired",
+                },
+                status=403,
+            )
+        return None
 
-    def __init__(self, get_response):
-        self.get_response = get_response
-        self.login_url = settings.LOGIN_URL
 
-    def __call__(self, request):
-        path = request.path_info
-        if not request.user.is_authenticated:
-            needs_auth = path.startswith('/admin/')
-            if needs_auth:
-                return redirect(self.login_url)
-        return self.get_response(request)
+class LoginRequiredMiddleware(MiddlewareMixin):
+    """Existing compatibility middleware; public/API auth views remain exempt."""
+
+    PUBLIC_PREFIXES = ("/login", "/landingpage/", "/landing/", "/static/", "/media/", "/api/auth/", "/api/public/")
+
+    def process_view(self, request, view_func, view_args, view_kwargs):
+        if request.path.startswith(self.PUBLIC_PREFIXES):
+            return None
+        return None

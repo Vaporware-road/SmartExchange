@@ -1,0 +1,1 @@
+import{C as r,o,c as e}from"./index-oe6JWETV.js";const n={},c={class:"inline-block w-8 h-8 border-2 rounded-full animate-spin",style:{"border-color":"var(--primary-muted)","border-top-color":"var(--primary)"}};function t(a,s){return o(),e("div",c)}const d=r(n,[["render",t]]);export{d as L};

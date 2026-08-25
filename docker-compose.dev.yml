@@ -1,0 +1,105 @@
+name: smart-exchange-dev
+
+services:
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "60", "1", "--loglevel", "warning"]
+    ports:
+      - "16379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    image: smart-exchange-app:latest
+    env_file:
+      - .env.docker
+    command: >
+      sh -c "
+        mkdir -p /app/backend/data /app/backend/public/media /app/backend/public/staticfiles &&
+        cd /app/backend &&
+        python manage.py migrate --noinput &&
+        python manage.py ensure_default_admin --username admin --password admin &&
+        python manage.py ensure_demo_user &&
+        echo '✅ Django + Vite starting...' &&
+        exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
+      "
+    environment:
+      DJANGO_DEBUG: "True"
+      DJANGO_ALLOWED_HOSTS: "localhost,127.0.0.1,0.0.0.0"
+      DJANGO_CSRF_TRUSTED_ORIGINS: "http://localhost:5252,http://127.0.0.1:5252"
+      DJANGO_USE_HTTP_BEHIND_PROXY: "false"
+      SQLITE_PATH: "/app/backend/data/db.sqlite3"
+      DEFAULT_ADMIN_USERNAME: "admin"
+      DEFAULT_ADMIN_PASSWORD: "admin"
+      DEFAULT_ADMIN_SYNC_PASSWORD: "true"
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      VITE_API_PROXY_TARGET: "http://127.0.0.1:8000"
+      VITE_DEV_SERVER_PORT: "5173"
+      VITE_HMR_CLIENT_PORT: "5252"
+      VITE_HMR_HOST: "localhost"
+      VITE_DEV_ORIGIN: "http://localhost:5252"
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+      - dev_media:/app/backend/public/media
+      - dev_db:/app/backend/data
+    ports:
+      - "5251:8000"
+      - "5252:5173"
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  celery-worker:
+    image: smart-exchange-celery-worker:latest
+    env_file:
+      - .env.docker
+    command: >
+      sh -c "cd /app/backend &&
+             celery -A SmartExchangePanel worker --loglevel=INFO --concurrency=2"
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      DJANGO_DEBUG: "True"
+      SQLITE_PATH: "/app/backend/data/db.sqlite3"
+    volumes:
+      - ./backend:/app/backend
+      - dev_media:/app/backend/public/media
+      - dev_db:/app/backend/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+  celery-beat:
+    image: smart-exchange-celery-beat:latest
+    env_file:
+      - .env.docker
+    command: >
+      sh -c "cd /app/backend &&
+             celery -A SmartExchangePanel beat --loglevel=INFO"
+    environment:
+      PYTHONUNBUFFERED: "1"
+      PYTHONDONTWRITEBYTECODE: "1"
+      DJANGO_DEBUG: "True"
+      SQLITE_PATH: "/app/backend/data/db.sqlite3"
+    volumes:
+      - ./backend:/app/backend
+      - dev_media:/app/backend/public/media
+      - dev_db:/app/backend/data
+    depends_on:
+      redis:
+        condition: service_healthy
+      app:
+        condition: service_started
+
+volumes:
+  dev_media:
+  dev_db:

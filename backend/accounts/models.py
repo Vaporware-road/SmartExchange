@@ -57,6 +57,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     telegram_username = models.CharField(max_length=128, blank=True, default='')
     plan = models.CharField(max_length=16, choices=PLAN_CHOICES, default=PLAN_BRONZE)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default=ROLE_EMPLOYEE)
+    trial_started_at = models.DateTimeField(null=True, blank=True)
+    trial_expires_at = models.DateTimeField(null=True, blank=True)
+    trial_expiry_notified_at = models.DateTimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

@@ -621,7 +621,7 @@
                     v-model="scheduleForm.timezone"
                     type="text"
                     class="input-luxury w-full"
-                    placeholder="Asia/Tehran"
+                    :placeholder="$t('telegram.timezonePlaceholder')"
                   />
                 </div>
                 <div class="flex items-end gap-2">
@@ -1422,6 +1422,9 @@ async function handleSend() {
       }
     }
     await telegramApi.sendMessage(payload)
+  } catch (err) {
+    const msg = err.response?.data?.detail || t('toast.serverError')
+    toast.error(typeof msg === 'string' ? msg : t('toast.serverError'))
   } finally {
     submitting.value = false
   }

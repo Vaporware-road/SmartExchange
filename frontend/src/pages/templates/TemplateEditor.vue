@@ -9,14 +9,14 @@
           class="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--primary)]"
         >
           <i class="fas fa-arrow-left" />
-          <span>Back</span>
+          <span>{{ $t('templateEditor.back') }}</span>
         </router-link>
       </div>
       <div class="min-w-0 flex-1 text-center">
         <h1 v-if="template" class="truncate text-sm font-semibold text-[var(--primary)] sm:text-base" :title="template.name">
           {{ template.name }}
         </h1>
-        <span v-else class="text-sm text-[var(--text-secondary)]">Template</span>
+        <span v-else class="text-sm text-[var(--text-secondary)]">{{ $t('templateEditor.template') }}</span>
       </div>
       <div class="flex w-48 shrink-0 items-center justify-end gap-2">
         <div class="flex flex-col items-end gap-0.5">
@@ -25,20 +25,20 @@
               class="h-2 w-2 rounded-full"
               :class="saveIndicatorClass"
             />
-            {{ saveStatusLabel }}
+            {{ saveStatusLabelLocal }}
           </span>
           <span v-if="lastSavedAt" class="text-[10px] text-[var(--text-secondary)]">
             {{ `Last save: ${lastSavedAt.toLocaleTimeString()}` }}
           </span>
         </div>
         <button type="button" class="btn-luxury py-1.5 px-4 text-sm" :disabled="isSaving" @click="save">
-          {{ isSaving ? 'Saving…' : 'Save' }}
+          {{ isSaving ? $t('templateEditor.saving') : $t('templateEditor.save') }}
         </button>
       </div>
     </header>
 
     <div v-if="loadError" class="p-8 text-center text-red-600 dark:text-red-300">{{ loadError }}</div>
-    <div v-else-if="loading" class="flex flex-1 items-center justify-center p-8 text-[var(--text-secondary)]">Loading…</div>
+    <div v-else-if="loading" class="flex flex-1 items-center justify-center p-8 text-[var(--text-secondary)]">{{ $t('templateEditor.loading') }}</div>
 
     <div v-else class="flex min-h-0 min-w-0 flex-1 gap-2 overflow-hidden p-2 sm:p-3">
       <WidgetLibraryPanel :category-id="template?.category ?? null" />
@@ -48,7 +48,7 @@
         <div
           class="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--border-card)] bg-[var(--bg-input)]/80 px-3 py-2 text-xs"
         >
-          <span class="text-[var(--text-secondary)]">Canvas {{ canvasW }}×{{ canvasH }}</span>
+          <span class="text-[var(--text-secondary)]">{{ $t('templateEditor.canvas') }} {{ canvasW }}×{{ canvasH }}</span>
           <div class="flex items-center gap-1">
             <button
               type="button"
@@ -70,7 +70,7 @@
               class="rounded-md border border-[var(--border-card)] px-2 py-0.5 text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
               @click="fitZoom"
             >
-              Fit
+              {{ $t('templateEditor.fit') }}
             </button>
           </div>
         </div>
@@ -152,8 +152,8 @@
               <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)]/15 text-[var(--primary)]">
                 <i class="fas fa-image text-2xl" />
               </span>
-              <span class="text-lg leading-tight">Upload background image</span>
-              <span class="text-sm font-medium leading-relaxed text-slate-600">Start your design by setting a base canvas image.</span>
+              <span class="text-lg leading-tight">{{ $t('templateEditor.uploadBackgroundImage') }}</span>
+              <span class="text-sm font-medium leading-relaxed text-slate-600">{{ $t('templateEditor.startDesignHint') }}</span>
             </button>
           </div>
         </div>
@@ -173,6 +173,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import Moveable from 'vue3-moveable'
 import { formatDrfError, templateEditorApi } from '@/services/api'
@@ -183,9 +184,11 @@ import WidgetLibraryPanel from './WidgetLibraryPanel.vue'
 import TemplateInspectorPanel from './TemplateInspectorPanel.vue'
 import WidgetPreviewHost from '@/components/template-editor/player/widgets/WidgetPreviewHost.vue'
 import { fitFontSizeToWidgetBox } from '@/utils/fitTextToBox.js'
+import { normalizeMediaUrl } from '@/utils/normalizeMediaUrl.js'
 
 const route = useRoute()
 const toast = useToast()
+const { t } = useI18n()
 const templatesStore = useTemplatesStore()
 
 const loading = ref(true)
@@ -215,10 +218,10 @@ const scale = ref(0.35)
 const selectedWidget = computed(() => widgets.value.find((w) => w.id === selectedId.value) || null)
 const isSaving = computed(() => templatesStore.saving || saveState.value === 'saving')
 const saveStatusLabel = computed(() => {
-  if (saveState.value === 'error') return 'Save failed'
-  if (isSaving.value) return 'Saving'
-  if (saveState.value === 'dirty') return 'Unsaved changes'
-  return 'Saved'
+  if (saveState.value === 'error') return t('templateEditor.saveFailed')
+  if (isSaving.value) return t('templateEditor.saving')
+  if (saveState.value === 'dirty') return t('templateEditor.unsavedChanges')
+  return t('templateEditor.saved')
 })
 const saveIndicatorClass = computed(() => {
   if (saveState.value === 'error') return 'bg-red-500'
@@ -286,20 +289,7 @@ function alignSelectedToBackgroundEdge(edge) {
 }
 
 function normalizeTemplateImageUrl(rawUrl) {
-  if (!rawUrl || typeof rawUrl !== 'string') return ''
-  const u = rawUrl.trim()
-  if (!u) return ''
-  if (u.startsWith('/')) return u
-  if (!u.startsWith('http://') && !u.startsWith('https://')) return ''
-  try {
-    const parsed = new URL(u)
-    if (parsed.pathname.startsWith('/media/')) {
-      return `${parsed.pathname}${parsed.search}${parsed.hash}`
-    }
-    return u
-  } catch {
-    return ''
-  }
+  return normalizeMediaUrl(rawUrl)
 }
 
 const moveableTarget = computed(() => {
@@ -415,7 +405,7 @@ function addWidget(type, extra = null) {
     base.width = Math.min(640, cw * 0.45)
     base.height = Math.min(120, ch * 0.12)
     if (!String(base.content || '').trim()) {
-      base.content = 'Sample text'
+      base.content = t('templateEditor.sampleText')
     }
     base.style = {
       fontSize: 28,
@@ -704,11 +694,11 @@ async function save() {
     await Promise.all([loadPriceBindingPreviewValues(), loadCategoryPriceTypes()])
     lastSavedAt.value = new Date()
     saveState.value = 'saved'
-    const categoryLabel = template.value?.category_name || (template.value?.category ? `#${template.value.category}` : 'No category')
-    toast.success(`Template saved (${categoryLabel})`)
+    const categoryLabel = template.value?.category_name || (template.value?.category ? `#${template.value.category}` : t('templateEditor.noCategory'))
+    toast.success(t('templateEditor.templateSaved', { category: categoryLabel }))
   } catch (e) {
     saveState.value = 'error'
-    toast.error(formatDrfError(e.response?.data) || 'Save failed')
+    toast.error(formatDrfError(e.response?.data) || t('templateEditor.saveFailed'))
   }
 }
 
@@ -736,10 +726,10 @@ async function onBackgroundFile(ev) {
     saveState.value = 'saved'
     lastSavedAt.value = new Date()
     nextTick(() => fitZoom())
-    toast.success('Background image uploaded')
+    toast.success(t('templateEditor.backgroundUploaded'))
   } catch (e) {
     saveState.value = 'error'
-    const msg = e?.response?.data ? formatDrfError(e.response.data) : (e?.message || 'Background upload failed')
+    const msg = e?.response?.data ? formatDrfError(e.response.data) : (e?.message || t('templateEditor.backgroundUploadFailed'))
     toast.error(msg)
   }
 }

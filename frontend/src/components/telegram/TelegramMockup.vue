@@ -6,9 +6,9 @@
     <div class="p-3 sm:p-4">
       <!-- Telegram message bubble -->
       <div class="rounded-2xl overflow-hidden bg-white border border-slate-200 dark:bg-[#2b2b2d] dark:border-white/5">
-        <div v-if="imageUrl" class="relative w-full aspect-video bg-slate-200 dark:bg-black/40 p-2">
+        <div v-if="displayImageUrl" class="relative w-full aspect-video bg-slate-200 dark:bg-black/40 p-2">
           <img
-            :src="imageUrl"
+            :src="displayImageUrl"
             alt=""
             class="w-full h-full object-contain rounded-lg"
             @error="imageError = true"
@@ -50,6 +50,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { normalizeMediaUrl } from '@/utils/normalizeMediaUrl.js'
 
 const props = defineProps({
   imageUrl: { type: String, default: '' },
@@ -65,6 +66,8 @@ const props = defineProps({
 })
 
 const imageError = ref(false)
+
+const displayImageUrl = computed(() => normalizeMediaUrl(props.imageUrl))
 
 const displayDescription = computed(() => {
   let text = props.description || ''

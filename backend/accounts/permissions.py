@@ -24,6 +24,8 @@ import logging
 
 from rest_framework import permissions
 
+from .trial import trial_is_expired
+
 logger = logging.getLogger(__name__)
 
 def _normalize_role(role):

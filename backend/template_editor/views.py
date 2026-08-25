@@ -115,9 +115,6 @@ class PreviewView(LoginRequiredMixin, View):
     def _render_preview(self, request, pk):
         template = get_object_or_404(Template, pk=pk)
 
-        if not template.image:
-            return JsonResponse({'error': 'Template has no image.'}, status=400)
-
         try:
             # Resolve config: from request body (API or POST) or saved config
             config_data = None
@@ -142,15 +139,15 @@ class PreviewView(LoginRequiredMixin, View):
                     if isinstance(cj_override, dict):
                         config_json = cj_override
             widgets_list = config_json.get('widgets') if isinstance(config_json, dict) else None
-            if (
-                isinstance(widgets_list, list)
-                and len(widgets_list) > 0
-                and not themes
-            ):
+            # render_template_from_config_json paints its own background when the template has
+            # no uploaded image, so canvas-only templates (and brand-new empty ones) preview
+            # here instead of failing the legacy path's hard image requirement.
+            has_widgets = isinstance(widgets_list, list) and len(widgets_list) > 0
+            if not themes and (has_widgets or not template.image):
                 from .render_config_json import render_template_from_config_json
 
                 sample_data = {}
-                for w in widgets_list:
+                for w in (widgets_list if has_widgets else []):
                     if not isinstance(w, dict):
                         continue
                     st = w.get('style') if isinstance(w.get('style'), dict) else {}
@@ -220,7 +217,9 @@ class PreviewView(LoginRequiredMixin, View):
                 img_rgb.close()
                 return HttpResponse(buffer.getvalue(), content_type='image/png')
 
-            # Legacy schema: config['fields']
+            # Legacy schema: config['fields'] — draws onto the uploaded background.
+            if not template.image:
+                return JsonResponse({'error': 'Template has no image.'}, status=400)
             bg_path = template.image.path
             img = Image.open(bg_path).convert('RGBA')
             draw = ImageDraw.Draw(img)

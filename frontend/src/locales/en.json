@@ -59,6 +59,8 @@
     "support": "Support"
   },
   "landing": {
+    "trialBadge": "14-day free trial",
+    "freeTrialButton": "Start Free Trial",
     "badge": "Trusted by exchanges worldwide",
     "learnMore": "Learn more",
     "featuresTitle": "Everything you need",

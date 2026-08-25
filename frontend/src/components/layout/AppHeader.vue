@@ -9,7 +9,7 @@
     >
       <i class="fas fa-bars text-xl" />
     </button>
-    <router-link to="/" class="hidden md:flex items-center gap-2 min-w-0">
+    <router-link to="/panel" class="hidden md:flex items-center gap-2 min-w-0">
       <AppBrandLogo size="sm" rounded="lg" />
       <span class="text-sm font-semibold text-[var(--primary)] truncate max-w-[180px]">{{ siteName }}</span>
     </router-link>

@@ -2,7 +2,7 @@
   <div class="w-full min-w-0">
     <!-- Breadcrumb: Home → Telegram → Bot Setup → New Bot / Edit Bot -->
     <nav class="mb-6 flex flex-wrap items-center gap-2 text-sm text-[var(--text-secondary)]">
-      <router-link to="/" class="hover:text-gold transition-colors">{{ $t('breadcrumb.home') }}</router-link>
+      <router-link to="/panel" class="hover:text-gold transition-colors">{{ $t('breadcrumb.home') }}</router-link>
       <span class="opacity-60" aria-hidden="true">/</span>
       <router-link :to="{ name: 'telegram-send', query: { tab: 'botSetup' } }" class="hover:text-gold transition-colors">
         {{ $t('sidebar.telegram') }}

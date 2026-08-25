@@ -1,43 +1,60 @@
 import { defineStore } from 'pinia'
 import { STORAGE_THEME, STORAGE_THEME_LEGACY, storageGet, storageSet } from '@/constants/branding.js'
 
+const THEMES = ['light', 'dark', 'black-gold']
+const DEFAULT_THEME = 'dark'
+
 export const useThemeStore = defineStore('theme', {
   state: () => ({
-    isDark: true,
+    /** 'light' | 'dark' | 'black-gold' */
+    theme: DEFAULT_THEME,
   }),
 
   getters: {
-    isLight: (state) => !state.isDark,
+    isDark: (state) => state.theme !== 'light',
+    isLight: (state) => state.theme === 'light',
+    isBlackGold: (state) => state.theme === 'black-gold',
   },
 
   actions: {
     init() {
       const stored = storageGet(STORAGE_THEME, STORAGE_THEME_LEGACY)
-      if (stored === 'light' || stored === 'dark') {
-        this.isDark = stored === 'dark'
+      if (THEMES.includes(stored)) {
+        this.theme = stored
+      } else if (stored === 'dark' || stored === 'light') {
+        // Legacy binary values
+        this.theme = stored
       } else if (window.matchMedia?.('(prefers-color-scheme: light)').matches) {
-        this.isDark = false
+        this.theme = 'light'
+      } else {
+        this.theme = DEFAULT_THEME
       }
       this.apply()
     },
 
     apply() {
       const root = document.documentElement
-      if (this.isDark) {
+      // Clear all theme classes
+      root.classList.remove('dark', 'black-gold')
+      if (this.theme === 'dark') {
         root.classList.add('dark')
-      } else {
-        root.classList.remove('dark')
+      } else if (this.theme === 'black-gold') {
+        root.classList.add('black-gold')
       }
-      storageSet(STORAGE_THEME, STORAGE_THEME_LEGACY, this.isDark ? 'dark' : 'light')
+      storageSet(STORAGE_THEME, STORAGE_THEME_LEGACY, this.theme)
     },
 
     toggle() {
-      this.isDark = !this.isDark
+      // Cycle: light → dark → black-gold → light
+      const idx = THEMES.indexOf(this.theme)
+      this.theme = THEMES[(idx + 1) % THEMES.length]
       this.apply()
     },
 
     set(mode) {
-      this.isDark = mode === 'dark'
+      if (THEMES.includes(mode)) {
+        this.theme = mode
+      }
       this.apply()
     },
   },

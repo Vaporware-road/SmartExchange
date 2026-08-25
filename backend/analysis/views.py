@@ -6,8 +6,8 @@ from datetime import timedelta, datetime, timezone as dt_timezone
 
 from django.conf import settings
 from django.core.serializers.json import DjangoJSONEncoder
-from django.db.models import DateTimeField, OuterRef, Subquery, Count
-from django.db.models.functions import Coalesce
+from django.db.models import DateTimeField, OuterRef, Subquery, Count, Max, Sum, Case, When, IntegerField
+from django.db.models.functions import Coalesce, TruncDate
 from django.utils import timezone
 from django.utils.dateparse import parse_date, parse_datetime
 from django.views.generic import TemplateView
@@ -865,32 +865,42 @@ class AnalyticsDashboardView(TemplateView):
             except Exception:
                 return day.isoformat()
 
-        # Timeline: aggregate successful/failed posts per day
+        # ── Timeline: DB-level aggregation per day (no Python iteration over rows) ──
+        window_filter = {"finalized_at__gte": window_start, "finalized_at__lte": window_end}
+
+        final_by_day = (
+            Finalization.objects.filter(**window_filter)
+            .annotate(day=TruncDate("finalized_at"))
+            .values("day")
+            .annotate(
+                success=Sum(Case(When(message_sent=True, then=1), default=0, output_field=IntegerField())),
+                failed=Sum(Case(When(message_sent=False, then=1), default=0, output_field=IntegerField())),
+            )
+        )
+
+        special_by_day = (
+            SpecialPriceFinalization.objects.filter(**window_filter)
+            .annotate(day=TruncDate("finalized_at"))
+            .values("day")
+            .annotate(
+                success=Sum(Case(When(message_sent=True, then=1), default=0, output_field=IntegerField())),
+                failed=Sum(Case(When(message_sent=False, then=1), default=0, output_field=IntegerField())),
+            )
+        )
+
         day_buckets = defaultdict(lambda: {"success": 0, "failed": 0})
-
-        final_qs = Finalization.objects.filter(
-            finalized_at__gte=window_start,
-            finalized_at__lte=window_end,
-        )
-        for f in final_qs:
-            day = timezone.localtime(_ensure_aware_datetime(f.finalized_at)).date()
-            bucket = day_buckets[day]
-            if f.message_sent:
-                bucket["success"] += 1
-            else:
-                bucket["failed"] += 1
-
-        special_qs = SpecialPriceFinalization.objects.filter(
-            finalized_at__gte=window_start,
-            finalized_at__lte=window_end,
-        )
-        for sf in special_qs:
-            day = timezone.localtime(_ensure_aware_datetime(sf.finalized_at)).date()
-            bucket = day_buckets[day]
-            if sf.message_sent:
-                bucket["success"] += 1
-            else:
-                bucket["failed"] += 1
+        for row in final_by_day:
+            d = row["day"]
+            if d is None:
+                continue
+            day_buckets[d]["success"] += row["success"] or 0
+            day_buckets[d]["failed"] += row["failed"] or 0
+        for row in special_by_day:
+            d = row["day"]
+            if d is None:
+                continue
+            day_buckets[d]["success"] += row["success"] or 0
+            day_buckets[d]["failed"] += row["failed"] or 0
 
         success_points = []
         failed_points = []
@@ -926,54 +936,69 @@ class AnalyticsDashboardView(TemplateView):
                 }
             )
 
-        # Channels: aggregate across Finalization and SpecialPriceFinalization
+        # ── Channels: DB-level aggregation (no Python iteration over all rows) ──
+        final_channel_rows = (
+            Finalization.objects.filter(channel__isnull=False)
+            .values("channel_id", "channel__name")
+            .annotate(
+                total=Count("id"),
+                success=Sum(Case(When(message_sent=True, then=1), default=0, output_field=IntegerField())),
+                failed=Sum(Case(When(message_sent=False, then=1), default=0, output_field=IntegerField())),
+                last_post_at=Max("finalized_at"),
+            )
+        )
+
+        special_channel_rows = (
+            SpecialPriceFinalization.objects.filter(channel__isnull=False)
+            .values("channel_id", "channel__name")
+            .annotate(
+                total=Count("id"),
+                success=Sum(Case(When(message_sent=True, then=1), default=0, output_field=IntegerField())),
+                failed=Sum(Case(When(message_sent=False, then=1), default=0, output_field=IntegerField())),
+                last_post_at=Max("finalized_at"),
+            )
+        )
+
         channel_stats = {}
-
-        for f in Finalization.objects.select_related("channel").filter(
-            channel__isnull=False
-        ):
-            key = f.channel_id
+        for row in final_channel_rows:
+            ch_id = row["channel_id"]
             entry = channel_stats.setdefault(
-                key,
+                ch_id,
                 {
-                    "channel_id": f.channel_id,
-                    "channel_name": (f.channel.name if f.channel else "") or "",
+                    "channel_id": ch_id,
+                    "channel_name": (row.get("channel__name") or ""),
                     "total": 0,
                     "success": 0,
                     "failed": 0,
                     "last_post_at": None,
                 },
             )
-            entry["total"] += 1
-            if f.message_sent:
-                entry["success"] += 1
-            else:
-                entry["failed"] += 1
-            if not entry["last_post_at"] or f.finalized_at > entry["last_post_at"]:
-                entry["last_post_at"] = f.finalized_at
+            entry["total"] += row["total"] or 0
+            entry["success"] += row["success"] or 0
+            entry["failed"] += row["failed"] or 0
+            rlast = row["last_post_at"]
+            if rlast and (not entry["last_post_at"] or rlast > entry["last_post_at"]):
+                entry["last_post_at"] = rlast
 
-        for sf in SpecialPriceFinalization.objects.select_related("channel").filter(
-            channel__isnull=False
-        ):
-            key = sf.channel_id
+        for row in special_channel_rows:
+            ch_id = row["channel_id"]
             entry = channel_stats.setdefault(
-                key,
+                ch_id,
                 {
-                    "channel_id": sf.channel_id,
-                    "channel_name": (sf.channel.name if sf.channel else "") or "",
+                    "channel_id": ch_id,
+                    "channel_name": (row.get("channel__name") or ""),
                     "total": 0,
                     "success": 0,
                     "failed": 0,
                     "last_post_at": None,
                 },
             )
-            entry["total"] += 1
-            if sf.message_sent:
-                entry["success"] += 1
-            else:
-                entry["failed"] += 1
-            if not entry["last_post_at"] or sf.finalized_at > entry["last_post_at"]:
-                entry["last_post_at"] = sf.finalized_at
+            entry["total"] += row["total"] or 0
+            entry["success"] += row["success"] or 0
+            entry["failed"] += row["failed"] or 0
+            rlast = row["last_post_at"]
+            if rlast and (not entry["last_post_at"] or rlast > entry["last_post_at"]):
+                entry["last_post_at"] = rlast
 
         channels = []
         for entry in channel_stats.values():

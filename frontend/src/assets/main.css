@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -142,6 +143,73 @@ body::before {
 
 .dark body::before {
   background: radial-gradient(ellipse 80% 50% at 80% 0%, rgba(255, 215, 0, 0.04) 0%, transparent 60%);
+}
+
+/* ── Black & Gold Theme ── */
+.black-gold {
+  --bg-base: #0a0a0a;
+  --bg-card: #141414;
+  --bg-elevated: #1c1c1c;
+  --bg-input: #1a1a1a;
+  --bg-navbar: #0d0d0d;
+  --bg-footer: #0a0a0a;
+  --bg-hover: #1f1f1f;
+  --text-primary: #f0f0f0;
+  --text-secondary: #a0a0a0;
+  --primary: #d4af37;
+  --primary-hover: #c5a028;
+  --primary-muted: rgba(212, 175, 55, 0.12);
+  --text-on-primary: #0a0a0a;
+  --border-color: rgba(212, 175, 55, 0.35);
+  --border-card: #262626;
+  --border-card-hover: rgba(212, 175, 55, 0.4);
+  --glass-bg: rgba(20, 20, 20, 0.8);
+  --glass-border: rgba(38, 38, 38, 0.9);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.5);
+  --shadow-card-hover: 0 8px 40px rgba(212, 175, 55, 0.12);
+  --shadow-glow: 0 0 24px rgba(212, 175, 55, 0.18), 0 0 48px rgba(212, 175, 55, 0.06);
+  --editor-workspace-bg: #080808;
+  --editor-canvas-border: rgba(212, 175, 55, 0.3);
+  --editor-canvas-shadow: 0 42px 70px -36px rgba(0, 0, 0, 0.95), 0 12px 24px -16px rgba(0, 0, 0, 0.85);
+  --color-buy: #10b981;
+  --color-sell: #f43f5e;
+  --color-info: #d4af37;
+  --color-template: #8b5cf6;
+  --color-slate: #3d3d3d;
+  --color-black-base: var(--bg-base);
+  --color-black-navbar: var(--bg-navbar);
+  --color-black-footer: var(--bg-footer);
+  --color-black-card: var(--bg-card);
+  --color-white-soft: #f0f0f0;
+  --glow-soft: 0 0 32px rgba(212, 175, 55, 0.22);
+  --glow-strong: 0 0 56px rgba(212, 175, 55, 0.38);
+  --font-ui-rtl: 'Vazirmatn', system-ui, -apple-system, sans-serif;
+  --font-ui-ltr: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-ui-sans: var(--font-ui-ltr);
+}
+
+.black-gold body::before {
+  background:
+    radial-gradient(ellipse 80% 50% at 80% 0%, rgba(212, 175, 55, 0.05) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 40% at 20% 100%, rgba(212, 175, 55, 0.03) 0%, transparent 50%);
+}
+
+.black-gold .btn-luxury-gradient {
+  background: linear-gradient(135deg, #d4af37 0%, #b8960f 50%, #9a7b0a 100%);
+  border-color: rgba(212, 175, 55, 0.5);
+}
+
+.black-gold .template-editor-workspace {
+  background-color: #080808;
+  background-image: radial-gradient(circle at 1px 1px, rgb(64 64 64 / 0.22) 1px, transparent 0);
+}
+
+.black-gold::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #d4af37 0%, #9a7b0a 100%);
+}
+
+.black-gold ::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #d4af37 0%, #9a7b0a 100%);
 }
 
 /* Theme-aware transitions for layout and cards */
@@ -582,6 +650,7 @@ html:not(.dark) .price-card-sell {
   --brand: #ff0090;
   --signal: #00f5ff;
   --star: #e8e4f5;
+  --font-display: 'Orbitron', 'Inter', system-ui, sans-serif;
 
   position: relative;
   isolation: isolate;
@@ -797,4 +866,53 @@ html:not(.dark) .price-card-sell {
   .vapor-about__title-channel {
     opacity: 0 !important;
   }
+}
+
+/* ── i18n overflow prevention (German / French long words) ── */
+[lang="de"] .card-luxury h1,
+[lang="de"] .card-luxury h2,
+[lang="de"] .card-luxury h3,
+[lang="fr"] .card-luxury h1,
+[lang="fr"] .card-luxury h2,
+[lang="fr"] .card-luxury h3 {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+[lang="de"] button,
+[lang="de"] a.btn-luxury,
+[lang="de"] a.btn-luxury-outline,
+[lang="de"] .btn-luxury,
+[lang="de"] .btn-luxury-outline,
+[lang="fr"] button,
+[lang="fr"] a.btn-luxury,
+[lang="fr"] a.btn-luxury-outline,
+[lang="fr"] .btn-luxury,
+[lang="fr"] .btn-luxury-outline {
+  white-space: nowrap;
+}
+
+[lang="de"] .card-luxury p,
+[lang="fr"] .card-luxury p,
+[lang="de"] th,
+[lang="fr"] th,
+[lang="de"] td,
+[lang="fr"] td {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Sidebar nav items need truncation for long translations */
+[lang="de"] .app-sidebar a,
+[lang="de"] .app-sidebar button,
+[lang="fr"] .app-sidebar a,
+[lang="fr"] .app-sidebar button,
+[lang="es"] .app-sidebar a,
+[lang="es"] .app-sidebar button,
+[lang="tr"] .app-sidebar a,
+[lang="tr"] .app-sidebar button {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

@@ -26,7 +26,7 @@
       </p>
 
       <div class="flex flex-wrap items-center justify-center gap-3 mt-8">
-        <router-link to="/" class="btn-luxury inline-flex items-center gap-2">
+        <router-link to="/panel" class="btn-luxury inline-flex items-center gap-2">
           <i class="fas fa-home"></i>
           <span>{{ t('errorPages.backToHome') }}</span>
         </router-link>

@@ -19,7 +19,7 @@
             style="inset-inline-start: 0; border-inline-end: 1px solid var(--border-card);"
           >
             <div class="flex items-center justify-between px-6 py-5 border-b" style="border-color: var(--border-card);">
-              <router-link to="/" class="flex items-center gap-3" @click="$emit('close')">
+              <router-link to="/panel" class="flex items-center gap-3" @click="$emit('close')">
                 <AppBrandLogo size="md" rounded="xl" />
                 <span class="text-lg font-bold text-[var(--primary)]">{{ siteName }}</span>
               </router-link>

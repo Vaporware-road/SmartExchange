@@ -3,30 +3,10 @@ import { settingsApi, templateEditorApi } from '@/services/api'
 import i18n from '@/i18n'
 import { editorFontFamilyToken, injectTemplateEditorFontFaces } from '@/pages/templates/templateEditorFonts'
 import { DEFAULT_SITE_NAME } from '@/constants/branding.js'
+import { normalizeMediaUrl } from '@/utils/normalizeMediaUrl.js'
 
 function normalizeAssetUrl(value) {
-  if (!value || typeof value !== 'string') return value
-  const trimmed = value.trim()
-  if (!trimmed) return trimmed
-  if (typeof window === 'undefined') return trimmed
-
-  // Already relative to current origin.
-  if (trimmed.startsWith('/media/') || trimmed.startsWith('/static/')) return trimmed
-
-  try {
-    const parsed = new URL(trimmed, window.location.origin)
-    const isAssetPath = parsed.pathname.startsWith('/media/') || parsed.pathname.startsWith('/static/')
-    if (!isAssetPath) return trimmed
-
-    // If backend returns a non-browser-reachable host (e.g. 127.0.0.1:8000 or docker internal host),
-    // keep only path so browser uses current origin/proxy.
-    if (parsed.origin !== window.location.origin) {
-      return `${parsed.pathname}${parsed.search}${parsed.hash}`
-    }
-  } catch {
-    return trimmed
-  }
-  return trimmed
+  return normalizeMediaUrl(value) || value
 }
 
 export const useSiteSettingsStore = defineStore('siteSettings', {

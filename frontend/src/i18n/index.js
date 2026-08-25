@@ -1,6 +1,11 @@
 import { createI18n } from 'vue-i18n'
 import fa from '@/locales/fa.json'
 import en from '@/locales/en.json'
+import ar from '@/locales/ar.json'
+import de from '@/locales/de.json'
+import fr from '@/locales/fr.json'
+import es from '@/locales/es.json'
+import tr from '@/locales/tr.json'
 import {
   STORAGE_LOCALE,
   STORAGE_LOCALE_LEGACY,
@@ -8,7 +13,9 @@ import {
   storageSet,
 } from '@/constants/branding.js'
 
-const SUPPORTED_LOCALES = ['en', 'fa']
+const SUPPORTED_LOCALES = ['en', 'fa', 'ar', 'de', 'fr', 'es', 'tr']
+const RTL_LOCALES = new Set(['fa', 'ar'])
+
 const safeStorage = {
   get() {
     return storageGet(STORAGE_LOCALE, STORAGE_LOCALE_LEGACY)
@@ -22,8 +29,19 @@ const savedLocale = safeStorage.get() || 'en'
 const initialLocale = SUPPORTED_LOCALES.includes(savedLocale) ? savedLocale : 'en'
 
 // Some bundlers may expose JSON as { default: ... }
-const enMessages = en?.default ?? en
-const faMessages = fa?.default ?? fa
+const resolveMessages = (mod) => mod?.default ?? mod
+
+const localeMessages = {
+  en: resolveMessages(en),
+  fa: resolveMessages(fa),
+  ar: resolveMessages(ar),
+  de: resolveMessages(de),
+  fr: resolveMessages(fr),
+  es: resolveMessages(es),
+  tr: resolveMessages(tr),
+}
+
+const enMessages = localeMessages.en
 
 /** Resolve nested key (e.g. "dashboard.title") from a messages object */
 function getMessageByPath(obj, path) {
@@ -39,10 +57,10 @@ function getMessageByPath(obj, path) {
 
 function applyDocumentLocale(locale) {
   document.documentElement.lang = locale
-  document.documentElement.dir = locale === 'fa' ? 'rtl' : 'ltr'
+  document.documentElement.dir = RTL_LOCALES.has(locale) ? 'rtl' : 'ltr'
 }
 
-// Use legacy: true so $t() in templates resolves correctly (vue-i18n v12 alpha issue with legacy: false)
+// Use legacy: true so $t() in templates resolves correctly
 const i18n = createI18n({
   legacy: true,
   locale: initialLocale,
@@ -50,10 +68,7 @@ const i18n = createI18n({
   globalInjection: true,
   missingWarn: false,
   fallbackWarn: false,
-  messages: {
-    en: enMessages,
-    fa: faMessages,
-  },
+  messages: localeMessages,
   missing: (locale, key) => {
     // If key is missing in current locale, return fallback (en) message so raw key is never shown
     const fallback = getMessageByPath(enMessages, key)
@@ -62,6 +77,8 @@ const i18n = createI18n({
 })
 
 applyDocumentLocale(initialLocale)
+
+export { SUPPORTED_LOCALES, RTL_LOCALES }
 
 export function setLocale(locale) {
   const next = SUPPORTED_LOCALES.includes(locale) ? locale : 'en'

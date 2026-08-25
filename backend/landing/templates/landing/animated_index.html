@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl" data-default-lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل هوشمند نرخ ارز برای صرافی‌ها | آقای صرافی</title>
+    <link rel="stylesheet" href="{% static 'landing/css/styles.css' %}">
+</head>
+<body>
+    <main class="hero" id="home">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <div class="hero-badge reveal"><span class="hero-badge-dot"></span><span>اتوماسیون کامل انتشار نرخ ارز</span></div>
+                <h1 class="reveal">پنل هوشمند نرخ ارز<br><span class="gradient-text">برای صرافی‌های مدرن</span></h1>
+                <p class="reveal">نرخ‌های خرید و فروش ارز را یک‌بار وارد کنید و به‌صورت خودکار در وب‌سایت، تلگرام، اینستاگرام و صفحه نمایش داخل صرافی منتشر کنید.</p>
+                <div class="hero-buttons reveal">
+                    <a href="/login?trial=1" class="btn btn-primary btn-glow">شروع آزمایش رایگان ۱۴ روزه</a>
+                    <a href="/login?demo=1" class="btn btn-outline">ورود به نسخه نمایشی</a>
+                </div>
+            </div>
+        </div>
+    </main>
+    <section class="section" id="features"><div class="container"><h2 class="section-title">همه امکانات در نسخه آزمایشی فعال است</h2><p class="section-subtitle">۱۴ روز بدون پرداخت هزینه، سپس دسترسی برای ارتقا متوقف می‌شود.</p></div></section>
+    <script src="{% static 'landing/js/translations.js' %}"></script>
+    <script src="{% static 'landing/js/translations-pages.js' %}"></script>
+    <script src="{% static 'landing/js/app.js' %}"></script>
+</body>
+</html>

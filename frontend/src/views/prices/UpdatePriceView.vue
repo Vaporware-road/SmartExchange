@@ -2,7 +2,7 @@
   <div>
     <nav class="mb-6">
       <router-link to="/prices" class="text-gray-400 hover:text-gold transition-colors">
-        <i class="fas fa-arrow-left mr-2"></i>Back to Prices
+        <i class="fas fa-arrow-left mr-2"></i>{{ $t('prices.backToPrices') }}
       </router-link>
     </nav>
     <h1 class="text-2xl font-bold text-gold mb-4">{{ $t('routes.updatePrice') }}</h1>
@@ -26,12 +26,12 @@
           </div>
         </div>
         <div v-else>
-          <label class="block text-sm font-medium text-gray-400 mb-2">New Price</label>
+          <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('prices.newPrice') }}</label>
           <input v-model.number="price" type="number" step="0.01" min="0" class="input-luxury" required />
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-2">Notes (optional)</label>
-          <input v-model="notes" type="text" class="input-luxury" placeholder="Optional notes" />
+          <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('prices.notesOptional') }}</label>
+          <input v-model="notes" type="text" class="input-luxury" :placeholder="$t('prices.optionalNotes')" />
         </div>
         <div class="flex gap-4">
           <button type="submit" class="btn-luxury" :disabled="submitting">

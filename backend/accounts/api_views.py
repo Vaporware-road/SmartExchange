@@ -12,6 +12,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 from core.exceptions import error_response
 from .models import CustomUser, UserActivityLog
 from .plans import allowed_plans_for, is_impersonating, user_plan
+from .trial import ensure_trial_started, trial_is_expired
 from .tokens import issue_tokens_for_user
 from .serializers import (
     LoginSerializer,
@@ -135,6 +136,14 @@ class LoginAPIView(APIView):
             )
             raise
 
+        ensure_trial_started(user)
+        if trial_is_expired(user):
+            return error_response(
+                "Your 14-day free trial has expired. Please contact an administrator to upgrade your plan.",
+                code="trial_expired",
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
+
         login(request, user)
 
         refresh = issue_tokens_for_user(user)
@@ -183,6 +192,13 @@ class DemoLoginAPIView(APIView):
                 status_code=status.HTTP_404_NOT_FOUND,
             )
 
+        ensure_trial_started(user)
+        if trial_is_expired(user):
+            return error_response(
+                "The demo trial has expired. Please contact an administrator.",
+                code="trial_expired",
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
         login(request, user)
 
         refresh = issue_tokens_for_user(user)

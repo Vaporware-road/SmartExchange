@@ -350,7 +350,9 @@ async function loadCategory() {
     if (!templateMediaUrl.value && data.last_used_template) {
       try {
         const templateRes = await templateEditorApi.get(data.last_used_template)
-        templateMediaUrl.value = templateRes?.data?.image || ''
+        const rawImage = templateRes?.data?.image
+        // image may be a DRF file-field object { url, name } or a raw URL string
+        templateMediaUrl.value = rawImage?.url || rawImage || ''
       } catch {
         templateMediaUrl.value = ''
       }

@@ -6,6 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from .models import CustomUser, UserActivityLog
 from .plans import COLLABORATION_CHOICES, PLAN_BRONZE, PLAN_CHOICES, normalize_plan
 from .tokens import issue_tokens_for_user
+from .trial import trial_expires_at
 
 
 class LoginSerializer(serializers.Serializer):
@@ -55,6 +56,10 @@ class UserSerializer(serializers.ModelSerializer):
             "sub_role",
             "plan",
             "role",
+            "trial_started_at",
+            "trial_expires_at",
+            "trial_expiry_notified_at",
+            "trial_days_remaining",
             "is_active",
             "date_joined",
             "telegram_bot_token_masked",
@@ -82,6 +87,13 @@ class UserSerializer(serializers.ModelSerializer):
         if owner is None:
             return ""
         return owner.username
+
+    def get_trial_days_remaining(self, obj):
+        from django.utils import timezone
+
+        if obj.trial_expires_at is None:
+            return None
+        return max(0, (obj.trial_expires_at - timezone.now()).days)
 
     def get_telegram_bot_token_masked(self, obj):
         bot = obj.telegram_bots.order_by("-created_at").first()
@@ -205,6 +217,9 @@ class ProgrammerRegisterSerializer(serializers.Serializer):
         delegated = sub_role in (CustomUser.SUB_ROLE_OPERATOR, CustomUser.SUB_ROLE_HEAD_OPERATOR)
         owner = self._resolve_owner((validated_data.get("owner_username") or "").strip())
         registered_by = validated_data.pop("registered_by", None) or getattr(self.context.get("request"), "user", None)
+        from django.utils import timezone
+
+        started_at = timezone.now()
         user = CustomUser.objects.create_user(
             username,
             password=password,
@@ -223,6 +238,8 @@ class ProgrammerRegisterSerializer(serializers.Serializer):
             owner=owner,
             role=CustomUser.ROLE_EMPLOYEE if delegated else CustomUser.ROLE_MANAGEMENT,
             is_active=True,
+            trial_started_at=started_at,
+            trial_expires_at=trial_expires_at(started_at),
         )
         user.registered_by = registered_by
         user.save(update_fields=["registered_by"])

@@ -19,11 +19,11 @@
         <table class="w-full text-sm min-w-[400px]">
         <thead>
           <tr class="border-b border-[var(--border-color)]">
-            <th class="text-left py-4 px-4 text-gold font-semibold">Price Type</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Category</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Pair</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Latest Price</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Actions</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('prices.priceType') }}</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('prices.category') }}</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('prices.pair') }}</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('prices.latestPrice') }}</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('common.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -45,7 +45,7 @@
             <td class="py-4 px-4 text-gold font-semibold">{{ pt.latest_price != null ? Number(pt.latest_price).toFixed(2) : '-' }}</td>
             <td class="py-4 px-4">
               <router-link :to="`/prices/${pt.id}/history`" class="btn-luxury-outline text-sm py-1.5 px-3">
-                <i class="fas fa-history"></i> History
+                <i class="fas fa-history"></i> {{ $t('prices.history') }}
               </router-link>
             </td>
           </tr>

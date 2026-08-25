@@ -1,6 +1,9 @@
 /** Default site / product name shown in UI, PWA, and document title. */
 export const DEFAULT_SITE_NAME = 'Mr Exchange'
 
+/** GitHub org URL — used on the About page. */
+export const VAPORWARE_GITHUB_ORG = 'https://github.com/Vaporware-road'
+
 /** localStorage primary keys (rebrand); legacy keys are still read for migration. */
 export const STORAGE_LOCALE = 'mrexchange-locale'
 export const STORAGE_LOCALE_LEGACY = 'smartexchange-locale'

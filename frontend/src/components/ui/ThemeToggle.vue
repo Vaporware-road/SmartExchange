@@ -2,13 +2,13 @@
   <button
     type="button"
     class="theme-toggle inline-flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 ease-in-out bg-[var(--bg-hover)] hover:bg-[var(--border-color)] text-[var(--primary)]"
-    aria-label="Toggle theme"
+    :aria-label="ariaLabel"
     @click="theme.toggle()"
   >
     <Transition name="icon-fade" mode="out-in">
       <i
-        :key="theme.isDark ? 'moon' : 'sun'"
-        :class="theme.isDark ? 'fas fa-moon' : 'fas fa-sun'"
+        :key="theme.theme"
+        :class="iconClass"
         class="text-lg"
       />
     </Transition>
@@ -16,9 +16,28 @@
 </template>
 
 <script setup>
+import { computed } from 'vue'
 import { useThemeStore } from '@/stores/theme'
 
 const theme = useThemeStore()
+
+const iconClass = computed(() => {
+  switch (theme.theme) {
+    case 'light': return 'fas fa-sun'
+    case 'dark': return 'fas fa-moon'
+    case 'black-gold': return 'fas fa-crown'
+    default: return 'fas fa-moon'
+  }
+})
+
+const ariaLabel = computed(() => {
+  switch (theme.theme) {
+    case 'light': return 'Switch to dark theme'
+    case 'dark': return 'Switch to black & gold theme'
+    case 'black-gold': return 'Switch to light theme'
+    default: return 'Toggle theme'
+  }
+})
 </script>
 
 <style scoped>

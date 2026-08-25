@@ -6,6 +6,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Security: DEBUG should be False in production
 # Set DJANGO_DEBUG=False in environment variables for production
 DEBUG = os.environ.get('DJANGO_DEBUG', 'True').lower() in ('true', '1', 'yes')
+DEPLOYMENT_MODE = os.environ.get('DEPLOYMENT_MODE', 'cloud').strip().lower()
+TRIAL_EXPIRY_CHECK_SECONDS = float(os.environ.get('TRIAL_EXPIRY_CHECK_SECONDS', '3600'))
 
 # Security: Use environment variable for SECRET_KEY
 # Generate a new key with: python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
@@ -151,6 +153,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     # Enforce login for all views (allows exceptions in middleware)
     'accounts.middleware.LoginRequiredMiddleware',
+    'accounts.middleware.TrialAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Custom 404 middleware to show custom 404 page even when DEBUG=True
@@ -433,6 +436,10 @@ CELERY_TASK_TIME_LIMIT = int(os.environ.get("CELERY_TASK_TIME_LIMIT", "120"))
 CELERY_TASK_SOFT_TIME_LIMIT = int(os.environ.get("CELERY_TASK_SOFT_TIME_LIMIT", "90"))
 CELERY_RESULT_EXPIRES = int(os.environ.get("CELERY_RESULT_EXPIRES", "3600"))
 CELERY_BEAT_SCHEDULE = {
+    "expire-individual-trials": {
+        "task": "accounts.tasks.expire_trials_task",
+        "schedule": TRIAL_EXPIRY_CHECK_SECONDS,
+    },
     "telegram-auto-post-due-configs": {
         "task": "telegram_app.auto_post_due_configs",
         "schedule": float(os.environ.get("TELEGRAM_AUTO_POST_CHECK_SECONDS", "60")),

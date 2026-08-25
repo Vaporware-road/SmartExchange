@@ -28,6 +28,16 @@ def display_name(profile: CustomerProfile) -> str:
     return (profile.username or profile.first_name or "").strip()
 
 
+def telegram_display_name(profile: CustomerProfile) -> str:
+    """Returns the Telegram display name (first_name or username fallback)."""
+    return (profile.first_name or profile.username or "").strip()
+
+
+def telegram_username(profile: CustomerProfile) -> str:
+    """Returns the Telegram username."""
+    return (profile.username or "").strip()
+
+
 def set_customer_tag(profile: CustomerProfile, tag: str) -> CustomerProfile:
     allowed = set(CustomerProfile.Tag.values)
     if tag not in allowed:

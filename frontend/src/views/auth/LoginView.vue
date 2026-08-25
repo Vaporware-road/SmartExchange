@@ -53,6 +53,15 @@
           </button>
         </form>
       </div>
+
+      <div class="text-center mt-6">
+        <router-link
+          to="/about"
+          class="text-xs tracking-widest uppercase text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors"
+        >
+          {{ $t('common.aboutPage') }}
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -90,13 +99,13 @@ onMounted(() => {
 
 async function startDemoLogin() {
   if (auth.isAuthenticated) {
-    router.push(route.query.redirect || '/')
+    router.push(route.query.redirect || '/panel')
     return
   }
   loading.value = true
   try {
     await auth.demoLogin()
-    router.push(route.query.redirect || '/')
+    router.push(route.query.redirect || '/panel')
   } catch (err) {
     error.value = getApiErrorDetails(err).message
   } finally {
@@ -110,7 +119,7 @@ async function handleSubmit() {
   try {
     await auth.login(username.value, password.value)
     const redirect = route.query.redirect
-    router.push(redirect || (auth.shouldOpenProgrammerHub ? '/programmer' : '/'))
+    router.push(redirect || (auth.shouldOpenProgrammerHub ? '/programmer' : '/panel'))
   } catch (err) {
     error.value = getApiErrorDetails(err).message
   } finally {

@@ -12,7 +12,7 @@
       :class="isCollapsed ? 'lg:justify-center lg:px-2' : 'lg:px-6'"
       style="border-color: var(--border-card);"
     >
-      <router-link to="/" class="flex items-center gap-3 group min-w-0 md:justify-center">
+      <router-link to="/panel" class="flex items-center gap-3 group min-w-0 md:justify-center">
         <AppBrandLogo size="md" rounded="xl" class="group-hover:scale-105 transition-all duration-300 ease-in-out shrink-0" />
         <!-- Text hidden on mobile/tablet and when collapsed; only icons visible in collapsed mode -->
         <div

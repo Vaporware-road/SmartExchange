@@ -4,15 +4,21 @@ import Layout from '@/layouts/AppLayout.vue'
 
 const routes = [
   {
+    path: '/',
+    name: 'landing',
+    component: () => import('@/views/auth/LandingView.vue'),
+    meta: { public: true },
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('@/views/auth/LoginView.vue'),
     meta: { public: true },
   },
   {
-    path: '/landing',
-    name: 'landing',
-    component: () => import('@/views/auth/LandingView.vue'),
+    path: '/about',
+    name: 'about',
+    component: () => import('@/views/auth/AboutView.vue'),
     meta: { public: true },
   },
   {
@@ -37,7 +43,7 @@ const routes = [
     meta: { public: true },
   },
   {
-    path: '/',
+    path: '/panel',
     component: Layout,
     meta: { requiresAuth: true, titleKey: 'breadcrumb.home' },
     children: [
@@ -320,7 +326,7 @@ router.beforeEach(async (to, from, next) => {
 
   if (to.meta.public) {
     if (auth.isAuthenticated && to.name === 'login') {
-      next({ name: auth.shouldOpenProgrammerHub ? 'programmer' : 'dashboard' })
+      next({ name: 'dashboard' })
     } else {
       next()
     }

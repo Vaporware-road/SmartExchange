@@ -18,8 +18,8 @@
         <a :href="githubOrg" target="_blank" rel="noopener noreferrer">
           GitHub // Vaporware-road
         </a>
-        <router-link to="/login">Access Panel</router-link>
-        <router-link to="/">Back to app</router-link>
+        <router-link to="/login">{{ $t('common.accessPanel') }}</router-link>
+        <router-link to="/panel">{{ $t('common.backToApp') }}</router-link>
       </nav>
     </div>
   </main>

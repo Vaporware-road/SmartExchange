@@ -6,6 +6,8 @@ from pathlib import Path
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
+from django.utils.decorators import method_decorator
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import View
 from django.views.static import serve as django_static_serve
 
@@ -65,6 +67,7 @@ def serve_static_with_cache(request, path, document_root=None, show_indexes=Fals
     return response
 
 
+@method_decorator(xframe_options_exempt, name='dispatch')
 class SPAView(View):
     """
     Serve the Vue SPA index.html for client-side routing.
@@ -72,6 +75,10 @@ class SPAView(View):
 
     Prefer the collectstatic copy under STATIC_ROOT so the shell matches
     assets served from /static/vue/; fall back to the build output dir.
+
+    xframe_options_exempt: the panel is a SaaS product whose live demo is embedded
+    in an iframe on the marketing site (landing page /demo.html). Same-origin in
+    production; the exemption also allows the demo to run from a dev origin.
     """
 
     def get(self, request, *args, **kwargs):

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Playbook – SmartExchange</title>
+
+<!-- Local Vazirmatn -->
+<style>
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('backend/static/fonts/VazirmatnVF.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('backend/static/fonts/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('backend/static/fonts/Vazirmatn-Medium.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('backend/static/fonts/Vazirmatn-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-style: normal;
+}
+</style>
+
+<style>
+:root {
+  --navy: #0A1A2F;
+  --navy-light: #112240;
+  --emerald: #00A47C;
+  --emerald-dim: #007F5F;
+  --amber: #A96A08;
+  --amber-bg: #FFF8E7;
+  --slate: #1E293B;
+  --slate-light: #334155;
+  --gray-50: #F8FAFC;
+  --gray-100: #F1F5F9;
+  --gray-200: #E2E8F0;
+  --gray-300: #CBD5E1;
+  --gray-600: #475569;
+  --gray-700: #334155;
+  --gray-800: #1E293B;
+  --gray-900: #0F172A;
+  --white: #FFFFFF;
+  --body: #1E293B;
+  --body-bg: #FFFFFF;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  font-weight: 400;
+  font-size: 11.5pt;
+  line-height: 1.8;
+  color: var(--body);
+  background: var(--body-bg);
+}
+
+/* ── Cover ── */
+.cover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: var(--navy);
+  color: var(--white);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+}
+.cover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(0,164,124,0.12) 0%, transparent 50%),
+    radial-gradient(circle at 75% 25%, rgba(0,164,124,0.08) 0%, transparent 40%);
+}
+.cover-svg { position: absolute; inset: 0; opacity: 0.25; }
+.cover-content { position: relative; z-index: 1; }
+.cover h1 {
+  font-size: 3.2rem;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.5rem;
+}
+.cover h2 {
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--emerald);
+  margin-bottom: 2rem;
+}
+.cover .logo-placeholder {
+  border: 2px dashed rgba(255,255,255,0.35);
+  border-radius: 12px;
+  padding: 2rem 3rem;
+  margin-top: 4rem;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.95rem;
+}
+.cover .meta {
+  margin-top: 3rem;
+  font-size: 0.85rem;
+  color: rgba(255,255,255,0.55);
+}
+
+/* ── Section Banners ── */
+.section-banner {
+  background: var(--navy);
+  color: var(--white);
+  padding: 2.5rem 3rem;
+  page-break-before: always;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.section-banner .section-num {
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--emerald);
+  line-height: 1;
+  min-width: 4rem;
+}
+.section-banner h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+/* ── Content Sections ── */
+.content-section {
+  padding: 2.5rem 3rem;
+}
+
+h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin: 1.8rem 0 0.8rem;
+}
+h3:first-child { margin-top: 0; }
+
+p { margin-bottom: 0.6rem; }
+
+ul, ol {
+  padding-right: 1.8rem;
+  margin-bottom: 1rem;
+}
+li { margin-bottom: 0.35rem; }
+
+/* ── Callout boxes ── */
+.callout {
+  border-radius: 10px;
+  padding: 1.4rem 1.6rem;
+  margin: 1.2rem 0;
+  page-break-inside: avoid;
+}
+.callout-warning {
+  background: var(--amber-bg);
+  border-right: 4px solid var(--amber);
+}
+.callout-warning h4 {
+  color: var(--amber);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.callout-info {
+  background: #F0FDF9;
+  border-right: 4px solid var(--emerald);
+}
+.callout-info h4 {
+  color: var(--emerald-dim);
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* ── Process steps ── */
+.process-flow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--gray-50);
+  border-radius: 12px;
+  padding: 1.5rem 1rem;
+  margin: 1.5rem 0;
+  page-break-inside: avoid;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.process-step {
+  text-align: center;
+  flex: 1;
+  min-width: 8rem;
+}
+.process-step .step-num {
+  display: inline-block;
+  width: 2.4rem;
+  height: 2.4rem;
+  line-height: 2.4rem;
+  border-radius: 50%;
+  background: var(--emerald);
+  color: white;
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin-bottom: 0.4rem;
+}
+.process-step .step-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gray-700);
+}
+.process-arrow {
+  font-size: 1.4rem;
+  color: var(--emerald);
+  font-weight: 900;
+}
+
+/* ── Table ── */
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9rem;
+  page-break-inside: avoid;
+}
+.matrix-table th {
+  background: var(--navy);
+  color: var(--white);
+  padding: 0.8rem 0.7rem;
+  font-weight: 700;
+  text-align: center;
+  font-size: 0.85rem;
+}
+.matrix-table td {
+  padding: 0.7rem;
+  border-bottom: 1px solid var(--gray-200);
+  vertical-align: top;
+}
+.matrix-table tr:nth-child(even) td {
+  background: var(--gray-50);
+}
+.matrix-table tr:nth-child(odd) td {
+  background: var(--white);
+}
+
+/* ── Code blocks (scripts) ── */
+.script-block {
+  background: var(--gray-900);
+  color: #E2E8F0;
+  border-radius: 10px;
+  margin: 1rem 0;
+  page-break-inside: avoid;
+  overflow: hidden;
+}
+.script-block .script-header {
+  background: var(--slate-light);
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--emerald);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.script-block .script-body {
+  padding: 1rem 1.2rem;
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  font-size: 0.9rem;
+  line-height: 1.9;
+  direction: rtl;
+  text-align: right;
+}
+
+/* ── Chat bubbles (objection handling) ── */
+.chat-thread {
+  margin: 1.5rem 0;
+}
+.chat-bubble {
+  display: flex;
+  margin-bottom: 1rem;
+  page-break-inside: avoid;
+}
+.chat-bubble.client { justify-content: flex-end; }
+.chat-bubble.rep    { justify-content: flex-start; }
+.chat-bubble .bubble-content {
+  max-width: 70%;
+  padding: 0.8rem 1.1rem;
+  border-radius: 14px;
+  font-size: 0.9rem;
+  line-height: 1.7;
+  position: relative;
+}
+.chat-bubble.client .bubble-content {
+  background: var(--gray-100);
+  color: var(--gray-800);
+  border-bottom-left-radius: 4px;
+}
+.chat-bubble.rep .bubble-content {
+  background: #E6F7F2;
+  color: #0A1A2F;
+  border-bottom-right-radius: 4px;
+  border-right: 3px solid var(--emerald);
+}
+.chat-bubble .bubble-role {
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+.chat-bubble.client .bubble-role { color: var(--gray-600); text-align: right; }
+.chat-bubble.rep .bubble-role    { color: var(--emerald); text-align: right; }
+
+/* ── Print ── */
+@media print {
+  @page {
+    size: A4;
+    margin: 0;
+  }
+  body {
+    font-size: 10.5pt;
+    line-height: 1.75;
+  }
+  .cover, .section-banner {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .cover { min-height: 100vh; }
+  .section-banner { break-before: page; }
+  .content-section { break-inside: auto; }
+  .callout, .script-block, .matrix-table, .process-flow, .chat-bubble, li, h3 {
+    break-inside: avoid;
+  }
+  .matrix-table tbody tr { break-inside: avoid; }
+  .pdf-btn { display: none !important; }
+}
+
+/* ── PDF button (screen only) ── */
+.pdf-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 999;
+  background: var(--emerald);
+  color: white;
+  border: none;
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  font-family: 'Vazirmatn', system-ui, sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 24px rgba(0,164,124,0.35);
+  transition: all 0.2s;
+}
+.pdf-btn:hover {
+  background: var(--emerald-dim);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 28px rgba(0,164,124,0.45);
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════ COVER ════════════════ -->
+<div class="cover">
+  <svg class="cover-svg" viewBox="0 0 800 1000" xmlns="http://www.w3.org/2000/svg">
+    <!-- Dot grid -->
+    <defs><pattern id="dots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="16" cy="16" r="1.2" fill="rgba(255,255,255,0.25)"/></pattern></defs>
+    <rect width="800" height="1000" fill="url(#dots)"/>
+    <!-- Abstract rate line -->
+    <polyline points="60,600 180,560 280,420 380,380 480,340 580,310 680,260 740,240" fill="none" stroke="rgba(0,164,124,0.45)" stroke-width="2.5"/>
+    <polyline points="60,620 180,590 280,450 380,410 480,370 580,340 680,290 740,270" fill="none" stroke="rgba(0,164,124,0.2)" stroke-width="1.2"/>
+    <!-- Data nodes -->
+    <circle cx="180" cy="560" r="4" fill="#00A47C" opacity="0.6"/>
+    <circle cx="380" cy="380" r="4" fill="#00A47C" opacity="0.6"/>
+    <circle cx="580" cy="310" r="4" fill="#00A47C" opacity="0.6"/>
+    <circle cx="740" cy="240" r="5" fill="#00A47C" opacity="0.8"/>
+  </svg>
+  <div class="cover-content">
+    <h1>Sales Playbook</h1>
+    <h2>راهنمای فروش و ارتباطات سرد</h2>
+
+    <div class="meta">پنل SmartExchange &nbsp;·&nbsp; نسخه داخلی تیم فروش</div>
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 1: Sales Rules ════════════════ -->
+<div class="section-banner">
+  <div class="section-num">۱</div>
+  <h2>اصول و قوانین حیاتی فروش (Sales Rules)</h2>
+</div>
+
+<div class="content-section">
+  <p>در بازار محدود B2B صرافی‌های برون‌مرزی، هر لید به‌اندازهٔ یک دارایی کمیاب ارزشمند است. رعایت این قوانین برای تمام نمایندگان فروش الزامی است:</p>
+
+  <div class="callout callout-warning">
+    <h4>⚡ قانون اول</h4>
+    <p><strong>کیفیت بر کمیت اولویت دارد (Zero Spam):</strong> ارسال پیام انبوه بدون تحلیل اولیه ممنوع است. پیش از ارسال اولین پیام، کانال تلگرام، وب‌سایت یا اینستاگرام صرافی هدف باید حسابرسی (Audit) شود.</p>
+  </div>
+
+  <div class="callout callout-warning">
+    <h4>⚡ قانون دوم</h4>
+    <p><strong>«کاهش ریسک و افزایش سرعت» را بفروشید، نه «ویژگی‌های فنی» را:</strong> صراف به‌دنبال نرم‌افزار نیست؛ او به‌دنبال این است که ادمینش نرخ اشتباهی وارد نکند، بنر تلگرامش در ۳ ثانیه ساخته شود و مشتریانش به او اعتماد کنند.</p>
+  </div>
+
+  <div class="callout callout-warning">
+    <h4>⚡ قانون سوم</h4>
+    <p><strong>اصل عدم قطعیت و دریافت گام بعدی (Micro-Commitment):</strong> هدف اولین پیام فروش، فروش پنل نیست؛ هدف صرفاً دریافت پاسخ و تنظیم یک جلسهٔ دموی کوتاه یا ارسال یک ویدیوی اختصاصی ۱ دقیقه‌ای است.</p>
+  </div>
+
+  <div class="callout callout-warning">
+    <h4>⚡ قانون چهارم</h4>
+    <p><strong>شخصی‌سازی بر اساس برند مشتری:</strong> در اولین دمو یا ارائهٔ بصری، حتماً لوگو و طرح رنگی آن صرافی در ویرایشگر قالب تست شود.</p>
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 2: Cold Outreach Process ════════════════ -->
+<div class="section-banner">
+  <div class="section-num">۲</div>
+  <h2>فرآیند ۴ مرحله‌ای ارتباط سرد (Cold Outreach)</h2>
+</div>
+
+<div class="content-section">
+  <div class="process-flow">
+    <div class="process-step">
+      <div class="step-num">۱</div>
+      <div class="step-label">حسابرسی و<br>شناسایی نقطهٔ درد</div>
+    </div>
+    <div class="process-arrow">→</div>
+    <div class="process-step">
+      <div class="step-num">۲</div>
+      <div class="step-label">پیام قلاب<br>شخصی‌سازی‌شده</div>
+    </div>
+    <div class="process-arrow">→</div>
+    <div class="process-step">
+      <div class="step-num">۳</div>
+      <div class="step-label">دموی اختصاصی<br>۳ دقیقه‌ای</div>
+    </div>
+    <div class="process-arrow">→</div>
+    <div class="process-step">
+      <div class="step-num">۴</div>
+      <div class="step-label">نهایی‌سازی<br>قرارداد / آزمایشی</div>
+    </div>
+  </div>
+
+  <h3>مرحلهٔ اول: حسابرسی پیش از تماس (Audit Checklist)</h3>
+  <p>پیش از ارسال پیام به صرافی، موارد زیر را شناسایی کنید:</p>
+  <ol>
+    <li><strong>وضعیت گرافیک تلگرام:</strong> آیا نرخ‌ها را به‌صورت متن ساده ارسال می‌کنند یا با بنرهای دستی و کم‌کیفیت؟</li>
+    <li><strong>سرعت به‌روزرسانی و سازمان‌دهی:</strong> آیا سابقهٔ نرخ مشخص و منظمی دارند یا پیام‌های قبلی را حذف می‌کنند؟</li>
+    <li><strong>حضور در وب:</strong> آیا وب‌سایت اختصاصی دارند یا صرفاً به کانال تلگرام متکی هستند؟</li>
+    <li><strong>نقاط ضعف قابل مشاهده:</strong> تأخیر در به‌روزرسانی، نبود نرخ‌نامهٔ شفاف، برندینگ ضعیف، عدم تعامل با مخاطب.</li>
+  </ol>
+
+  <div class="callout callout-info">
+    <h4>💡 نکتهٔ کلیدی</h4>
+    <p>نتیجهٔ این حسابرسی باید مستقیماً در جملهٔ اول پیام شما منعکس شود. مثال: «سلام، دیدم توی کانال تلگرامتون نرخ‌ها رو به‌صورت دستی می‌نویسید…»</p>
+  </div>
+
+  <h3>مرحلهٔ دوم: پیام قلاب شخصی‌سازی‌شده</h3>
+  <p>هدف: دریافت پاسخ — نه فروش.</p>
+
+  <div class="script-block">
+    <div class="script-header">📋 الگوی پیام اولیه (تلگرام)</div>
+    <div class="script-body">
+      <p>سلام وقت بخیر<br>
+      [نام یا نام کانال] عزیز، من از تیم SmartExchange هستم.<br><br>
+      دیدم که توی کانال [نام کانال] نرخ‌ها رو [مشاهدهٔ خاص: دستی می‌نویسید | با تأخیر آپدیت می‌کنید | بنر ندارید].<br><br>
+      ما یه پنل اختصاصی برای صرافی‌ها طراحی کردیم که توش:<br>
+      • نرخ‌ها توی ۳ ثانیه تبدیل به بنر آمادهٔ تلگرام می‌شن<br>
+      • قیمت‌دهی چندلایه با تأیید مدیر انجام می‌شه (قیمت اشتباهی ثبت نمی‌شه)<br>
+      • مشتریاتون می‌تونن آنلاین استعلام قیمت بگیرن<br><br>
+      اگه ۳ دقیقه وقت دارید، می‌تونم یه دموی اختصاصی باهاتون به اشتراک بذارم.</p>
+    </div>
+  </div>
+
+  <h3>مرحلهٔ سوم: دموی اختصاصی ۳ دقیقه‌ای</h3>
+  <p>در این جلسه:</p>
+  <ul>
+    <li>لوگو و برند صرافی را از قبل در ویرایشگر قالب SmartExchange بارگذاری کنید.</li>
+    <li>روی <strong>یک</strong> قابلیت که مستقیماً به نقطهٔ درد شناسایی‌شده مربوط است تمرکز کنید.</li>
+    <li>نمایش زنده: از ورود نرخ تا انتشار بنر در تلگرام — در کمتر از ۶۰ ثانیه.</li>
+    <li>در انتها Call to Action شفاف: «هفتهٔ بعد می‌تونیم با یه حساب آزمایشی رایگان شروع کنیم.»</li>
+  </ul>
+
+  <h3>مرحلهٔ چهارم: نهایی‌سازی قرارداد / دورهٔ آزمایشی</h3>
+  <p>ارائهٔ یک دورهٔ آزمایشی ۷ تا ۱۴ روزه با پشتیبانی کامل. تأکید بر:</p>
+  <ul>
+    <li>بدون ریسک — بدون نیاز به پرداخت اولیه</li>
+    <li>پشتیبانی مستقیم در تمام مراحل راه‌اندازی</li>
+    <li>انعطاف در شخصی‌سازی پنل متناسب با نیاز صرافی</li>
+  </ul>
+</div>
+
+<!-- ════════════════ SECTION 3: Sales Matrix ════════════════ -->
+<div class="section-banner">
+  <div class="section-num">۳</div>
+  <h2>ماتریس فروش برای بخش‌های مختلف محصول (Feature-to-Value)</h2>
+</div>
+
+<div class="content-section">
+  <p>برای هر بخش از قابلیت‌های <strong>پنل SmartExchange</strong>، نمایندهٔ فروش باید دقیقاً بداند چه بگوید و چه سؤالی بپرسد:</p>
+
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th>بخش محصول</th>
+        <th>قابلیت‌های کلیدی</th>
+        <th>نقطهٔ درد مشتری (Pain Point)</th>
+        <th>نحوهٔ ارائه (Sales Pitch)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>مدیریت و تأیید قیمت</strong></td>
+        <td>ثبت کنترل‌شدهٔ نرخ با گردش تأیید چندلایه، تاریخچهٔ کامل تغییرات</td>
+        <td>ورود نرخ اشتباهی توسط اپراتور، نبود نظام نظارتی بر قیمت‌گذاری</td>
+        <td>«تا حالا شده اپراتورتون یه صفر اضافه وارد کنه و متوجه نشید؟ با سیستم تأیید ما، هیچ نرخی بدون امضای مدیر منتشر نمی‌شه.»</td>
+      </tr>
+      <tr>
+        <td><strong>مدیریت و انتشار بنر</strong></td>
+        <td>تولید خودکار بنرهای تلگرامی از قالب‌های آماده، ویرایش drag-and-drop</td>
+        <td>طراحی دستی بنر در فتوشاپ، اتلاف وقت، عدم هماهنگی بصری</td>
+        <td>«بنر تلگرامت رو بذار کنار. ببین توی ۳ ثانیه چطور یه بنر حرفه‌ای با لوگوی خودت ساخته می‌شه.»</td>
+      </tr>
+      <tr>
+        <td><strong>قیمت‌های ویژه (اسپرد شخصی)</strong></td>
+        <td>تعریف نرخ اختصاصی برای هر مشتری با انقضای خودکار و اعلان تلگرامی</td>
+        <td>ناتوانی در ارائهٔ قیمت رقابتی به مشتریان خاص، مدیریت دستی اسپرد</td>
+        <td>«می‌خوای به سه تا مشتری VIP نرخ ویژه بدی؟ با پنل ما هر مشتری قیمت مخصوص خودش رو می‌بینه، بدون دردسر.»</td>
+      </tr>
+      <tr>
+        <td><strong>صفحهٔ استعلام آنلاین</strong></td>
+        <td>صفحهٔ عمومی با برند صرافی برای استعلام لحظه‌ای قیمت توسط مشتریان</td>
+        <td>حجم بالای پیام‌های تکراری «قیمت امروز چنده؟»</td>
+        <td>«چندتا پیام در روز فقط برای پرسیدن قیمت می‌گیری؟ با صفحهٔ استعلام ما، مشتری خودش قیمت رو می‌بینه و تو فقط معامله می‌کنی.»</td>
+      </tr>
+      <tr>
+        <td><strong>یکپارچگی تلگرام</strong></td>
+        <td>اتصال مستقیم به کانال/گروه تلگرام، ربات قیمت‌دهی خودکار</td>
+        <td>فاصلهٔ زمانی بین تغییر نرخ و انتشار، خطای انسانی در کپی-پیست</td>
+        <td>«ربات ما نرخ رو مستقیم از پنل می‌خونه و توی کانال منتشر می‌کنه. دیگه کپی-پیست و اشتباه تایپی وجود نداره.»</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ════════════════ SECTION 4: Scripts ════════════════ -->
+<div class="section-banner">
+  <div class="section-num">۴</div>
+  <h2>اسکریپت‌های ارتباطی و سناریوهای فروش</h2>
+</div>
+
+<div class="content-section">
+
+  <h3>سناریوی A: صرافی بدون وب‌سایت، فقط تلگرام</h3>
+  <div class="script-block">
+    <div class="script-header">📋 اسکریپت — صرافی تلگرام-محور</div>
+    <div class="script-body">
+      <p>سلام، [نام] عزیز 🌱<br><br>
+      کانال [نام کانال] رو دنبال می‌کنم — نرخ‌هاتون به‌روزه و حس اعتماد خوبی داره. فقط یه چیزی توجه‌مو جلب کرد:<br><br>
+      مشتریاتون برای دیدن قیمت‌ها مجبورن توی تاریخچهٔ کانال بگردن یا مدام پیام بدن. ما برای صراف‌هایی مثل شما یه <strong>صفحهٔ استعلام آنلاین</strong> می‌سازیم که:<br>
+      • با برند و لوگوی خودتونه<br>
+      • نرخ‌ها به‌صورت خودکار از پنلتون خونده می‌شه<br>
+      • مشتری بدون فرستادن حتی یه پیام، همهٔ قیمت‌ها رو می‌بینه<br><br>
+      اگه ۳ دقیقه وقت بدید، یه دموی اختصاصی براتون می‌فرستم. نظرتون چیه؟</p>
+    </div>
+  </div>
+
+  <h3>سناریوی B: صرافی با وب‌سایت قدیمی و بروزرسانی دستی</h3>
+  <div class="script-block">
+    <div class="script-header">📋 اسکریپت — صرافی با سایت سنتی</div>
+    <div class="script-body">
+      <p>سلام، وقتتون بخیر ☘️<br><br>
+      سایت [نام وبسایت] رو دیدم — طراحی منظمی داره. فقط یه سؤال:<br>
+      <strong>هر بار که قیمت دلار یا درهم عوض می‌شه، چقدر طول می‌کشه تا سایت آپدیت بشه؟</strong><br><br>
+      خیلی از صرافی‌ها این وسط ۱۰-۱۵ دقیقه تأخیر دارن که توی بازار امروز یعنی کلی ضرر. ما توی SmartExchange یه پنل داریم که:<br>
+      • لحظه‌ای که نرخ رو تغییر می‌دید، <strong>همزمان</strong> سایت، تلگرام و صفحهٔ استعلام آپدیت می‌شن<br>
+      • همهٔ تغییرات با گردش تأیید انجام می‌شه (جلوی اشتباهات اپراتور رو می‌گیره)<br><br>
+      می‌تونم یه ویدیوی ۱ دقیقه‌ای از نحوهٔ کارش براتون بفرستم؟</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 5: Objection Handling ════════════════ -->
+<div class="section-banner">
+  <div class="section-num">۵</div>
+  <h2>مدیریت اعتراضات مشتری (Objection Handling)</h2>
+</div>
+
+<div class="content-section">
+
+  <h3>اعتراض ۱: «ما الان با همین روش راضی هستیم»</h3>
+  <div class="chat-thread">
+    <div class="chat-bubble client">
+      <div class="bubble-content">
+        <div class="bubble-role">مشتری</div>
+        ما الان با همین روش دستی راضی هستیم. سال‌هاست همین‌جوری کار می‌کنیم.
+      </div>
+    </div>
+    <div class="chat-bubble rep">
+      <div class="bubble-content">
+        <div class="bubble-role">نماینده فروش</div>
+        کاملاً قابل درکه. خیلی از مشتریای فعلی ما هم دقیقاً همین حس رو داشتن. ولی بذارید یه سؤال بپرسم: <strong>اگه اپراتورتون فردا مریض بشه یا قطع بشه، کی قراره نرخ‌ها رو آپدیت کنه؟</strong> پنل ما یه سرمایه‌گذاری برای <strong>تضمین تداوم</strong> کارتونه، نه فقط یه ابزار. می‌تونیم با یه حساب آزمایشی رایگان شروع کنیم تا خودتون ببینید.
+      </div>
+    </div>
+  </div>
+
+  <h3>اعتراض ۲: «هزینه برامون زیاده»</h3>
+  <div class="chat-thread">
+    <div class="chat-bubble client">
+      <div class="bubble-content">
+        <div class="bubble-role">مشتری</div>
+        هزینه‌ش برامون زیاده. فعلاً در اولویت نیست.
+      </div>
+    </div>
+    <div class="chat-bubble rep">
+      <div class="bubble-content">
+        <div class="bubble-role">نماینده فروش</div>
+        این رو کاملاً درک می‌کنم. بذارید یه زاویهٔ دیگه ببینیم: <strong>یه اشتباه تایپی توی نرخ چقدر براتون هزینه داره؟</strong> فقط یه معامله که با نرخ اشتباه انجام بشه می‌تونه چند برابر هزینهٔ ماهانهٔ پنل باشه. ما در واقع <strong>بیمهٔ کاهش خطا</strong> هستیم. ضمناً می‌تونیم با یه پلن سبک‌تر شروع کنیم و امکانات رو تدریجاً اضافه کنیم.
+      </div>
+    </div>
+  </div>
+
+  <h3>اعتراض ۳: «باید با مدیر/شریکم مشورت کنم»</h3>
+  <div class="chat-thread">
+    <div class="chat-bubble client">
+      <div class="bubble-content">
+        <div class="bubble-role">مشتری</div>
+        باید با شریکم مشورت کنم. خودم به‌تنهایی تصمیم نمی‌گیرم.
+      </div>
+    </div>
+    <div class="chat-bubble rep">
+      <div class="bubble-content">
+        <div class="bubble-role">نماینده فروش</div>
+        عالیه، اتفاقاً بهترین کار همینه. بذارید کمکتون کنم: <strong>یه دموی کوتاه ۳ دقیقه‌ای</strong> براتون آماده می‌کنم که بتونید با هم ببینیدش. حتی می‌تونم لوگوی صرافیتون رو توی پنل بذارم تا شریکتون دقیقاً ببینه محصول نهایی چه شکلی می‌شه. کی وقت مناسبیه که هردوتون آزاد باشین؟
+      </div>
+    </div>
+  </div>
+
+  <h3>اعتراض ۴: «از پنل فلان استفاده می‌کنیم»</h3>
+  <div class="chat-thread">
+    <div class="chat-bubble client">
+      <div class="bubble-content">
+        <div class="bubble-role">مشتری</div>
+        ما از پنل دیگه‌ای استفاده می‌کنیم. چرا باید عوضش کنیم؟
+      </div>
+    </div>
+    <div class="chat-bubble rep">
+      <div class="bubble-content">
+        <div class="bubble-role">نماینده فروش</div>
+        احترام می‌ذارم به انتخابتون. نمی‌خوام بگم عوضش کنین. فقط یه سؤال دارم: <strong>آخرین باری که پنلتون براتون یه مشتری جدید آورد کی بود؟</strong> تفاوت اصلی ما اینه که پنل SmartExchange فقط ابزار مدیریت نرخ نیست — <strong>کانال جذب مشتری</strong> هم هست، با صفحهٔ استعلام عمومی و بنرهای حرفه‌ای که مشتری‌های جدید رو به سمت شما می‌کشونه. اگه دوست داشتید، یه مقایسهٔ کوتاه براتون می‌فرستم.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════ SECTION 6: MEDDPICC Qualification ════════════════ -->
+<div class="section-banner">
+  <div class="section-num">۶</div>
+  <h2>چارچوب ارزیابی واجد شرایط بودن مشتری (MEDDPICC)</h2>
+</div>
+
+<div class="content-section">
+  <p>برای هر لید، چارچوب ارزیابی MEDDPICC را تکمیل کنید:</p>
+
+  <table class="matrix-table">
+    <thead>
+      <tr><th>معیار</th><th>سؤال کلیدی</th><th>وضعیت</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>M</strong>etrics</td><td>شاخص موفقیت صرافی چیست؟ (تعداد معامله روزانه، سرعت انتشار؟)</td><td></td></tr>
+      <tr><td><strong>E</strong>conomic Buyer</td><td>تصمیم‌گیرندهٔ نهایی کیست؟ (مدیرعامل، شریک، مدیر مالی؟)</td><td></td></tr>
+      <tr><td><strong>D</strong>ecision Criteria</td><td>معیارهای انتخاب پنل چیست؟ (قیمت، پشتیبانی، سرعت؟)</td><td></td></tr>
+      <tr><td><strong>D</strong>ecision Process</td><td>فرآیند تصمیم‌گیری چگونه است؟ (تست، تأیید، پرداخت؟)</td><td></td></tr>
+      <tr><td><strong>P</strong>aper Process</td><td>مراحل اداری/قراردادی چیست؟</td><td></td></tr>
+      <tr><td><strong>I</strong>mplicate Pain</td><td>هزینهٔ عدم اقدام چقدر است؟</td><td></td></tr>
+      <tr><td><strong>C</strong>hampion</td><td>حامی داخلی در صرافی کیست؟</td><td></td></tr>
+      <tr><td><strong>C</strong>ompetition</td><td>رقبای در حال بررسی کدامند؟</td><td></td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ── PDF Export Button ── -->
+<button class="pdf-btn" onclick="window.print()">🖨️ خروجی PDF / چاپ</button>
+
+</body>
+</html>
