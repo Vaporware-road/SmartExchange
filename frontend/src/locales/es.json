@@ -16,7 +16,8 @@
     "adminManagement": "Gestión de admins",
     "userManagement": "Gestión usuarios",
     "registerUser": "Registrar usuario",
-    "plans": "Planes y plantillas"
+    "plans": "Planes y plantillas",
+    "fleet": "Flota"
   },
   "common": {
     "save": "Guardar",
@@ -155,7 +156,8 @@
     "telegramStudio": "Estudio de mensajes Telegram",
     "instagramHub": "Hub Instagram",
     "userCenter": "Gestión de admins",
-    "programmerHub": "Hub Desarrollador"
+    "programmerHub": "Hub Desarrollador",
+    "programmerFleet": "Flota"
   },
   "lang": {
     "fa": "فارسی",
@@ -990,6 +992,49 @@
     "telegramIdHint": "ID de Telegram numérico o nombre de usuario",
     "plan": "Plan",
     "saving": "Creando…"
+  },
+  "fleet": {
+    "title": "Flota de clientes",
+    "tabs": {
+      "trials": "Clientes de prueba",
+      "licensed": "Clientes con licencia"
+    },
+    "noTrials": "No hay clientes de prueba en este momento.",
+    "noDeployments": "Aún no se ha registrado ninguna instalación con licencia.",
+    "customer": "Cliente",
+    "domain": "Dominio",
+    "plan": "Plan",
+    "status": "Estado",
+    "expires": "Vence",
+    "reminded": "Recordado",
+    "renews": "Renueva",
+    "lastCheckin": "Último registro",
+    "neverCheckedIn": "Nunca se registró",
+    "version": "Versión",
+    "license": "Clave de licencia",
+    "noStack": "Sin stack",
+    "daysLeft": "Quedan {days} días",
+    "expiresToday": "Vence hoy",
+    "lapsed": "Caducado",
+    "extend": "Ampliar {days} días",
+    "extended": "Prueba ampliada {days} días.",
+    "convert": "Convertir",
+    "convertTitle": "Convertir la prueba en instalación con licencia",
+    "convertHint": "Introduzca el dominio en el que funcionará el servidor propio del cliente. Se emitirá una clave de licencia y la prueba finalizará.",
+    "converted": "Convertido. Clave de licencia: {key}",
+    "provision": "Aprovisionar stack",
+    "provisionQueued": "Aprovisionamiento en cola.",
+    "reissue": "Reemitir",
+    "reissued": "Se emitió una nueva clave de licencia. La anterior ya no funciona.",
+    "statuses": {
+      "pending": "Pendiente",
+      "provisioning": "Aprovisionando",
+      "active": "Activo",
+      "expired": "Caducado",
+      "suspended": "Suspendido",
+      "archived": "Archivado",
+      "failed": "Fallido"
+    }
   },
   "collaboration": {
     "title": "Cómo trabajar con nosotros",

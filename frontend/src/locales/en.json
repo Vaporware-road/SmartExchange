@@ -16,7 +16,8 @@
     "adminManagement": "Admin Management",
     "userManagement": "User Management",
     "registerUser": "Register User",
-    "plans": "Plans & Templates"
+    "plans": "Plans & Templates",
+    "fleet": "Fleet"
   },
   "common": {
     "save": "Save",
@@ -220,6 +221,7 @@
     "telegramStudio": "Telegram Message Studio",
     "instagramHub": "Instagram Hub",
     "programmerHub": "Developer Hub",
+    "programmerFleet": "Fleet",
     "userCenter": "Admin Management"
   },
   "instagramHub": {
@@ -1266,5 +1268,48 @@
     "delegationDesc": "Grant this user access to the in-bot admin panel of another account’s bot.",
     "admin": "Admin",
     "head_operator": "Head Operator"
+  },
+  "fleet": {
+    "title": "Customer fleet",
+    "tabs": {
+      "trials": "Trial customers",
+      "licensed": "Licensed customers"
+    },
+    "noTrials": "No trial customers right now.",
+    "noDeployments": "No licensed installs have been recorded yet.",
+    "customer": "Customer",
+    "domain": "Domain",
+    "plan": "Plan",
+    "status": "Status",
+    "expires": "Expires",
+    "reminded": "Reminded",
+    "renews": "Renews",
+    "lastCheckin": "Last check-in",
+    "neverCheckedIn": "Never checked in",
+    "version": "Version",
+    "license": "License key",
+    "noStack": "No stack",
+    "daysLeft": "{days} days left",
+    "expiresToday": "Expires today",
+    "lapsed": "Lapsed",
+    "extend": "Extend {days} days",
+    "extended": "Trial extended by {days} days.",
+    "convert": "Convert",
+    "convertTitle": "Convert trial to a licensed install",
+    "convertHint": "Enter the domain the customer's own server will run on. A license key is issued and the trial ends.",
+    "converted": "Converted. License key: {key}",
+    "provision": "Provision stack",
+    "provisionQueued": "Provisioning queued.",
+    "reissue": "Reissue",
+    "reissued": "A new license key was issued. The old key no longer works.",
+    "statuses": {
+      "pending": "Pending",
+      "provisioning": "Provisioning",
+      "active": "Active",
+      "expired": "Expired",
+      "suspended": "Suspended",
+      "archived": "Archived",
+      "failed": "Failed"
+    }
   }
 }

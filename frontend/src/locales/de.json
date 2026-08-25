@@ -16,7 +16,8 @@
     "adminManagement": "Admin-Verwaltung",
     "userManagement": "Benutzerverwaltung",
     "registerUser": "Benutzer registrieren",
-    "plans": "Pläne & Vorlagen"
+    "plans": "Pläne & Vorlagen",
+    "fleet": "Flotte"
   },
   "common": {
     "save": "Speichern",
@@ -155,7 +156,8 @@
     "telegramStudio": "Telegram Nachrichtenstudio",
     "instagramHub": "Instagram Hub",
     "userCenter": "Admin-Verwaltung",
-    "programmerHub": "Entwickler-Hub"
+    "programmerHub": "Entwickler-Hub",
+    "programmerFleet": "Flotte"
   },
   "lang": {
     "fa": "فارسی",
@@ -990,6 +992,49 @@
     "telegramIdHint": "Numerische Telegram-ID oder Benutzername",
     "plan": "Plan",
     "saving": "Wird erstellt…"
+  },
+  "fleet": {
+    "title": "Kundenflotte",
+    "tabs": {
+      "trials": "Testkunden",
+      "licensed": "Lizenzierte Kunden"
+    },
+    "noTrials": "Derzeit keine Testkunden.",
+    "noDeployments": "Es wurden noch keine lizenzierten Installationen erfasst.",
+    "customer": "Kunde",
+    "domain": "Domain",
+    "plan": "Tarif",
+    "status": "Status",
+    "expires": "Läuft ab",
+    "reminded": "Erinnert",
+    "renews": "Verlängerung",
+    "lastCheckin": "Letzte Meldung",
+    "neverCheckedIn": "Nie gemeldet",
+    "version": "Version",
+    "license": "Lizenzschlüssel",
+    "noStack": "Kein Stack",
+    "daysLeft": "Noch {days} Tage",
+    "expiresToday": "Läuft heute ab",
+    "lapsed": "Abgelaufen",
+    "extend": "Um {days} Tage verlängern",
+    "extended": "Testphase um {days} Tage verlängert.",
+    "convert": "Umwandeln",
+    "convertTitle": "Testphase in lizenzierte Installation umwandeln",
+    "convertHint": "Geben Sie die Domain an, unter der der eigene Server des Kunden läuft. Ein Lizenzschlüssel wird ausgestellt und die Testphase endet.",
+    "converted": "Umgewandelt. Lizenzschlüssel: {key}",
+    "provision": "Stack bereitstellen",
+    "provisionQueued": "Bereitstellung eingereiht.",
+    "reissue": "Neu ausstellen",
+    "reissued": "Ein neuer Lizenzschlüssel wurde ausgestellt. Der alte Schlüssel funktioniert nicht mehr.",
+    "statuses": {
+      "pending": "Ausstehend",
+      "provisioning": "Wird bereitgestellt",
+      "active": "Aktiv",
+      "expired": "Abgelaufen",
+      "suspended": "Gesperrt",
+      "archived": "Archiviert",
+      "failed": "Fehlgeschlagen"
+    }
   },
   "collaboration": {
     "title": "Zusammenarbeit",

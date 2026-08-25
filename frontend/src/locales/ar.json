@@ -16,7 +16,8 @@
     "adminManagement": "إدارة المشرفين",
     "userManagement": "إدارة المستخدمين",
     "registerUser": "تسجيل مستخدم",
-    "plans": "الخطط والقوالب"
+    "plans": "الخطط والقوالب",
+    "fleet": "الأسطول"
   },
   "common": {
     "save": "حفظ",
@@ -155,7 +156,8 @@
     "telegramStudio": "استوديو رسائل تليجرام",
     "instagramHub": "مركز إنستغرام",
     "userCenter": "إدارة المشرفين",
-    "programmerHub": "مركز المطور"
+    "programmerHub": "مركز المطور",
+    "programmerFleet": "الأسطول"
   },
   "lang": {
     "fa": "فارسی",
@@ -990,6 +992,49 @@
     "telegramIdHint": "معرف تليجرام الرقمي أو اسم المستخدم",
     "plan": "الخطة",
     "saving": "جارٍ الإنشاء…"
+  },
+  "fleet": {
+    "title": "أسطول العملاء",
+    "tabs": {
+      "trials": "العملاء التجريبيون",
+      "licensed": "العملاء المرخّصون"
+    },
+    "noTrials": "لا يوجد عملاء تجريبيون حالياً.",
+    "noDeployments": "لم يتم تسجيل أي تثبيت مرخّص بعد.",
+    "customer": "العميل",
+    "domain": "النطاق",
+    "plan": "الخطة",
+    "status": "الحالة",
+    "expires": "ينتهي",
+    "reminded": "تم التذكير",
+    "renews": "التجديد",
+    "lastCheckin": "آخر اتصال",
+    "neverCheckedIn": "لم يتصل مطلقاً",
+    "version": "الإصدار",
+    "license": "مفتاح الترخيص",
+    "noStack": "بدون حزمة",
+    "daysLeft": "بقي {days} يوماً",
+    "expiresToday": "ينتهي اليوم",
+    "lapsed": "منتهٍ",
+    "extend": "تمديد {days} يوماً",
+    "extended": "تم تمديد الفترة التجريبية {days} يوماً.",
+    "convert": "تحويل",
+    "convertTitle": "تحويل الفترة التجريبية إلى تثبيت مرخّص",
+    "convertHint": "أدخل النطاق الذي سيعمل عليه خادم العميل الخاص. سيتم إصدار مفتاح ترخيص وإنهاء الفترة التجريبية.",
+    "converted": "تم التحويل. مفتاح الترخيص: {key}",
+    "provision": "تجهيز الحزمة",
+    "provisionQueued": "تم إدراج التجهيز في قائمة الانتظار.",
+    "reissue": "إعادة إصدار",
+    "reissued": "تم إصدار مفتاح ترخيص جديد. المفتاح القديم لم يعد صالحاً.",
+    "statuses": {
+      "pending": "قيد الانتظار",
+      "provisioning": "قيد التجهيز",
+      "active": "نشط",
+      "expired": "منتهٍ",
+      "suspended": "موقوف",
+      "archived": "مؤرشف",
+      "failed": "فشل"
+    }
   },
   "collaboration": {
     "title": "طريقة التعاون",

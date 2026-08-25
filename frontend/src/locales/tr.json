@@ -16,7 +16,8 @@
     "adminManagement": "Yönetici Yönetimi",
     "userManagement": "Kullanıcı Yönetimi",
     "registerUser": "Kullanıcı Kaydet",
-    "plans": "Planlar ve Şablonlar"
+    "plans": "Planlar ve Şablonlar",
+    "fleet": "Filo"
   },
   "common": {
     "save": "Kaydet",
@@ -155,7 +156,8 @@
     "telegramStudio": "Telegram Mesaj Stüdyosu",
     "instagramHub": "Instagram Merkezi",
     "userCenter": "Yönetici Yönetimi",
-    "programmerHub": "Geliştirici Merkezi"
+    "programmerHub": "Geliştirici Merkezi",
+    "programmerFleet": "Filo"
   },
   "lang": {
     "fa": "فارسی",
@@ -990,6 +992,49 @@
     "telegramIdHint": "Sayısal Telegram kimliği veya kullanıcı adı",
     "plan": "Plan",
     "saving": "Oluşturuluyor…"
+  },
+  "fleet": {
+    "title": "Müşteri filosu",
+    "tabs": {
+      "trials": "Deneme müşterileri",
+      "licensed": "Lisanslı müşteriler"
+    },
+    "noTrials": "Şu anda deneme müşterisi yok.",
+    "noDeployments": "Henüz lisanslı kurulum kaydedilmedi.",
+    "customer": "Müşteri",
+    "domain": "Alan adı",
+    "plan": "Paket",
+    "status": "Durum",
+    "expires": "Bitiş",
+    "reminded": "Hatırlatıldı",
+    "renews": "Yenileme",
+    "lastCheckin": "Son bildirim",
+    "neverCheckedIn": "Hiç bildirim yok",
+    "version": "Sürüm",
+    "license": "Lisans anahtarı",
+    "noStack": "Yığın yok",
+    "daysLeft": "{days} gün kaldı",
+    "expiresToday": "Bugün doluyor",
+    "lapsed": "Süresi doldu",
+    "extend": "{days} gün uzat",
+    "extended": "Deneme süresi {days} gün uzatıldı.",
+    "convert": "Dönüştür",
+    "convertTitle": "Denemeyi lisanslı kuruluma dönüştür",
+    "convertHint": "Müşterinin kendi sunucusunun çalışacağı alan adını girin. Bir lisans anahtarı verilir ve deneme sona erer.",
+    "converted": "Dönüştürüldü. Lisans anahtarı: {key}",
+    "provision": "Yığını hazırla",
+    "provisionQueued": "Hazırlama kuyruğa alındı.",
+    "reissue": "Yeniden ver",
+    "reissued": "Yeni bir lisans anahtarı verildi. Eski anahtar artık çalışmıyor.",
+    "statuses": {
+      "pending": "Beklemede",
+      "provisioning": "Hazırlanıyor",
+      "active": "Etkin",
+      "expired": "Süresi doldu",
+      "suspended": "Askıda",
+      "archived": "Arşivlendi",
+      "failed": "Başarısız"
+    }
   },
   "collaboration": {
     "title": "İş Birliği Şekli",

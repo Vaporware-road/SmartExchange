@@ -81,6 +81,15 @@ const routes = [
         },
       },
       {
+        path: 'programmer/fleet',
+        name: 'programmer-fleet',
+        component: () => import('@/views/programmer/ProgrammerFleetView.vue'),
+        meta: {
+          titleKey: 'routes.programmerFleet',
+          roles: ['super_admin', 'developer'],
+        },
+      },
+      {
         path: 'programmer/templates',
         name: 'programmer-templates',
         component: () => import('@/views/programmer/ProgrammerTemplatesView.vue'),
@@ -345,6 +354,7 @@ router.beforeEach(async (to, from, next) => {
       next({ name: 'programmer' })
     } else if (
       (to.name === 'programmer' ||
+        to.name === 'programmer-fleet' ||
         to.name === 'programmer-templates' ||
         to.name === 'programmer-register' ||
         to.name === 'programmer-user') &&

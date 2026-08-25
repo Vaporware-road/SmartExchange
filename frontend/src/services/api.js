@@ -295,6 +295,15 @@ export const authApi = {
   activity: (params) => api.get('/auth/activity/', { params }),
 }
 
+export const fleetApi = {
+  trials: () => api.get('/fleet/trials/'),
+  extendTrial: (id, data) => api.post(`/fleet/trials/${id}/extend/`, data),
+  convertTrial: (id, data) => api.post(`/fleet/trials/${id}/convert/`, data),
+  provisionTrial: (id) => api.post(`/fleet/trials/${id}/provision/`),
+  deployments: () => api.get('/fleet/deployments/'),
+  reissueLicense: (id) => api.post(`/fleet/deployments/${id}/reissue-license/`),
+}
+
 export const dashboardApi = {
   summary: (config = {}) => api.get('/dashboard/summary/', config),
   telegramStats: (config = {}) => api.get('/dashboard/telegram-stats/', config),

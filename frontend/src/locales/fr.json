@@ -16,7 +16,8 @@
     "adminManagement": "Gestion des admins",
     "userManagement": "Gestion utilisateurs",
     "registerUser": "Enregistrer",
-    "plans": "Plans & modèles"
+    "plans": "Plans & modèles",
+    "fleet": "Parc"
   },
   "common": {
     "save": "Enregistrer",
@@ -155,7 +156,8 @@
     "telegramStudio": "Studio de messages Telegram",
     "instagramHub": "Hub Instagram",
     "userCenter": "Gestion des admins",
-    "programmerHub": "Hub Développeur"
+    "programmerHub": "Hub Développeur",
+    "programmerFleet": "Parc"
   },
   "lang": {
     "fa": "فارسی",
@@ -990,6 +992,49 @@
     "telegramIdHint": "ID Telegram numérique ou nom d'utilisateur",
     "plan": "Forfait",
     "saving": "Création…"
+  },
+  "fleet": {
+    "title": "Parc clients",
+    "tabs": {
+      "trials": "Clients en essai",
+      "licensed": "Clients sous licence"
+    },
+    "noTrials": "Aucun client en essai pour le moment.",
+    "noDeployments": "Aucune installation sous licence n'a encore été enregistrée.",
+    "customer": "Client",
+    "domain": "Domaine",
+    "plan": "Formule",
+    "status": "Statut",
+    "expires": "Expire",
+    "reminded": "Relancé",
+    "renews": "Renouvellement",
+    "lastCheckin": "Dernier contact",
+    "neverCheckedIn": "Jamais contacté",
+    "version": "Version",
+    "license": "Clé de licence",
+    "noStack": "Aucune stack",
+    "daysLeft": "{days} jours restants",
+    "expiresToday": "Expire aujourd'hui",
+    "lapsed": "Expiré",
+    "extend": "Prolonger de {days} jours",
+    "extended": "Essai prolongé de {days} jours.",
+    "convert": "Convertir",
+    "convertTitle": "Convertir l'essai en installation sous licence",
+    "convertHint": "Saisissez le domaine sur lequel tournera le serveur du client. Une clé de licence est émise et l'essai prend fin.",
+    "converted": "Converti. Clé de licence : {key}",
+    "provision": "Provisionner la stack",
+    "provisionQueued": "Provisionnement mis en file d'attente.",
+    "reissue": "Réémettre",
+    "reissued": "Une nouvelle clé de licence a été émise. L'ancienne ne fonctionne plus.",
+    "statuses": {
+      "pending": "En attente",
+      "provisioning": "Provisionnement",
+      "active": "Actif",
+      "expired": "Expiré",
+      "suspended": "Suspendu",
+      "archived": "Archivé",
+      "failed": "Échec"
+    }
   },
   "collaboration": {
     "title": "Mode de collaboration",
