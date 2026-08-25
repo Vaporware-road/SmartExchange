@@ -295,31 +295,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 DEMO_LOGIN_ENABLED = os.environ.get('DEMO_LOGIN_ENABLED', 'True').lower() in ('true', '1', 'yes')
 DEMO_USERNAME = (os.environ.get('DEMO_USERNAME', 'demo') or 'demo').strip()
 
-# -----------------------------
-# External API (sarafipardis.co.uk rates)
-# -----------------------------
-EXTERNAL_API_URL = os.environ.get(
-    'EXTERNAL_API_URL',
-    'https://sarafipardis.co.uk/wp-json/pardis/v1/rates'
-)
-_EXTERNAL_API_KEY_RAW = os.environ.get('EXTERNAL_API_KEY', '')
-if not _EXTERNAL_API_KEY_RAW:
-    if DEBUG:
-        import warnings
-        warnings.warn(
-            'EXTERNAL_API_KEY not set — external rates sync will fail. '
-            'Set the env var for production.',
-            stacklevel=1,
-        )
-        EXTERNAL_API_KEY = ''
-    else:
-        raise ValueError(
-            'EXTERNAL_API_KEY environment variable is required in production. '
-            'The previously hardcoded key must be rotated — it was exposed in source code.'
-        )
-else:
-    EXTERNAL_API_KEY = _EXTERNAL_API_KEY_RAW
-
 # Security settings
 # HTTP-only reverse proxies (e.g. Dokploy *.traefik.me preview URLs): set
 # DJANGO_USE_HTTP_BEHIND_PROXY=true so Django does not force HTTPS redirects

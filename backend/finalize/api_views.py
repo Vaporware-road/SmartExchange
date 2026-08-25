@@ -27,7 +27,6 @@ from instagram_hub.services.instagram_config import is_instagram_configured
 from instagram_hub.tasks import schedule_instagram_post_finalize
 
 from .models import Finalization, FinalizedPriceHistory, SpecialPriceFinalization
-from .tasks import send_finalized_prices_task, send_finalized_special_prices_task
 from .views import sort_gbp_price_types
 from .serializers import (
     FinalizeCategoryRequestSerializer,
@@ -90,13 +89,6 @@ def _get_publication_destinations():
         })
     except Exception:
         destinations.append({"id": "instagram", "label": "Instagram", "enabled": False})
-    external_url = getattr(settings, "EXTERNAL_API_URL", None)
-    external_key = getattr(settings, "EXTERNAL_API_KEY", None)
-    destinations.append({
-        "id": "external_api",
-        "label": "Mobile App / Web",
-        "enabled": bool(external_url and external_key),
-    })
     return destinations
 
 
@@ -419,11 +411,6 @@ class FinalizeCategoryAPIView(APIView):
                     finalization=finalization,
                     price_history=item["price_history"],
                 )
-            transaction.on_commit(
-                lambda: send_finalized_prices_task.delay(
-                    price_history_ids=[price_history.id for _, price_history in price_items]
-                )
-            )
             if is_instagram_configured():
                 transaction.on_commit(
                     lambda cid=category.id: schedule_instagram_post_finalize(
@@ -552,11 +539,6 @@ class FinalizeSpecialPriceAPIView(APIView):
                 image_caption=image_caption if message_sent else None,
                 telegram_response=publication_response or None,
                 notes=notes,
-            )
-            transaction.on_commit(
-                lambda: send_finalized_special_prices_task.delay(
-                    special_price_history_ids=[special_price_history.id]
-                )
             )
             if is_instagram_configured():
                 transaction.on_commit(
@@ -692,11 +674,6 @@ class FinalizeAllAPIView(APIView):
                         telegram_response=publication_response or None,
                         notes=notes,
                     )
-                    transaction.on_commit(
-                        lambda: send_finalized_special_prices_task.delay(
-                            special_price_history_ids=[special_price_history.id]
-                        )
-                    )
                 log_finalize_event(
                     level="INFO" if message_sent else "WARNING",
                     message=f"Special price finalized (all): {special_price_type.name}",
@@ -826,11 +803,6 @@ class FinalizeAllAPIView(APIView):
                     finalization=finalization,
                     price_history=item["price_history"],
                 )
-            transaction.on_commit(
-                lambda: send_finalized_prices_task.delay(
-                    price_history_ids=[price_history.id for _, price_history in price_items]
-                )
-            )
 
         log_finalize_event(
             level="INFO" if message_sent else "WARNING",

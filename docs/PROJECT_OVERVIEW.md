@@ -60,7 +60,7 @@ MrExchange/
 ├── frontend/                 # Vue 3 SPA
 ├── landing page/             # Static marketing page (fa, RTL) + Demo.mp4
 ├── docker/                   # entrypoint, supervisord, dev Dockerfiles
-├── docs/                     # MASTER_PLAN.md, EXTERNAL_API_DEBUG_ANALYSIS.md
+├── docs/                     # MASTER_PLAN.md, PROJECT_OVERVIEW.md
 ├── scripts/                  # PowerShell helpers (default admin, font download)
 ├── docker-compose.yml
 ├── Dockerfile
@@ -93,7 +93,6 @@ MrExchange/
 - Models: `Finalization`, `FinalizedPriceHistory`, `SpecialPriceFinalization`.
 - API: dashboard, `finalize-category`, `finalize-special-price`, `finalize-all` (channel + category/special selection).
 - Flow per finalize: run **Celery publish task** → wait up to `FINALIZE_TASK_WAIT_TIMEOUT` → honor `FINALIZE_STRICT_TELEGRAM` (503 if Telegram fails) → persist finalization **only on success** → then on-commit queue **external API sync** and optional **Instagram post**.
-- `ExternalAPIService` posts `GBP_BUY/GBP_SELL/USDT_BUY/USDT_SELL` to the WordPress WP-JSON rates endpoint (`sarafipardis.co.uk/wp-json/pardis/v1/rates`), with DB logging. (See `docs/EXTERNAL_API_DEBUG_ANALYSIS.md` for the history of a bug where rates weren't reaching WordPress.)
 
 ### price_publisher — publish service
 - `PricePublisherService` (`publish_category_prices`, `publish_special_price`) returns a `PublicationResult` (success, response, caption, template id, render fallback reason).
@@ -211,6 +210,5 @@ Throttles: anon 100/h, user 1000/h, finalize 60/h, settings 200/h, public prices
 ## 10. Development Notes / Current State
 
 - Both README (frontend) and docs/MASTER_PLAN.md describe an ongoing **migration from server-rendered Django templates to the Vue SPA** (phases: rebrand ✅ → backend API conversion → Vue frontend → deprecate old templates). The codebase currently has both HTML views and DRF APIs.
-- `docs/EXTERNAL_API_DEBUG_ANALYSIS.md` documents a past production bug (finalized prices not reaching the external WordPress API) with instrumentation and root-cause analysis.
 - `tel.txt` contains a task list ("Telegram Management Hub" 4-tab refactor, Analytics Telegram engagement, AutoPostConfig, UpdatePriceView bug fix) — a work-in-progress agenda.
 - Scripts: `scripts/ensure-default-admin.ps1`, `scripts/download_template_fonts.ps1`.

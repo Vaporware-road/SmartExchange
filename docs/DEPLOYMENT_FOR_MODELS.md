@@ -50,12 +50,11 @@ DJANGO_CSRF_TRUSTED_ORIGINS=https://your-domain.example,https://www.your-domain.
 DEFAULT_ADMIN_USERNAME=admin
 DEFAULT_ADMIN_PASSWORD=<strong-password>
 DEFAULT_ADMIN_SYNC_PASSWORD=false
-EXTERNAL_API_KEY=<real-key-or-an-unused-placeholder-if-disabled>
 ```
 
 For a local-only demo, `DJANGO_ALLOWED_HOSTS` may include `localhost,127.0.0.1`, but never ship `admin/admin` or a known secret to production. Keep `.env.docker` private; it is ignored by Git in normal project setup.
 
-Optional integrations are configured with the remaining variables in `.env.example`, including Telegram, Instagram, external WordPress synchronization, and Celery settings.
+Optional integrations are configured with the remaining variables in `.env.example`, including Telegram, Instagram, and Celery settings.
 
 ## 5. Choose free host ports
 
@@ -190,12 +189,11 @@ docker compose down
 2. Set `DJANGO_DEBUG=False`.
 3. Set exact `DJANGO_ALLOWED_HOSTS` and `DJANGO_CSRF_TRUSTED_ORIGINS`.
 4. Set a strong admin password and `DEFAULT_ADMIN_SYNC_PASSWORD=false`.
-5. Set a real `EXTERNAL_API_KEY` if external synchronization is enabled.
-6. Configure Telegram/Instagram credentials only through environment or the application’s encrypted configuration flow.
-7. Put the app behind HTTPS and a reverse proxy.
-8. Do not publish Redis directly.
-9. Back up the SQLite database and media volume.
-10. Run migrations before declaring a new release healthy.
+5. Configure Telegram/Instagram credentials only through environment or the application’s encrypted configuration flow.
+6. Put the app behind HTTPS and a reverse proxy.
+7. Do not publish Redis directly.
+8. Back up the SQLite database and media volume.
+9. Run migrations before declaring a new release healthy.
 11. Confirm frontend, API, worker, Beat, and Redis health after rollout.
 12. Have a rollback and database-backup plan before changing production data.
 

@@ -8,7 +8,7 @@
 
 ## One-line orientation
 
-Exchange ops panel for MrExchange (`mrexchange.co.uk`). Operators update prices → managers finalize → Celery renders branded images → publishes to Telegram (mandatory) + Instagram + external WordPress API.
+Exchange ops panel for MrExchange (`mrexchange.co.uk`). Operators update prices → managers finalize → Celery renders branded images → publishes to Telegram (mandatory) + Instagram.
 
 **Two products in this repo — do not cross-import:**
 
@@ -101,7 +101,6 @@ update prices (change_price / special_price)
 | `DJANGO_DEBUG` | `False` in production |
 | `DEFAULT_ADMIN_SYNC_PASSWORD` | `false` in production (disables auto-reset of admin password) |
 | `UPLOAD_STORAGE_LIMIT_GB` | Max temp upload storage (default 10 GB) |
-| `EXTERNAL_API_URL` / `EXTERNAL_API_KEY` | WordPress rates endpoint (`sarafipardis.co.uk/wp-json/pardis/v1/rates`) |
 
 ---
 

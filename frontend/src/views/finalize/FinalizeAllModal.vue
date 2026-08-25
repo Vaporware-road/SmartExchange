@@ -20,7 +20,6 @@
         >
           <i v-if="d.id === 'telegram'" class="fab fa-telegram-plane text-xl"></i>
           <i v-else-if="d.id === 'instagram'" class="fab fa-instagram text-xl"></i>
-          <i v-else-if="d.id === 'external_api'" class="fas fa-mobile-alt text-lg"></i>
           <i v-else class="fas fa-paper-plane text-lg"></i>
           <span>{{ d.label }}</span>
         </span>
