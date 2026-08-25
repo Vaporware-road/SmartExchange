@@ -36,7 +36,7 @@ from .serializers import (
     TrialCustomerSerializer,
 )
 from .services import convert_to_licensed, ensure_trial_deployment, extend_trial
-from .tasks import provision_trial_task
+from .tasks import archive_trial_stack_task, provision_trial_task
 
 logger = logging.getLogger(__name__)
 
@@ -104,9 +104,11 @@ class TrialExtendAPIView(APIView):
 class TrialConvertAPIView(APIView):
     """Convert a trial to a licensed customer-server install.
 
-    This issues the license and records the new install. Moving the data onto
-    the customer's VPS is the `convert_trial` management command — deliberately
-    a separate, explicit step rather than something a button does silently.
+    This issues the license, records the new install and tears the trial's
+    stack down. Moving the data onto the customer's VPS is the `convert_trial`
+    management command — deliberately a separate, explicit step rather than
+    something a button does silently, so use that command instead of this
+    button whenever the trial holds data worth keeping.
     """
 
     permission_classes = [IsProgrammer]
@@ -135,6 +137,11 @@ class TrialConvertAPIView(APIView):
             plan=serializer.validated_data.get("plan"),
             renews_at=serializer.validated_data.get("renews_at"),
             notes=serializer.validated_data.get("notes", ""),
+        )
+        # The trial's subdomain stops serving here; its data is kept in the
+        # archive so a bundle can still be exported inside the retention window.
+        transaction.on_commit(
+            lambda: archive_trial_stack_task.delay(deployment_id=trial.pk)
         )
         return Response(
             CustomerDeploymentSerializer(licensed).data, status=status.HTTP_201_CREATED

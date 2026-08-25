@@ -20,7 +20,13 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from fleet.models import CustomerDeployment
-from fleet.provisioning import COMPOSE_FILENAME, stack_dir
+from fleet.provisioning import (
+    COMPOSE_FILENAME,
+    ProvisioningDisabled,
+    ProvisioningError,
+    archive,
+    stack_dir,
+)
 from fleet.services import convert_to_licensed
 
 DB_PATH_IN_CONTAINER = "/app/backend/data/db.sqlite3"
@@ -51,6 +57,11 @@ class Command(BaseCommand):
             help="Where to write the bundle (default TRIAL_ARCHIVE_ROOT).",
         )
         parser.add_argument(
+            "--keep-stack",
+            action="store_true",
+            help="Leave the trial stack up after converting, instead of tearing it down.",
+        )
+        parser.add_argument(
             "--keep-running",
             action="store_true",
             help="Do not stop the trial stack before copying. Risks a torn SQLite file.",
@@ -78,10 +89,17 @@ class Command(BaseCommand):
             notes=f"Converted from {trial.slug}; bundle {bundle}",
         )
 
+        torn_down = self._retire_stack(licensed, trial, options)
+
         self.stdout.write(self.style.SUCCESS(f"Bundle written: {bundle}"))
         self.stdout.write(self.style.SUCCESS(f"License key:   {licensed.license_key}"))
         self.stdout.write(
             f"Renews:        {licensed.renews_at:%Y-%m-%d}" if licensed.renews_at else ""
+        )
+        self.stdout.write(
+            self.style.SUCCESS(f"Trial stack:   torn down ({trial.domain} no longer serves)")
+            if torn_down
+            else self.style.WARNING(f"Trial stack:   still up at {trial.domain}")
         )
         self.stdout.write("")
         self.stdout.write("Next, on the customer's VPS:")
@@ -94,6 +112,30 @@ class Command(BaseCommand):
             "Set FLEET_LICENSE_KEY and FLEET_CHECKIN_URL in their .env so the "
             "install appears in the fleet view, then point their DNS at it."
         )
+
+    def _retire_stack(self, licensed, trial, options):
+        """Cut the trial subdomain over by taking its stack down.
+
+        The record is already retired by `convert_to_licensed`; this is the
+        Docker half, and its failure must not lose the license we just issued.
+        """
+        if options["keep_stack"]:
+            return False
+        try:
+            archive_path = archive(trial, keep_data=True)
+        except ProvisioningDisabled:
+            return False
+        except ProvisioningError as exc:
+            self.stderr.write(
+                self.style.WARNING(
+                    f"License {licensed.license_key} was issued, but tearing the "
+                    f"trial stack down failed: {exc}. Take it down by hand."
+                )
+            )
+            return False
+        if archive_path:
+            self.stdout.write(f"Stack archive: {archive_path}")
+        return True
 
     def _export_bundle(self, trial, options):
         output_dir = Path(options["output_dir"] or settings.TRIAL_ARCHIVE_ROOT)

@@ -59,16 +59,23 @@ prints the license key:
 python manage.py convert_trial trial-acme --domain panel.customer.example --plan gold
 ```
 
+The trial stack is then taken down and its directory archived to
+`TRIAL_ARCHIVE_ROOT`, so `trial-acme.mrexchange.co.uk` stops serving — that is
+the cut-over on our side. Volumes are left in place, so a bundle can still be
+re-exported inside your retention window.
+
 Useful flags: `--term-days` (defaults to `LICENSE_TERM_DAYS=365`),
-`--output-dir` (defaults to `TRIAL_ARCHIVE_ROOT`), and `--keep-running`, which
-skips the stop and therefore risks a torn database — only for a trial with no
-data worth keeping.
+`--output-dir` (defaults to `TRIAL_ARCHIVE_ROOT`), `--keep-stack` to leave the
+trial running while the customer's server is being set up, and `--keep-running`,
+which skips the stop before the copy and therefore risks a torn database — only
+for a trial with no data worth keeping.
 
 If the customer never used the trial for real work, skip the bundle entirely and
-use **Convert** in the owner panel instead: it issues the license and records the
-deployment without exporting anything.
+use **Convert** in the owner panel instead: it issues the license, records the
+deployment and queues the same teardown, but exports nothing — so do not use the
+button when the trial holds data they want to keep.
 
-- [ ] Bundle path noted.
+- [ ] Bundle path and stack archive path noted.
 - [ ] License key recorded and kept somewhere you can hand to the customer.
 - [ ] `/programmer/fleet → Licensed customers` now lists the domain, plan and
       renewal date. Last check-in will read *Never checked in* until step 6.
@@ -127,6 +134,8 @@ data — do not reach for the flag.
 ## 5. DNS and TLS
 
 - [ ] `A`/`AAAA` record for the domain points at their VPS.
+- [ ] The trial subdomain no longer resolves to a running panel — confirm, so a
+      bookmarked trial URL cannot quietly keep being used.
 - [ ] Reverse proxy terminates HTTPS with a valid certificate.
 - [ ] `http://` redirects to `https://`.
 - [ ] The domain matches `DJANGO_ALLOWED_HOSTS` and

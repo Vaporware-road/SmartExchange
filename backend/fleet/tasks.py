@@ -17,6 +17,7 @@ from django.utils import timezone
 
 from .models import CustomerDeployment
 from .provisioning import ProvisioningDisabled, ProvisioningError, archive, provision
+from .services import retire_trial_deployment
 
 logger = logging.getLogger(__name__)
 
@@ -68,6 +69,31 @@ def provision_trial_task(self, *, deployment_id: int):
     _log("INFO", f"Trial stack provisioned: {deployment.domain}",
          event="fleet_provisioned", slug=deployment.slug, domain=deployment.domain)
     return {"provisioned": True, "domain": deployment.domain}
+
+
+@shared_task
+def archive_trial_stack_task(*, deployment_id: int, keep_data: bool = True):
+    """Tear the trial's containers down after a conversion or a manual retire.
+
+    The record is retired by ``convert_to_licensed`` before this runs, so a
+    host with no Docker simply has nothing left to do.
+    """
+    deployment = CustomerDeployment.objects.filter(pk=deployment_id).first()
+    if deployment is None:
+        return {"archived": False, "reason": "missing"}
+
+    try:
+        archive(deployment, keep_data=keep_data)
+    except ProvisioningDisabled:
+        retire_trial_deployment(deployment)
+        return {"archived": False, "reason": "disabled"}
+    except ProvisioningError:
+        logger.exception("fleet: stack teardown failed for %s", deployment.slug)
+        return {"archived": False, "reason": "compose_failed"}
+
+    _log("INFO", f"Trial stack torn down: {deployment.slug}",
+         event="fleet_trial_archived", slug=deployment.slug)
+    return {"archived": True, "slug": deployment.slug}
 
 
 @shared_task
@@ -165,9 +191,7 @@ def teardown_lapsed_trials_task():
             archive(deployment)
         except ProvisioningDisabled:
             # No Docker here; still retire the record so the panel is truthful.
-            deployment.status = CustomerDeployment.STATUS_ARCHIVED
-            deployment.archived_at = now
-            deployment.save(update_fields=["status", "archived_at"])
+            retire_trial_deployment(deployment, now=now)
         except ProvisioningError:
             logger.exception("fleet: teardown failed for %s", deployment.slug)
             continue

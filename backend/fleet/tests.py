@@ -19,8 +19,12 @@ from .api_views import (
 )
 from .licensing import generate_license_key
 from .models import CustomerDeployment
-from .services import ensure_trial_deployment
-from .tasks import send_trial_expiry_reminders_task, teardown_lapsed_trials_task
+from .services import convert_to_licensed, ensure_trial_deployment
+from .tasks import (
+    archive_trial_stack_task,
+    send_trial_expiry_reminders_task,
+    teardown_lapsed_trials_task,
+)
 
 
 def make_customer(username="acme", **extra):
@@ -144,6 +148,19 @@ class TrialLifecycleTaskTest(TestCase):
         self.assertEqual(deployment.status, CustomerDeployment.STATUS_ARCHIVED)
         user.refresh_from_db()
         self.assertFalse(user.is_active)
+
+    def test_archive_task_retires_the_record_where_docker_is_unavailable(self):
+        user = make_customer()
+        user.trial_expires_at = timezone.now() + timedelta(days=5)
+        user.save()
+        deployment, _ = ensure_trial_deployment(user)
+
+        result = archive_trial_stack_task(deployment_id=deployment.pk)
+
+        self.assertEqual(result, {"archived": False, "reason": "disabled"})
+        deployment.refresh_from_db()
+        self.assertEqual(deployment.status, CustomerDeployment.STATUS_ARCHIVED)
+        self.assertIsNotNone(deployment.archived_at)
 
     def test_teardown_leaves_trials_still_inside_the_grace_window(self):
         user = make_customer()
@@ -270,6 +287,36 @@ class OwnerPanelAPITest(TestCase):
         self.assertIsNone(self.customer.trial_expires_at)
         self.assertTrue(self.customer.is_active)
 
+    def test_convert_retires_the_trial_record_and_queues_its_teardown(self):
+        trial = CustomerDeployment.objects.get(
+            customer=self.customer, deployment_type=CustomerDeployment.TYPE_TRIAL
+        )
+        with patch("fleet.api_views.archive_trial_stack_task.delay") as teardown:
+            with self.captureOnCommitCallbacks(execute=True):
+                self.call(
+                    TrialConvertAPIView, "post",
+                    f"/api/fleet/trials/{self.customer.pk}/convert/",
+                    self.owner, {"domain": "panel.acme.example"}, pk=self.customer.pk,
+                )
+
+        teardown.assert_called_once_with(deployment_id=trial.pk)
+        trial.refresh_from_db()
+        self.assertEqual(trial.status, CustomerDeployment.STATUS_ARCHIVED)
+        self.assertIn("panel.acme.example", trial.notes)
+
+    def test_a_converted_customer_can_be_given_a_fresh_trial_later(self):
+        trial = CustomerDeployment.objects.get(
+            customer=self.customer, deployment_type=CustomerDeployment.TYPE_TRIAL
+        )
+        convert_to_licensed(trial, domain="panel.acme.example")
+
+        self.customer.trial_expires_at = timezone.now() + timedelta(days=14)
+        self.customer.save(update_fields=["trial_expires_at"])
+        second, created = ensure_trial_deployment(self.customer)
+
+        self.assertTrue(created)
+        self.assertNotEqual(second.pk, trial.pk)
+
     def test_convert_refuses_a_domain_another_install_already_uses(self):
         self.call(
             TrialConvertAPIView, "post",
@@ -316,3 +363,77 @@ class OwnerPanelAPITest(TestCase):
             "/api/fleet/checkin/", {"license_key": old_key}, format="json"
         )
         self.assertEqual(FleetCheckinAPIView.as_view()(checkin).status_code, 403)
+
+
+class DeliveryTierEndToEndTest(TestCase):
+    """Walk one customer through both tiers, the way phase 6 asks for.
+
+    Signup → trial record → reminder → convert → licensed record → the
+    customer-server install's first check-in, all without Docker.
+    """
+
+    def setUp(self):
+        self.factory = APIRequestFactory()
+        self.owner = CustomUser.objects.create_user(
+            username="fleet-owner", password="pw-for-tests", role=CustomUser.ROLE_SUPER_ADMIN
+        )
+        self.customer = make_customer(username="lifecycle")
+
+    def test_trial_signup_through_to_a_licensed_install_checking_in(self):
+        ensure_trial_started(self.customer)
+        trial = CustomerDeployment.objects.get(
+            customer=self.customer, deployment_type=CustomerDeployment.TYPE_TRIAL
+        )
+        self.assertEqual(trial.status, CustomerDeployment.STATUS_PENDING)
+
+        # Tier 1: the trial reports in from its own stack on our VPS.
+        checkin = self.factory.post(
+            "/api/fleet/checkin/",
+            {"license_key": trial.license_key, "app_version": "2026.08.1"},
+            format="json",
+        )
+        self.assertEqual(FleetCheckinAPIView.as_view()(checkin).status_code, 200)
+        trial.refresh_from_db()
+        self.assertEqual(trial.status, CustomerDeployment.STATUS_ACTIVE)
+
+        # Day 11 of 14: the reminder fires once.
+        self.customer.trial_expires_at = timezone.now() + timedelta(days=2)
+        self.customer.save(update_fields=["trial_expires_at"])
+        self.assertEqual(send_trial_expiry_reminders_task(), {"notified": 1})
+
+        # Tier 2: sales closes, and the owner converts.
+        request = self.factory.post(
+            f"/api/fleet/trials/{self.customer.pk}/convert/",
+            {"domain": "panel.lifecycle.example"},
+            format="json",
+        )
+        force_authenticate(request, user=self.owner)
+        with patch("fleet.api_views.archive_trial_stack_task.delay"):
+            with self.captureOnCommitCallbacks(execute=True):
+                response = TrialConvertAPIView.as_view()(request, pk=self.customer.pk)
+        self.assertEqual(response.status_code, 201)
+        licensed_key = response.data["license_key"]
+
+        trial.refresh_from_db()
+        self.assertEqual(trial.status, CustomerDeployment.STATUS_ARCHIVED)
+        self.customer.refresh_from_db()
+        self.assertIsNone(self.customer.trial_expires_at)
+        self.assertTrue(self.customer.is_active)
+
+        # The trial's key is dead; only the licensed install can check in now.
+        stale = self.factory.post(
+            "/api/fleet/checkin/", {"license_key": trial.license_key}, format="json"
+        )
+        self.assertEqual(FleetCheckinAPIView.as_view()(stale).status_code, 403)
+
+        live = self.factory.post(
+            "/api/fleet/checkin/",
+            {"license_key": licensed_key, "app_version": "2026.08.1", "uptime_seconds": 90},
+            format="json",
+        )
+        self.assertEqual(FleetCheckinAPIView.as_view()(live).status_code, 200)
+
+        licensed = CustomerDeployment.objects.get(license_key=licensed_key)
+        self.assertEqual(licensed.deployment_type, CustomerDeployment.TYPE_CUSTOMER_SERVER)
+        self.assertEqual(licensed.status, CustomerDeployment.STATUS_ACTIVE)
+        self.assertIsNotNone(licensed.last_checkin_at)

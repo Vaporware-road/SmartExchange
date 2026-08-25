@@ -82,9 +82,11 @@ def convert_to_licensed(
 ):
     """Turn a converted trial into the customer's licensed install record.
 
-    The trial deployment is left in place and marked archived-on-teardown by
-    the caller; the returned record is the one the owner panel tracks from
-    here on, and it carries a freshly issued license key.
+    The trial record is retired here so it stops occupying the one-live-trial
+    slot and stops showing up as a trial customer; tearing the trial's actual
+    containers down is a separate, Docker-touching step the caller schedules.
+    The returned record is the one the owner panel tracks from here on, and it
+    carries a freshly issued license key.
     """
     customer = trial_deployment.customer
     licensed = CustomerDeployment(
@@ -109,7 +111,28 @@ def convert_to_licensed(
     customer.save(
         update_fields=["trial_expires_at", "trial_expiry_notified_at", "is_active"]
     )
+
+    retire_trial_deployment(trial_deployment, reason=f"converted to {licensed.domain}")
     return licensed
+
+
+def retire_trial_deployment(trial_deployment, *, reason="", now=None):
+    """Mark a trial record finished without touching Docker.
+
+    Called on conversion, and as the fallback whenever the host has no
+    provisioning to tear down, so the owner panel never shows a trial that is
+    no longer a trial.
+    """
+    if trial_deployment.status == CustomerDeployment.STATUS_ARCHIVED:
+        return trial_deployment
+    trial_deployment.status = CustomerDeployment.STATUS_ARCHIVED
+    trial_deployment.archived_at = now or timezone.now()
+    if reason:
+        trial_deployment.notes = f"{trial_deployment.notes}\n{reason}".strip()
+        trial_deployment.save(update_fields=["status", "archived_at", "notes"])
+    else:
+        trial_deployment.save(update_fields=["status", "archived_at"])
+    return trial_deployment
 
 
 def extend_trial(user, *, days):
