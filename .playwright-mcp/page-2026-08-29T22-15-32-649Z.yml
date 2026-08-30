@@ -1,0 +1,111 @@
+- generic [ref=f11e1]:
+  - generic [ref=f11e4]:
+    - complementary [ref=f11e5]:
+      - link "" [ref=f11e7] [cursor=pointer]:
+        - /url: /panel
+      - navigation [ref=f11e10]:
+        - list [ref=f11e11]:
+          - listitem [ref=f11e12]:
+            - link "" [ref=f11e13] [cursor=pointer]:
+              - /url: /panel
+          - listitem [ref=f11e15]:
+            - link "$" [ref=f11e16] [cursor=pointer]:
+              - /url: /update
+          - listitem [ref=f11e18]:
+            - link "" [ref=f11e19] [cursor=pointer]:
+              - /url: /finalize
+          - listitem [ref=f11e21]:
+            - link "" [ref=f11e22] [cursor=pointer]:
+              - /url: /categories
+          - listitem [ref=f11e24]:
+            - link "" [ref=f11e25] [cursor=pointer]:
+              - /url: /analysis
+          - listitem [ref=f11e27]:
+            - link "" [ref=f11e28] [cursor=pointer]:
+              - /url: /telegram/send
+          - listitem [ref=f11e30]:
+            - link "" [ref=f11e31] [cursor=pointer]:
+              - /url: /instagram
+          - listitem [ref=f11e33]:
+            - link "" [ref=f11e34] [cursor=pointer]:
+              - /url: /templates
+      - text: 
+    - generic [ref=f11e36]:
+      - status [ref=f11e37]:
+        - generic [ref=f11e38]: Live demo
+        - paragraph [ref=f11e39]:
+          - strong [ref=f11e40]: You are inside a live MrExchange panel.
+          - text: —Sample rates, sample channels. Nothing here is published anywhere, and it resets for the next visitor.
+        - generic [ref=f11e41]:
+          - button "Show me around" [ref=f11e42] [cursor=pointer]:
+            - generic [ref=f11e43]: 
+          - link "Talk to us" [ref=f11e45] [cursor=pointer]:
+            - /url: /contact
+            - generic [ref=f11e46]: 
+          - link "Back to site" [ref=f11e48] [cursor=pointer]:
+            - /url: /
+            - generic [ref=f11e49]: 
+      - banner [ref=f11e51]:
+        - text: 
+        - link " MrExchange" [ref=f11e52] [cursor=pointer]:
+          - /url: /panel
+          - generic [ref=f11e53]: 
+          - generic [ref=f11e55]: MrExchange
+        - generic [ref=f11e56]:
+          - button " EN" [ref=f11e58] [cursor=pointer]:
+            - generic [ref=f11e59]: 
+            - generic [ref=f11e60]: EN
+          - button "Switch to dark theme" [ref=f11e61] [cursor=pointer]:
+            - generic [ref=f11e62]: 
+          - generic [ref=f11e63]:
+            - generic [ref=f11e64]: 
+            - generic [ref=f11e66]:
+              - generic [ref=f11e67]: Demo User
+              - generic [ref=f11e68]: management
+          - button "" [ref=f11e69] [cursor=pointer]
+      - main [ref=f11e71]:
+        - generic [ref=f11e72]:
+          - navigation "Breadcrumb" [ref=f11e73]:
+            - link "Home" [ref=f11e74] [cursor=pointer]:
+              - /url: /panel
+            - generic [ref=f11e75]: 
+            - generic [ref=f11e302]: Finalize
+          - generic [ref=f11e303]:
+            - heading "Finalize Category" [level=1] [ref=f11e304]
+            - generic [ref=f11e305]:
+              - generic [ref=f11e306]: 
+              - paragraph [ref=f11e307]: No Channels Available
+              - paragraph [ref=f11e308]: Add a Telegram channel first before publishing.
+              - link "Add a channel →" [ref=f11e309] [cursor=pointer]:
+                - /url: /telegram/send?section=tools&tab=channels
+      - contentinfo [ref=f11e265]:
+        - generic [ref=f11e266]:
+          - paragraph [ref=f11e267]:
+            - text: Powered by
+            - link "Vaporware-road" [ref=f11e268] [cursor=pointer]:
+              - /url: https://github.com/Vaporware-road
+          - generic [ref=f11e269]:
+            - generic [ref=f11e270]: MrExchange
+            - generic [ref=f11e271]: 
+    - text:  $ 
+  - text:    $      
+  - dialog "What this panel does" [ref=f11e273]:
+    - banner [ref=f11e274]:
+      - generic [ref=f11e275]:
+        - paragraph [ref=f11e276]: Live demo
+        - heading "What this panel does" [level=2] [ref=f11e277]
+      - button "Close" [ref=f11e278] [cursor=pointer]:
+        - generic [ref=f11e279]: 
+    - paragraph [ref=f11e280]: Eight stops, in the order a rate desk uses them. Each one opens the real page — look around, change things, nothing breaks.
+    - generic "Step 3 of 8" [ref=f11e310]
+    - generic [ref=f11e290]:
+      - generic [ref=f11e291]: 
+      - paragraph [ref=f11e293]: Step 3 of 8
+      - heading "Approve, then publish" [level=3] [ref=f11e311]
+      - paragraph [ref=f11e295]: Nothing reaches your customers until someone approves it. A manager reviews the new rates, sees the generated image, and releases them.
+      - paragraph [ref=f11e296]:
+        - generic [ref=f11e297]: 
+        - generic [ref=f11e298]: The rendered rate image is built here from your own template before it goes out.
+    - generic [ref=f11e299]:
+      - button "Back" [ref=f11e300] [cursor=pointer]
+      - button "Next" [active] [ref=f11e301] [cursor=pointer]

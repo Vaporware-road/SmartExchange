@@ -54,6 +54,28 @@ function serveTemplateFontsFromRepo() {
   }
 }
 
+/**
+ * vue-i18n 12.0.0-alpha.3 ships `"sideEffects": false`, so a production build
+ * tree-shakes its entry module away — and with it the top-level
+ * `registerMessageCompiler(compile)` call. The app then has no message
+ * compiler and every `{placeholder}` renders literally ("Viewing as {name}").
+ * Dev is unaffected because it does not tree-shake.
+ *
+ * Marking the entry as side-effectful keeps the registration. Drop this once
+ * vue-i18n is on a release that declares its entry correctly.
+ */
+function keepVueI18nMessageCompiler() {
+  return {
+    name: 'keep-vue-i18n-message-compiler',
+    transform(code, id) {
+      if (id.includes('vue-i18n/dist/vue-i18n.js')) {
+        return { code, map: null, moduleSideEffects: true }
+      }
+      return null
+    },
+  }
+}
+
 export default defineConfig(({ command, mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   // In Docker, point proxy to backend service name.
@@ -98,6 +120,7 @@ export default defineConfig(({ command, mode }) => {
   base: command === 'serve' ? '/' : '/static/vue/',
   plugins: [
     serveTemplateFontsFromRepo(),
+    keepVueI18nMessageCompiler(),
     vue(),
     VitePWA({
       registerType: 'autoUpdate',

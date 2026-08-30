@@ -3,7 +3,7 @@
  * Developer panel (not impersonating) uses a shorter list.
  */
 export const staffNavLinks = [
-  { to: '/', labelKey: 'sidebar.dashboard', icon: 'fas fa-tachometer-alt', exact: true, activeColor: 'gold' },
+  { to: '/panel', labelKey: 'sidebar.dashboard', icon: 'fas fa-tachometer-alt', exact: true, activeColor: 'gold' },
   { to: '/update', labelKey: 'sidebar.priceHub', icon: 'fas fa-dollar-sign', exact: false, activeColor: 'buy' },
   { to: '/finalize', labelKey: 'sidebar.finalize', icon: 'fas fa-check-circle', exact: false, permission: 'finalize', activeColor: 'buy' },
   { to: '/categories', labelKey: 'sidebar.categories', icon: 'fas fa-tags', exact: false, activeColor: 'gold' },

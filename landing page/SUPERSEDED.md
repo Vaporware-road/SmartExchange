@@ -6,7 +6,7 @@ This directory is the cPanel deployment shell for the old standalone
 The single MrExchange marketing site is now the Django landing app:
 
 - app: `backend/landing/`
-- template: `backend/landing/templates/landing/animated_index.html`
+- page: `frontend/src/views/landing/LandingView.vue` (served through `backend/landing/views.py`)
 - route: `/` (see `backend/MrExchangePanel/urls.py`)
 - assets: `backend/static/landing/`
 

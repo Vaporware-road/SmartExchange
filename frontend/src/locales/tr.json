@@ -1056,5 +1056,338 @@
     "systemAccessDesc": "Telegram bot kimlik bilgileri ve erişim seviyesi.",
     "registeredBy": "Kaydeden",
     "registeredByHint": "Otomatik olarak giriş yapan yönetici olarak kaydedilir."
+  },
+  "landing": {
+    "meta": {
+      "title": "MrExchange — Döviz Kuru Otomasyon Paneli"
+    },
+    "nav": {
+      "label": "Ana menü",
+      "product": "Ürün",
+      "services": "Hizmetler",
+      "package": "Paket",
+      "contact": "Bize ulaşın",
+      "cta": "Demo alın",
+      "menu": "Menü",
+      "language": "Dil"
+    },
+    "hero": {
+      "badge": "Kur yayını, tamamen otomatik",
+      "title": "Tek bir kur paneli,",
+      "titleAccent": "yayın yaptığınız her kanal için",
+      "subtitle": "Alış ve satış kurlarınızı bir kez girin. MrExchange kaydettiğiniz anda bunları web sitenize, Telegram kanalınıza, Instagram sayfanıza ve kur bileşeninize gönderir.",
+      "ctaDemo": "Demo alın",
+      "ctaTrial": "14 günlük ücretsiz denemeyi başlatın",
+      "note": "Demo, hazır verilerle hızlı bir bakıştır. Deneme ise kendi alt alan adınızda kendi panelinizdir.",
+      "panelTitle": "Kur yönetimi",
+      "live": "Canlı güncelleme",
+      "buy": "Alış",
+      "sell": "Satış"
+    },
+    "stats": {
+      "saved": "Kur yayınında günlük tasarruf",
+      "automation": "Elle hiçbir adım olmadan otomatik yayın",
+      "channels": "Tek panelden yayın kanalı",
+      "uptime": "Kesintisiz güncelleme ve erişilebilirlik"
+    },
+    "features": {
+      "eyebrow": "Neler var",
+      "title": "Kur masasının gerçekten ihtiyaç duyduğu her şey",
+      "subtitle": "Panelin her gün yaptığı altı iş. Tam liste aşağıda.",
+      "items": {
+        "panel": {
+          "title": "Kur yönetim paneli",
+          "desc": "Alış ve satış kurlarını her cihazdan, her yerden değiştirmek için güvenli bir panel."
+        },
+        "instant": {
+          "title": "Anında yayın",
+          "desc": "Tek kayıt, bağlı tüm kanallar aynı saniyede güncellenir."
+        },
+        "telegram": {
+          "title": "Telegram kanalı ve botu",
+          "desc": "Kanalınıza biçimlendirilmiş kur mesajları ve görselleri, ayrıca fiyat sorularını yanıtlayan bir bot."
+        },
+        "instagram": {
+          "title": "Instagram gönderileri",
+          "desc": "Kur görselleri kendi şablonunuzda üretilip doğrudan sayfanızda yayımlanır."
+        },
+        "branding": {
+          "title": "Her yerde sizin markanız",
+          "desc": "Sistemin ürettiği her görselde, sayfada ve bileşende logonuz, renkleriniz, yazı tipleriniz."
+        },
+        "security": {
+          "title": "Roller ve denetim kaydı",
+          "desc": "Yönetici, operatör ve geliştirici için ayrı erişim; her kur değişikliği kayıt altında."
+        }
+      }
+    },
+    "flow": {
+      "title": "Tek kur, her yerde, aynı anda",
+      "subtitle": "Fiyatı kaydettiğiniz andan itibaren veri, bağladığınız tüm kanallara akar.",
+      "steps": {
+        "enter": {
+          "title": "Kurları girin",
+          "desc": "Paneli bilgisayarda veya telefonda açın ve yeni alış-satış kurlarını yazın."
+        },
+        "render": {
+          "title": "İçerik üretilir",
+          "desc": "Sistem görselleri, mesajları ve sayfa verisini kendi şablonunuzda bir saniyeden kısa sürede hazırlar."
+        },
+        "publish": {
+          "title": "Her şey yayına gider",
+          "desc": "Web sitesi, Telegram, Instagram ve kur bileşeniniz eşzamanlı güncellenir."
+        }
+      }
+    },
+    "channelsSection": {
+      "title": "Tek platform, tüm çıktılar",
+      "subtitle": "Modern bir döviz bürosunun yayımladığı her şey, tek bir kur kaynağından."
+    },
+    "channels": {
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "website": "Web sitesi",
+      "widget": "Kur bileşeni",
+      "bot": "Fiyat botu",
+      "api": "Özel API",
+      "reports": "Raporlama",
+      "branches": "Çok şubeli",
+      "security": "Güvenlik",
+      "whatsapp": "WhatsApp"
+    },
+    "demo": {
+      "title": "Çalışırken görün",
+      "text": "Videoda tek bir kur değişikliğinin aynı anda web sitesine, Telegram kanalına ve Instagram sayfasına ulaştığını görürsünüz. Ya da atlayın ve gerçek paneli açın — kayıt yok, parola yok.",
+      "cta": "Demo panelini aç",
+      "note": "Demo hesabı yönetici rolündedir: tüm operasyonel ekranları görür, ancak kullanıcı yönetimi ve site ayarları kapalıdır."
+    },
+    "pricing": {
+      "eyebrow": "Fiyatlandırma",
+      "title": "Tek paket, tek ödeme",
+      "subtitle": "Ürünün tamamı tek bir ödemeyle. Süregelen hizmetler sizin seçtiğiniz eklentilerdir, pakete dayatılmaz.",
+      "oneOff": "tek seferlik",
+      "perMonth": "ay",
+      "optional": "İsteğe bağlı",
+      "supportNote": "İsteğe bağlıdır. Panel sunucunuzda onsuz da çalışır; destek güncelleme, yedekleme, izleme ve öncelikli yanıt demektir.",
+      "bundle": {
+        "badge": "Eksiksiz",
+        "name": "MrExchange Paketi",
+        "note": "Sunucu kurulumu, yükleme, API bağlantıları, şablon tasarımı ve ekip eğitimi dahildir. Ayrıca kurulum ücreti yoktur.",
+        "cta": "Bize ulaşın"
+      }
+    },
+    "addons": {
+      "title": "Ek hizmetler",
+      "subtitle": "2026'da ajansların ve serbest çalışanların aynı iş için aldığı ücretle karşılaştırıldı ve bilinçli olarak altına konumlandırıldı. Üstü çizili rakam piyasa fiyatıdır.",
+      "disclaimer": "Fiyatlar GBP cinsinden ve KDV hariçtir. Piyasa rakamları, 2026 yılına ait yayımlanmış ajans ve serbest çalışan fiyat rehberlerinden alınan yaklaşık aralıklardır.",
+      "groups": {
+        "once": "Tek seferlik yapımlar",
+        "month": "Süregelen, isteğe bağlı"
+      },
+      "items": {
+        "website": {
+          "title": "Tam döviz bürosu sitesi",
+          "desc": "Kendi alan adınızda markalı, eksiksiz bir site — sayfalar, içerik, SEO temelleri ve canlı kur tablosu."
+        },
+        "mobileApp": {
+          "title": "Markalı mobil uygulama",
+          "desc": "Müşterileriniz için kurlarınızı, markanızı ve bildirimlerinizi taşıyan kurulabilir bir uygulama."
+        },
+        "api": {
+          "title": "Özel API entegrasyonu",
+          "desc": "Kurları küresel bir kaynaktan otomatik çekin veya kurlarınızı başka bir sisteme açın."
+        },
+        "accounting": {
+          "title": "Muhasebe entegrasyonu",
+          "desc": "Paneli muhasebe veya arka ofis yazılımınıza bağlayın; kurlar ve kayıtlar uyumlu kalsın."
+        },
+        "brandTemplate": {
+          "title": "Özel marka şablonu",
+          "desc": "Logonuz, renkleriniz, yazı tipleriniz ve görsellerinizle tasarlanmış gönderi ve afiş şablonu."
+        },
+        "telegramBot": {
+          "title": "Telegram fiyat botu",
+          "desc": "Müşterilerinizin güncel kuru sormak için yazdığı, sizin dilinizle konuşan bir bot."
+        },
+        "whatsapp": {
+          "title": "WhatsApp Business kurulumu",
+          "desc": "Kur sorularının ve duyuruların WhatsApp üzerinden akması için Business API kurulumu."
+        },
+        "widget": {
+          "title": "Siteniz için kur bileşeni",
+          "desc": "Halihazırdaki sitenize gömülebilen canlı kur tablosu — tek bir kod parçası, yeniden yapım yok."
+        },
+        "branch": {
+          "title": "Ek şube",
+          "desc": "Kendi erişimi, personel hesapları ve kur ayarları olan başka bir şube."
+        },
+        "migration": {
+          "title": "Veri taşıma",
+          "desc": "Mevcut para birimlerinizi, müşterilerinizi ve kur geçmişinizi panele aktarma."
+        },
+        "training": {
+          "title": "Ekip eğitimi",
+          "desc": "Ekibiniz için canlı bir eğitim oturumu ve kendi dilinizde yazılı bir rehber."
+        },
+        "domain": {
+          "title": "Alan adı ve SSL kurulumu",
+          "desc": "Alan adı, DNS, sertifikalar ve e-posta kayıtları sizin adınıza yapılandırılır."
+        },
+        "support": {
+          "title": "Destek ve bakım",
+          "desc": "Sistemi kuran ekipten güncelleme, yedekleme, çalışma süresi izleme ve öncelikli yanıt."
+        },
+        "social": {
+          "title": "Instagram ve Telegram yönetimi",
+          "desc": "Kanalları biz yürütürüz: paylaşım takvimi, metinler, topluluk yanıtları ve aylık rapor."
+        },
+        "seo": {
+          "title": "SEO ve yerel görünürlük",
+          "desc": "Bölgenizde döviz bürosu arayanların sizi bulması için süregelen arama çalışması."
+        },
+        "content": {
+          "title": "Özel grafik içerik",
+          "desc": "Standart kur şablonunun ötesinde kampanya görselleri, mevsimlik tasarımlar ve hikâye setleri."
+        },
+        "hosting": {
+          "title": "Yönetilen barındırma ve yedekleme",
+          "desc": "Paneliniz, dışarıda otomatik yedeklemeli, ayrılmış ve izole bir sunucuda."
+        },
+        "rateFeed": {
+          "title": "Canlı piyasa kuru beslemesi",
+          "desc": "Baz kurlarınızın kimse yazmadan piyasayı izlemesi için lisanslı bir veri beslemesi."
+        }
+      }
+    },
+    "package": {
+      "title": "Paket özellikleri",
+      "subtitle": "Aşağıdakilerin tamamı tek seferlik fiyata dahildir.",
+      "included": "Dahil",
+      "rows": {
+        "panel": "Döviz kuru yönetim paneli",
+        "instant": "Tüm kanallarda anında yayın",
+        "telegram": "Telegram kanalında yayın",
+        "telegramBot": "Telegram fiyat botu",
+        "instagram": "Doğrudan Instagram yayını",
+        "website": "Alan adınızda markalı kur sayfası",
+        "graphics": "Kendi şablonunuzda otomatik görsel üretimi",
+        "widget": "Web siteniz için kur bileşeni",
+        "reports": "Excel ve PDF çıktılı raporlama",
+        "alerts": "Yönetim için kur hareketi uyarıları",
+        "branches": "Çok şubeli yönetim",
+        "roles": "Ayrı roller ve erişim denetimi",
+        "backups": "Otomatik yedekleme ve tam denetim kaydı",
+        "support": "Kurulum, eğitim ve devir"
+      }
+    },
+    "telegram": {
+      "eyebrow": "Telegram kanalı",
+      "title": "Kanalı takip edin",
+      "subtitle": "Ürün haberleri, sürüm notları ve örnek kur gönderileri önce oraya düşer. Katılın ve paneli almadan önce ne yayımladığını görün.",
+      "cta": "Kanalı aç",
+      "perks": {
+        "rates": "Müşterilerinizin göreceği hâliyle örnek kur gönderileri",
+        "releases": "Yeni özellikler ve sürüm notları, çıktıkları anda",
+        "tips": "Kur masasını çevrimiçi yürütmek için pratik ipuçları"
+      }
+    },
+    "faq": {
+      "title": "Sık sorulan sorular",
+      "subtitle": "Satın almadan önce sorulanlar.",
+      "items": {
+        "auto": {
+          "q": "Kurlar otomatik güncelleniyor mu?",
+          "a": "Panele bir baz kur ya da doğrudan alış-satış kurlarını girersiniz. Kaydettiğiniz anda sistem değişikliği web sitenize, Telegram kanalınıza ve Instagram sayfanıza gönderir."
+        },
+        "telegram": {
+          "q": "Telegram kanalımıza gönderi yapabilir mi?",
+          "a": "Evet. Telegram yayını pakete dahildir: biçimlendirilmiş metin mesajları ve kur görselleri doğrudan kanalınıza gider, ayrıca bir bot müşterilerinizin fiyat sorularını yanıtlayabilir."
+        },
+        "instagram": {
+          "q": "Instagram destekleniyor mu?",
+          "a": "Evet. Kur görselleri kendi şablonunuzda otomatik üretilir ve Instagram API üzerinden doğrudan sayfanızda yayımlanır."
+        },
+        "branding": {
+          "q": "Gönderiler kendi markamızı taşıyabilir mi?",
+          "a": "Evet. Logonuzu, marka renklerinizi, yazı tiplerinizi ve arka plan görsellerinizi yükleyin; üretilen her görsel ve sayfa görsel kimliğinizi izler."
+        },
+        "website": {
+          "q": "Web sitesi de alıyor muyuz?",
+          "a": "Alan adınızda markalı bir kur sayfası pakete dahildir. Tam bir döviz bürosu sitesi ayrı bir ek hizmet olarak sunulur."
+        },
+        "branches": {
+          "q": "Birden fazla şubeyi yönetebilir miyiz?",
+          "a": "Evet. Şubeler ayrı erişimle tanımlanabilir ve kurlar merkezî olarak yönetilir. Ek şubeler küçük, tek seferlik bir ek hizmettir."
+        },
+        "setup": {
+          "q": "Tek seferlik ücret neleri kapsıyor?",
+          "a": "Sunucu kurulumu, panel yüklemesi, güvenlik yapılandırması, Telegram ve Instagram API bağlantısı, şablon tasarımı ve ekip eğitimi. Ayrı bir kurulum ücreti yoktur."
+        },
+        "api": {
+          "q": "Bize özel bir API geliştirebilir misiniz?",
+          "a": "Evet. Ek hizmet olarak, kurları küresel bir kaynaktan çeken ya da paneli muhasebe yazılımınıza bağlayan özel bir API geliştirebiliriz."
+        },
+        "support": {
+          "q": "Aylık destek zorunlu mu?",
+          "a": "Hayır. Destek ve bakım; güncelleme, yedekleme, izleme ve öncelikli yanıtı kapsayan isteğe bağlı bir ek hizmettir. Panel onsuz da çalışmaya devam eder."
+        }
+      }
+    },
+    "contact": {
+      "title": "Kurları elle yayımlamayı bırakmaya hazır mısınız?",
+      "subtitle": "Arayın, WhatsApp'tan yazın ya da demo panelini hemen açın. Kayıt yok, parola yok.",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "whatsappMessage": "Merhaba, MrExchange paneli için demo ve danışmanlık almak istiyorum."
+    },
+    "contactPage": {
+      "metaTitle": "MrExchange ile iletişim",
+      "eyebrow": "Bize ulaşın",
+      "title": "Gerçek bir insanla konuşun,",
+      "titleAccent": "hâlihazırda kullandığınız kanaldan",
+      "subtitle": "Telegram, WhatsApp ya da sıradan bir telefon görüşmesi. Panel, fiyat veya kurulum hakkında sorun; konuşurken canlı demoyu birlikte açalım.",
+      "channels": {
+        "telegram": {
+          "name": "Telegram",
+          "desc": "Oradan yazın ya da kanalı takip ederek örnek kur gönderilerini ve sürüm notlarını görün.",
+          "action": "Telegram'ı aç"
+        },
+        "whatsapp": {
+          "name": "WhatsApp",
+          "desc": "Satış hattına en hızlı yol. Sohbet hazır bir karşılama mesajıyla açılır.",
+          "action": "Sohbeti başlat"
+        },
+        "phone": {
+          "name": "Telefon",
+          "desc": "Konuşarak ilerlemeyi tercih ediyorsanız satış hattını doğrudan arayın.",
+          "action": "Şimdi ara"
+        }
+      },
+      "facts": {
+        "languages": {
+          "title": "Yedi dil",
+          "value": "Panel, site ve destek İngilizce, Farsça, Arapça, Türkçe, Almanca, Fransızca ve İspanyolca sunulur."
+        },
+        "demo": {
+          "title": "Almadan önce görün",
+          "value": "Demo panelini isteyin; hazır verilerle açılır — kayıt yok, parola yok."
+        },
+        "setup": {
+          "title": "Kurulum fiyata dahil",
+          "value": "Kurulum, güvenlik ayarları, Telegram ve Instagram bağlantıları ve personel eğitimi tek seferlik fiyata dahildir; ayrı kurulum ücreti yoktur."
+        }
+      },
+      "ctaTitle": "Önce bakmayı mı tercih edersiniz?",
+      "ctaText": "Demo panelini şimdi açın ya da bize yazmadan önce paketin tam olarak neleri içerdiğini okuyun."
+    },
+    "footer": {
+      "about": "Döviz büroları için kur yayın paneli: tek giriş, tüm kanallar.",
+      "productTitle": "Ürün",
+      "startTitle": "Başlayın",
+      "contactTitle": "İletişim",
+      "faq": "SSS",
+      "login": "Giriş yap",
+      "bottom": "mrexchange.co.uk. Tüm hakları saklıdır."
+    }
   }
 }

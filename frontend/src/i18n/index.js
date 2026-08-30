@@ -25,6 +25,8 @@ const safeStorage = {
   },
 }
 
+// English-first: the marketing page and its crawler metadata are en_GB, and the
+// panel now shares one locale with it. A returning visitor keeps their choice.
 const savedLocale = safeStorage.get() || 'en'
 const initialLocale = SUPPORTED_LOCALES.includes(savedLocale) ? savedLocale : 'en'
 
@@ -60,9 +62,12 @@ function applyDocumentLocale(locale) {
   document.documentElement.dir = RTL_LOCALES.has(locale) ? 'rtl' : 'ltr'
 }
 
-// Use legacy: true so $t() in templates resolves correctly
+// Composition mode: `useI18n()` in a legacy-mode app returns a *local* composer
+// with its own locale, which left the landing page (useI18n) in English while the
+// panel ($t) followed the stored locale — English copy laid out RTL. One composer
+// for both; `globalInjection` keeps `$t` working in every template.
 const i18n = createI18n({
-  legacy: true,
+  legacy: false,
   locale: initialLocale,
   fallbackLocale: 'en',
   globalInjection: true,

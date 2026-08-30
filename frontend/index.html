@@ -18,11 +18,13 @@
       } else {
         document.documentElement.classList.add('dark');
       }
-      // Restore locale direction (only 'en' and 'fa' are supported)
+      // Restore locale direction before first paint; keep in sync with
+      // src/i18n/index.js (SUPPORTED_LOCALES / RTL_LOCALES).
+      var supported = ['en', 'fa', 'ar', 'de', 'fr', 'es', 'tr'];
       var locale = localStorage.getItem('mrexchange-locale') || localStorage.getItem('smartexchange-locale') || 'en';
-      if (locale !== 'en' && locale !== 'fa') locale = 'en';
+      if (supported.indexOf(locale) === -1) locale = 'en';
       document.documentElement.lang = locale;
-      document.documentElement.dir = locale === 'fa' ? 'rtl' : 'ltr';
+      document.documentElement.dir = (locale === 'fa' || locale === 'ar') ? 'rtl' : 'ltr';
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -1056,5 +1056,338 @@
     "systemAccessDesc": "Identifiants du bot Telegram et niveau d'accès.",
     "registeredBy": "Enregistré par",
     "registeredByHint": "Enregistré automatiquement comme admin connecté."
+  },
+  "landing": {
+    "meta": {
+      "title": "MrExchange — Panneau d'automatisation des taux de change"
+    },
+    "nav": {
+      "label": "Menu principal",
+      "product": "Produit",
+      "services": "Services",
+      "package": "Formule",
+      "contact": "Contact",
+      "cta": "Demander une démo",
+      "menu": "Menu",
+      "language": "Langue"
+    },
+    "hero": {
+      "badge": "Publication des taux, entièrement automatisée",
+      "title": "Un seul panneau de taux pour",
+      "titleAccent": "tous les canaux où vous publiez",
+      "subtitle": "Saisissez vos taux d'achat et de vente une seule fois. MrExchange les envoie aussitôt vers votre site, votre canal Telegram, votre page Instagram et votre widget de taux.",
+      "ctaDemo": "Demander une démo",
+      "ctaTrial": "Démarrer l'essai gratuit de 14 jours",
+      "note": "La démo est un aperçu rapide avec des données prêtes. L'essai, c'est votre propre panneau sur votre propre sous-domaine.",
+      "panelTitle": "Gestion des taux",
+      "live": "Mise à jour en direct",
+      "buy": "Achat",
+      "sell": "Vente"
+    },
+    "stats": {
+      "saved": "Économisé chaque jour sur la publication des taux",
+      "automation": "Publié automatiquement, sans aucune étape manuelle",
+      "channels": "Canaux de publication depuis un seul panneau",
+      "uptime": "Disponibilité et mises à jour sans interruption"
+    },
+    "features": {
+      "eyebrow": "Ce que vous obtenez",
+      "title": "Tout ce dont un guichet de change a réellement besoin",
+      "subtitle": "Six choses que le panneau fait chaque jour. La liste complète se trouve plus bas.",
+      "items": {
+        "panel": {
+          "title": "Panneau de gestion des taux",
+          "desc": "Un tableau de bord sécurisé pour modifier les taux d'achat et de vente depuis n'importe quel appareil."
+        },
+        "instant": {
+          "title": "Publication instantanée",
+          "desc": "Un enregistrement, et tous les canaux connectés sont à jour dans la seconde."
+        },
+        "telegram": {
+          "title": "Canal et bot Telegram",
+          "desc": "Messages et visuels de taux mis en forme dans votre canal, plus un bot qui répond aux demandes de cours."
+        },
+        "instagram": {
+          "title": "Publications Instagram",
+          "desc": "Les visuels de taux sont générés sur votre gabarit et publiés directement sur votre page."
+        },
+        "branding": {
+          "title": "Votre marque, partout",
+          "desc": "Logo, couleurs, polices et visuels sur chaque image, page et widget produit par le système."
+        },
+        "security": {
+          "title": "Rôles et journal d'audit",
+          "desc": "Accès distincts pour la direction, les opérateurs et les développeurs, chaque changement de taux journalisé."
+        }
+      }
+    },
+    "flow": {
+      "title": "Un taux, partout, au même instant",
+      "subtitle": "Dès l'enregistrement d'un prix, la donnée part vers chaque canal que vous avez connecté.",
+      "steps": {
+        "enter": {
+          "title": "Saisissez les taux",
+          "desc": "Ouvrez le panneau sur ordinateur ou mobile et entrez les nouveaux taux d'achat et de vente."
+        },
+        "render": {
+          "title": "Le contenu est généré",
+          "desc": "Le système produit images, messages et données de page sur votre gabarit en moins d'une seconde."
+        },
+        "publish": {
+          "title": "Tout part en ligne",
+          "desc": "Site web, Telegram, Instagram et votre widget de taux se mettent à jour simultanément."
+        }
+      }
+    },
+    "channelsSection": {
+      "title": "Une plateforme, toutes les sorties",
+      "subtitle": "Tout ce qu'un bureau de change moderne publie, à partir d'une seule source de taux."
+    },
+    "channels": {
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "website": "Site web",
+      "widget": "Widget de taux",
+      "bot": "Bot de cours",
+      "api": "API sur mesure",
+      "reports": "Rapports",
+      "branches": "Multi-agences",
+      "security": "Sécurité",
+      "whatsapp": "WhatsApp"
+    },
+    "demo": {
+      "title": "Voyez-le fonctionner",
+      "text": "La vidéo montre un seul changement de taux atteignant en même temps le site, le canal Telegram et la page Instagram. Ou passez la vidéo et ouvrez directement le vrai panneau — sans inscription, sans mot de passe.",
+      "cta": "Ouvrir le panneau de démo",
+      "note": "Le compte de démo a le rôle « direction » : il voit tous les écrans opérationnels, mais la gestion des utilisateurs et les réglages du site restent désactivés."
+    },
+    "pricing": {
+      "eyebrow": "Tarifs",
+      "title": "Une formule, un seul paiement",
+      "subtitle": "Tout le produit pour un paiement unique. Les services récurrents sont des options que vous choisissez, jamais imposées avec la formule.",
+      "oneOff": "paiement unique",
+      "perMonth": "mois",
+      "optional": "Optionnel",
+      "supportNote": "Optionnel. Le panneau continue de tourner sur votre serveur sans lui ; le support, ce sont les mises à jour, les sauvegardes, la supervision et une réponse prioritaire.",
+      "bundle": {
+        "badge": "Complète",
+        "name": "Formule MrExchange",
+        "note": "Comprend la mise en place du serveur, l'installation, les connexions API, la conception du gabarit et la formation de l'équipe. Sans frais d'installation supplémentaires.",
+        "cta": "Parlons-en"
+      }
+    },
+    "addons": {
+      "title": "Services complémentaires",
+      "subtitle": "Tarifés par rapport à ce que facturent agences et indépendants pour le même travail en 2026 — et volontairement placés en dessous. Le montant barré est le prix courant du marché.",
+      "disclaimer": "Prix en GBP, hors taxes. Les montants de marché sont des fourchettes indicatives issues de guides tarifaires publiés d'agences et d'indépendants pour 2026.",
+      "groups": {
+        "once": "Prestations ponctuelles",
+        "month": "Récurrent, optionnel"
+      },
+      "items": {
+        "website": {
+          "title": "Site complet de bureau de change",
+          "desc": "Un site complet à vos couleurs sur votre domaine — pages, contenus, bases SEO et tableau des taux en direct."
+        },
+        "mobileApp": {
+          "title": "Application mobile à votre marque",
+          "desc": "Une application installable pour vos clients, portant vos taux, votre marque et vos notifications."
+        },
+        "api": {
+          "title": "Intégration d'API sur mesure",
+          "desc": "Récupérez automatiquement les taux d'une source mondiale, ou exposez vos taux à un autre système."
+        },
+        "accounting": {
+          "title": "Intégration comptable",
+          "desc": "Reliez le panneau à votre logiciel comptable ou à votre back-office pour garder taux et écritures alignés."
+        },
+        "brandTemplate": {
+          "title": "Gabarit de marque sur mesure",
+          "desc": "Un gabarit de publication et de bannière conçu avec votre logo, vos couleurs, vos polices et vos visuels."
+        },
+        "telegramBot": {
+          "title": "Bot de cours Telegram",
+          "desc": "Un bot auquel vos clients écrivent pour obtenir le taux du moment, à votre marque et dans vos mots."
+        },
+        "whatsapp": {
+          "title": "Mise en place de WhatsApp Business",
+          "desc": "Activation de l'API Business pour que demandes de cours et diffusions passent par WhatsApp."
+        },
+        "widget": {
+          "title": "Widget de taux pour votre site",
+          "desc": "Un tableau de taux en direct intégrable au site que vous avez déjà — un extrait de code, sans refonte."
+        },
+        "branch": {
+          "title": "Agence supplémentaire",
+          "desc": "Une agence de plus, avec ses accès, ses comptes et ses ajustements de taux."
+        },
+        "migration": {
+          "title": "Migration des données",
+          "desc": "Import de vos devises, clients et historique de taux existants dans le panneau."
+        },
+        "training": {
+          "title": "Formation de l'équipe",
+          "desc": "Une session de prise en main en direct pour votre équipe, plus un guide écrit dans votre langue."
+        },
+        "domain": {
+          "title": "Configuration domaine et SSL",
+          "desc": "Domaine, DNS, certificats et enregistrements e-mail configurés pour vous."
+        },
+        "support": {
+          "title": "Support et maintenance",
+          "desc": "Mises à jour, sauvegardes, supervision de disponibilité et réponse prioritaire par l'équipe qui l'a construit."
+        },
+        "social": {
+          "title": "Gestion Instagram et Telegram",
+          "desc": "Nous tenons les canaux : calendrier de publication, textes, réponses à la communauté et rapport mensuel."
+        },
+        "seo": {
+          "title": "SEO et présence locale",
+          "desc": "Un travail de référencement continu pour que ceux qui cherchent un bureau de change près de chez vous vous trouvent."
+        },
+        "content": {
+          "title": "Contenus graphiques sur mesure",
+          "desc": "Visuels de campagne, créations saisonnières et séries de stories au-delà du gabarit standard."
+        },
+        "hosting": {
+          "title": "Hébergement infogéré et sauvegardes",
+          "desc": "Votre panneau sur un serveur dédié et isolé, avec sauvegardes automatiques externalisées."
+        },
+        "rateFeed": {
+          "title": "Flux de taux de marché en direct",
+          "desc": "Un flux sous licence pour que vos taux de référence suivent le marché sans saisie manuelle."
+        }
+      }
+    },
+    "package": {
+      "title": "Contenu de la formule",
+      "subtitle": "Tout ce qui suit est compris dans le paiement unique.",
+      "included": "Inclus",
+      "rows": {
+        "panel": "Panneau de gestion des taux de change",
+        "instant": "Publication instantanée sur tous les canaux",
+        "telegram": "Publication sur le canal Telegram",
+        "telegramBot": "Bot de cours Telegram",
+        "instagram": "Publication directe sur Instagram",
+        "website": "Page de taux à vos couleurs sur votre domaine",
+        "graphics": "Visuels générés automatiquement sur votre gabarit",
+        "widget": "Widget de taux pour votre site web",
+        "reports": "Rapports avec export Excel et PDF",
+        "alerts": "Alertes de variation des taux pour la direction",
+        "branches": "Gestion multi-agences",
+        "roles": "Rôles et contrôle d'accès distincts",
+        "backups": "Sauvegardes automatiques et journal complet",
+        "support": "Mise en route, formation et transfert"
+      }
+    },
+    "telegram": {
+      "eyebrow": "Canal Telegram",
+      "title": "Suivez le canal",
+      "subtitle": "Nouveautés produit, notes de version et exemples de publications de taux y arrivent en premier. Rejoignez-le pour voir ce que le panneau publie avant de l'acheter.",
+      "cta": "Ouvrir le canal",
+      "perks": {
+        "rates": "Des exemples de publications de taux, tels que vos clients les verraient",
+        "releases": "Les nouveautés et notes de version dès leur sortie",
+        "tips": "Des conseils concrets pour tenir un guichet de change en ligne"
+      }
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "subtitle": "Ce que l'on demande avant d'acheter.",
+      "items": {
+        "auto": {
+          "q": "Les taux se mettent-ils à jour automatiquement ?",
+          "a": "Vous saisissez un taux de référence, ou directement les taux d'achat et de vente, dans le panneau. Dès l'enregistrement, le système diffuse le changement sur votre site, votre canal Telegram et votre page Instagram."
+        },
+        "telegram": {
+          "q": "Peut-il publier sur notre canal Telegram ?",
+          "a": "Oui. La publication Telegram fait partie de la formule : messages texte mis en forme et visuels de taux partent directement dans votre canal, et un bot peut répondre aux demandes de cours de vos clients."
+        },
+        "instagram": {
+          "q": "Instagram est-il pris en charge ?",
+          "a": "Oui. Les visuels de taux sont générés automatiquement sur votre gabarit et publiés directement sur votre page via l'API Instagram."
+        },
+        "branding": {
+          "q": "Les publications peuvent-elles porter notre marque ?",
+          "a": "Oui. Chargez votre logo, vos couleurs, vos polices et vos fonds : chaque image et chaque page générée suit votre identité visuelle."
+        },
+        "website": {
+          "q": "Obtenons-nous aussi un site web ?",
+          "a": "Une page de taux à vos couleurs sur votre domaine est comprise. Un site complet de bureau de change est proposé en service complémentaire."
+        },
+        "branches": {
+          "q": "Peut-on gérer plusieurs agences ?",
+          "a": "Oui. Les agences se déclarent avec des accès distincts et les taux sont pilotés de façon centralisée. Chaque agence supplémentaire est un petit complément ponctuel."
+        },
+        "setup": {
+          "q": "Que couvre le paiement unique ?",
+          "a": "Mise en place du serveur, installation du panneau, configuration de sécurité, connexion des API Telegram et Instagram, conception du gabarit et formation de l'équipe. Il n'y a pas de frais d'installation distincts."
+        },
+        "api": {
+          "q": "Pouvez-vous nous développer une API sur mesure ?",
+          "a": "Oui. En service complémentaire, nous pouvons construire une API qui récupère les taux d'une source mondiale ou relie le panneau à votre logiciel comptable."
+        },
+        "support": {
+          "q": "Le support mensuel est-il obligatoire ?",
+          "a": "Non. Le support et la maintenance sont un service optionnel couvrant mises à jour, sauvegardes, supervision et réponse prioritaire. Le panneau continue de fonctionner sans."
+        }
+      }
+    },
+    "contact": {
+      "title": "Prêt à ne plus publier vos taux à la main ?",
+      "subtitle": "Appelez-nous, écrivez-nous sur WhatsApp, ou ouvrez le panneau de démo maintenant. Sans inscription, sans mot de passe.",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "whatsappMessage": "Bonjour, je souhaite une démo et un conseil au sujet du panneau MrExchange."
+    },
+    "contactPage": {
+      "metaTitle": "Contacter MrExchange",
+      "eyebrow": "Contact",
+      "title": "Parlez à quelqu'un,",
+      "titleAccent": "sur le canal que vous utilisez déjà",
+      "subtitle": "Telegram, WhatsApp ou un simple appel. Posez vos questions sur le panneau, le prix ou l'installation — nous ouvrons la démo en direct pendant l'échange.",
+      "channels": {
+        "telegram": {
+          "name": "Telegram",
+          "desc": "Écrivez-nous là-bas, ou suivez le canal pour les exemples de publications de taux et les notes de version.",
+          "action": "Ouvrir Telegram"
+        },
+        "whatsapp": {
+          "name": "WhatsApp",
+          "desc": "Le chemin le plus court vers le service commercial. La conversation s'ouvre avec un message déjà rédigé.",
+          "action": "Démarrer la discussion"
+        },
+        "phone": {
+          "name": "Téléphone",
+          "desc": "Appelez directement la ligne commerciale si vous préférez en parler.",
+          "action": "Appeler maintenant"
+        }
+      },
+      "facts": {
+        "languages": {
+          "title": "Sept langues",
+          "value": "Le panneau, le site et le support existent en anglais, persan, arabe, turc, allemand, français et espagnol."
+        },
+        "demo": {
+          "title": "Voir avant d'acheter",
+          "value": "Demandez le panneau de démo : il s'ouvre avec des données prêtes, sans inscription ni mot de passe."
+        },
+        "setup": {
+          "title": "Installation comprise",
+          "value": "Installation, configuration de sécurité, connexions Telegram et Instagram et formation des équipes sont incluses dans le prix unique. Aucun frais d'installation séparé."
+        }
+      },
+      "ctaTitle": "Vous préférez d'abord regarder ?",
+      "ctaText": "Ouvrez le panneau de démo maintenant, ou lisez ce que contient exactement la formule avant de nous écrire."
+    },
+    "footer": {
+      "about": "Un panneau de publication des taux pour bureaux de change : une saisie, tous les canaux.",
+      "productTitle": "Produit",
+      "startTitle": "Commencer",
+      "contactTitle": "Contact",
+      "faq": "FAQ",
+      "login": "Se connecter",
+      "bottom": "mrexchange.co.uk. Tous droits réservés."
+    }
   }
 }

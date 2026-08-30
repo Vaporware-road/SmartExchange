@@ -172,8 +172,15 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         # Custom templates path
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,
+        'APP_DIRS': False,
         'OPTIONS': {
+            # Un-cached loaders: templates are re-read on every request so HTML
+            # edits hot-reload even with DEBUG=False (Django 6.1 would otherwise
+            # default to the cached loader).
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+            ],
             'context_processors': [
                 'django.template.context_processors.debug',
                 'setting.context_processors.site_settings_processor',

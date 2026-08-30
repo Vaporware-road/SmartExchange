@@ -1,15 +1,18 @@
 """
 Seed professional demo data for Categories, PriceTypes, SpecialPriceTypes, and Pending Finalize state.
 
-- Categories: Tether (USDT), British Pound (GBP), Euro (EUR) with pairs USDT/IRT, IRT/USDT, GBP/IRT, IRT/GBP, EUR/IRT.
+- Categories: Tether (USDT), British Pound (GBP), Euro (EUR) with pairs USDT/IRT, GBP/IRT, EUR/IRT.
 - Each category has at least 2 price types (Buy/Sell) for Dual-Column Bulk Update layout.
 - Special Prices: "Cash VIP Buy" (Gold Star icon), "Corporate Sell" (Shield icon).
 - Realistic market rates (USDT ~65,000 range).
 - Creates 2–3 pending updates (old price finalized, new price not) for FinalizeView testing.
 
+- Telegram: one demo bot and channel, so the finalize wizard can be walked end to end.
+
 Usage:
   python manage.py seed_demo_data
-  python manage.py seed_demo_data --clear   # Remove demo categories/special types created by this command first
+  python manage.py seed_demo_data --clear      # Remove demo categories/special types created by this command first
+  python manage.py seed_demo_data --if-empty   # No-op when the panel already has categories (safe on every boot)
 """
 from decimal import Decimal
 
@@ -20,12 +23,37 @@ from category.models import Category, Currency, PriceType
 from change_price.models import PriceHistory
 from finalize.models import Finalization, FinalizedPriceHistory
 from special_price.models import SpecialPriceHistory, SpecialPricePair, SpecialPriceType
+from telegram_app.models import TelegramBot, TelegramChannel
 
 
 # Slug used to mark categories created by this command (for --clear)
 DEMO_CATEGORY_SLUG_PREFIX = "demo-"
 # Exact names for special prices (cleared with --clear)
 DEMO_SPECIAL_NAMES = ("Cash VIP Buy", "Corporate Sell")
+# Demo Telegram bot/channel. The token is deliberately not a real one: the demo
+# must show the publish step without ever reaching a customer's channel.
+DEMO_BOT_NAME = "Demo Bot"
+DEMO_BOT_TOKEN = "000000000:DEMO-BOT-TOKEN-NOT-A-REAL-CREDENTIAL"
+DEMO_CHANNEL_NAME = "Demo Rates Channel"
+DEMO_CHANNEL_CHAT_ID = "@mrexchange_demo"
+
+
+def create_telegram_demo_channel():
+    """A bot and channel so Finalize offers a publish target instead of an empty state."""
+    bot, _ = TelegramBot.objects.get_or_create(
+        name=DEMO_BOT_NAME,
+        defaults={
+            "token": DEMO_BOT_TOKEN,
+            "display_name": "MrExchange Demo",
+            "is_active": True,
+            "notes": "Seeded demo bot — not connected to Telegram.",
+        },
+    )
+    TelegramChannel.objects.get_or_create(
+        bot=bot,
+        chat_id=DEMO_CHANNEL_CHAT_ID,
+        defaults={"name": DEMO_CHANNEL_NAME, "is_active": True},
+    )
 
 
 def get_currency(code: str) -> Currency:
@@ -53,10 +81,16 @@ def clear_demo_data():
     """Remove categories and special price types created by this command."""
     Category.objects.filter(slug__startswith=DEMO_CATEGORY_SLUG_PREFIX).delete()
     SpecialPriceType.objects.filter(name__in=DEMO_SPECIAL_NAMES).delete()
+    TelegramBot.objects.filter(name=DEMO_BOT_NAME).delete()
 
 
 def create_categories_and_prices(currencies):
-    """Create Tether, British Pound, Euro categories with pairs and price types."""
+    """Create Tether, British Pound, Euro categories with pairs and price types.
+
+    Only the XXX/IRT direction is seeded: PriceHistory.price is a 2-decimal
+    field, so an inverse rate such as 0.0000121 would store — and the demo would
+    display — 0.00.
+    """
     USDT = currencies["USDT"]
     GBP = currencies["GBP"]
     EUR = currencies["EUR"]
@@ -70,14 +104,10 @@ def create_categories_and_prices(currencies):
             "pairs": [
                 {"name": "USDT/IRT Buy", "source": USDT, "target": IRT, "trade_type": "buy", "order": 0},
                 {"name": "USDT/IRT Sell", "source": USDT, "target": IRT, "trade_type": "sell", "order": 1},
-                {"name": "IRT/USDT Buy", "source": IRT, "target": USDT, "trade_type": "buy", "order": 2},
-                {"name": "IRT/USDT Sell", "source": IRT, "target": USDT, "trade_type": "sell", "order": 3},
             ],
             "prices": {
                 "USDT/IRT Buy": Decimal("64800.00"),
                 "USDT/IRT Sell": Decimal("65200.00"),
-                "IRT/USDT Buy": Decimal("0.0000154"),
-                "IRT/USDT Sell": Decimal("0.0000153"),
             },
         },
         {
@@ -87,14 +117,10 @@ def create_categories_and_prices(currencies):
             "pairs": [
                 {"name": "GBP/IRT Buy", "source": GBP, "target": IRT, "trade_type": "buy", "order": 0},
                 {"name": "GBP/IRT Sell", "source": GBP, "target": IRT, "trade_type": "sell", "order": 1},
-                {"name": "IRT/GBP Buy", "source": IRT, "target": GBP, "trade_type": "buy", "order": 2},
-                {"name": "IRT/GBP Sell", "source": IRT, "target": GBP, "trade_type": "sell", "order": 3},
             ],
             "prices": {
                 "GBP/IRT Buy": Decimal("82500.00"),
                 "GBP/IRT Sell": Decimal("83200.00"),
-                "IRT/GBP Buy": Decimal("0.0000121"),
-                "IRT/GBP Sell": Decimal("0.0000120"),
             },
         },
         {
@@ -184,7 +210,6 @@ def create_pending_finalize_state(created_categories, price_types_with_old_histo
     new_prices = {
         "USDT/IRT Buy": Decimal("64950.00"),
         "USDT/IRT Sell": Decimal("65350.00"),
-        "IRT/USDT Buy": Decimal("0.0000154"),
     }
     for price_type, _old_ph, _ in tether_entries:
         new_price = new_prices.get(price_type.name)
@@ -254,9 +279,20 @@ class Command(BaseCommand):
             action="store_true",
             help="Remove demo categories and special price types created by this command before seeding.",
         )
+        parser.add_argument(
+            "--if-empty",
+            action="store_true",
+            help="Seed only when no categories exist yet, so container start-up can run this every boot.",
+        )
 
     @transaction.atomic
     def handle(self, *args, **options):
+        if options.get("if_empty") and Category.objects.exists():
+            self.stdout.write(
+                self.style.NOTICE("Panel already has categories; --if-empty made this a no-op.")
+            )
+            return
+
         if options.get("clear"):
             clear_demo_data()
             self.stdout.write(self.style.WARNING("Cleared existing demo data."))
@@ -270,8 +306,10 @@ class Command(BaseCommand):
         created_categories, price_types_with_old_history = create_categories_and_prices(currencies)
         create_pending_finalize_state(created_categories, price_types_with_old_history)
         create_special_prices(currencies)
+        create_telegram_demo_channel()
 
         self.stdout.write(self.style.SUCCESS("Demo data seeded successfully."))
         self.stdout.write("  - Categories: Tether (USDT), British Pound (GBP), Euro (EUR) with pairs and Buy/Sell price types.")
         self.stdout.write("  - Special Prices: Cash VIP Buy (Gold Star), Corporate Sell (Shield).")
         self.stdout.write("  - 2–3 Pending updates on Tether category for FinalizeView (Old vs New price).")
+        self.stdout.write(f"  - Telegram: bot \"{DEMO_BOT_NAME}\" and channel {DEMO_CHANNEL_CHAT_ID} (not connected to Telegram).")

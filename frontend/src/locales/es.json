@@ -1056,5 +1056,338 @@
     "systemAccessDesc": "Credenciales del bot de Telegram y nivel de acceso.",
     "registeredBy": "Registrado por",
     "registeredByHint": "Se registra automáticamente como el admin conectado."
+  },
+  "landing": {
+    "meta": {
+      "title": "MrExchange — Panel de automatización de tipos de cambio"
+    },
+    "nav": {
+      "label": "Menú principal",
+      "product": "Producto",
+      "services": "Servicios",
+      "package": "Paquete",
+      "contact": "Contacto",
+      "cta": "Solicitar demo",
+      "menu": "Menú",
+      "language": "Idioma"
+    },
+    "hero": {
+      "badge": "Publicación de tipos, totalmente automática",
+      "title": "Un único panel de tipos para",
+      "titleAccent": "todos los canales en los que publicas",
+      "subtitle": "Introduce tus tipos de compra y venta una sola vez. MrExchange los envía al instante a tu web, tu canal de Telegram, tu página de Instagram y tu widget de tipos.",
+      "ctaDemo": "Solicitar demo",
+      "ctaTrial": "Empezar prueba gratuita de 14 días",
+      "note": "La demo es un vistazo rápido con datos preparados. La prueba es tu propio panel en tu propio subdominio.",
+      "panelTitle": "Gestión de tipos",
+      "live": "Actualización en vivo",
+      "buy": "Compra",
+      "sell": "Venta"
+    },
+    "stats": {
+      "saved": "Ahorro diario al publicar los tipos",
+      "automation": "Publicado automáticamente, sin ningún paso manual",
+      "channels": "Canales de publicación desde un solo panel",
+      "uptime": "Disponibilidad con actualización ininterrumpida"
+    },
+    "features": {
+      "eyebrow": "Qué incluye",
+      "title": "Todo lo que una casa de cambio necesita de verdad",
+      "subtitle": "Seis cosas que el panel hace cada día. La lista completa está más abajo.",
+      "items": {
+        "panel": {
+          "title": "Panel de gestión de tipos",
+          "desc": "Un cuadro de mando seguro para cambiar los tipos de compra y venta desde cualquier dispositivo y lugar."
+        },
+        "instant": {
+          "title": "Publicación instantánea",
+          "desc": "Un guardado, y todos los canales conectados se actualizan en ese mismo segundo."
+        },
+        "telegram": {
+          "title": "Canal y bot de Telegram",
+          "desc": "Mensajes e imágenes de tipos con formato en tu canal, más un bot que responde consultas de precio."
+        },
+        "instagram": {
+          "title": "Publicaciones en Instagram",
+          "desc": "Los gráficos de tipos se generan sobre tu plantilla y se publican directamente en tu página."
+        },
+        "branding": {
+          "title": "Tu marca, en todas partes",
+          "desc": "Tu logo, colores, tipografías y diseños en cada imagen, página y widget que produce el sistema."
+        },
+        "security": {
+          "title": "Roles y registro de auditoría",
+          "desc": "Accesos separados para dirección, operadores y desarrollo, con cada cambio de tipo registrado."
+        }
+      }
+    },
+    "flow": {
+      "title": "Un tipo, en todas partes, a la vez",
+      "subtitle": "Desde que guardas un precio, el dato fluye hacia todos los canales que hayas conectado.",
+      "steps": {
+        "enter": {
+          "title": "Introduce los tipos",
+          "desc": "Abre el panel en ordenador o móvil y escribe los nuevos tipos de compra y venta."
+        },
+        "render": {
+          "title": "Se genera el contenido",
+          "desc": "El sistema crea imágenes, mensajes y datos de página sobre tu plantilla en menos de un segundo."
+        },
+        "publish": {
+          "title": "Todo sale publicado",
+          "desc": "Web, Telegram, Instagram y tu widget de tipos se actualizan de forma simultánea."
+        }
+      }
+    },
+    "channelsSection": {
+      "title": "Una plataforma, todas las salidas",
+      "subtitle": "Todo lo que publica una casa de cambio moderna, desde una única fuente de tipos."
+    },
+    "channels": {
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "website": "Sitio web",
+      "widget": "Widget de tipos",
+      "bot": "Bot de precios",
+      "api": "API a medida",
+      "reports": "Informes",
+      "branches": "Multisucursal",
+      "security": "Seguridad",
+      "whatsapp": "WhatsApp"
+    },
+    "demo": {
+      "title": "Míralo en marcha",
+      "text": "El vídeo muestra un solo cambio de tipo llegando a la vez a la web, al canal de Telegram y a la página de Instagram. O sáltatelo y abre el panel real — sin registro y sin contraseña.",
+      "cta": "Abrir el panel de demo",
+      "note": "La cuenta de demo tiene rol de dirección: ve todas las pantallas operativas, pero la gestión de usuarios y los ajustes del sitio quedan desactivados."
+    },
+    "pricing": {
+      "eyebrow": "Precios",
+      "title": "Un paquete, un solo pago",
+      "subtitle": "Todo el producto por un pago único. Los servicios recurrentes son complementos que eliges tú, nunca algo impuesto con el paquete.",
+      "oneOff": "pago único",
+      "perMonth": "mes",
+      "optional": "Opcional",
+      "supportNote": "Es opcional. El panel sigue funcionando en tu servidor sin él; el soporte son actualizaciones, copias de seguridad, monitorización y respuesta prioritaria.",
+      "bundle": {
+        "badge": "Completo",
+        "name": "Paquete MrExchange",
+        "note": "Incluye configuración del servidor, instalación, conexión de APIs, diseño de plantilla y formación del equipo. Sin cuota de puesta en marcha aparte.",
+        "cta": "Hablemos"
+      }
+    },
+    "addons": {
+      "title": "Servicios complementarios",
+      "subtitle": "Comparados con lo que cobran agencias y profesionales por el mismo trabajo en 2026, y situados deliberadamente por debajo. La cifra tachada es el precio de mercado.",
+      "disclaimer": "Precios en GBP, sin impuestos. Las cifras de mercado son rangos orientativos de guías de precios publicadas por agencias y profesionales para 2026.",
+      "groups": {
+        "once": "Trabajos puntuales",
+        "month": "Recurrente y opcional"
+      },
+      "items": {
+        "website": {
+          "title": "Web completa de casa de cambio",
+          "desc": "Un sitio completo con tu marca en tu dominio: páginas, contenido, base de SEO y la tabla de tipos en vivo."
+        },
+        "mobileApp": {
+          "title": "App móvil con tu marca",
+          "desc": "Una app instalable para tus clientes, con tus tipos, tu marca y avisos push."
+        },
+        "api": {
+          "title": "Integración de API a medida",
+          "desc": "Trae tipos automáticamente de una fuente global, o expón tus tipos a otro sistema."
+        },
+        "accounting": {
+          "title": "Integración contable",
+          "desc": "Conecta el panel con tu software contable o de back-office para que tipos y registros vayan a la par."
+        },
+        "brandTemplate": {
+          "title": "Plantilla de marca a medida",
+          "desc": "Plantilla de publicación y banner diseñada con tu logo, colores, tipografías y materiales."
+        },
+        "telegramBot": {
+          "title": "Bot de precios de Telegram",
+          "desc": "Un bot al que escriben tus clientes para conocer el tipo actual, con tu marca y tu tono."
+        },
+        "whatsapp": {
+          "title": "Alta de WhatsApp Business",
+          "desc": "Puesta en marcha de la API Business para que consultas y difusiones pasen por WhatsApp."
+        },
+        "widget": {
+          "title": "Widget de tipos para tu web",
+          "desc": "Una tabla de tipos en vivo incrustable en la web que ya tienes: un fragmento de código, sin rehacer nada."
+        },
+        "branch": {
+          "title": "Sucursal adicional",
+          "desc": "Otra sucursal con sus accesos, sus cuentas de personal y sus ajustes de tipos."
+        },
+        "migration": {
+          "title": "Migración de datos",
+          "desc": "Importación de tus divisas, clientes e histórico de tipos actuales al panel."
+        },
+        "training": {
+          "title": "Formación del equipo",
+          "desc": "Una sesión de puesta en marcha en directo para tu equipo, más una guía escrita en tu idioma."
+        },
+        "domain": {
+          "title": "Configuración de dominio y SSL",
+          "desc": "Dominio, DNS, certificados y registros de correo configurados por nosotros."
+        },
+        "support": {
+          "title": "Soporte y mantenimiento",
+          "desc": "Actualizaciones, copias de seguridad, monitorización y respuesta prioritaria del equipo que lo construyó."
+        },
+        "social": {
+          "title": "Gestión de Instagram y Telegram",
+          "desc": "Llevamos los canales: calendario de publicación, textos, respuestas a la comunidad e informe mensual."
+        },
+        "seo": {
+          "title": "SEO y presencia local",
+          "desc": "Trabajo de posicionamiento continuo para que quien busque una casa de cambio en tu zona te encuentre."
+        },
+        "content": {
+          "title": "Contenido gráfico a medida",
+          "desc": "Piezas de campaña, diseños de temporada y sets de historias más allá de la plantilla estándar."
+        },
+        "hosting": {
+          "title": "Hosting gestionado y copias",
+          "desc": "Tu panel en un servidor dedicado y aislado, con copias automáticas fuera del servidor."
+        },
+        "rateFeed": {
+          "title": "Feed de tipos de mercado en vivo",
+          "desc": "Un feed con licencia para que tus tipos base sigan al mercado sin que nadie los teclee."
+        }
+      }
+    },
+    "package": {
+      "title": "Características del paquete",
+      "subtitle": "Todo lo siguiente está incluido en el pago único.",
+      "included": "Incluido",
+      "rows": {
+        "panel": "Panel de gestión de tipos de cambio",
+        "instant": "Publicación instantánea en todos los canales",
+        "telegram": "Publicación en el canal de Telegram",
+        "telegramBot": "Bot de precios de Telegram",
+        "instagram": "Publicación directa en Instagram",
+        "website": "Página de tipos con tu marca en tu dominio",
+        "graphics": "Gráficos automáticos sobre tu propia plantilla",
+        "widget": "Widget de tipos para tu web",
+        "reports": "Informes con exportación a Excel y PDF",
+        "alerts": "Avisos de variación de tipos para dirección",
+        "branches": "Gestión multisucursal",
+        "roles": "Roles y control de acceso separados",
+        "backups": "Copias automáticas y registro completo de auditoría",
+        "support": "Puesta en marcha, formación y entrega"
+      }
+    },
+    "telegram": {
+      "eyebrow": "Canal de Telegram",
+      "title": "Sigue el canal",
+      "subtitle": "Novedades del producto, notas de versión y ejemplos de publicaciones de tipos llegan allí primero. Únete y verás qué publica el panel antes de comprarlo.",
+      "cta": "Abrir el canal",
+      "perks": {
+        "rates": "Publicaciones de tipos de ejemplo, tal y como las verían tus clientes",
+        "releases": "Nuevas funciones y notas de versión en cuanto salen",
+        "tips": "Consejos prácticos para llevar una casa de cambio en línea"
+      }
+    },
+    "faq": {
+      "title": "Preguntas frecuentes",
+      "subtitle": "Lo que se pregunta antes de comprar.",
+      "items": {
+        "auto": {
+          "q": "¿Los tipos se actualizan automáticamente?",
+          "a": "Introduces un tipo base, o los tipos de compra y venta directamente, en el panel. Al guardar, el sistema envía el cambio a tu web, tu canal de Telegram y tu página de Instagram."
+        },
+        "telegram": {
+          "q": "¿Puede publicar en nuestro canal de Telegram?",
+          "a": "Sí. La publicación en Telegram forma parte del paquete: mensajes de texto con formato e imágenes de tipos van directos a tu canal, y un bot puede responder las consultas de precio de tus clientes."
+        },
+        "instagram": {
+          "q": "¿Se admite Instagram?",
+          "a": "Sí. Los gráficos de tipos se generan automáticamente sobre tu plantilla y se publican directamente en tu página mediante la API de Instagram."
+        },
+        "branding": {
+          "q": "¿Las publicaciones pueden llevar nuestra marca?",
+          "a": "Sí. Sube tu logo, colores corporativos, tipografías y fondos, y cada imagen y página generada seguirá tu identidad visual."
+        },
+        "website": {
+          "q": "¿También incluye web?",
+          "a": "Se incluye una página de tipos con tu marca en tu dominio. Una web completa de casa de cambio está disponible como servicio complementario aparte."
+        },
+        "branches": {
+          "q": "¿Podemos gestionar más de una sucursal?",
+          "a": "Sí. Las sucursales se definen con accesos separados y los tipos se gestionan de forma centralizada. Cada sucursal adicional es un complemento puntual de bajo coste."
+        },
+        "setup": {
+          "q": "¿Qué cubre el pago único?",
+          "a": "Configuración del servidor, instalación del panel, ajustes de seguridad, conexión de las APIs de Telegram e Instagram, diseño de plantilla y formación del equipo. No hay cuota de puesta en marcha aparte."
+        },
+        "api": {
+          "q": "¿Podéis desarrollarnos una API a medida?",
+          "a": "Sí. Como complemento podemos construir una API que traiga tipos de una fuente global o conecte el panel con tu software contable."
+        },
+        "support": {
+          "q": "¿El soporte mensual es obligatorio?",
+          "a": "No. El soporte y mantenimiento es un complemento opcional que cubre actualizaciones, copias de seguridad, monitorización y respuesta prioritaria. El panel sigue funcionando sin él."
+        }
+      }
+    },
+    "contact": {
+      "title": "¿Listo para dejar de publicar los tipos a mano?",
+      "subtitle": "Llámanos, escríbenos por WhatsApp o abre ahora mismo el panel de demo. Sin registro y sin contraseña.",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "whatsappMessage": "Hola, me gustaría una demo y asesoramiento sobre el panel MrExchange."
+    },
+    "contactPage": {
+      "metaTitle": "Contactar con MrExchange",
+      "eyebrow": "Contacto",
+      "title": "Habla con una persona,",
+      "titleAccent": "en el canal que ya usas",
+      "subtitle": "Telegram, WhatsApp o una llamada de toda la vida. Pregunta por el panel, el precio o la instalación: abrimos la demo en directo mientras hablamos.",
+      "channels": {
+        "telegram": {
+          "name": "Telegram",
+          "desc": "Escríbenos allí, o sigue el canal para ver publicaciones de tipos de ejemplo y notas de versión.",
+          "action": "Abrir Telegram"
+        },
+        "whatsapp": {
+          "name": "WhatsApp",
+          "desc": "La vía más rápida al equipo comercial. El chat se abre con un saludo ya escrito.",
+          "action": "Iniciar chat"
+        },
+        "phone": {
+          "name": "Teléfono",
+          "desc": "Llama directamente a la línea comercial si prefieres hablarlo.",
+          "action": "Llamar ahora"
+        }
+      },
+      "facts": {
+        "languages": {
+          "title": "Siete idiomas",
+          "value": "El panel, la web y el soporte están en inglés, persa, árabe, turco, alemán, francés y español."
+        },
+        "demo": {
+          "title": "Míralo antes de comprar",
+          "value": "Pide el panel de demo: se abre con datos preparados, sin registro y sin contraseña."
+        },
+        "setup": {
+          "title": "Instalación incluida",
+          "value": "Instalación, configuración de seguridad, conexión con Telegram e Instagram y formación del personal entran en el pago único. No hay coste de instalación aparte."
+        }
+      },
+      "ctaTitle": "¿Prefieres echar un vistazo primero?",
+      "ctaText": "Abre el panel de demo ahora, o lee qué incluye exactamente el paquete antes de escribirnos."
+    },
+    "footer": {
+      "about": "Un panel de publicación de tipos para casas de cambio: una entrada, todos los canales.",
+      "productTitle": "Producto",
+      "startTitle": "Empezar",
+      "contactTitle": "Contacto",
+      "faq": "Preguntas frecuentes",
+      "login": "Iniciar sesión",
+      "bottom": "mrexchange.co.uk. Todos los derechos reservados."
+    }
   }
 }

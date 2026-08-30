@@ -59,69 +59,6 @@
     "copyright": "© {year} {name}. All rights reserved.",
     "support": "Support"
   },
-  "landing": {
-    "trialBadge": "14-day free trial",
-    "freeTrialButton": "Start Free Trial",
-    "badge": "Trusted by exchanges worldwide",
-    "learnMore": "Learn more",
-    "featuresTitle": "Everything you need",
-    "featuresSubtitle": "A complete exchange operations panel — from live prices to Telegram publishing.",
-    "features": {
-      "priceHub": {
-        "title": "Live Price Hub",
-        "desc": "Update buy/sell rates across all currencies in real time. Bulk update, history tracking, and instant validation."
-      },
-      "telegram": {
-        "title": "Telegram Integration",
-        "desc": "Connect your bots and channels. Send branded rate images directly to Telegram with one click."
-      },
-      "finalize": {
-        "title": "One-Click Finalize",
-        "desc": "Review pending prices, render a branded image, and publish to Telegram — all in a single workflow."
-      },
-      "templates": {
-        "title": "Visual Templates",
-        "desc": "Drag-and-drop template editor. Design custom price cards with your brand colors, logos, and fonts."
-      },
-      "analytics": {
-        "title": "Analytics Dashboard",
-        "desc": "Track price trends, Telegram engagement, and customer activity. Export data to Excel."
-      },
-      "multiUser": {
-        "title": "Multi-User RBAC",
-        "desc": "Role-based access control for super admins, managers, operators, and developers. Impersonate users."
-      }
-    },
-    "howItWorksTitle": "How it works",
-    "howItWorksSubtitle": "From setup to publishing in four simple steps.",
-    "steps": {
-      "setup": {
-        "title": "Setup",
-        "desc": "Configure your Telegram bot, channels, and currency categories."
-      },
-      "update": {
-        "title": "Update Prices",
-        "desc": "Enter live buy/sell rates or bulk-update an entire category at once."
-      },
-      "design": {
-        "title": "Design Template",
-        "desc": "Customize the price card image with your brand identity and layout."
-      },
-      "publish": {
-        "title": "Publish",
-        "desc": "Finalize and broadcast branded images to Telegram channels instantly."
-      }
-    },
-    "stats": {
-      "currencies": "Supported Currencies",
-      "channels": "Telegram Channels",
-      "uptime": "Uptime",
-      "support": "Support"
-    },
-    "ctaTitle": "Ready to get started?",
-    "ctaSubtitle": "Launch your exchange panel in minutes. Manage prices, design templates, and publish to Telegram — all from one place.",
-    "ctaButton": "Get Started"
-  },
   "breadcrumb": {
     "home": "Home"
   },
@@ -1310,6 +1247,413 @@
       "suspended": "Suspended",
       "archived": "Archived",
       "failed": "Failed"
+    }
+  },
+  "landing": {
+    "meta": {
+      "title": "MrExchange — Currency Rate Automation Panel"
+    },
+    "nav": {
+      "label": "Main",
+      "product": "Product",
+      "services": "Services",
+      "package": "Package",
+      "contact": "Contact us",
+      "cta": "Get a demo",
+      "menu": "Menu",
+      "language": "Language"
+    },
+    "hero": {
+      "badge": "Rate publishing, fully automated",
+      "title": "One rate panel for",
+      "titleAccent": "every channel you publish to",
+      "subtitle": "Enter your buy and sell rates once. MrExchange pushes them to your website, Telegram channel, Instagram page and rate widget the moment you save.",
+      "ctaDemo": "Get a demo",
+      "ctaTrial": "Start 14-day free trial",
+      "note": "The demo is a quick look with ready-made data. The trial is your own panel on your own subdomain.",
+      "panelTitle": "Rate management",
+      "live": "Live updates",
+      "buy": "Buy",
+      "sell": "Sell"
+    },
+    "stats": {
+      "saved": "Saved every day on publishing rates",
+      "automation": "Published automatically, with no manual step",
+      "channels": "Publishing channels from one panel",
+      "uptime": "Availability with uninterrupted updates"
+    },
+    "features": {
+      "eyebrow": "What you get",
+      "title": "Everything the rate desk actually needs",
+      "subtitle": "Six things the panel does every day. The full list is further down.",
+      "items": {
+        "panel": {
+          "title": "Rate management panel",
+          "desc": "A secure dashboard for changing buy and sell rates from any device, anywhere."
+        },
+        "instant": {
+          "title": "Instant publishing",
+          "desc": "One save, and every connected channel is updated in the same second."
+        },
+        "telegram": {
+          "title": "Telegram channel and bot",
+          "desc": "Formatted rate messages and images sent to your channel, plus a bot that answers price queries."
+        },
+        "instagram": {
+          "title": "Instagram posts",
+          "desc": "Rate graphics rendered on your template and published straight to your page."
+        },
+        "branding": {
+          "title": "Your brand, everywhere",
+          "desc": "Your logo, colours, fonts and artwork on every image, page and widget the system produces."
+        },
+        "security": {
+          "title": "Roles and audit trail",
+          "desc": "Separate access for managers, operators and developers, with every rate change logged."
+        }
+      }
+    },
+    "flow": {
+      "title": "One rate, everywhere, at once",
+      "subtitle": "From the moment you save a price, the data flows out to every channel you have connected.",
+      "steps": {
+        "enter": {
+          "title": "Enter the rates",
+          "desc": "Open the panel on desktop or mobile and type the new buy and sell rates."
+        },
+        "render": {
+          "title": "Content is generated",
+          "desc": "The system renders images, messages and page data on your own template in under a second."
+        },
+        "publish": {
+          "title": "Everything goes out",
+          "desc": "Website, Telegram, Instagram and your rate widget update simultaneously."
+        }
+      }
+    },
+    "channelsSection": {
+      "title": "One platform, every output",
+      "subtitle": "Everything a modern exchange office publishes, driven from a single rate store."
+    },
+    "channels": {
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "website": "Website",
+      "widget": "Rate widget",
+      "bot": "Price bot",
+      "api": "Custom API",
+      "reports": "Reporting",
+      "branches": "Multi-branch",
+      "security": "Security",
+      "whatsapp": "WhatsApp"
+    },
+    "demo": {
+      "title": "See it running",
+      "text": "The video shows a single rate change travelling to the website, the Telegram channel and the Instagram page at the same time. Or skip it and open the real panel — no signup, no password.",
+      "cta": "Open the demo panel",
+      "note": "The demo account has a manager role: it sees every operational screen, but user management and site settings stay disabled."
+    },
+    "pricing": {
+      "eyebrow": "Pricing",
+      "title": "One package, priced once",
+      "subtitle": "Everything in the product for a single payment. Ongoing services are add-ons you choose, never a bundle you inherit.",
+      "oneOff": "one-off",
+      "perMonth": "month",
+      "optional": "Optional",
+      "supportNote": "Optional. The panel keeps running on your server without it — support buys you updates, backups, monitoring and priority response.",
+      "bundle": {
+        "badge": "Complete",
+        "name": "MrExchange Bundle",
+        "note": "Includes server setup, installation, API connections, template design and staff training. No setup fee on top.",
+        "cta": "Talk to us"
+      }
+    },
+    "addons": {
+      "title": "We've got your back",
+      "subtitle": "The services below are offered below the 2026 market rate — the original rate is shown in dollars and crossed out.",
+      "disclaimer": "Prices in USD, excluding tax. Market figures are indicative 2026 rates.",
+      "groups": {
+        "once": "One-off builds",
+        "month": "Ongoing, optional"
+      },
+      "items": {
+        "website": {
+          "title": "Full exchange website",
+          "desc": "A complete branded site on your own domain — pages, content, SEO basics and the live rate table."
+        },
+        "mobileApp": {
+          "title": "Branded mobile app",
+          "desc": "A branded mobile app for your customers plus the Master Exchange management app for Android and iOS, and a customer panel."
+        },
+        "api": {
+          "title": "Custom API integration",
+          "desc": "Pull rates automatically from a global source, or expose your rates to another system.",
+          "note": "Free when you purchase the package."
+        },
+        "accounting": {
+          "title": "Accounting integration",
+          "desc": "Connect the panel to your accounting or back-office software so rates and records stay in step.",
+          "note": "Free with a package purchase — up to 5 connections; $50 per later change."
+        },
+        "brandTemplate": {
+          "title": "Custom brand template",
+          "desc": "A designed post and banner template using your logo, colours, fonts and artwork."
+        },
+        "telegramBot": {
+          "title": "Telegram price bot",
+          "desc": "A bot your customers message to get the current rate, with your branding and wording."
+        },
+        "whatsapp": {
+          "title": "WhatsApp Business setup",
+          "desc": "Business API onboarding so rate enquiries and broadcasts run through WhatsApp."
+        },
+        "widget": {
+          "title": "Rate widget for your site",
+          "desc": "An embeddable live rate table for a website you already have — one snippet, no rebuild."
+        },
+        "branch": {
+          "title": "Additional branch",
+          "desc": "A further branch with its own access, staff accounts and rate overrides.",
+          "note": "Up to 2 branches free; $130 for each additional branch."
+        },
+        "migration": {
+          "title": "Data migration",
+          "desc": "Import your existing currencies, customers and rate history into the panel."
+        },
+        "training": {
+          "title": "Staff training",
+          "desc": "A live onboarding session for your team, plus a written guide in your language.",
+          "note": "Included free with the package."
+        },
+        "domain": {
+          "title": "Domain and SSL setup",
+          "desc": "Domain configuration, DNS, certificates and mail records handled for you.",
+          "note": "Free with a package purchase."
+        },
+        "support": {
+          "title": "Support and maintenance",
+          "desc": "Updates, backups, uptime monitoring and priority response from the team who built it."
+        },
+        "social": {
+          "title": "Instagram and Telegram management",
+          "desc": "We run the channels: posting schedule, captions, community replies and monthly reporting."
+        },
+        "seo": {
+          "title": "SEO and local presence",
+          "desc": "Ongoing search work so people looking for an exchange office in your area find you."
+        },
+        "content": {
+          "title": "Custom graphic content",
+          "desc": "Campaign artwork, seasonal designs and story sets beyond the standard rate template."
+        },
+        "hosting": {
+          "title": "Managed hosting and backups",
+          "desc": "Your panel on a dedicated, isolated server with automated off-site backups."
+        },
+        "rateFeed": {
+          "title": "Live market rate feed",
+          "desc": "A licensed feed so your base rates track the market without anyone typing them."
+        }
+      }
+    },
+    "package": {
+      "title": "Package features",
+      "subtitle": "Everything below is included in the one-off price.",
+      "included": "Included",
+      "rows": {
+        "panel": "Currency rate management panel",
+        "instant": "Instant publishing across all channels",
+        "telegram": "Telegram channel publishing",
+        "telegramBot": "Telegram price bot",
+        "instagram": "Direct Instagram publishing",
+        "website": "Branded rate page on your domain",
+        "graphics": "Automatic graphics on your own template",
+        "widget": "Rate widget for your website",
+        "reports": "Reporting with Excel and PDF export",
+        "alerts": "Rate movement alerts for management",
+        "branches": "Multi-branch management",
+        "roles": "Separate roles and access control",
+        "backups": "Automatic backups and full audit log",
+        "support": "Onboarding, training and handover"
+      }
+    },
+    "telegram": {
+      "eyebrow": "Telegram channel",
+      "title": "Follow the channel",
+      "subtitle": "Product updates, release notes and sample rate posts land there first. Join and you will see what the panel publishes before you buy it.",
+      "cta": "Open the channel",
+      "perks": {
+        "rates": "Sample rate posts, exactly as your customers would see them",
+        "releases": "New features and release notes as they ship",
+        "tips": "Practical tips for running an exchange desk online"
+      }
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "subtitle": "The things people ask before they buy.",
+      "items": {
+        "auto": {
+          "q": "Do the rates update automatically?",
+          "a": "You enter a base rate, or explicit buy and sell rates, in the panel. The moment you save, the system pushes the change to your website, Telegram channel and Instagram page."
+        },
+        "telegram": {
+          "q": "Can it post to our Telegram channel?",
+          "a": "Yes. Telegram publishing is part of the package: formatted text messages and rendered rate images go straight to your channel, and a bot can answer price queries from your customers."
+        },
+        "instagram": {
+          "q": "Is Instagram supported?",
+          "a": "Yes. Rate graphics are generated automatically on your own template and published directly to your page through the Instagram API."
+        },
+        "branding": {
+          "q": "Can the posts use our own branding?",
+          "a": "Yes. Upload your logo, brand colours, fonts and background artwork, and every generated image and page follows your visual identity."
+        },
+        "website": {
+          "q": "Do we get a website as well?",
+          "a": "A branded rate page on your domain is included. A full exchange website is available as a separate add-on."
+        },
+        "branches": {
+          "q": "Can we manage more than one branch?",
+          "a": "Yes. Branches can be defined with separate access, and rates are managed centrally. Additional branches are a small one-off add-on."
+        },
+        "setup": {
+          "q": "What does the one-off price cover?",
+          "a": "Server setup, panel installation, security configuration, Telegram and Instagram API connection, template design and staff training. There is no separate setup fee."
+        },
+        "api": {
+          "q": "Can you build a custom API for us?",
+          "a": "Yes. As an add-on we can build a custom API that pulls rates from a global source or connects the panel to your accounting software."
+        },
+        "support": {
+          "q": "Is monthly support mandatory?",
+          "a": "No. Support and maintenance is an optional add-on covering updates, backups, monitoring and priority response. The panel keeps running without it."
+        }
+      }
+    },
+    "contact": {
+      "title": "Ready to stop publishing rates by hand?",
+      "subtitle": "Call, message us on WhatsApp, or open the demo panel right now. No signup, no password.",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "whatsappMessage": "Hello, I would like a demo and a consultation about the MrExchange panel."
+    },
+    "contactPage": {
+      "metaTitle": "Contact MrExchange",
+      "eyebrow": "Contact us",
+      "title": "Talk to a real person,",
+      "titleAccent": "on the channel you already use",
+      "subtitle": "Telegram, WhatsApp, or a plain phone call. Ask about the panel, the price or the setup — and we will open a live demo with you while we talk.",
+      "channels": {
+        "telegram": {
+          "name": "Telegram",
+          "desc": "Message us there, or follow the channel for sample rate posts and release notes.",
+          "action": "Open Telegram"
+        },
+        "whatsapp": {
+          "name": "WhatsApp",
+          "desc": "The quickest route to the sales line. The chat opens with a greeting already written.",
+          "action": "Start a chat"
+        },
+        "phone": {
+          "name": "Phone",
+          "desc": "Call the sales line directly if you would rather talk it through.",
+          "action": "Call now"
+        }
+      },
+      "facts": {
+        "languages": {
+          "title": "Seven languages",
+          "value": "The panel, the site and support are all available in English, Persian, Arabic, Turkish, German, French and Spanish."
+        },
+        "demo": {
+          "title": "See it before you buy",
+          "value": "Ask for the demo panel and it opens with ready-made data — no signup and no password."
+        },
+        "setup": {
+          "title": "Setup included",
+          "value": "Installation, security configuration, Telegram and Instagram connections and staff training are part of the one-off price. There is no separate setup fee."
+        }
+      },
+      "ctaTitle": "Rather look around first?",
+      "ctaText": "Open the demo panel now, or read exactly what the package includes before you get in touch.",
+      "trial": {
+        "eyebrow": "Free trial",
+        "title": "Your own panel, on your own subdomain",
+        "text": "Trials are set up by us, not by a signup form — so your panel arrives with your currencies, your template and your Telegram channel already connected. Message us on any channel above and it is usually running the same day. Fourteen days, no card, no obligation."
+      }
+    },
+    "footer": {
+      "about": "A rate publishing panel for exchange offices: one entry, every channel.",
+      "productTitle": "Product",
+      "startTitle": "Get started",
+      "contactTitle": "Contact",
+      "faq": "FAQ",
+      "login": "Sign in",
+      "bottom": "mrexchange.co.uk. All rights reserved."
+    }
+  },
+  "demo": {
+    "badge": "Live demo",
+    "banner": {
+      "title": "You are inside a live MrExchange panel.",
+      "text": "Sample rates, sample channels. Nothing here is published anywhere, and it resets for the next visitor.",
+      "tour": "Show me around",
+      "talk": "Talk to us",
+      "site": "Back to site"
+    },
+    "tour": {
+      "title": "What this panel does",
+      "intro": "Eight stops, in the order a rate desk uses them. Each one opens the real page — look around, change things, nothing breaks.",
+      "progress": "Step {current} of {total}",
+      "prev": "Back",
+      "next": "Next",
+      "finish": "Get this for my exchange",
+      "steps": {
+        "dashboard": {
+          "title": "The morning screen",
+          "body": "Every rate, bot and channel in one view: what changed, what is waiting to be published, and whether your Telegram and Instagram connections are alive.",
+          "look": "Bot status, recent rate changes and channel numbers — all live, no spreadsheet."
+        },
+        "prices": {
+          "title": "Set your rates",
+          "body": "Buy and sell for every currency you deal in. Type one number, or set a base rate and let the panel work out the spread for each pair.",
+          "look": "Open a currency and change a rate — the panel keeps the history and the percentage move."
+        },
+        "finalize": {
+          "title": "Approve, then publish",
+          "body": "Nothing reaches your customers until someone approves it. A manager reviews the new rates, sees the generated image, and releases them.",
+          "look": "The rendered rate image is built here from your own template before it goes out."
+        },
+        "categories": {
+          "title": "Your currencies, your rules",
+          "body": "Define the currencies, pairs and price types you actually quote — cash, transfer, VIP — each with its own rounding and formatting.",
+          "look": "Add a price type and it appears on the panel, the channel post and the image."
+        },
+        "templates": {
+          "title": "Your brand on every post",
+          "body": "The rate images are drawn on your template: your logo, colours, fonts and background. The editor is right here, no designer needed.",
+          "look": "Open a template and move a field — that is exactly what your customers will receive."
+        },
+        "telegram": {
+          "title": "Telegram, automatically",
+          "body": "Formatted rate messages and images go to your channel the moment rates are approved, and a bot answers price questions for your customers.",
+          "look": "Channels, bots and the message that gets sent — all configured from this page."
+        },
+        "instagram": {
+          "title": "Instagram without the phone",
+          "body": "The same branded rate graphic is published straight to your page through the Instagram API, on your schedule.",
+          "look": "The post queue and the account connection live here."
+        },
+        "analytics": {
+          "title": "Proof it is working",
+          "body": "Rate history, publishing activity and channel reach, so you can see how often you move and how many people saw it.",
+          "look": "Pick a range and compare — the same numbers your manager will ask for."
+        }
+      }
+    },
+    "opening": {
+      "title": "Opening the live demo…",
+      "text": "Signing you into a demo panel filled with sample rates. No account needed."
     }
   }
 }

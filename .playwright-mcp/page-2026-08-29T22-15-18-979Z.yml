@@ -1,0 +1,301 @@
+- generic [ref=f11e1]:
+  - generic [ref=f11e4]:
+    - complementary [ref=f11e5]:
+      - link "" [ref=f11e7] [cursor=pointer]:
+        - /url: /panel
+      - navigation [ref=f11e10]:
+        - list [ref=f11e11]:
+          - listitem [ref=f11e12]:
+            - link "" [ref=f11e13] [cursor=pointer]:
+              - /url: /panel
+          - listitem [ref=f11e15]:
+            - link "$" [ref=f11e16] [cursor=pointer]:
+              - /url: /update
+          - listitem [ref=f11e18]:
+            - link "" [ref=f11e19] [cursor=pointer]:
+              - /url: /finalize
+          - listitem [ref=f11e21]:
+            - link "" [ref=f11e22] [cursor=pointer]:
+              - /url: /categories
+          - listitem [ref=f11e24]:
+            - link "" [ref=f11e25] [cursor=pointer]:
+              - /url: /analysis
+          - listitem [ref=f11e27]:
+            - link "" [ref=f11e28] [cursor=pointer]:
+              - /url: /telegram/send
+          - listitem [ref=f11e30]:
+            - link "" [ref=f11e31] [cursor=pointer]:
+              - /url: /instagram
+          - listitem [ref=f11e33]:
+            - link "" [ref=f11e34] [cursor=pointer]:
+              - /url: /templates
+      - text: 
+    - generic [ref=f11e36]:
+      - status [ref=f11e37]:
+        - generic [ref=f11e38]: Live demo
+        - paragraph [ref=f11e39]:
+          - strong [ref=f11e40]: You are inside a live MrExchange panel.
+          - text: —Sample rates, sample channels. Nothing here is published anywhere, and it resets for the next visitor.
+        - generic [ref=f11e41]:
+          - button "Show me around" [ref=f11e42] [cursor=pointer]:
+            - generic [ref=f11e43]: 
+          - link "Talk to us" [ref=f11e45] [cursor=pointer]:
+            - /url: /contact
+            - generic [ref=f11e46]: 
+          - link "Back to site" [ref=f11e48] [cursor=pointer]:
+            - /url: /
+            - generic [ref=f11e49]: 
+      - banner [ref=f11e51]:
+        - text: 
+        - link " MrExchange" [ref=f11e52] [cursor=pointer]:
+          - /url: /panel
+          - generic [ref=f11e53]: 
+          - generic [ref=f11e55]: MrExchange
+        - generic [ref=f11e56]:
+          - button " EN" [ref=f11e58] [cursor=pointer]:
+            - generic [ref=f11e59]: 
+            - generic [ref=f11e60]: EN
+          - button "Switch to dark theme" [ref=f11e61] [cursor=pointer]:
+            - generic [ref=f11e62]: 
+          - generic [ref=f11e63]:
+            - generic [ref=f11e64]: 
+            - generic [ref=f11e66]:
+              - generic [ref=f11e67]: Demo User
+              - generic [ref=f11e68]: management
+          - button "" [ref=f11e69] [cursor=pointer]
+      - main [ref=f11e71]:
+        - generic [ref=f11e72]:
+          - navigation "Breadcrumb" [ref=f11e73]:
+            - link "Home" [ref=f11e74] [cursor=pointer]:
+              - /url: /panel
+            - generic [ref=f11e75]: 
+            - generic [ref=f11e76]: Price Hub
+          - generic [ref=f11e77]:
+            - heading "Price Hub" [level=1] [ref=f11e78]
+            - generic [ref=f11e79]:
+              - heading " Standard Categories" [level=2] [ref=f11e80]:
+                - generic [ref=f11e81]: 
+                - text: Standard Categories
+              - generic [ref=f11e82]:
+                - generic [ref=f11e83]:
+                  - generic [ref=f11e84]:
+                    - generic [ref=f11e85]:
+                      - img "British Pound (GBP) icon" [ref=f11e87]
+                      - generic [ref=f11e88]:
+                        - heading "British Pound (GBP)" [level=3] [ref=f11e89]
+                        - paragraph [ref=f11e90]: 4 Price Type
+                    - link "Update" [ref=f11e91] [cursor=pointer]:
+                      - /url: /prices/category/2/update
+                  - generic [ref=f11e92]:
+                    - article [ref=f11e93]:
+                      - generic [ref=f11e94]:
+                        - paragraph [ref=f11e95]: GBP/IRT Buy
+                        - paragraph [ref=f11e96]: GBP / IRT • GBPIRT-BUY
+                      - generic [ref=f11e97]:
+                        - button "82,500" [ref=f11e98] [cursor=pointer]
+                        - paragraph [ref=f11e99]: 15d ago
+                      - generic [ref=f11e100]:
+                        - generic [ref=f11e101]:
+                          - generic [ref=f11e102]: 
+                          - text: 0.0%
+                        - link "" [ref=f11e103] [cursor=pointer]:
+                          - /url: /prices/category/2/update
+                    - article [ref=f11e105]:
+                      - generic [ref=f11e106]:
+                        - paragraph [ref=f11e107]: GBP/IRT Sell
+                        - paragraph [ref=f11e108]: GBP / IRT • GBPIRT-SELL
+                      - generic [ref=f11e109]:
+                        - button "83,200" [ref=f11e110] [cursor=pointer]
+                        - paragraph [ref=f11e111]: 15d ago
+                      - generic [ref=f11e112]:
+                        - generic [ref=f11e113]:
+                          - generic [ref=f11e114]: 
+                          - text: 0.0%
+                        - link "" [ref=f11e115] [cursor=pointer]:
+                          - /url: /prices/category/2/update
+                    - article [ref=f11e117]:
+                      - generic [ref=f11e118]:
+                        - paragraph [ref=f11e119]: IRT/GBP Buy
+                        - paragraph [ref=f11e120]: IRT / GBP • IRTGBP-BUY
+                      - generic [ref=f11e121]:
+                        - button "0" [ref=f11e122] [cursor=pointer]
+                        - paragraph [ref=f11e123]: 15d ago
+                      - generic [ref=f11e124]:
+                        - generic [ref=f11e125]:
+                          - generic [ref=f11e126]: 
+                          - text: 0.0%
+                        - link "" [ref=f11e127] [cursor=pointer]:
+                          - /url: /prices/category/2/update
+                    - article [ref=f11e129]:
+                      - generic [ref=f11e130]:
+                        - paragraph [ref=f11e131]: IRT/GBP Sell
+                        - paragraph [ref=f11e132]: IRT / GBP • IRTGBP-SELL
+                      - generic [ref=f11e133]:
+                        - button "0" [ref=f11e134] [cursor=pointer]
+                        - paragraph [ref=f11e135]: 15d ago
+                      - generic [ref=f11e136]:
+                        - generic [ref=f11e137]:
+                          - generic [ref=f11e138]: 
+                          - text: 0.0%
+                        - link "" [ref=f11e139] [cursor=pointer]:
+                          - /url: /prices/category/2/update
+                - generic [ref=f11e141]:
+                  - generic [ref=f11e142]:
+                    - generic [ref=f11e143]:
+                      - img "Euro (EUR) icon" [ref=f11e145]
+                      - generic [ref=f11e146]:
+                        - heading "Euro (EUR)" [level=3] [ref=f11e147]
+                        - paragraph [ref=f11e148]: 2 Price Type
+                    - link "Update" [ref=f11e149] [cursor=pointer]:
+                      - /url: /prices/category/3/update
+                  - generic [ref=f11e150]:
+                    - article [ref=f11e151]:
+                      - generic [ref=f11e152]:
+                        - paragraph [ref=f11e153]: EUR/IRT Buy
+                        - paragraph [ref=f11e154]: EUR / IRT • EURIRT-BUY
+                      - generic [ref=f11e155]:
+                        - button "69,800" [ref=f11e156] [cursor=pointer]
+                        - paragraph [ref=f11e157]: 15d ago
+                      - generic [ref=f11e158]:
+                        - generic [ref=f11e159]:
+                          - generic [ref=f11e160]: 
+                          - text: 0.0%
+                        - link "" [ref=f11e161] [cursor=pointer]:
+                          - /url: /prices/category/3/update
+                    - article [ref=f11e163]:
+                      - generic [ref=f11e164]:
+                        - paragraph [ref=f11e165]: EUR/IRT Sell
+                        - paragraph [ref=f11e166]: EUR / IRT • EURIRT-SELL
+                      - generic [ref=f11e167]:
+                        - button "70,400" [ref=f11e168] [cursor=pointer]
+                        - paragraph [ref=f11e169]: 15d ago
+                      - generic [ref=f11e170]:
+                        - generic [ref=f11e171]:
+                          - generic [ref=f11e172]: 
+                          - text: 0.0%
+                        - link "" [ref=f11e173] [cursor=pointer]:
+                          - /url: /prices/category/3/update
+                - generic [ref=f11e175]:
+                  - generic [ref=f11e176]:
+                    - generic [ref=f11e177]:
+                      - img "Tether (USDT) icon" [ref=f11e179]
+                      - generic [ref=f11e180]:
+                        - heading "Tether (USDT)" [level=3] [ref=f11e181]
+                        - paragraph [ref=f11e182]: 4 Price Type
+                    - link "Update" [ref=f11e183] [cursor=pointer]:
+                      - /url: /prices/category/1/update
+                  - generic [ref=f11e184]:
+                    - article [ref=f11e185]:
+                      - generic [ref=f11e186]:
+                        - paragraph [ref=f11e187]: USDT/IRT Buy
+                        - paragraph [ref=f11e188]: USDT / IRT • USDTIRT-BUY
+                      - generic [ref=f11e189]:
+                        - button "936,000" [ref=f11e190] [cursor=pointer]
+                        - paragraph [ref=f11e191]: 14d ago
+                      - generic [ref=f11e192]:
+                        - generic [ref=f11e193]:
+                          - generic [ref=f11e194]: 
+                          - text: +0.1%
+                        - link "" [ref=f11e195] [cursor=pointer]:
+                          - /url: /prices/category/1/update
+                    - article [ref=f11e197]:
+                      - generic [ref=f11e198]:
+                        - paragraph [ref=f11e199]: USDT/IRT Sell
+                        - paragraph [ref=f11e200]: USDT / IRT • USDTIRT-SELL
+                      - generic [ref=f11e201]:
+                        - button "935,000" [ref=f11e202] [cursor=pointer]
+                        - paragraph [ref=f11e203]: 14d ago
+                      - generic [ref=f11e204]:
+                        - generic [ref=f11e205]:
+                          - generic [ref=f11e206]: 
+                          - text: +0.3%
+                        - link "" [ref=f11e207] [cursor=pointer]:
+                          - /url: /prices/category/1/update
+                    - article [ref=f11e209]:
+                      - generic [ref=f11e210]:
+                        - paragraph [ref=f11e211]: IRT/USDT Buy
+                        - paragraph [ref=f11e212]: IRT / USDT • IRTUSDT-BUY
+                      - generic [ref=f11e213]:
+                        - button "936,000" [ref=f11e214] [cursor=pointer]
+                        - paragraph [ref=f11e215]: 14d ago
+                      - generic [ref=f11e216]:
+                        - generic [ref=f11e217]:
+                          - generic [ref=f11e218]: 
+                          - text: +0.5%
+                        - link "" [ref=f11e219] [cursor=pointer]:
+                          - /url: /prices/category/1/update
+                    - article [ref=f11e221]:
+                      - generic [ref=f11e222]:
+                        - paragraph [ref=f11e223]: IRT/USDT Sell
+                        - paragraph [ref=f11e224]: IRT / USDT • IRTUSDT-SELL
+                      - generic [ref=f11e225]:
+                        - button "935,000" [ref=f11e226] [cursor=pointer]
+                        - paragraph [ref=f11e227]: 14d ago
+                      - generic [ref=f11e228]:
+                        - generic [ref=f11e229]:
+                          - generic [ref=f11e230]: 
+                          - text: +0.5%
+                        - link "" [ref=f11e231] [cursor=pointer]:
+                          - /url: /prices/category/1/update
+            - generic [ref=f11e233]:
+              - heading " Special Offers (VIP)" [level=2] [ref=f11e234]:
+                - generic [ref=f11e235]: 
+                - text: Special Offers (VIP)
+              - generic [ref=f11e236]:
+                - generic [ref=f11e237]:
+                  - generic [ref=f11e238]:
+                    - generic [ref=f11e239]:
+                      - generic [ref=f11e240]: 
+                      - heading "Cash VIP Buy" [level=3] [ref=f11e242]
+                    - generic [ref=f11e243]: active
+                  - generic [ref=f11e245]:
+                    - paragraph [ref=f11e246]: "- USDT / IRT (Buy)"
+                    - paragraph [ref=f11e247]: 65.5K
+                  - link " Update" [ref=f11e248] [cursor=pointer]:
+                    - /url: /prices/special/1/update
+                    - generic [ref=f11e249]: 
+                    - generic [ref=f11e250]: Update
+                - generic [ref=f11e251]:
+                  - generic [ref=f11e252]:
+                    - generic [ref=f11e253]:
+                      - generic [ref=f11e254]: 
+                      - heading "Corporate Sell" [level=3] [ref=f11e256]
+                    - generic [ref=f11e257]: active
+                  - generic [ref=f11e259]:
+                    - paragraph [ref=f11e260]: "- USDT / IRT (Buy)"
+                    - paragraph [ref=f11e261]: 65.4K
+                  - link " Update" [ref=f11e262] [cursor=pointer]:
+                    - /url: /prices/special/2/update
+                    - generic [ref=f11e263]: 
+                    - generic [ref=f11e264]: Update
+      - contentinfo [ref=f11e265]:
+        - generic [ref=f11e266]:
+          - paragraph [ref=f11e267]:
+            - text: Powered by
+            - link "Vaporware-road" [ref=f11e268] [cursor=pointer]:
+              - /url: https://github.com/Vaporware-road
+          - generic [ref=f11e269]:
+            - generic [ref=f11e270]: MrExchange
+            - generic [ref=f11e271]: 
+    - text:  $ 
+  - text:    $      
+  - dialog "What this panel does" [ref=f11e273]:
+    - banner [ref=f11e274]:
+      - generic [ref=f11e275]:
+        - paragraph [ref=f11e276]: Live demo
+        - heading "What this panel does" [level=2] [ref=f11e277]
+      - button "Close" [ref=f11e278] [cursor=pointer]:
+        - generic [ref=f11e279]: 
+    - paragraph [ref=f11e280]: Eight stops, in the order a rate desk uses them. Each one opens the real page — look around, change things, nothing breaks.
+    - generic "Step 2 of 8" [ref=f11e281]
+    - generic [ref=f11e290]:
+      - generic [ref=f11e291]: $
+      - paragraph [ref=f11e293]: Step 2 of 8
+      - heading "Set your rates" [level=3] [ref=f11e294]
+      - paragraph [ref=f11e295]: Buy and sell for every currency you deal in. Type one number, or set a base rate and let the panel work out the spread for each pair.
+      - paragraph [ref=f11e296]:
+        - generic [ref=f11e297]: 
+        - generic [ref=f11e298]: Open a currency and change a rate — the panel keeps the history and the percentage move.
+    - generic [ref=f11e299]:
+      - button "Back" [ref=f11e300] [cursor=pointer]
+      - button "Next" [active] [ref=f11e301] [cursor=pointer]

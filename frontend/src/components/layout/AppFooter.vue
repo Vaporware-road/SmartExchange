@@ -4,7 +4,13 @@
   >
     <div class="flex items-center justify-between gap-3">
       <p class="m-0 text-[11px] md:text-xs leading-none text-slate-400/90 dark:text-slate-500/90">
-        Powered by Siavash
+        Powered by
+        <a
+          href="https://github.com/Vaporware-road"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="font-medium text-slate-400/90 hover:text-slate-200 dark:text-slate-500/90 dark:hover:text-slate-300 transition-colors"
+        >Vaporware-road</a>
       </p>
       <div class="flex items-center gap-1.5 min-w-0">
         <span class="font-semibold text-[11px] md:text-xs text-[var(--primary)] truncate max-w-[120px]">{{ siteName }}</span>

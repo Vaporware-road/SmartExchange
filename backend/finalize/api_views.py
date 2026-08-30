@@ -20,6 +20,7 @@ from change_price.prefetch_helpers import prefetch_price_histories_latest
 from special_price.models import SpecialPriceType, SpecialPriceHistory
 from special_price.prefetch_helpers import prefetch_special_price_histories_latest
 from telegram_app.models import TelegramChannel
+from telegram_app.serializers import TelegramChannelSerializer
 from price_publisher.tasks import publish_category_prices_task, publish_special_price_task
 from setting.utils import log_finalize_event, log_telegram_event
 
@@ -232,6 +233,16 @@ def _build_finalize_dashboard_data():
                     }
                 )
 
+    # The publish step picks a channel from this payload, and the whole screen is
+    # gated on `has_telegram_channel`; without them the dashboard renders its
+    # "no channels" empty state even when channels exist.
+    channels = TelegramChannelSerializer(
+        TelegramChannel.objects.filter(is_active=True, bot__is_active=True)
+        .select_related("bot")
+        .order_by("name"),
+        many=True,
+    ).data
+
     return {
         "categories": category_summaries,
         "pending_by_category": pending_by_category,
@@ -239,6 +250,8 @@ def _build_finalize_dashboard_data():
         "pending_special_prices": pending_special_prices,
         "has_pending_special": len(pending_special_prices) > 0,
         "publication_destinations": _get_publication_destinations(),
+        "channels": channels,
+        "has_telegram_channel": len(channels) > 0,
     }
 
 
@@ -275,6 +288,8 @@ class FinalizeDashboardAPIView(APIView):
                 "pending_special_prices": [],
                 "has_pending_special": False,
                 "publication_destinations": destinations,
+                "channels": [],
+                "has_telegram_channel": False,
                 "degraded": True,
                 "detail": detail,
             }

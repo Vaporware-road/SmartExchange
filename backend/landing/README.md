@@ -1,395 +1,64 @@
-# MrExchange | آقای صرافی - Landing Page
-
-A premium, dark-themed landing page with dual language support (English/Persian) and RTL capabilities for the automated exchange management system.
-
-## 📋 Landing Page Structure Preview
-
-```
-╔══════════════════════════════════════════════════════════════════════════╗
-║                    FIXED NAVIGATION BAR (Top)                             ║
-║  ┌──────────────────┐  [Features] [Pricing] [FAQ] [Contact] [EN/FA]    ║
-║  │ MrExchange        │  [Get Started]                                     ║
-║  │ آقای صرافی        │                                                     ║
-║  └──────────────────┘                                                     ║
-╚══════════════════════════════════════════════════════════════════════════╝
-
-┌──────────────────────────────────────────────────────────────────────────┐
-│                          HERO SECTION (Dark + Gold)                      │
-│  ┌────────────────────────────────────────────────────────────┐          │
-│  │  Automate Your Exchange Operations                           │          │
-│  │  عملیات صرافی خود را خودکار کنید                            │          │
-│  └────────────────────────────────────────────────────────────┘          │
-│                                                                           │
-│  Real-time price updates, automated Telegram posts...                   │
-│  به‌روزرسانی قیمت در زمان واقعی، ارسال خودکار به تلگرام...            │
-│                                                                           │
-│  [Start Free Trial]  [Watch Demo]                                       │
-│  [شروع آزمایشی رایگان]  [مشاهده دمو]                                    │
-│                                                                           │
-│  ┌──────┐  ┌──────┐  ┌──────┐                                           │
-│  │ 24/7 │  │99.9% │  │ 10x  │                                           │
-│  │Auto  │  │Uptime│  │Saved │                                           │
-│  └──────┘  └──────┘  └──────┘                                           │
-└──────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────┐
-│                    PROBLEM & SOLUTION SECTION                             │
-│  ┌──────────────────────────┐  ┌──────────────────────────┐             │
-│  │ ❌ Manual Process        │  │ ✅ Our Solution          │             │
-│  │ ❌ فرآیند دستی            │  │ ✅ راه حل ما             │             │
-│  │                          │  │                          │             │
-│  │ • Manual updates         │  │ • Automated Updates      │             │
-│  │ • Delays in posting      │  │ • Instant Posting        │             │
-│  │ • Human errors           │  │ • Error Prevention       │             │
-│  └──────────────────────────┘  └──────────────────────────┘             │
-└──────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────┐
-│                          FEATURES SECTION                                 │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                               │
-│  │ ⚡       │  │ 📱       │  │ 🛡️       │                               │
-│  │ Real-Time│  │ Telegram │  │ Error-Free│                               │
-│  │ Updates  │  │Integration│ │Management│                               │
-│  └──────────┘  └──────────┘  └──────────┘                               │
-│                                                                           │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐                               │
-│  │ 💰       │  │ 🤖       │  │ 📊       │                               │
-│  │Time & Cost│ │ 24/7     │  │Analytics │                               │
-│  │ Savings  │  │Assistant │  │& Insights│                               │
-│  └──────────┘  └──────────┘  └──────────┘                               │
-└──────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────┐
-│                         DEMO / PREVIEW SECTION                            │
-│  ┌──────────────────────────────┐  ┌──────────────────────┐             │
-│  │                              │  │ ✓ Intuitive dashboard│             │
-│  │   [Dashboard Screenshot]     │  │ ✓ Real-time monitoring│             │
-│  │                              │  │ ✓ Telegram management│             │
-│  └──────────────────────────────┘  └──────────────────────┘             │
-└──────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────┐
-│                          PRICING SECTION                                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                   │
-│  │   Basic      │  │     Pro      │  │  Enterprise  │                   │
-│  │   پایه       │  │   حرفه‌ای    │  │   سازمانی     │                   │
-│  │              │  │ [Most Popular]│  │              │                   │
-│  │   $99/mo     │  │   $249/mo    │  │   Custom     │                   │
-│  └──────────────┘  └──────────────┘  └──────────────┘                   │
-└──────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────┐
-│                      TESTIMONIALS SECTION                                 │
-│  Trusted by Leading Exchanges | مورد اعتماد صرافی‌های پیشرو            │
-│  [Logo 1] [Logo 2] [Logo 3] [Logo 4] [Logo 5]                           │
-│                                                                           │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐                  │
-│  │ "MrExchange  │  │ "The Telegram│  │ "Best       │                  │
-│  │  transformed │  │  integration │  │  investment" │                  │
-│  │  our ops..." │  │  is a game-  │  │              │                  │
-│  └──────────────┘  └──────────────┘  └──────────────┘                  │
-└──────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────┐
-│                            FAQ SECTION                                    │
-│  ┌──────────────────────────────────────────────────────────┐           │
-│  │ How quickly can I get started?                    [+]     │           │
-│  │ چقدر سریع می‌توانم شروع کنم؟                      [+]     │           │
-│  └──────────────────────────────────────────────────────────┘           │
-│  ┌──────────────────────────────────────────────────────────┐           │
-│  │ Do I need technical knowledge?                    [+]     │           │
-│  │ آیا به دانش فنی نیاز دارم؟                        [+]     │           │
-│  └──────────────────────────────────────────────────────────┘           │
-└──────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────┐
-│                         FINAL CTA SECTION                                 │
-│  ┌──────────────────────────────────────────────────────────┐          │
-│  │                                                            │          │
-│  │     Ready to Automate Your Exchange?                       │          │
-│  │     آماده خودکارسازی صرافی خود هستید؟                    │          │
-│  │                                                            │          │
-│  │  [Contact on Telegram]  [Email Us]                        │          │
-│  │  [تماس در تلگرام]      [ایمیل بزنید]                      │          │
-│  └──────────────────────────────────────────────────────────┘          │
-└──────────────────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────────────────────────────┐
-│                              FOOTER                                       │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐│
-│  │ MrExchange   │  │   Product    │  │   Company    │  │    Legal     ││
-│  │ آقای صرافی  │  │   محصول      │  │   شرکت       │  │   قانونی     ││
-│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘│
-│                                                                           │
-│  © 2025 MrExchange. All rights reserved.                                 │
-│  © 2025 آقای صرافی. تمامی حقوق محفوظ است.                              │
-└──────────────────────────────────────────────────────────────────────────┘
-```
-
-## 🎨 Design Features
-
-- **Dark Theme**: Pure black (#000000) background with luxurious gold (#FFD700) accents
-- **Dual Language**: Full English and Persian (Farsi) support with seamless switching
-- **RTL Support**: Automatic right-to-left text direction for Persian
-- **Premium Branding**: "MrExchange" in English and "آقای صرافی" in Persian
-- **Responsive**: Fully responsive design (desktop, tablet, mobile)
-- **Modern**: Clean, minimal, professional design with smooth animations
-
-## 🚀 Django Integration Guide
-
-### Step 1: File Structure
-
-The landing page files are already organized:
-
-```
-PardisPanel/
-├── landing/
-│   ├── templates/
-│   │   └── landing/
-│   │       └── index.html          # Main landing page template
-│   ├── views.py                    # Already configured
-│   ├── urls.py                     # Already configured
-│   └── README.md                   # This file
-│
-└── static/
-    └── landing/
-        ├── css/
-        │   └── style.css           # Dark theme + gold accents
-        ├── js/
-        │   └── main.js             # Language toggle + RTL support
-        └── images/                 # Place images here
-            └── demo-screenshot.png  # Dashboard screenshot (add your own)
-```
-
-### Step 2: Django Settings
-
-Ensure your `settings.py` includes:
-
-```python
-# settings.py
-
-INSTALLED_APPS = [
-    # ... other apps
-    'landing',
-    # ... other apps
-]
-
-# Static files configuration
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-
-# Media files (if needed)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-```
-
-### Step 3: URL Configuration
-
-The URLs are already configured. Verify in your main `urls.py`:
-
-```python
-# MrExchangePanel/urls.py (or your main urls.py)
-from django.urls import path, include
-
-urlpatterns = [
-    # ... other patterns
-    path('', include('landing.urls')),  # Landing page at root
-    # OR
-    path('landing/', include('landing.urls')),  # Landing page at /landing/
-    # ... other patterns
-]
-```
-
-### Step 4: Collect Static Files
-
-Run Django's collectstatic command:
-
-```bash
-python manage.py collectstatic --noinput
-```
-
-### Step 5: Replace Placeholders
-
-#### Images to Add:
-
-1. **Demo Screenshot**: Add your dashboard screenshot
-   - Location: `static/landing/images/demo-screenshot.png`
-   - Recommended: 1920x1080px, optimized for web
-
-2. **Logo** (optional): Add your logo if you want to replace text logo
-   - Update navbar logo section in `index.html`
-
-3. **Client Logos**: Add actual client/exchange logos
-   - Location: `static/landing/images/clients/`
-   - Update trusted logos section
-
-#### Content to Update:
-
-1. **Contact Information**:
-   - Update Telegram link: `https://t.me/your_telegram_username`
-   - Update email: `support@mrexchange.co.uk` (or your actual email)
-
-2. **Social Media Links**:
-   - Update footer social links (Twitter, LinkedIn, Telegram)
-
-3. **Testimonials**:
-   - Replace with real customer quotes
-   - Add actual customer names and companies
-
-4. **Pricing**:
-   - Adjust pricing amounts if needed
-   - Update feature lists for each plan
-
-### Step 6: Testing
-
-1. **Development Server**:
-   ```bash
-   python manage.py runserver
-   ```
-   Visit `http://127.0.0.1:8000/`
-
-2. **Test Language Toggle**:
-   - Click the language toggle button (EN/FA)
-   - Verify text switches between English and Persian
-   - Check RTL layout activates for Persian
-
-3. **Test Responsiveness**:
-   - Open browser DevTools
-   - Test on mobile (375px), tablet (768px), and desktop (1200px+)
-   - Verify mobile menu works
-   - Check FAQ accordion functionality
-
-4. **Test RTL**:
-   - Switch to Persian (FA)
-   - Verify text direction is right-to-left
-   - Check all elements align correctly
-
-### Step 7: Production Deployment
-
-For production:
-
-1. **Set DEBUG = False** in settings.py
-2. **Configure ALLOWED_HOSTS**
-3. **Use a proper web server** (Nginx + Gunicorn) to serve static files
-4. **Or use a CDN** for static assets
-5. **Enable HTTPS** for security
-
-## 🌐 Language Support
-
-### How It Works
-
-- **Language Toggle**: Click the EN/FA button in the navigation to switch languages
-- **Persistent**: Language preference is saved in localStorage
-- **RTL Support**: Automatically switches to RTL when Persian is selected
-- **Fonts**: Uses Inter for English, Vazirmatn for Persian
-
-### Adding New Translations
-
-To add new text in both languages:
-
-1. **For inline text**: Use the pattern:
-   ```html
-   <span class="lang-en">English text</span>
-   <span class="lang-fa">متن فارسی</span>
-   ```
-
-2. **For data attributes**: Use:
-   ```html
-   <element data-en="English" data-fa="فارسی">English</element>
-   ```
-
-3. **JavaScript will automatically update** these elements when language changes
-
-## 🎨 Customization Guide
-
-### Colors
-
-Edit CSS variables in `static/landing/css/style.css`:
-
-```css
-:root {
-    --color-bg-primary: #000000;      /* Main background */
-    --color-gold: #FFD700;             /* Gold accent */
-    --color-gold-light: #FFE55C;      /* Light gold */
-    --color-gold-dark: #CCAA00;        /* Dark gold */
-    /* ... more colors */
-}
-```
-
-### Fonts
-
-- **English**: Inter (Google Fonts)
-- **Persian**: Vazirmatn (Google Fonts)
-- Both are loaded in the HTML `<head>`
-
-### Spacing & Layout
-
-Adjust spacing variables in CSS:
-
-```css
-:root {
-    --spacing-sm: 1rem;
-    --spacing-md: 1.5rem;
-    /* ... adjust as needed */
-}
-```
-
-## 📱 Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-- Mobile browsers (iOS Safari, Chrome Mobile)
-
-## 🔧 Troubleshooting
-
-### Language toggle not working?
-
-1. Check JavaScript console for errors
-2. Ensure `main.js` is loaded
-3. Check localStorage is enabled in browser
-4. Verify language toggle button exists: `#languageToggle`
-
-### RTL layout issues?
-
-1. Check `dir="rtl"` is set on `<html>` when Persian is selected
-2. Verify Persian font (Vazirmatn) is loaded
-3. Check CSS has RTL-specific rules (they're included)
-
-### Static files not loading?
-
-1. Check `STATIC_URL` and `STATICFILES_DIRS` in settings.py
-2. Run `python manage.py collectstatic`
-3. Check file paths match exactly (case-sensitive on Linux)
-4. Clear browser cache
-
-### Mobile menu not working?
-
-1. Check JavaScript console for errors
-2. Ensure `main.js` is loaded
-3. Verify hamburger button exists: `#mobileMenuToggle`
-
-## 📝 Notes
-
-- All images should be optimized for web (use tools like TinyPNG)
-- Consider lazy loading for images below the fold
-- Add analytics tracking (Google Analytics, etc.) if needed
-- The page is fully accessible (ARIA labels, semantic HTML)
-- Language preference persists across page reloads
-
-## 🆘 Support
-
-For issues or questions:
-- Check HTML comments in `index.html` for placeholder locations
-- Check CSS comments in `style.css` for styling explanations
-- Check JavaScript comments in `main.js` for functionality details
-
----
-
-**Built with modern web standards** • **Dark + Gold Premium Theme** • **Dual Language Support** • **Production Ready**
-
-**MrExchange | آقای صرافی** - Premium Exchange Automation
+# Landing app
+
+The public marketing site served at `/`. It is a Vue page inside the panel's own
+SPA, not a separate stack: the marketing site and the product it sells share one
+design system, one component set and one set of translations.
+
+| Piece | Path |
+|---|---|
+| Page | `frontend/src/views/landing/LandingView.vue` |
+| Sections | `frontend/src/views/landing/components/` |
+| Animation | `frontend/src/views/landing/composables/` |
+| Styles | `frontend/src/views/landing/landing.css` + Tailwind + the app's design tokens |
+| Prices, phone, links | `frontend/src/config/landing.js` |
+| Copy (7 languages) | `landing.*` in `frontend/src/locales/*.json` |
+| Crawler metadata | `landing/templates/landing/seo_head.html` |
+| Video / logo | `static/landing/Demo.mp4`, `static/landing/images/` |
+
+## How `/` is served
+
+`landing.views.landing_page` reads the built SPA shell — the same file `SPAView`
+serves — strips its generic `<title>`, injects `seo_head.html` into `<head>`, and
+returns it. The Vue router then renders `LandingView` for `/`.
+
+Only the crawler-facing metadata is server-rendered: title, description, OG and
+Twitter cards, and the `SoftwareApplication` / `Organization` / `FAQPage`
+JSON-LD. Everything a human reads comes from the SPA. **Keep the JSON-LD FAQ in
+step with `landing.faq` in the locale files** — a crawler that reads one and a
+visitor who reads the other must not be told different things.
+
+## Editing copy
+
+Every string is a `landing.*` key in `frontend/src/locales/<lang>.json`, across
+`en` (default), `fa`, `ar`, `de`, `fr`, `es` and `tr`. Adding a string means
+adding the key to all seven; a key missing from one falls back to `en`, which
+reads as a bug to that visitor.
+
+Numbers are not copy. Prices, the sales phone number, the WhatsApp deep link and
+the Telegram channel handle all live in `frontend/src/config/landing.js` — change
+them once there, not in seven dictionaries.
+
+The Telegram channel handle is a placeholder (`TELEGRAM_CHANNEL`); point it at
+the real channel when it is live and the nav, the channel section and the footer
+all follow.
+
+## Pricing
+
+One package at a one-off price, plus add-ons. `ADDONS` carries both our price and
+`market`, the researched 2026 going rate for the same service; the cards render
+the market figure struck through beside ours. If you change a price, keep ours
+below the market figure or the comparison stops being honest.
+
+Monthly support is an add-on and is marked optional — the panel runs without it.
+
+## Animation
+
+No animation library. `composables/` holds the hero particle canvas, the
+scroll-reveal observer, the stat count-up and the live-price jitter; the marquees
+and everything else are CSS. Every one of them is disabled under
+`prefers-reduced-motion`.
+
+Marquees (`LandingMarquee.vue`) render their item list **twice** and translate the
+track by exactly `-50%`. The end frame is then identical to the start, so the
+loop is seamless — no visible seam, no snap back to the beginning. Anything that
+scrolls forever on this page must be built that way.

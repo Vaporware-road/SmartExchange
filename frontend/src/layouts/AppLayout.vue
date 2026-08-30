@@ -17,6 +17,7 @@
           {{ $t('programmerHub.exit') }}
         </button>
       </div>
+      <DemoBanner v-if="auth.isDemo" @open-tour="tourOpen = true" />
       <AppHeader @toggle-drawer="drawerOpen = !drawerOpen" />
       <main
         class="flex min-w-0 flex-1 flex-col overflow-x-hidden"
@@ -45,6 +46,7 @@
       <AppFooter v-if="!isTemplateEditorLayout" />
     </div>
     <AppBottomNav />
+    <DemoTour v-if="auth.isDemo" :open="tourOpen" @close="tourOpen = false" />
   </div>
 </template>
 
@@ -52,13 +54,18 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { AppSidebar, AppHeader, AppDrawer, AppFooter, AppBreadcrumb, AppBottomNav } from '@/components/layout'
+import DemoBanner from '@/components/demo/DemoBanner.vue'
+import DemoTour from '@/components/demo/DemoTour.vue'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useSidebarStore } from '@/stores/sidebar'
 import { useAuthStore } from '@/stores/auth'
+import { STORAGE_DEMO_TOUR_SEEN, storageGet, storageSet } from '@/constants/branding'
 
 const route = useRoute()
 const router = useRouter()
 const drawerOpen = ref(false)
+/* The tour opens itself once per browser: helpful on arrival, not on every click. */
+const tourOpen = ref(false)
 const siteSettings = useSiteSettingsStore()
 const sidebarStore = useSidebarStore()
 const auth = useAuthStore()
@@ -72,5 +79,9 @@ async function exitImpersonation() {
 
 onMounted(() => {
   siteSettings.fetch()
+  if (auth.isDemo && !storageGet(STORAGE_DEMO_TOUR_SEEN)) {
+    tourOpen.value = true
+    storageSet(STORAGE_DEMO_TOUR_SEEN, null, '1')
+  }
 })
 </script>

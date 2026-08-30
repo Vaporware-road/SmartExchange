@@ -1056,5 +1056,338 @@
     "systemAccessDesc": "Telegram-Bot-Zugangsdaten und Zugriffsstufe.",
     "registeredBy": "Registriert von",
     "registeredByHint": "Wird automatisch als angemeldeter Admin erfasst."
+  },
+  "landing": {
+    "meta": {
+      "title": "MrExchange — Panel zur Automatisierung von Wechselkursen"
+    },
+    "nav": {
+      "label": "Hauptmenü",
+      "product": "Produkt",
+      "services": "Leistungen",
+      "package": "Paket",
+      "contact": "Kontakt",
+      "cta": "Demo anfordern",
+      "menu": "Menü",
+      "language": "Sprache"
+    },
+    "hero": {
+      "badge": "Kursveröffentlichung, vollautomatisch",
+      "title": "Ein Kurs-Panel für",
+      "titleAccent": "jeden Kanal, auf dem Sie publizieren",
+      "subtitle": "Geben Sie An- und Verkaufskurse einmal ein. MrExchange spielt sie beim Speichern sofort auf Ihre Website, Ihren Telegram-Kanal, Ihre Instagram-Seite und Ihr Kurs-Widget aus.",
+      "ctaDemo": "Demo anfordern",
+      "ctaTrial": "14 Tage kostenlos testen",
+      "note": "Die Demo ist ein schneller Blick mit vorbereiteten Daten. Der Test ist Ihr eigenes Panel auf Ihrer eigenen Subdomain.",
+      "panelTitle": "Kursverwaltung",
+      "live": "Live-Aktualisierung",
+      "buy": "Ankauf",
+      "sell": "Verkauf"
+    },
+    "stats": {
+      "saved": "Tägliche Ersparnis bei der Kursveröffentlichung",
+      "automation": "Automatisch veröffentlicht, ohne manuellen Schritt",
+      "channels": "Veröffentlichungskanäle aus einem Panel",
+      "uptime": "Verfügbarkeit bei unterbrechungsfreier Aktualisierung"
+    },
+    "features": {
+      "eyebrow": "Das bekommen Sie",
+      "title": "Alles, was der Kursschalter wirklich braucht",
+      "subtitle": "Sechs Dinge, die das Panel täglich erledigt. Die vollständige Liste steht weiter unten.",
+      "items": {
+        "panel": {
+          "title": "Panel zur Kursverwaltung",
+          "desc": "Ein sicheres Dashboard, um An- und Verkaufskurse von jedem Gerät und überall zu ändern."
+        },
+        "instant": {
+          "title": "Sofortige Veröffentlichung",
+          "desc": "Einmal speichern, und jeder verbundene Kanal ist in derselben Sekunde aktuell."
+        },
+        "telegram": {
+          "title": "Telegram-Kanal und Bot",
+          "desc": "Formatierte Kursnachrichten und -bilder in Ihrem Kanal, dazu ein Bot, der Kursanfragen beantwortet."
+        },
+        "instagram": {
+          "title": "Instagram-Beiträge",
+          "desc": "Kursgrafiken werden auf Ihrer Vorlage erzeugt und direkt auf Ihrer Seite veröffentlicht."
+        },
+        "branding": {
+          "title": "Ihre Marke, überall",
+          "desc": "Logo, Farben, Schriften und Grafiken auf jedem Bild, jeder Seite und jedem Widget des Systems."
+        },
+        "security": {
+          "title": "Rollen und Protokoll",
+          "desc": "Getrennte Zugänge für Leitung, Mitarbeitende und Entwicklung, jede Kursänderung protokolliert."
+        }
+      }
+    },
+    "flow": {
+      "title": "Ein Kurs, überall, im selben Moment",
+      "subtitle": "Sobald Sie einen Kurs speichern, fließen die Daten an jeden verbundenen Kanal.",
+      "steps": {
+        "enter": {
+          "title": "Kurse eingeben",
+          "desc": "Panel am Rechner oder Handy öffnen und die neuen An- und Verkaufskurse eintragen."
+        },
+        "render": {
+          "title": "Inhalte entstehen",
+          "desc": "Das System erzeugt Bilder, Nachrichten und Seitendaten auf Ihrer Vorlage in unter einer Sekunde."
+        },
+        "publish": {
+          "title": "Alles geht raus",
+          "desc": "Website, Telegram, Instagram und Ihr Kurs-Widget werden gleichzeitig aktualisiert."
+        }
+      }
+    },
+    "channelsSection": {
+      "title": "Eine Plattform, alle Ausgaben",
+      "subtitle": "Alles, was eine moderne Wechselstube veröffentlicht — aus einer einzigen Kursquelle."
+    },
+    "channels": {
+      "telegram": "Telegram",
+      "instagram": "Instagram",
+      "website": "Website",
+      "widget": "Kurs-Widget",
+      "bot": "Kurs-Bot",
+      "api": "Eigene API",
+      "reports": "Auswertungen",
+      "branches": "Mehrere Filialen",
+      "security": "Sicherheit",
+      "whatsapp": "WhatsApp"
+    },
+    "demo": {
+      "title": "Im Betrieb ansehen",
+      "text": "Das Video zeigt, wie eine einzige Kursänderung gleichzeitig auf Website, Telegram-Kanal und Instagram-Seite ankommt. Oder überspringen Sie es und öffnen Sie direkt das echte Panel — ohne Anmeldung, ohne Passwort.",
+      "cta": "Demo-Panel öffnen",
+      "note": "Das Demokonto hat die Rolle „Leitung“: Es sieht alle operativen Bereiche, Benutzerverwaltung und Website-Einstellungen bleiben jedoch gesperrt."
+    },
+    "pricing": {
+      "eyebrow": "Preise",
+      "title": "Ein Paket, einmal bezahlt",
+      "subtitle": "Das gesamte Produkt für eine einzige Zahlung. Laufende Leistungen sind Zusatzoptionen, die Sie wählen — nichts wird dem Paket aufgedrängt.",
+      "oneOff": "einmalig",
+      "perMonth": "Monat",
+      "optional": "Optional",
+      "supportNote": "Optional. Das Panel läuft auch ohne auf Ihrem Server; Support bedeutet Updates, Backups, Überwachung und bevorzugte Reaktion.",
+      "bundle": {
+        "badge": "Komplett",
+        "name": "MrExchange-Paket",
+        "note": "Enthält Servereinrichtung, Installation, API-Anbindungen, Vorlagendesign und Teamschulung. Keine zusätzliche Einrichtungsgebühr.",
+        "cta": "Sprechen Sie mit uns"
+      }
+    },
+    "addons": {
+      "title": "Zusatzleistungen",
+      "subtitle": "Verglichen mit dem, was Agenturen und Freelancer 2026 für dieselbe Arbeit verlangen — und bewusst darunter angesetzt. Der durchgestrichene Betrag ist der marktübliche Preis.",
+      "disclaimer": "Preise in GBP, zzgl. Steuern. Marktzahlen sind Richtwerte aus veröffentlichten Preisleitfäden von Agenturen und Freelancern für 2026.",
+      "groups": {
+        "once": "Einmalige Umsetzungen",
+        "month": "Laufend, optional"
+      },
+      "items": {
+        "website": {
+          "title": "Komplette Wechselstuben-Website",
+          "desc": "Eine vollständige Website in Ihrem Branding auf Ihrer Domain — Seiten, Inhalte, SEO-Grundlagen und die Live-Kurstabelle."
+        },
+        "mobileApp": {
+          "title": "App im eigenen Branding",
+          "desc": "Eine installierbare App für Ihre Kundschaft, mit Ihren Kursen, Ihrem Branding und Push-Hinweisen."
+        },
+        "api": {
+          "title": "Individuelle API-Anbindung",
+          "desc": "Kurse automatisch aus einer globalen Quelle beziehen oder Ihre Kurse einem anderen System bereitstellen."
+        },
+        "accounting": {
+          "title": "Buchhaltungsanbindung",
+          "desc": "Panel an Ihre Buchhaltung oder Ihr Backoffice anbinden, damit Kurse und Belege zusammenpassen."
+        },
+        "brandTemplate": {
+          "title": "Individuelle Markenvorlage",
+          "desc": "Gestaltete Post- und Banner-Vorlage mit Ihrem Logo, Ihren Farben, Schriften und Grafiken."
+        },
+        "telegramBot": {
+          "title": "Telegram-Kurs-Bot",
+          "desc": "Ein Bot, dem Ihre Kundschaft schreibt, um den aktuellen Kurs zu erhalten — in Ihrer Sprache und Ihrem Branding."
+        },
+        "whatsapp": {
+          "title": "WhatsApp-Business-Einrichtung",
+          "desc": "Onboarding der Business-API, damit Kursanfragen und Rundnachrichten über WhatsApp laufen."
+        },
+        "widget": {
+          "title": "Kurs-Widget für Ihre Website",
+          "desc": "Eine einbettbare Live-Kurstabelle für eine bestehende Website — ein Snippet, kein Neubau."
+        },
+        "branch": {
+          "title": "Weitere Filiale",
+          "desc": "Eine zusätzliche Filiale mit eigenem Zugang, eigenen Konten und eigenen Kursanpassungen."
+        },
+        "migration": {
+          "title": "Datenübernahme",
+          "desc": "Import Ihrer bestehenden Währungen, Kunden und Kurshistorie in das Panel."
+        },
+        "training": {
+          "title": "Teamschulung",
+          "desc": "Eine Live-Einführung für Ihr Team, dazu eine schriftliche Anleitung in Ihrer Sprache."
+        },
+        "domain": {
+          "title": "Domain- und SSL-Einrichtung",
+          "desc": "Domain, DNS, Zertifikate und Mail-Einträge übernehmen wir für Sie."
+        },
+        "support": {
+          "title": "Support und Wartung",
+          "desc": "Updates, Backups, Verfügbarkeitsüberwachung und bevorzugte Reaktion vom Team, das es gebaut hat."
+        },
+        "social": {
+          "title": "Instagram- und Telegram-Betreuung",
+          "desc": "Wir führen die Kanäle: Redaktionsplan, Texte, Community-Antworten und Monatsbericht."
+        },
+        "seo": {
+          "title": "SEO und lokale Sichtbarkeit",
+          "desc": "Laufende Suchmaschinenarbeit, damit Sie findet, wer in Ihrer Gegend eine Wechselstube sucht."
+        },
+        "content": {
+          "title": "Individuelle Grafikinhalte",
+          "desc": "Kampagnenmotive, saisonale Designs und Story-Sets über die Standardvorlage hinaus."
+        },
+        "hosting": {
+          "title": "Managed Hosting und Backups",
+          "desc": "Ihr Panel auf einem dedizierten, isolierten Server mit automatischen externen Sicherungen."
+        },
+        "rateFeed": {
+          "title": "Live-Marktkursdaten",
+          "desc": "Ein lizenzierter Datenfeed, damit Ihre Basiskurse dem Markt folgen, ohne dass jemand tippt."
+        }
+      }
+    },
+    "package": {
+      "title": "Paketleistungen",
+      "subtitle": "Alles Folgende ist im einmaligen Preis enthalten.",
+      "included": "Enthalten",
+      "rows": {
+        "panel": "Panel zur Wechselkursverwaltung",
+        "instant": "Sofortige Veröffentlichung auf allen Kanälen",
+        "telegram": "Veröffentlichung im Telegram-Kanal",
+        "telegramBot": "Telegram-Kurs-Bot",
+        "instagram": "Direkte Instagram-Veröffentlichung",
+        "website": "Kursseite im eigenen Branding auf Ihrer Domain",
+        "graphics": "Automatische Grafiken auf Ihrer eigenen Vorlage",
+        "widget": "Kurs-Widget für Ihre Website",
+        "reports": "Auswertungen mit Excel- und PDF-Export",
+        "alerts": "Kursbewegungs-Warnungen für die Leitung",
+        "branches": "Verwaltung mehrerer Filialen",
+        "roles": "Getrennte Rollen und Zugriffssteuerung",
+        "backups": "Automatische Backups und vollständiges Protokoll",
+        "support": "Einrichtung, Schulung und Übergabe"
+      }
+    },
+    "telegram": {
+      "eyebrow": "Telegram-Kanal",
+      "title": "Folgen Sie dem Kanal",
+      "subtitle": "Produktneuigkeiten, Release-Notes und Beispiel-Kursposts landen dort zuerst. Treten Sie bei und sehen Sie, was das Panel veröffentlicht, bevor Sie es kaufen.",
+      "cta": "Kanal öffnen",
+      "perks": {
+        "rates": "Beispiel-Kursposts, genau so, wie Ihre Kundschaft sie sähe",
+        "releases": "Neue Funktionen und Release-Notes, sobald sie erscheinen",
+        "tips": "Praktische Tipps für den Online-Betrieb eines Kursschalters"
+      }
+    },
+    "faq": {
+      "title": "Häufige Fragen",
+      "subtitle": "Was vor dem Kauf gefragt wird.",
+      "items": {
+        "auto": {
+          "q": "Werden die Kurse automatisch aktualisiert?",
+          "a": "Sie geben im Panel einen Basiskurs oder direkt An- und Verkaufskurse ein. Beim Speichern spielt das System die Änderung auf Website, Telegram-Kanal und Instagram-Seite aus."
+        },
+        "telegram": {
+          "q": "Kann es in unseren Telegram-Kanal posten?",
+          "a": "Ja. Telegram-Veröffentlichung gehört zum Paket: formatierte Textnachrichten und gerenderte Kursbilder gehen direkt in Ihren Kanal, und ein Bot kann Kursanfragen Ihrer Kundschaft beantworten."
+        },
+        "instagram": {
+          "q": "Wird Instagram unterstützt?",
+          "a": "Ja. Kursgrafiken werden automatisch auf Ihrer eigenen Vorlage erzeugt und über die Instagram-API direkt auf Ihrer Seite veröffentlicht."
+        },
+        "branding": {
+          "q": "Können die Beiträge unser Branding tragen?",
+          "a": "Ja. Laden Sie Logo, Markenfarben, Schriften und Hintergrundgrafiken hoch — jedes erzeugte Bild und jede Seite folgt Ihrer visuellen Identität."
+        },
+        "website": {
+          "q": "Bekommen wir auch eine Website?",
+          "a": "Eine Kursseite im eigenen Branding auf Ihrer Domain ist enthalten. Eine vollständige Wechselstuben-Website gibt es als separate Zusatzleistung."
+        },
+        "branches": {
+          "q": "Können wir mehrere Filialen verwalten?",
+          "a": "Ja. Filialen lassen sich mit getrenntem Zugang anlegen, die Kurse werden zentral gepflegt. Zusätzliche Filialen sind eine kleine einmalige Zusatzleistung."
+        },
+        "setup": {
+          "q": "Was deckt der einmalige Preis ab?",
+          "a": "Servereinrichtung, Panel-Installation, Sicherheitskonfiguration, Anbindung der Telegram- und Instagram-API, Vorlagendesign und Teamschulung. Eine separate Einrichtungsgebühr gibt es nicht."
+        },
+        "api": {
+          "q": "Können Sie eine eigene API für uns bauen?",
+          "a": "Ja. Als Zusatzleistung bauen wir eine API, die Kurse aus einer globalen Quelle bezieht oder das Panel an Ihre Buchhaltungssoftware anbindet."
+        },
+        "support": {
+          "q": "Ist der monatliche Support Pflicht?",
+          "a": "Nein. Support und Wartung sind eine optionale Zusatzleistung für Updates, Backups, Überwachung und bevorzugte Reaktion. Das Panel läuft auch ohne weiter."
+        }
+      }
+    },
+    "contact": {
+      "title": "Bereit, Kurse nicht mehr von Hand zu veröffentlichen?",
+      "subtitle": "Rufen Sie an, schreiben Sie uns auf WhatsApp oder öffnen Sie jetzt das Demo-Panel. Ohne Anmeldung, ohne Passwort.",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "whatsappMessage": "Hallo, ich hätte gern eine Demo und eine Beratung zum MrExchange-Panel."
+    },
+    "contactPage": {
+      "metaTitle": "MrExchange kontaktieren",
+      "eyebrow": "Kontakt",
+      "title": "Sprechen Sie mit einem Menschen –",
+      "titleAccent": "auf dem Kanal, den Sie ohnehin nutzen",
+      "subtitle": "Telegram, WhatsApp oder ein ganz normaler Anruf. Fragen Sie nach dem Panel, dem Preis oder der Einrichtung — die Live-Demo öffnen wir im Gespräch gleich mit.",
+      "channels": {
+        "telegram": {
+          "name": "Telegram",
+          "desc": "Schreiben Sie uns dort, oder folgen Sie dem Kanal für Beispiel-Kursposts und Release-Notes.",
+          "action": "Telegram öffnen"
+        },
+        "whatsapp": {
+          "name": "WhatsApp",
+          "desc": "Der schnellste Weg zum Vertrieb. Der Chat öffnet sich mit einer fertigen Begrüßung.",
+          "action": "Chat starten"
+        },
+        "phone": {
+          "name": "Telefon",
+          "desc": "Rufen Sie den Vertrieb direkt an, wenn Sie es lieber besprechen.",
+          "action": "Jetzt anrufen"
+        }
+      },
+      "facts": {
+        "languages": {
+          "title": "Sieben Sprachen",
+          "value": "Panel, Website und Support gibt es auf Englisch, Persisch, Arabisch, Türkisch, Deutsch, Französisch und Spanisch."
+        },
+        "demo": {
+          "title": "Erst sehen, dann kaufen",
+          "value": "Fragen Sie nach dem Demo-Panel: Es öffnet mit fertigen Daten — ohne Anmeldung, ohne Passwort."
+        },
+        "setup": {
+          "title": "Einrichtung inklusive",
+          "value": "Installation, Sicherheitskonfiguration, Telegram- und Instagram-Anbindung und Mitarbeiterschulung stecken im einmaligen Preis. Eine separate Einrichtungsgebühr gibt es nicht."
+        }
+      },
+      "ctaTitle": "Lieber erst umsehen?",
+      "ctaText": "Öffnen Sie jetzt das Demo-Panel, oder lesen Sie vor dem Kontakt, was das Paket genau enthält."
+    },
+    "footer": {
+      "about": "Ein Panel zur Kursveröffentlichung für Wechselstuben: einmal eingeben, alle Kanäle.",
+      "productTitle": "Produkt",
+      "startTitle": "Loslegen",
+      "contactTitle": "Kontakt",
+      "faq": "FAQ",
+      "login": "Anmelden",
+      "bottom": "mrexchange.co.uk. Alle Rechte vorbehalten."
+    }
   }
 }

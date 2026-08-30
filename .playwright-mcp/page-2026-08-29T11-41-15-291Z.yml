@@ -1,0 +1,10 @@
+- generic [ref=e3]:
+  - generic [ref=e4]: 
+  - generic [ref=e6]:
+    - heading "نصب اپلیکیشن" [level=3] [ref=e7]
+    - paragraph [ref=e8]: این اپلیکیشن را روی دستگاه خود نصب کنید
+    - generic [ref=e9]:
+      - button " نصب" [ref=e10] [cursor=pointer]:
+        - generic [ref=e11]: 
+        - text: نصب
+      - button "بعداً" [ref=e12] [cursor=pointer]

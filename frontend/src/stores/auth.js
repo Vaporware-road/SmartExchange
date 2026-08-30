@@ -58,6 +58,10 @@ export const useAuthStore = defineStore('auth', {
     isImpersonating() {
       return Boolean(this.user?.impersonated_by)
     },
+    /** Shared public demo account — the panel labels the session and offers the tour. */
+    isDemo() {
+      return Boolean(this.user?.is_demo)
+    },
     shouldOpenProgrammerHub() {
       return this.canAccessProgrammerHub && !this.isImpersonating
     },

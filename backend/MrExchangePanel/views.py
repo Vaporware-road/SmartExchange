@@ -6,8 +6,6 @@ from pathlib import Path
 from django.conf import settings
 from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseNotFound
-from django.utils.decorators import method_decorator
-from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import View
 from django.views.static import serve as django_static_serve
 
@@ -45,11 +43,19 @@ _NO_CACHE_STATIC_NAMES = frozenset(
 
 def serve_static_with_cache(request, path, document_root=None, show_indexes=False):
     """
-    Serve STATIC_ROOT files with cache policy suited to the Vue SPA:
+    Serve static files with cache policy suited to the Vue SPA:
 
     - Service worker / manifest / shell → no-cache (always revalidate)
     - Content-hashed /static/vue/assets/* → long-lived immutable
+
+    document_root defaults to STATIC_ROOT (the collected build). When the
+    requested file exists in the editable source dir (STATICFILES_DIRS), it is
+    served from there instead so source edits hot-reload without collectstatic.
     """
+    source_root = settings.STATICFILES_DIRS[0]
+    if document_root is None or (source_root / path.strip("/")).is_file():
+        document_root = source_root
+
     response = django_static_serve(
         request, path, document_root=document_root, show_indexes=show_indexes
     )
@@ -67,32 +73,40 @@ def serve_static_with_cache(request, path, document_root=None, show_indexes=Fals
     return response
 
 
-@method_decorator(xframe_options_exempt, name='dispatch')
+def spa_index_path():
+    """
+    Locate the built SPA shell.
+
+    Prefer the collectstatic copy under STATIC_ROOT so the shell matches assets
+    served from /static/vue/; fall back to the build output dir. Returns None
+    when the frontend has not been built.
+    """
+    candidates = [
+        Path(settings.STATIC_ROOT) / "vue" / "index.html",
+        Path(settings.BASE_DIR) / "static" / "vue" / "index.html",
+    ]
+    return next((p for p in candidates if p.exists()), None)
+
+
+def spa_not_built_response():
+    return HttpResponse(
+        "<h1>Vue app not built</h1><p>Run: cd frontend && npm run build</p>",
+        status=503,
+        content_type="text/html",
+    )
+
+
 class SPAView(View):
     """
     Serve the Vue SPA index.html for client-side routing.
-    All non-API, non-admin routes are handled by the Vue app.
-
-    Prefer the collectstatic copy under STATIC_ROOT so the shell matches
-    assets served from /static/vue/; fall back to the build output dir.
-
-    xframe_options_exempt: the panel is a SaaS product whose live demo is embedded
-    in an iframe on the marketing site (landing page /demo.html). Same-origin in
-    production; the exemption also allows the demo to run from a dev origin.
+    All non-API, non-admin routes are handled by the Vue app, `/` included —
+    see landing/views.py, which serves the same shell with marketing metadata.
     """
 
     def get(self, request, *args, **kwargs):
-        candidates = [
-            Path(settings.STATIC_ROOT) / "vue" / "index.html",
-            Path(settings.BASE_DIR) / "static" / "vue" / "index.html",
-        ]
-        index_path = next((p for p in candidates if p.exists()), None)
+        index_path = spa_index_path()
         if index_path is None:
-            return HttpResponse(
-                "<h1>Vue app not built</h1><p>Run: cd frontend && npm run build</p>",
-                status=503,
-                content_type="text/html",
-            )
+            return spa_not_built_response()
         response = HttpResponse(index_path.read_text(), content_type="text/html")
         response["Cache-Control"] = "no-store, no-cache, must-revalidate"
         return response

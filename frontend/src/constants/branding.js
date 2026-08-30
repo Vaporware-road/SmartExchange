@@ -11,6 +11,7 @@ export const STORAGE_THEME = 'mrexchange-theme'
 export const STORAGE_THEME_LEGACY = 'smartexchange-theme'
 export const STORAGE_PWA_DISMISSED = 'mrexchange-pwa-dismissed'
 export const STORAGE_PWA_DISMISSED_LEGACY = 'smartexchange-pwa-dismissed'
+export const STORAGE_DEMO_TOUR_SEEN = 'mrexchange-demo-tour-seen'
 export const STORAGE_RECENT_SEARCHES = 'mrexchange-recent-searches'
 export const STORAGE_RECENT_SEARCHES_LEGACY = 'smartexchange-recent-searches'
 
