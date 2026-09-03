@@ -42,13 +42,19 @@ Onboarding a paying customer: [docs/CUSTOMER_SERVER_ONBOARDING.md](docs/CUSTOMER
 
 ### Docker (recommended)
 ```bash
-cp .env.docker.example .env.docker   # first time only
+# .env.docker is committed with working local-testing defaults.
+# For a real deployment copy .env.example instead and fill it in.
 docker compose up --build
 ```
 - Frontend: `http://localhost:5250`
 - Backend API: `http://localhost:18000`
 
 ### Local dev
+System packages first (not installed by pip/npm):
+`python3-venv`, `python3-dev`, `build-essential`, `redis-server`.
+Start Redis before Celery: `redis-server --daemonize yes --save "" --appendonly no`
+(verify with `redis-cli ping`).
+
 ```bash
 # Backend
 cd backend
@@ -70,8 +76,13 @@ npm install && npm run dev   # :3000, proxies /api + /media → :8000
 ### Quick verify after any change
 ```bash
 cd backend && python manage.py check
+cd backend && python manage.py test --parallel 4   # 169 tests, all green
 cd frontend && npm run build
 ```
+
+`npm run build` writes into `backend/static/vue/` with `emptyOutDir: true` and then
+runs `collectstatic`. Those bundles are tracked, so a build shows up in `git status`
+whenever the frontend actually changed — commit them with the source change.
 
 ---
 
