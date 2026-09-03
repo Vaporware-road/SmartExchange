@@ -1,0 +1,55 @@
+# Build / cache
+graphify-out/
+**/__pycache__/
+*.pyc
+
+# macOS junk
+._*
+.DS_Store
+
+# Python venv
+SmartExchange/backend/venv/
+
+# Node
+SmartExchange/frontend/node_modules/
+SmartExchange/frontend/dist/
+
+# Django collectstatic + uploaded media (duplicates backend/static)
+SmartExchange/backend/public/
+
+# Built SPA + binary/static assets (no program structure)
+SmartExchange/backend/static/vue/
+SmartExchange/backend/static/img/
+SmartExchange/backend/static/fonts/
+SmartExchange/frontend/public/
+
+# Database + logs
+*.sqlite3
+*.sqlite3-shm
+*.sqlite3-wal
+*.log
+
+# Media & fonts
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.webp
+*.mp4
+*.mp3
+*.ttf
+*.woff
+*.woff2
+*.otf
+*.eot
+
+# Vendored / minified
+*.min.js
+*.min.css
+
+# TelegramLibrarySkill — use search.py or MCP (user-aiogram-docs), not broad grep
+.cursor/skills/TelegramLibrarySkill/reference/
+.cursor/skills/TelegramLibrarySkill/scripts/aiogram_docs_scraper/.venv/
+.cursor/skills/TelegramLibrarySkill/scripts/aiogram_docs_scraper/.build/

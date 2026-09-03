@@ -1,0 +1,5 @@
+# Scraper venv + local Sphinx build cache
+.venv/
+.build/
+__pycache__/
+*.pyc
