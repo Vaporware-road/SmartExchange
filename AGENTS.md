@@ -1,8 +1,7 @@
 # MrExchange — Agent Notes
 
 > Full architecture: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)  
-> Parent workspace notes: [../AGENTS.md](../AGENTS.md)  
-> Roadmap / WIP plan: [tel.txt](tel.txt) (Telegram Hub refactor, Analytics Telegram section, AutoPostConfig, UpdatePriceView bug)
+> Onboarding a paying customer: [docs/CUSTOMER_SERVER_ONBOARDING.md](docs/CUSTOMER_SERVER_ONBOARDING.md)
 
 ---
 
@@ -196,7 +195,6 @@ update prices (change_price / special_price)
 
 Library: **aiogram 3** (not python-telegram-bot / Telethon / Pyrogram).
 
-For any `telegram_app` work: read `.cursor/skills/TelegramLibrarySkill/SKILL.md` first.
 - Customer UX: **reply keyboards** only (panel under chat input)
 - Channel broadcasts: inline buttons OK
 - MCP: `search_aiogram_docs`, `read_aiogram_doc` via `user-aiogram-docs`
@@ -206,14 +204,14 @@ For any `telegram_app` work: read `.cursor/skills/TelegramLibrarySkill/SKILL.md`
 ## Do not edit or index
 
 - `backend/venv/`, `backend/public/`, `backend/static/vue/`, `frontend/node_modules/`
-- `.cursor/skills/TelegramLibrarySkill/reference/` (use search/MCP instead)
 - `backend/Request-Manage-System/` (separate product)
 
 ---
 
-## Work in progress (see `tel.txt` for full spec)
+## Status
 
-1. **Fix `UpdatePriceView` loading bug** — handles `data` but not `{ results: [...] }` paginated shape
-2. **Telegram Management Hub** — refactor `TelegramMessageView.vue` into 4 tabs: Messenger, Bot Setup, Channels, Automation
-3. **AutoPostConfig model** — new `telegram_app` model + CRUD API (config-only, no scheduler yet)
-4. **Telegram Engagement analytics** — move channel analytics into `AnalyticsView.vue`, extend `/api/analysis/dashboard/`
+The four items tracked in `tel.txt` are all shipped and covered by tests:
+`UpdatePriceView` handles both the bare-list and `{ results: [...] }` shapes,
+`TelegramMessageView.vue` is the 5-tab hub, `AutoPostConfig` lives in
+`telegram_app/models.py` with CRUD API, and Telegram engagement is part of
+`/api/analysis/dashboard/`. Treat `tel.txt` as history, not as a plan.

@@ -280,6 +280,10 @@ STATIC_ROOT = BASE_DIR / 'public' / 'staticfiles'  # Collection location for fil
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'public' / 'media'
 
+# Redirect uploads to a temp copy during tests so a run cannot dirty or
+# overwrite the tracked seed media.
+TEST_RUNNER = 'MrExchangePanel.test_runner.IsolatedMediaTestRunner'
+
 # -----------------------------
 # Template & Rendering extras
 # -----------------------------
