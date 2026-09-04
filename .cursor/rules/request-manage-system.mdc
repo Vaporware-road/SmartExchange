@@ -1,0 +1,15 @@
+---
+description: Iraniu ad-request app — separate from SmartExchange Panel
+globs: backend/Request-Manage-System/**
+alwaysApply: false
+---
+
+# Request-Manage-System (Iraniu)
+
+This is a **separate Django application**, not part of SmartExchange Panel.
+
+- Own models, views, templates, and documentation under this directory.
+- Do not import from or into other `backend/` apps unless an explicit integration already exists.
+- Do not apply SmartExchange finalize/publish or TelegramLibrarySkill customer-bot rules here.
+
+Start with [README.md](../../backend/Request-Manage-System/README.md) in this folder.

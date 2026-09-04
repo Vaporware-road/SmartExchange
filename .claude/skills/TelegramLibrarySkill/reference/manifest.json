@@ -1,0 +1,5394 @@
+{
+  "base": "https://docs.aiogram.dev/en/latest/",
+  "version": "3.30.0",
+  "fetched": "2026-08-16T15:47:29Z",
+  "mode": "local Sphinx HTML",
+  "page_count": 673,
+  "ok_count": 673,
+  "pages": [
+    {
+      "docname": "api/bot",
+      "title": "Bot",
+      "url": "https://docs.aiogram.dev/en/latest/api/bot.html",
+      "path": "api/bot.md",
+      "bytes": 4076,
+      "status": 200
+    },
+    {
+      "docname": "api/defaults",
+      "title": "Global defaults",
+      "url": "https://docs.aiogram.dev/en/latest/api/defaults.html",
+      "path": "api/defaults.md",
+      "bytes": 3864,
+      "status": 200
+    },
+    {
+      "docname": "api/download_file",
+      "title": "How to download file?",
+      "url": "https://docs.aiogram.dev/en/latest/api/download_file.html",
+      "path": "api/download_file.md",
+      "bytes": 4200,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/bot_command_scope_type",
+      "title": "BotCommandScopeType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/bot_command_scope_type.html",
+      "path": "api/enums/bot_command_scope_type.md",
+      "bytes": 784,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/bot_subscription_updated_state",
+      "title": "BotSubscriptionUpdatedState",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/bot_subscription_updated_state.html",
+      "path": "api/enums/bot_subscription_updated_state.md",
+      "bytes": 661,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/button_style",
+      "title": "ButtonStyle",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/button_style.html",
+      "path": "api/enums/button_style.md",
+      "bytes": 611,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/chat_action",
+      "title": "ChatAction",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/chat_action.html",
+      "path": "api/enums/chat_action.md",
+      "bytes": 1249,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/chat_boost_source_type",
+      "title": "ChatBoostSourceType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/chat_boost_source_type.html",
+      "path": "api/enums/chat_boost_source_type.md",
+      "bytes": 572,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/chat_member_status",
+      "title": "ChatMemberStatus",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/chat_member_status.html",
+      "path": "api/enums/chat_member_status.md",
+      "bytes": 623,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/chat_type",
+      "title": "ChatType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/chat_type.html",
+      "path": "api/enums/chat_type.md",
+      "bytes": 531,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/content_type",
+      "title": "ContentType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/content_type.html",
+      "path": "api/enums/content_type.md",
+      "bytes": 3829,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/currency",
+      "title": "Currency",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/currency.html",
+      "path": "api/enums/currency.md",
+      "bytes": 2054,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/dice_emoji",
+      "title": "DiceEmoji",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/dice_emoji.html",
+      "path": "api/enums/dice_emoji.md",
+      "bytes": 561,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/encrypted_passport_element",
+      "title": "EncryptedPassportElement",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/encrypted_passport_element.html",
+      "path": "api/enums/encrypted_passport_element.md",
+      "bytes": 1046,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/index",
+      "title": "Enums",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/index.html",
+      "path": "api/enums/index.md",
+      "bytes": 1965,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/inline_query_result_type",
+      "title": "InlineQueryResultType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/inline_query_result_type.html",
+      "path": "api/enums/inline_query_result_type.md",
+      "bytes": 798,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/input_media_type",
+      "title": "InputMediaType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/input_media_type.html",
+      "path": "api/enums/input_media_type.md",
+      "bytes": 681,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/input_paid_media_type",
+      "title": "InputPaidMediaType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/input_paid_media_type.html",
+      "path": "api/enums/input_paid_media_type.md",
+      "bytes": 568,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/input_profile_photo_type",
+      "title": "InputProfilePhotoType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/input_profile_photo_type.html",
+      "path": "api/enums/input_profile_photo_type.md",
+      "bytes": 547,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/input_rich_block_type",
+      "title": "InputRichBlockType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/input_rich_block_type.html",
+      "path": "api/enums/input_rich_block_type.md",
+      "bytes": 1085,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/input_story_content_type",
+      "title": "InputStoryContentType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/input_story_content_type.html",
+      "path": "api/enums/input_story_content_type.md",
+      "bytes": 551,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/keyboard_button_poll_type_type",
+      "title": "KeyboardButtonPollTypeType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/keyboard_button_poll_type_type.html",
+      "path": "api/enums/keyboard_button_poll_type_type.md",
+      "bytes": 647,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/mask_position_point",
+      "title": "MaskPositionPoint",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/mask_position_point.html",
+      "path": "api/enums/mask_position_point.md",
+      "bytes": 577,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/menu_button_type",
+      "title": "MenuButtonType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/menu_button_type.html",
+      "path": "api/enums/menu_button_type.md",
+      "bytes": 536,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/message_entity_type",
+      "title": "MessageEntityType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/message_entity_type.html",
+      "path": "api/enums/message_entity_type.md",
+      "bytes": 1066,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/message_origin_type",
+      "title": "MessageOriginType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/message_origin_type.html",
+      "path": "api/enums/message_origin_type.md",
+      "bytes": 566,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/owned_gift_type",
+      "title": "OwnedGiftType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/owned_gift_type.html",
+      "path": "api/enums/owned_gift_type.md",
+      "bytes": 485,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/paid_media_type",
+      "title": "PaidMediaType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/paid_media_type.html",
+      "path": "api/enums/paid_media_type.md",
+      "bytes": 562,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/parse_mode",
+      "title": "ParseMode",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/parse_mode.html",
+      "path": "api/enums/parse_mode.md",
+      "bytes": 483,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/passport_element_error_type",
+      "title": "PassportElementErrorType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/passport_element_error_type.html",
+      "path": "api/enums/passport_element_error_type.md",
+      "bytes": 804,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/poll_type",
+      "title": "PollType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/poll_type.html",
+      "path": "api/enums/poll_type.md",
+      "bytes": 442,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/reaction_type_type",
+      "title": "ReactionTypeType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/reaction_type_type.html",
+      "path": "api/enums/reaction_type_type.md",
+      "bytes": 531,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/revenue_withdrawal_state_type",
+      "title": "RevenueWithdrawalStateType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/revenue_withdrawal_state_type.html",
+      "path": "api/enums/revenue_withdrawal_state_type.md",
+      "bytes": 613,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/rich_block_type",
+      "title": "RichBlockType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/rich_block_type.html",
+      "path": "api/enums/rich_block_type.md",
+      "bytes": 1040,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/rich_text_type",
+      "title": "RichTextType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/rich_text_type.html",
+      "path": "api/enums/rich_text_type.md",
+      "bytes": 1238,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/sticker_format",
+      "title": "StickerFormat",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/sticker_format.html",
+      "path": "api/enums/sticker_format.md",
+      "bytes": 500,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/sticker_type",
+      "title": "StickerType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/sticker_type.html",
+      "path": "api/enums/sticker_type.md",
+      "bytes": 535,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/story_area_type_type",
+      "title": "StoryAreaTypeType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/story_area_type_type.html",
+      "path": "api/enums/story_area_type_type.md",
+      "bytes": 630,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/topic_icon_color",
+      "title": "TopicIconColor",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/topic_icon_color.html",
+      "path": "api/enums/topic_icon_color.md",
+      "bytes": 678,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/transaction_partner_type",
+      "title": "TransactionPartnerType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/transaction_partner_type.html",
+      "path": "api/enums/transaction_partner_type.md",
+      "bytes": 717,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/transaction_partner_user_transaction_type_enum",
+      "title": "TransactionPartnerUserTransactionTypeEnum",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/transaction_partner_user_transaction_type_enum.html",
+      "path": "api/enums/transaction_partner_user_transaction_type_enum.md",
+      "bytes": 874,
+      "status": 200
+    },
+    {
+      "docname": "api/enums/update_type",
+      "title": "UpdateType",
+      "url": "https://docs.aiogram.dev/en/latest/api/enums/update_type.html",
+      "path": "api/enums/update_type.md",
+      "bytes": 1560,
+      "status": 200
+    },
+    {
+      "docname": "api/index",
+      "title": "Bot API",
+      "url": "https://docs.aiogram.dev/en/latest/api/index.html",
+      "path": "api/index.md",
+      "bytes": 671101,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/add_sticker_to_set",
+      "title": "addStickerToSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/add_sticker_to_set.html",
+      "path": "api/methods/add_sticker_to_set.md",
+      "bytes": 1524,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/answer_callback_query",
+      "title": "answerCallbackQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/answer_callback_query.html",
+      "path": "api/methods/answer_callback_query.md",
+      "bytes": 2785,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/answer_chat_join_request_query",
+      "title": "answerChatJoinRequestQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/answer_chat_join_request_query.html",
+      "path": "api/methods/answer_chat_join_request_query.md",
+      "bytes": 1608,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/answer_guest_query",
+      "title": "answerGuestQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/answer_guest_query.html",
+      "path": "api/methods/answer_guest_query.md",
+      "bytes": 10150,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/answer_inline_query",
+      "title": "answerInlineQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/answer_inline_query.html",
+      "path": "api/methods/answer_inline_query.md",
+      "bytes": 7757,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/answer_pre_checkout_query",
+      "title": "answerPreCheckoutQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/answer_pre_checkout_query.html",
+      "path": "api/methods/answer_pre_checkout_query.md",
+      "bytes": 2293,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/answer_shipping_query",
+      "title": "answerShippingQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/answer_shipping_query.html",
+      "path": "api/methods/answer_shipping_query.md",
+      "bytes": 2456,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/answer_web_app_query",
+      "title": "answerWebAppQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/answer_web_app_query.html",
+      "path": "api/methods/answer_web_app_query.md",
+      "bytes": 5812,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/approve_chat_join_request",
+      "title": "approveChatJoinRequest",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/approve_chat_join_request.html",
+      "path": "api/methods/approve_chat_join_request.md",
+      "bytes": 1514,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/approve_suggested_post",
+      "title": "approveSuggestedPost",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/approve_suggested_post.html",
+      "path": "api/methods/approve_suggested_post.md",
+      "bytes": 1547,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/ban_chat_member",
+      "title": "banChatMember",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/ban_chat_member.html",
+      "path": "api/methods/ban_chat_member.md",
+      "bytes": 2180,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/ban_chat_sender_chat",
+      "title": "banChatSenderChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/ban_chat_sender_chat.html",
+      "path": "api/methods/ban_chat_sender_chat.md",
+      "bytes": 1633,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/close",
+      "title": "close",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/close.html",
+      "path": "api/methods/close.md",
+      "bytes": 961,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/close_forum_topic",
+      "title": "closeForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/close_forum_topic.html",
+      "path": "api/methods/close_forum_topic.md",
+      "bytes": 1288,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/close_general_forum_topic",
+      "title": "closeGeneralForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/close_general_forum_topic.html",
+      "path": "api/methods/close_general_forum_topic.md",
+      "bytes": 1221,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/convert_gift_to_stars",
+      "title": "convertGiftToStars",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/convert_gift_to_stars.html",
+      "path": "api/methods/convert_gift_to_stars.md",
+      "bytes": 1178,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/copy_message",
+      "title": "copyMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/copy_message.html",
+      "path": "api/methods/copy_message.md",
+      "bytes": 7008,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/copy_messages",
+      "title": "copyMessages",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/copy_messages.html",
+      "path": "api/methods/copy_messages.md",
+      "bytes": 3229,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/create_chat_invite_link",
+      "title": "createChatInviteLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/create_chat_invite_link.html",
+      "path": "api/methods/create_chat_invite_link.md",
+      "bytes": 2536,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/create_chat_subscription_invite_link",
+      "title": "createChatSubscriptionInviteLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/create_chat_subscription_invite_link.html",
+      "path": "api/methods/create_chat_subscription_invite_link.md",
+      "bytes": 2703,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/create_forum_topic",
+      "title": "createForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/create_forum_topic.html",
+      "path": "api/methods/create_forum_topic.md",
+      "bytes": 2168,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/create_invoice_link",
+      "title": "createInvoiceLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/create_invoice_link.html",
+      "path": "api/methods/create_invoice_link.md",
+      "bytes": 6182,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/create_new_sticker_set",
+      "title": "createNewStickerSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/create_new_sticker_set.html",
+      "path": "api/methods/create_new_sticker_set.md",
+      "bytes": 2644,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/decline_chat_join_request",
+      "title": "declineChatJoinRequest",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/decline_chat_join_request.html",
+      "path": "api/methods/decline_chat_join_request.md",
+      "bytes": 1514,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/decline_suggested_post",
+      "title": "declineSuggestedPost",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/decline_suggested_post.html",
+      "path": "api/methods/decline_suggested_post.md",
+      "bytes": 1338,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_all_message_reactions",
+      "title": "deleteAllMessageReactions",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_all_message_reactions.html",
+      "path": "api/methods/delete_all_message_reactions.md",
+      "bytes": 1581,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_business_messages",
+      "title": "deleteBusinessMessages",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_business_messages.html",
+      "path": "api/methods/delete_business_messages.md",
+      "bytes": 1628,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_chat_photo",
+      "title": "deleteChatPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_chat_photo.html",
+      "path": "api/methods/delete_chat_photo.md",
+      "bytes": 1305,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_chat_sticker_set",
+      "title": "deleteChatStickerSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_chat_sticker_set.html",
+      "path": "api/methods/delete_chat_sticker_set.md",
+      "bytes": 1600,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_ephemeral_message",
+      "title": "deleteEphemeralMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_ephemeral_message.html",
+      "path": "api/methods/delete_ephemeral_message.md",
+      "bytes": 1616,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_forum_topic",
+      "title": "deleteForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_forum_topic.html",
+      "path": "api/methods/delete_forum_topic.md",
+      "bytes": 1355,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_message",
+      "title": "deleteMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_message.html",
+      "path": "api/methods/delete_message.md",
+      "bytes": 2299,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_message_reaction",
+      "title": "deleteMessageReaction",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_message_reaction.html",
+      "path": "api/methods/delete_message_reaction.md",
+      "bytes": 1572,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_messages",
+      "title": "deleteMessages",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_messages.html",
+      "path": "api/methods/delete_messages.md",
+      "bytes": 1402,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_my_commands",
+      "title": "deleteMyCommands",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_my_commands.html",
+      "path": "api/methods/delete_my_commands.md",
+      "bytes": 3373,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_sticker_from_set",
+      "title": "deleteStickerFromSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_sticker_from_set.html",
+      "path": "api/methods/delete_sticker_from_set.md",
+      "bytes": 1187,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_sticker_set",
+      "title": "deleteStickerSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_sticker_set.html",
+      "path": "api/methods/delete_sticker_set.md",
+      "bytes": 906,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_story",
+      "title": "deleteStory",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_story.html",
+      "path": "api/methods/delete_story.md",
+      "bytes": 1063,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/delete_webhook",
+      "title": "deleteWebhook",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/delete_webhook.html",
+      "path": "api/methods/delete_webhook.md",
+      "bytes": 1094,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_chat_invite_link",
+      "title": "editChatInviteLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_chat_invite_link.html",
+      "path": "api/methods/edit_chat_invite_link.md",
+      "bytes": 2332,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_chat_subscription_invite_link",
+      "title": "editChatSubscriptionInviteLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_chat_subscription_invite_link.html",
+      "path": "api/methods/edit_chat_subscription_invite_link.md",
+      "bytes": 1642,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_ephemeral_message_caption",
+      "title": "editEphemeralMessageCaption",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_ephemeral_message_caption.html",
+      "path": "api/methods/edit_ephemeral_message_caption.md",
+      "bytes": 3069,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_ephemeral_message_media",
+      "title": "editEphemeralMessageMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_ephemeral_message_media.html",
+      "path": "api/methods/edit_ephemeral_message_media.md",
+      "bytes": 4433,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_ephemeral_message_reply_markup",
+      "title": "editEphemeralMessageReplyMarkup",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_ephemeral_message_reply_markup.html",
+      "path": "api/methods/edit_ephemeral_message_reply_markup.md",
+      "bytes": 2322,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_ephemeral_message_text",
+      "title": "editEphemeralMessageText",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_ephemeral_message_text.html",
+      "path": "api/methods/edit_ephemeral_message_text.md",
+      "bytes": 3429,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_forum_topic",
+      "title": "editForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_forum_topic.html",
+      "path": "api/methods/edit_forum_topic.md",
+      "bytes": 2066,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_general_forum_topic",
+      "title": "editGeneralForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_general_forum_topic.html",
+      "path": "api/methods/edit_general_forum_topic.md",
+      "bytes": 1287,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_message_caption",
+      "title": "editMessageCaption",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_message_caption.html",
+      "path": "api/methods/edit_message_caption.md",
+      "bytes": 3742,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_message_checklist",
+      "title": "editMessageChecklist",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_message_checklist.html",
+      "path": "api/methods/edit_message_checklist.md",
+      "bytes": 2373,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_message_live_location",
+      "title": "editMessageLiveLocation",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_message_live_location.html",
+      "path": "api/methods/edit_message_live_location.md",
+      "bytes": 4187,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_message_media",
+      "title": "editMessageMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_message_media.html",
+      "path": "api/methods/edit_message_media.md",
+      "bytes": 4234,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_message_reply_markup",
+      "title": "editMessageReplyMarkup",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_message_reply_markup.html",
+      "path": "api/methods/edit_message_reply_markup.md",
+      "bytes": 3021,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_message_text",
+      "title": "editMessageText",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_message_text.html",
+      "path": "api/methods/edit_message_text.md",
+      "bytes": 4641,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_story",
+      "title": "editStory",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_story.html",
+      "path": "api/methods/edit_story.md",
+      "bytes": 2775,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/edit_user_star_subscription",
+      "title": "editUserStarSubscription",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/edit_user_star_subscription.html",
+      "path": "api/methods/edit_user_star_subscription.md",
+      "bytes": 1498,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/export_chat_invite_link",
+      "title": "exportChatInviteLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/export_chat_invite_link.html",
+      "path": "api/methods/export_chat_invite_link.md",
+      "bytes": 2297,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/forward_message",
+      "title": "forwardMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/forward_message.html",
+      "path": "api/methods/forward_message.md",
+      "bytes": 3510,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/forward_messages",
+      "title": "forwardMessages",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/forward_messages.html",
+      "path": "api/methods/forward_messages.md",
+      "bytes": 2709,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_available_gifts",
+      "title": "getAvailableGifts",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_available_gifts.html",
+      "path": "api/methods/get_available_gifts.md",
+      "bytes": 915,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_business_account_gifts",
+      "title": "getBusinessAccountGifts",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_business_account_gifts.html",
+      "path": "api/methods/get_business_account_gifts.md",
+      "bytes": 3212,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_business_account_star_balance",
+      "title": "getBusinessAccountStarBalance",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_business_account_star_balance.html",
+      "path": "api/methods/get_business_account_star_balance.md",
+      "bytes": 1266,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_business_connection",
+      "title": "getBusinessConnection",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_business_connection.html",
+      "path": "api/methods/get_business_connection.md",
+      "bytes": 1215,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_chat",
+      "title": "getChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_chat.html",
+      "path": "api/methods/get_chat.md",
+      "bytes": 1021,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_chat_administrators",
+      "title": "getChatAdministrators",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_chat_administrators.html",
+      "path": "api/methods/get_chat_administrators.md",
+      "bytes": 1615,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_chat_gifts",
+      "title": "getChatGifts",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_chat_gifts.html",
+      "path": "api/methods/get_chat_gifts.md",
+      "bytes": 2949,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_chat_member",
+      "title": "getChatMember",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_chat_member.html",
+      "path": "api/methods/get_chat_member.md",
+      "bytes": 1453,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_chat_member_count",
+      "title": "getChatMemberCount",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_chat_member_count.html",
+      "path": "api/methods/get_chat_member_count.md",
+      "bytes": 1150,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_chat_menu_button",
+      "title": "getChatMenuButton",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_chat_menu_button.html",
+      "path": "api/methods/get_chat_menu_button.md",
+      "bytes": 1203,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_custom_emoji_stickers",
+      "title": "getCustomEmojiStickers",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_custom_emoji_stickers.html",
+      "path": "api/methods/get_custom_emoji_stickers.md",
+      "bytes": 1189,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_file",
+      "title": "getFile",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_file.html",
+      "path": "api/methods/get_file.md",
+      "bytes": 1510,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_forum_topic_icon_stickers",
+      "title": "getForumTopicIconStickers",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_forum_topic_icon_stickers.html",
+      "path": "api/methods/get_forum_topic_icon_stickers.md",
+      "bytes": 1079,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_game_high_scores",
+      "title": "getGameHighScores",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_game_high_scores.html",
+      "path": "api/methods/get_game_high_scores.md",
+      "bytes": 1875,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_managed_bot_access_settings",
+      "title": "getManagedBotAccessSettings",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_managed_bot_access_settings.html",
+      "path": "api/methods/get_managed_bot_access_settings.md",
+      "bytes": 1253,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_managed_bot_token",
+      "title": "getManagedBotToken",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_managed_bot_token.html",
+      "path": "api/methods/get_managed_bot_token.md",
+      "bytes": 903,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_me",
+      "title": "getMe",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_me.html",
+      "path": "api/methods/get_me.md",
+      "bytes": 792,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_my_commands",
+      "title": "getMyCommands",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_my_commands.html",
+      "path": "api/methods/get_my_commands.md",
+      "bytes": 3226,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_my_default_administrator_rights",
+      "title": "getMyDefaultAdministratorRights",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_my_default_administrator_rights.html",
+      "path": "api/methods/get_my_default_administrator_rights.md",
+      "bytes": 1489,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_my_description",
+      "title": "getMyDescription",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_my_description.html",
+      "path": "api/methods/get_my_description.md",
+      "bytes": 1113,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_my_name",
+      "title": "getMyName",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_my_name.html",
+      "path": "api/methods/get_my_name.md",
+      "bytes": 959,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_my_short_description",
+      "title": "getMyShortDescription",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_my_short_description.html",
+      "path": "api/methods/get_my_short_description.md",
+      "bytes": 1233,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_my_star_balance",
+      "title": "getMyStarBalance",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_my_star_balance.html",
+      "path": "api/methods/get_my_star_balance.md",
+      "bytes": 956,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_star_transactions",
+      "title": "getStarTransactions",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_star_transactions.html",
+      "path": "api/methods/get_star_transactions.md",
+      "bytes": 1308,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_sticker_set",
+      "title": "getStickerSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_sticker_set.html",
+      "path": "api/methods/get_sticker_set.md",
+      "bytes": 941,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_updates",
+      "title": "getUpdates",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_updates.html",
+      "path": "api/methods/get_updates.md",
+      "bytes": 2791,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_user_chat_boosts",
+      "title": "getUserChatBoosts",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_user_chat_boosts.html",
+      "path": "api/methods/get_user_chat_boosts.md",
+      "bytes": 1251,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_user_gifts",
+      "title": "getUserGifts",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_user_gifts.html",
+      "path": "api/methods/get_user_gifts.md",
+      "bytes": 2376,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_user_personal_chat_messages",
+      "title": "getUserPersonalChatMessages",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_user_personal_chat_messages.html",
+      "path": "api/methods/get_user_personal_chat_messages.md",
+      "bytes": 1300,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_user_profile_audios",
+      "title": "getUserProfileAudios",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_user_profile_audios.html",
+      "path": "api/methods/get_user_profile_audios.md",
+      "bytes": 1629,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_user_profile_photos",
+      "title": "getUserProfilePhotos",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_user_profile_photos.html",
+      "path": "api/methods/get_user_profile_photos.md",
+      "bytes": 1631,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/get_webhook_info",
+      "title": "getWebhookInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/get_webhook_info.html",
+      "path": "api/methods/get_webhook_info.md",
+      "bytes": 1135,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/gift_premium_subscription",
+      "title": "giftPremiumSubscription",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/gift_premium_subscription.html",
+      "path": "api/methods/gift_premium_subscription.md",
+      "bytes": 2549,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/hide_general_forum_topic",
+      "title": "hideGeneralForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/hide_general_forum_topic.html",
+      "path": "api/methods/hide_general_forum_topic.md",
+      "bytes": 1259,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/index",
+      "title": "Methods",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/index.html",
+      "path": "api/methods/index.md",
+      "bytes": 9549,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/leave_chat",
+      "title": "leaveChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/leave_chat.html",
+      "path": "api/methods/leave_chat.md",
+      "bytes": 1183,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/log_out",
+      "title": "logOut",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/log_out.html",
+      "path": "api/methods/log_out.md",
+      "bytes": 1040,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/pin_chat_message",
+      "title": "pinChatMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/pin_chat_message.html",
+      "path": "api/methods/pin_chat_message.md",
+      "bytes": 2098,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/post_story",
+      "title": "postStory",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/post_story.html",
+      "path": "api/methods/post_story.md",
+      "bytes": 3168,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/promote_chat_member",
+      "title": "promoteChatMember",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/promote_chat_member.html",
+      "path": "api/methods/promote_chat_member.md",
+      "bytes": 4915,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/read_business_message",
+      "title": "readBusinessMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/read_business_message.html",
+      "path": "api/methods/read_business_message.md",
+      "bytes": 1353,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/refund_star_payment",
+      "title": "refundStarPayment",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/refund_star_payment.html",
+      "path": "api/methods/refund_star_payment.md",
+      "bytes": 1077,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/remove_business_account_profile_photo",
+      "title": "removeBusinessAccountProfilePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/remove_business_account_profile_photo.html",
+      "path": "api/methods/remove_business_account_profile_photo.md",
+      "bytes": 1541,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/remove_chat_verification",
+      "title": "removeChatVerification",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/remove_chat_verification.html",
+      "path": "api/methods/remove_chat_verification.md",
+      "bytes": 1187,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/remove_my_profile_photo",
+      "title": "removeMyProfilePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/remove_my_profile_photo.html",
+      "path": "api/methods/remove_my_profile_photo.md",
+      "bytes": 891,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/remove_user_verification",
+      "title": "removeUserVerification",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/remove_user_verification.html",
+      "path": "api/methods/remove_user_verification.md",
+      "bytes": 1104,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/reopen_forum_topic",
+      "title": "reopenForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/reopen_forum_topic.html",
+      "path": "api/methods/reopen_forum_topic.md",
+      "bytes": 1302,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/reopen_general_forum_topic",
+      "title": "reopenGeneralForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/reopen_general_forum_topic.html",
+      "path": "api/methods/reopen_general_forum_topic.md",
+      "bytes": 1294,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/replace_managed_bot_token",
+      "title": "replaceManagedBotToken",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/replace_managed_bot_token.html",
+      "path": "api/methods/replace_managed_bot_token.md",
+      "bytes": 1068,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/replace_sticker_in_set",
+      "title": "replaceStickerInSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/replace_sticker_in_set.html",
+      "path": "api/methods/replace_sticker_in_set.md",
+      "bytes": 2284,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/repost_story",
+      "title": "repostStory",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/repost_story.html",
+      "path": "api/methods/repost_story.md",
+      "bytes": 1986,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/restrict_chat_member",
+      "title": "restrictChatMember",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/restrict_chat_member.html",
+      "path": "api/methods/restrict_chat_member.md",
+      "bytes": 2656,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/revoke_chat_invite_link",
+      "title": "revokeChatInviteLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/revoke_chat_invite_link.html",
+      "path": "api/methods/revoke_chat_invite_link.md",
+      "bytes": 1734,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/save_prepared_inline_message",
+      "title": "savePreparedInlineMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/save_prepared_inline_message.html",
+      "path": "api/methods/save_prepared_inline_message.md",
+      "bytes": 6388,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/save_prepared_keyboard_button",
+      "title": "savePreparedKeyboardButton",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/save_prepared_keyboard_button.html",
+      "path": "api/methods/save_prepared_keyboard_button.md",
+      "bytes": 1823,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_animation",
+      "title": "sendAnimation",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_animation.html",
+      "path": "api/methods/send_animation.md",
+      "bytes": 9892,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_audio",
+      "title": "sendAudio",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_audio.html",
+      "path": "api/methods/send_audio.md",
+      "bytes": 9530,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_chat_action",
+      "title": "sendChatAction",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_chat_action.html",
+      "path": "api/methods/send_chat_action.md",
+      "bytes": 3204,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_chat_join_request_web_app",
+      "title": "sendChatJoinRequestWebApp",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_chat_join_request_web_app.html",
+      "path": "api/methods/send_chat_join_request_web_app.md",
+      "bytes": 1986,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_checklist",
+      "title": "sendChecklist",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_checklist.html",
+      "path": "api/methods/send_checklist.md",
+      "bytes": 3082,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_contact",
+      "title": "sendContact",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_contact.html",
+      "path": "api/methods/send_contact.md",
+      "bytes": 7389,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_dice",
+      "title": "sendDice",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_dice.html",
+      "path": "api/methods/send_dice.md",
+      "bytes": 6666,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_document",
+      "title": "sendDocument",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_document.html",
+      "path": "api/methods/send_document.md",
+      "bytes": 9344,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_game",
+      "title": "sendGame",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_game.html",
+      "path": "api/methods/send_game.md",
+      "bytes": 5619,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_gift",
+      "title": "sendGift",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_gift.html",
+      "path": "api/methods/send_gift.md",
+      "bytes": 2620,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_invoice",
+      "title": "sendInvoice",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_invoice.html",
+      "path": "api/methods/send_invoice.md",
+      "bytes": 11036,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_live_photo",
+      "title": "sendLivePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_live_photo.html",
+      "path": "api/methods/send_live_photo.md",
+      "bytes": 8425,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_location",
+      "title": "sendLocation",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_location.html",
+      "path": "api/methods/send_location.md",
+      "bytes": 8079,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_media_group",
+      "title": "sendMediaGroup",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_media_group.html",
+      "path": "api/methods/send_media_group.md",
+      "bytes": 5890,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_message",
+      "title": "sendMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_message.html",
+      "path": "api/methods/send_message.md",
+      "bytes": 8315,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_message_draft",
+      "title": "sendMessageDraft",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_message_draft.html",
+      "path": "api/methods/send_message_draft.md",
+      "bytes": 2466,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_paid_media",
+      "title": "sendPaidMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_paid_media.html",
+      "path": "api/methods/send_paid_media.md",
+      "bytes": 7792,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_photo",
+      "title": "sendPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_photo.html",
+      "path": "api/methods/send_photo.md",
+      "bytes": 8668,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_poll",
+      "title": "sendPoll",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_poll.html",
+      "path": "api/methods/send_poll.md",
+      "bytes": 12557,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_rich_message",
+      "title": "sendRichMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_rich_message.html",
+      "path": "api/methods/send_rich_message.md",
+      "bytes": 6925,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_rich_message_draft",
+      "title": "sendRichMessageDraft",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_rich_message_draft.html",
+      "path": "api/methods/send_rich_message_draft.md",
+      "bytes": 2128,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_sticker",
+      "title": "sendSticker",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_sticker.html",
+      "path": "api/methods/send_sticker.md",
+      "bytes": 7742,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_venue",
+      "title": "sendVenue",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_venue.html",
+      "path": "api/methods/send_venue.md",
+      "bytes": 7858,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_video",
+      "title": "sendVideo",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_video.html",
+      "path": "api/methods/send_video.md",
+      "bytes": 10660,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_video_note",
+      "title": "sendVideoNote",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_video_note.html",
+      "path": "api/methods/send_video_note.md",
+      "bytes": 8607,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/send_voice",
+      "title": "sendVoice",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/send_voice.html",
+      "path": "api/methods/send_voice.md",
+      "bytes": 8766,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_business_account_bio",
+      "title": "setBusinessAccountBio",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_business_account_bio.html",
+      "path": "api/methods/set_business_account_bio.md",
+      "bytes": 1188,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_business_account_gift_settings",
+      "title": "setBusinessAccountGiftSettings",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_business_account_gift_settings.html",
+      "path": "api/methods/set_business_account_gift_settings.md",
+      "bytes": 1844,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_business_account_name",
+      "title": "setBusinessAccountName",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_business_account_name.html",
+      "path": "api/methods/set_business_account_name.md",
+      "bytes": 1358,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_business_account_profile_photo",
+      "title": "setBusinessAccountProfilePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_business_account_profile_photo.html",
+      "path": "api/methods/set_business_account_profile_photo.md",
+      "bytes": 1943,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_business_account_username",
+      "title": "setBusinessAccountUsername",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_business_account_username.html",
+      "path": "api/methods/set_business_account_username.md",
+      "bytes": 1272,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_chat_administrator_custom_title",
+      "title": "setChatAdministratorCustomTitle",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_chat_administrator_custom_title.html",
+      "path": "api/methods/set_chat_administrator_custom_title.md",
+      "bytes": 1675,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_chat_description",
+      "title": "setChatDescription",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_chat_description.html",
+      "path": "api/methods/set_chat_description.md",
+      "bytes": 1458,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_chat_member_tag",
+      "title": "setChatMemberTag",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_chat_member_tag.html",
+      "path": "api/methods/set_chat_member_tag.md",
+      "bytes": 1528,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_chat_menu_button",
+      "title": "setChatMenuButton",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_chat_menu_button.html",
+      "path": "api/methods/set_chat_menu_button.md",
+      "bytes": 1992,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_chat_permissions",
+      "title": "setChatPermissions",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_chat_permissions.html",
+      "path": "api/methods/set_chat_permissions.md",
+      "bytes": 2269,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_chat_photo",
+      "title": "setChatPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_chat_photo.html",
+      "path": "api/methods/set_chat_photo.md",
+      "bytes": 1507,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_chat_sticker_set",
+      "title": "setChatStickerSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_chat_sticker_set.html",
+      "path": "api/methods/set_chat_sticker_set.md",
+      "bytes": 1676,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_chat_title",
+      "title": "setChatTitle",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_chat_title.html",
+      "path": "api/methods/set_chat_title.md",
+      "bytes": 1340,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_custom_emoji_sticker_set_thumbnail",
+      "title": "setCustomEmojiStickerSetThumbnail",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_custom_emoji_sticker_set_thumbnail.html",
+      "path": "api/methods/set_custom_emoji_sticker_set_thumbnail.md",
+      "bytes": 1350,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_game_score",
+      "title": "setGameScore",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_game_score.html",
+      "path": "api/methods/set_game_score.md",
+      "bytes": 2132,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_managed_bot_access_settings",
+      "title": "setManagedBotAccessSettings",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_managed_bot_access_settings.html",
+      "path": "api/methods/set_managed_bot_access_settings.md",
+      "bytes": 1521,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_message_reaction",
+      "title": "setMessageReaction",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_message_reaction.html",
+      "path": "api/methods/set_message_reaction.md",
+      "bytes": 3339,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_my_commands",
+      "title": "setMyCommands",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_my_commands.html",
+      "path": "api/methods/set_my_commands.md",
+      "bytes": 3672,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_my_default_administrator_rights",
+      "title": "setMyDefaultAdministratorRights",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_my_default_administrator_rights.html",
+      "path": "api/methods/set_my_default_administrator_rights.md",
+      "bytes": 2054,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_my_description",
+      "title": "setMyDescription",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_my_description.html",
+      "path": "api/methods/set_my_description.md",
+      "bytes": 1310,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_my_name",
+      "title": "setMyName",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_my_name.html",
+      "path": "api/methods/set_my_name.md",
+      "bytes": 1112,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_my_profile_photo",
+      "title": "setMyProfilePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_my_profile_photo.html",
+      "path": "api/methods/set_my_profile_photo.md",
+      "bytes": 1335,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_my_short_description",
+      "title": "setMyShortDescription",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_my_short_description.html",
+      "path": "api/methods/set_my_short_description.md",
+      "bytes": 1467,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_passport_data_errors",
+      "title": "setPassportDataErrors",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_passport_data_errors.html",
+      "path": "api/methods/set_passport_data_errors.md",
+      "bytes": 3877,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_sticker_emoji_list",
+      "title": "setStickerEmojiList",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_sticker_emoji_list.html",
+      "path": "api/methods/set_sticker_emoji_list.md",
+      "bytes": 1177,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_sticker_keywords",
+      "title": "setStickerKeywords",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_sticker_keywords.html",
+      "path": "api/methods/set_sticker_keywords.md",
+      "bytes": 1214,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_sticker_mask_position",
+      "title": "setStickerMaskPosition",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_sticker_mask_position.html",
+      "path": "api/methods/set_sticker_mask_position.md",
+      "bytes": 1575,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_sticker_position_in_set",
+      "title": "setStickerPositionInSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_sticker_position_in_set.html",
+      "path": "api/methods/set_sticker_position_in_set.md",
+      "bytes": 1349,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_sticker_set_thumbnail",
+      "title": "setStickerSetThumbnail",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_sticker_set_thumbnail.html",
+      "path": "api/methods/set_sticker_set_thumbnail.md",
+      "bytes": 2831,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_sticker_set_title",
+      "title": "setStickerSetTitle",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_sticker_set_title.html",
+      "path": "api/methods/set_sticker_set_title.md",
+      "bytes": 1000,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_user_emoji_status",
+      "title": "setUserEmojiStatus",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_user_emoji_status.html",
+      "path": "api/methods/set_user_emoji_status.md",
+      "bytes": 1495,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/set_webhook",
+      "title": "setWebhook",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/set_webhook.html",
+      "path": "api/methods/set_webhook.md",
+      "bytes": 4426,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/stop_message_live_location",
+      "title": "stopMessageLiveLocation",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/stop_message_live_location.html",
+      "path": "api/methods/stop_message_live_location.md",
+      "bytes": 2731,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/stop_poll",
+      "title": "stopPoll",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/stop_poll.html",
+      "path": "api/methods/stop_poll.md",
+      "bytes": 1858,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/transfer_business_account_stars",
+      "title": "transferBusinessAccountStars",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/transfer_business_account_stars.html",
+      "path": "api/methods/transfer_business_account_stars.md",
+      "bytes": 1283,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/transfer_gift",
+      "title": "transferGift",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/transfer_gift.html",
+      "path": "api/methods/transfer_gift.md",
+      "bytes": 1565,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/unban_chat_member",
+      "title": "unbanChatMember",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/unban_chat_member.html",
+      "path": "api/methods/unban_chat_member.md",
+      "bytes": 1804,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/unban_chat_sender_chat",
+      "title": "unbanChatSenderChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/unban_chat_sender_chat.html",
+      "path": "api/methods/unban_chat_sender_chat.md",
+      "bytes": 1464,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/unhide_general_forum_topic",
+      "title": "unhideGeneralForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/unhide_general_forum_topic.html",
+      "path": "api/methods/unhide_general_forum_topic.md",
+      "bytes": 1230,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/unpin_all_chat_messages",
+      "title": "unpinAllChatMessages",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/unpin_all_chat_messages.html",
+      "path": "api/methods/unpin_all_chat_messages.md",
+      "bytes": 1555,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/unpin_all_forum_topic_messages",
+      "title": "unpinAllForumTopicMessages",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/unpin_all_forum_topic_messages.html",
+      "path": "api/methods/unpin_all_forum_topic_messages.md",
+      "bytes": 1501,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/unpin_all_general_forum_topic_messages",
+      "title": "unpinAllGeneralForumTopicMessages",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/unpin_all_general_forum_topic_messages.html",
+      "path": "api/methods/unpin_all_general_forum_topic_messages.md",
+      "bytes": 1633,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/unpin_chat_message",
+      "title": "unpinChatMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/unpin_chat_message.html",
+      "path": "api/methods/unpin_chat_message.md",
+      "bytes": 2029,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/upgrade_gift",
+      "title": "upgradeGift",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/upgrade_gift.html",
+      "path": "api/methods/upgrade_gift.md",
+      "bytes": 1690,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/upload_sticker_file",
+      "title": "uploadStickerFile",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/upload_sticker_file.html",
+      "path": "api/methods/upload_sticker_file.md",
+      "bytes": 2341,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/verify_chat",
+      "title": "verifyChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/verify_chat.html",
+      "path": "api/methods/verify_chat.md",
+      "bytes": 1306,
+      "status": 200
+    },
+    {
+      "docname": "api/methods/verify_user",
+      "title": "verifyUser",
+      "url": "https://docs.aiogram.dev/en/latest/api/methods/verify_user.html",
+      "path": "api/methods/verify_user.md",
+      "bytes": 1161,
+      "status": 200
+    },
+    {
+      "docname": "api/session/aiohttp",
+      "title": "aiohttp",
+      "url": "https://docs.aiogram.dev/en/latest/api/session/aiohttp.html",
+      "path": "api/session/aiohttp.md",
+      "bytes": 2531,
+      "status": 200
+    },
+    {
+      "docname": "api/session/base",
+      "title": "Base",
+      "url": "https://docs.aiogram.dev/en/latest/api/session/base.html",
+      "path": "api/session/base.md",
+      "bytes": 1796,
+      "status": 200
+    },
+    {
+      "docname": "api/session/custom_server",
+      "title": "Use Custom API server",
+      "url": "https://docs.aiogram.dev/en/latest/api/session/custom_server.html",
+      "path": "api/session/custom_server.md",
+      "bytes": 1915,
+      "status": 200
+    },
+    {
+      "docname": "api/session/index",
+      "title": "Client session",
+      "url": "https://docs.aiogram.dev/en/latest/api/session/index.html",
+      "path": "api/session/index.md",
+      "bytes": 2570,
+      "status": 200
+    },
+    {
+      "docname": "api/session/middleware",
+      "title": "Client session middlewares",
+      "url": "https://docs.aiogram.dev/en/latest/api/session/middleware.html",
+      "path": "api/session/middleware.md",
+      "bytes": 2655,
+      "status": 200
+    },
+    {
+      "docname": "api/types/accepted_gift_types",
+      "title": "AcceptedGiftTypes",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/accepted_gift_types.html",
+      "path": "api/types/accepted_gift_types.md",
+      "bytes": 1034,
+      "status": 200
+    },
+    {
+      "docname": "api/types/affiliate_info",
+      "title": "AffiliateInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/affiliate_info.html",
+      "path": "api/types/affiliate_info.md",
+      "bytes": 1598,
+      "status": 200
+    },
+    {
+      "docname": "api/types/animation",
+      "title": "Animation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/animation.html",
+      "path": "api/types/animation.md",
+      "bytes": 1879,
+      "status": 200
+    },
+    {
+      "docname": "api/types/audio",
+      "title": "Audio",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/audio.html",
+      "path": "api/types/audio.md",
+      "bytes": 1981,
+      "status": 200
+    },
+    {
+      "docname": "api/types/background_fill",
+      "title": "BackgroundFill",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/background_fill.html",
+      "path": "api/types/background_fill.md",
+      "bytes": 1153,
+      "status": 200
+    },
+    {
+      "docname": "api/types/background_fill_freeform_gradient",
+      "title": "BackgroundFillFreeformGradient",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/background_fill_freeform_gradient.html",
+      "path": "api/types/background_fill_freeform_gradient.md",
+      "bytes": 826,
+      "status": 200
+    },
+    {
+      "docname": "api/types/background_fill_gradient",
+      "title": "BackgroundFillGradient",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/background_fill_gradient.html",
+      "path": "api/types/background_fill_gradient.md",
+      "bytes": 856,
+      "status": 200
+    },
+    {
+      "docname": "api/types/background_fill_solid",
+      "title": "BackgroundFillSolid",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/background_fill_solid.html",
+      "path": "api/types/background_fill_solid.md",
+      "bytes": 614,
+      "status": 200
+    },
+    {
+      "docname": "api/types/background_type",
+      "title": "BackgroundType",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/background_type.html",
+      "path": "api/types/background_type.md",
+      "bytes": 1293,
+      "status": 200
+    },
+    {
+      "docname": "api/types/background_type_chat_theme",
+      "title": "BackgroundTypeChatTheme",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/background_type_chat_theme.html",
+      "path": "api/types/background_type_chat_theme.md",
+      "bytes": 673,
+      "status": 200
+    },
+    {
+      "docname": "api/types/background_type_fill",
+      "title": "BackgroundTypeFill",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/background_type_fill.html",
+      "path": "api/types/background_type_fill.md",
+      "bytes": 1308,
+      "status": 200
+    },
+    {
+      "docname": "api/types/background_type_pattern",
+      "title": "BackgroundTypePattern",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/background_type_pattern.html",
+      "path": "api/types/background_type_pattern.md",
+      "bytes": 2093,
+      "status": 200
+    },
+    {
+      "docname": "api/types/background_type_wallpaper",
+      "title": "BackgroundTypeWallpaper",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/background_type_wallpaper.html",
+      "path": "api/types/background_type_wallpaper.md",
+      "bytes": 1273,
+      "status": 200
+    },
+    {
+      "docname": "api/types/birthdate",
+      "title": "Birthdate",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/birthdate.html",
+      "path": "api/types/birthdate.md",
+      "bytes": 557,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_access_settings",
+      "title": "BotAccessSettings",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_access_settings.html",
+      "path": "api/types/bot_access_settings.md",
+      "bytes": 854,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_command",
+      "title": "BotCommand",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_command.html",
+      "path": "api/types/bot_command.md",
+      "bytes": 779,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_command_scope",
+      "title": "BotCommandScope",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_command_scope.html",
+      "path": "api/types/bot_command_scope.md",
+      "bytes": 2386,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_command_scope_all_chat_administrators",
+      "title": "BotCommandScopeAllChatAdministrators",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_command_scope_all_chat_administrators.html",
+      "path": "api/types/bot_command_scope_all_chat_administrators.md",
+      "bytes": 834,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_command_scope_all_group_chats",
+      "title": "BotCommandScopeAllGroupChats",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_command_scope_all_group_chats.html",
+      "path": "api/types/bot_command_scope_all_group_chats.md",
+      "bytes": 740,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_command_scope_all_private_chats",
+      "title": "BotCommandScopeAllPrivateChats",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_command_scope_all_private_chats.html",
+      "path": "api/types/bot_command_scope_all_private_chats.md",
+      "bytes": 747,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_command_scope_chat",
+      "title": "BotCommandScopeChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_command_scope_chat.html",
+      "path": "api/types/bot_command_scope_chat.md",
+      "bytes": 848,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_command_scope_chat_administrators",
+      "title": "BotCommandScopeChatAdministrators",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_command_scope_chat_administrators.html",
+      "path": "api/types/bot_command_scope_chat_administrators.md",
+      "bytes": 1037,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_command_scope_chat_member",
+      "title": "BotCommandScopeChatMember",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_command_scope_chat_member.html",
+      "path": "api/types/bot_command_scope_chat_member.md",
+      "bytes": 1028,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_command_scope_default",
+      "title": "BotCommandScopeDefault",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_command_scope_default.html",
+      "path": "api/types/bot_command_scope_default.md",
+      "bytes": 791,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_description",
+      "title": "BotDescription",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_description.html",
+      "path": "api/types/bot_description.md",
+      "bytes": 439,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_name",
+      "title": "BotName",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_name.html",
+      "path": "api/types/bot_name.md",
+      "bytes": 369,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_short_description",
+      "title": "BotShortDescription",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_short_description.html",
+      "path": "api/types/bot_short_description.md",
+      "bytes": 496,
+      "status": 200
+    },
+    {
+      "docname": "api/types/bot_subscription_updated",
+      "title": "BotSubscriptionUpdated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/bot_subscription_updated.html",
+      "path": "api/types/bot_subscription_updated.md",
+      "bytes": 1056,
+      "status": 200
+    },
+    {
+      "docname": "api/types/business_bot_rights",
+      "title": "BusinessBotRights",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/business_bot_rights.html",
+      "path": "api/types/business_bot_rights.md",
+      "bytes": 3283,
+      "status": 200
+    },
+    {
+      "docname": "api/types/business_connection",
+      "title": "BusinessConnection",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/business_connection.html",
+      "path": "api/types/business_connection.md",
+      "bytes": 2023,
+      "status": 200
+    },
+    {
+      "docname": "api/types/business_intro",
+      "title": "BusinessIntro",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/business_intro.html",
+      "path": "api/types/business_intro.md",
+      "bytes": 881,
+      "status": 200
+    },
+    {
+      "docname": "api/types/business_location",
+      "title": "BusinessLocation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/business_location.html",
+      "path": "api/types/business_location.md",
+      "bytes": 747,
+      "status": 200
+    },
+    {
+      "docname": "api/types/business_messages_deleted",
+      "title": "BusinessMessagesDeleted",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/business_messages_deleted.html",
+      "path": "api/types/business_messages_deleted.md",
+      "bytes": 1002,
+      "status": 200
+    },
+    {
+      "docname": "api/types/business_opening_hours",
+      "title": "BusinessOpeningHours",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/business_opening_hours.html",
+      "path": "api/types/business_opening_hours.md",
+      "bytes": 1083,
+      "status": 200
+    },
+    {
+      "docname": "api/types/business_opening_hours_interval",
+      "title": "BusinessOpeningHoursInterval",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/business_opening_hours_interval.html",
+      "path": "api/types/business_opening_hours_interval.md",
+      "bytes": 890,
+      "status": 200
+    },
+    {
+      "docname": "api/types/callback_game",
+      "title": "CallbackGame",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/callback_game.html",
+      "path": "api/types/callback_game.md",
+      "bytes": 405,
+      "status": 200
+    },
+    {
+      "docname": "api/types/callback_query",
+      "title": "CallbackQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/callback_query.html",
+      "path": "api/types/callback_query.md",
+      "bytes": 5600,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat",
+      "title": "Chat",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat.html",
+      "path": "api/types/chat.md",
+      "bytes": 69153,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_administrator_rights",
+      "title": "ChatAdministratorRights",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_administrator_rights.html",
+      "path": "api/types/chat_administrator_rights.md",
+      "bytes": 3647,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_background",
+      "title": "ChatBackground",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_background.html",
+      "path": "api/types/chat_background.md",
+      "bytes": 1149,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_boost",
+      "title": "ChatBoost",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_boost.html",
+      "path": "api/types/chat_boost.md",
+      "bytes": 1504,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_boost_added",
+      "title": "ChatBoostAdded",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_boost_added.html",
+      "path": "api/types/chat_boost_added.md",
+      "bytes": 476,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_boost_removed",
+      "title": "ChatBoostRemoved",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_boost_removed.html",
+      "path": "api/types/chat_boost_removed.md",
+      "bytes": 1481,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_boost_source",
+      "title": "ChatBoostSource",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_boost_source.html",
+      "path": "api/types/chat_boost_source.md",
+      "bytes": 1109,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_boost_source_gift_code",
+      "title": "ChatBoostSourceGiftCode",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_boost_source_gift_code.html",
+      "path": "api/types/chat_boost_source_gift_code.md",
+      "bytes": 968,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_boost_source_giveaway",
+      "title": "ChatBoostSourceGiveaway",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_boost_source_giveaway.html",
+      "path": "api/types/chat_boost_source_giveaway.md",
+      "bytes": 1708,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_boost_source_premium",
+      "title": "ChatBoostSourcePremium",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_boost_source_premium.html",
+      "path": "api/types/chat_boost_source_premium.md",
+      "bytes": 863,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_boost_updated",
+      "title": "ChatBoostUpdated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_boost_updated.html",
+      "path": "api/types/chat_boost_updated.md",
+      "bytes": 845,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_full_info",
+      "title": "ChatFullInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_full_info.html",
+      "path": "api/types/chat_full_info.md",
+      "bytes": 14972,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_invite_link",
+      "title": "ChatInviteLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_invite_link.html",
+      "path": "api/types/chat_invite_link.md",
+      "bytes": 2192,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_join_request",
+      "title": "ChatJoinRequest",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_join_request.html",
+      "path": "api/types/chat_join_request.md",
+      "bytes": 203144,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_location",
+      "title": "ChatLocation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_location.html",
+      "path": "api/types/chat_location.md",
+      "bytes": 763,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_member",
+      "title": "ChatMember",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_member.html",
+      "path": "api/types/chat_member.md",
+      "bytes": 1601,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_member_administrator",
+      "title": "ChatMemberAdministrator",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_member_administrator.html",
+      "path": "api/types/chat_member_administrator.md",
+      "bytes": 4355,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_member_banned",
+      "title": "ChatMemberBanned",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_member_banned.html",
+      "path": "api/types/chat_member_banned.md",
+      "bytes": 1078,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_member_left",
+      "title": "ChatMemberLeft",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_member_left.html",
+      "path": "api/types/chat_member_left.md",
+      "bytes": 831,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_member_member",
+      "title": "ChatMemberMember",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_member_member.html",
+      "path": "api/types/chat_member_member.md",
+      "bytes": 1124,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_member_owner",
+      "title": "ChatMemberOwner",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_member_owner.html",
+      "path": "api/types/chat_member_owner.md",
+      "bytes": 1058,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_member_restricted",
+      "title": "ChatMemberRestricted",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_member_restricted.html",
+      "path": "api/types/chat_member_restricted.md",
+      "bytes": 3386,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_member_updated",
+      "title": "ChatMemberUpdated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_member_updated.html",
+      "path": "api/types/chat_member_updated.md",
+      "bytes": 101210,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_owner_changed",
+      "title": "ChatOwnerChanged",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_owner_changed.html",
+      "path": "api/types/chat_owner_changed.md",
+      "bytes": 599,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_owner_left",
+      "title": "ChatOwnerLeft",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_owner_left.html",
+      "path": "api/types/chat_owner_left.md",
+      "bytes": 689,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_permissions",
+      "title": "ChatPermissions",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_permissions.html",
+      "path": "api/types/chat_permissions.md",
+      "bytes": 3229,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_photo",
+      "title": "ChatPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_photo.html",
+      "path": "api/types/chat_photo.md",
+      "bytes": 1186,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chat_shared",
+      "title": "ChatShared",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chat_shared.html",
+      "path": "api/types/chat_shared.md",
+      "bytes": 1833,
+      "status": 200
+    },
+    {
+      "docname": "api/types/checklist",
+      "title": "Checklist",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/checklist.html",
+      "path": "api/types/checklist.md",
+      "bytes": 1483,
+      "status": 200
+    },
+    {
+      "docname": "api/types/checklist_task",
+      "title": "ChecklistTask",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/checklist_task.html",
+      "path": "api/types/checklist_task.md",
+      "bytes": 1644,
+      "status": 200
+    },
+    {
+      "docname": "api/types/checklist_tasks_added",
+      "title": "ChecklistTasksAdded",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/checklist_tasks_added.html",
+      "path": "api/types/checklist_tasks_added.md",
+      "bytes": 1286,
+      "status": 200
+    },
+    {
+      "docname": "api/types/checklist_tasks_done",
+      "title": "ChecklistTasksDone",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/checklist_tasks_done.html",
+      "path": "api/types/checklist_tasks_done.md",
+      "bytes": 1333,
+      "status": 200
+    },
+    {
+      "docname": "api/types/chosen_inline_result",
+      "title": "ChosenInlineResult",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/chosen_inline_result.html",
+      "path": "api/types/chosen_inline_result.md",
+      "bytes": 1859,
+      "status": 200
+    },
+    {
+      "docname": "api/types/community",
+      "title": "Community",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/community.html",
+      "path": "api/types/community.md",
+      "bytes": 729,
+      "status": 200
+    },
+    {
+      "docname": "api/types/community_chat_added",
+      "title": "CommunityChatAdded",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/community_chat_added.html",
+      "path": "api/types/community_chat_added.md",
+      "bytes": 691,
+      "status": 200
+    },
+    {
+      "docname": "api/types/community_chat_removed",
+      "title": "CommunityChatRemoved",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/community_chat_removed.html",
+      "path": "api/types/community_chat_removed.md",
+      "bytes": 453,
+      "status": 200
+    },
+    {
+      "docname": "api/types/contact",
+      "title": "Contact",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/contact.html",
+      "path": "api/types/contact.md",
+      "bytes": 1150,
+      "status": 200
+    },
+    {
+      "docname": "api/types/copy_text_button",
+      "title": "CopyTextButton",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/copy_text_button.html",
+      "path": "api/types/copy_text_button.md",
+      "bytes": 507,
+      "status": 200
+    },
+    {
+      "docname": "api/types/dice",
+      "title": "Dice",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/dice.html",
+      "path": "api/types/dice.md",
+      "bytes": 788,
+      "status": 200
+    },
+    {
+      "docname": "api/types/direct_message_price_changed",
+      "title": "DirectMessagePriceChanged",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/direct_message_price_changed.html",
+      "path": "api/types/direct_message_price_changed.md",
+      "bytes": 949,
+      "status": 200
+    },
+    {
+      "docname": "api/types/direct_messages_topic",
+      "title": "DirectMessagesTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/direct_messages_topic.html",
+      "path": "api/types/direct_messages_topic.md",
+      "bytes": 1018,
+      "status": 200
+    },
+    {
+      "docname": "api/types/document",
+      "title": "Document",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/document.html",
+      "path": "api/types/document.md",
+      "bytes": 1743,
+      "status": 200
+    },
+    {
+      "docname": "api/types/encrypted_credentials",
+      "title": "EncryptedCredentials",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/encrypted_credentials.html",
+      "path": "api/types/encrypted_credentials.md",
+      "bytes": 1469,
+      "status": 200
+    },
+    {
+      "docname": "api/types/encrypted_passport_element",
+      "title": "EncryptedPassportElement",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/encrypted_passport_element.html",
+      "path": "api/types/encrypted_passport_element.md",
+      "bytes": 6008,
+      "status": 200
+    },
+    {
+      "docname": "api/types/external_reply_info",
+      "title": "ExternalReplyInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/external_reply_info.html",
+      "path": "api/types/external_reply_info.md",
+      "bytes": 8929,
+      "status": 200
+    },
+    {
+      "docname": "api/types/file",
+      "title": "File",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/file.html",
+      "path": "api/types/file.md",
+      "bytes": 1544,
+      "status": 200
+    },
+    {
+      "docname": "api/types/force_reply",
+      "title": "ForceReply",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/force_reply.html",
+      "path": "api/types/force_reply.md",
+      "bytes": 2518,
+      "status": 200
+    },
+    {
+      "docname": "api/types/forum_topic",
+      "title": "ForumTopic",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/forum_topic.html",
+      "path": "api/types/forum_topic.md",
+      "bytes": 956,
+      "status": 200
+    },
+    {
+      "docname": "api/types/forum_topic_closed",
+      "title": "ForumTopicClosed",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/forum_topic_closed.html",
+      "path": "api/types/forum_topic_closed.md",
+      "bytes": 437,
+      "status": 200
+    },
+    {
+      "docname": "api/types/forum_topic_created",
+      "title": "ForumTopicCreated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/forum_topic_created.html",
+      "path": "api/types/forum_topic_created.md",
+      "bytes": 948,
+      "status": 200
+    },
+    {
+      "docname": "api/types/forum_topic_edited",
+      "title": "ForumTopicEdited",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/forum_topic_edited.html",
+      "path": "api/types/forum_topic_edited.md",
+      "bytes": 732,
+      "status": 200
+    },
+    {
+      "docname": "api/types/forum_topic_reopened",
+      "title": "ForumTopicReopened",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/forum_topic_reopened.html",
+      "path": "api/types/forum_topic_reopened.md",
+      "bytes": 451,
+      "status": 200
+    },
+    {
+      "docname": "api/types/game",
+      "title": "Game",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/game.html",
+      "path": "api/types/game.md",
+      "bytes": 2259,
+      "status": 200
+    },
+    {
+      "docname": "api/types/game_high_score",
+      "title": "GameHighScore",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/game_high_score.html",
+      "path": "api/types/game_high_score.md",
+      "bytes": 842,
+      "status": 200
+    },
+    {
+      "docname": "api/types/general_forum_topic_hidden",
+      "title": "GeneralForumTopicHidden",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/general_forum_topic_hidden.html",
+      "path": "api/types/general_forum_topic_hidden.md",
+      "bytes": 488,
+      "status": 200
+    },
+    {
+      "docname": "api/types/general_forum_topic_unhidden",
+      "title": "GeneralForumTopicUnhidden",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/general_forum_topic_unhidden.html",
+      "path": "api/types/general_forum_topic_unhidden.md",
+      "bytes": 502,
+      "status": 200
+    },
+    {
+      "docname": "api/types/gift",
+      "title": "Gift",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/gift.html",
+      "path": "api/types/gift.md",
+      "bytes": 2850,
+      "status": 200
+    },
+    {
+      "docname": "api/types/gift_background",
+      "title": "GiftBackground",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/gift_background.html",
+      "path": "api/types/gift_background.md",
+      "bytes": 648,
+      "status": 200
+    },
+    {
+      "docname": "api/types/gift_info",
+      "title": "GiftInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/gift_info.html",
+      "path": "api/types/gift_info.md",
+      "bytes": 2512,
+      "status": 200
+    },
+    {
+      "docname": "api/types/gifts",
+      "title": "Gifts",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/gifts.html",
+      "path": "api/types/gifts.md",
+      "bytes": 495,
+      "status": 200
+    },
+    {
+      "docname": "api/types/giveaway",
+      "title": "Giveaway",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/giveaway.html",
+      "path": "api/types/giveaway.md",
+      "bytes": 2330,
+      "status": 200
+    },
+    {
+      "docname": "api/types/giveaway_completed",
+      "title": "GiveawayCompleted",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/giveaway_completed.html",
+      "path": "api/types/giveaway_completed.md",
+      "bytes": 1201,
+      "status": 200
+    },
+    {
+      "docname": "api/types/giveaway_created",
+      "title": "GiveawayCreated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/giveaway_created.html",
+      "path": "api/types/giveaway_created.md",
+      "bytes": 601,
+      "status": 200
+    },
+    {
+      "docname": "api/types/giveaway_winners",
+      "title": "GiveawayWinners",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/giveaway_winners.html",
+      "path": "api/types/giveaway_winners.md",
+      "bytes": 2553,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inaccessible_message",
+      "title": "InaccessibleMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inaccessible_message.html",
+      "path": "api/types/inaccessible_message.md",
+      "bytes": 209512,
+      "status": 200
+    },
+    {
+      "docname": "api/types/index",
+      "title": "Types",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/index.html",
+      "path": "api/types/index.md",
+      "bytes": 19587,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_keyboard_button",
+      "title": "InlineKeyboardButton",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_keyboard_button.html",
+      "path": "api/types/inline_keyboard_button.md",
+      "bytes": 5714,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_keyboard_markup",
+      "title": "InlineKeyboardMarkup",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_keyboard_markup.html",
+      "path": "api/types/inline_keyboard_markup.md",
+      "bytes": 1197,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query",
+      "title": "InlineQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query.html",
+      "path": "api/types/inline_query.md",
+      "bytes": 4388,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result",
+      "title": "InlineQueryResult",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result.html",
+      "path": "api/types/inline_query_result.md",
+      "bytes": 5777,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_article",
+      "title": "InlineQueryResultArticle",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_article.html",
+      "path": "api/types/inline_query_result_article.md",
+      "bytes": 3411,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_audio",
+      "title": "InlineQueryResultAudio",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_audio.html",
+      "path": "api/types/inline_query_result_audio.md",
+      "bytes": 2979,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_cached_audio",
+      "title": "InlineQueryResultCachedAudio",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_cached_audio.html",
+      "path": "api/types/inline_query_result_cached_audio.md",
+      "bytes": 2815,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_cached_document",
+      "title": "InlineQueryResultCachedDocument",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_cached_document.html",
+      "path": "api/types/inline_query_result_cached_document.md",
+      "bytes": 3059,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_cached_gif",
+      "title": "InlineQueryResultCachedGif",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_cached_gif.html",
+      "path": "api/types/inline_query_result_cached_gif.md",
+      "bytes": 3202,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_cached_mpeg4_gif",
+      "title": "InlineQueryResultCachedMpeg4Gif",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_cached_mpeg4_gif.html",
+      "path": "api/types/inline_query_result_cached_mpeg4_gif.md",
+      "bytes": 3313,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_cached_photo",
+      "title": "InlineQueryResultCachedPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_cached_photo.html",
+      "path": "api/types/inline_query_result_cached_photo.md",
+      "bytes": 3309,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_cached_sticker",
+      "title": "InlineQueryResultCachedSticker",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_cached_sticker.html",
+      "path": "api/types/inline_query_result_cached_sticker.md",
+      "bytes": 2931,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_cached_video",
+      "title": "InlineQueryResultCachedVideo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_cached_video.html",
+      "path": "api/types/inline_query_result_cached_video.md",
+      "bytes": 3292,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_cached_voice",
+      "title": "InlineQueryResultCachedVoice",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_cached_voice.html",
+      "path": "api/types/inline_query_result_cached_voice.md",
+      "bytes": 2903,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_contact",
+      "title": "InlineQueryResultContact",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_contact.html",
+      "path": "api/types/inline_query_result_contact.md",
+      "bytes": 3556,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_document",
+      "title": "InlineQueryResultDocument",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_document.html",
+      "path": "api/types/inline_query_result_document.md",
+      "bytes": 3540,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_game",
+      "title": "InlineQueryResultGame",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_game.html",
+      "path": "api/types/inline_query_result_game.md",
+      "bytes": 1274,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_gif",
+      "title": "InlineQueryResultGif",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_gif.html",
+      "path": "api/types/inline_query_result_gif.md",
+      "bytes": 3791,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_location",
+      "title": "InlineQueryResultLocation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_location.html",
+      "path": "api/types/inline_query_result_location.md",
+      "bytes": 4200,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_mpeg4_gif",
+      "title": "InlineQueryResultMpeg4Gif",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_mpeg4_gif.html",
+      "path": "api/types/inline_query_result_mpeg4_gif.md",
+      "bytes": 3895,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_photo",
+      "title": "InlineQueryResultPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_photo.html",
+      "path": "api/types/inline_query_result_photo.md",
+      "bytes": 3584,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_venue",
+      "title": "InlineQueryResultVenue",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_venue.html",
+      "path": "api/types/inline_query_result_venue.md",
+      "bytes": 4105,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_video",
+      "title": "InlineQueryResultVideo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_video.html",
+      "path": "api/types/inline_query_result_video.md",
+      "bytes": 4087,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_result_voice",
+      "title": "InlineQueryResultVoice",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_result_voice.html",
+      "path": "api/types/inline_query_result_voice.md",
+      "bytes": 2981,
+      "status": 200
+    },
+    {
+      "docname": "api/types/inline_query_results_button",
+      "title": "InlineQueryResultsButton",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/inline_query_results_button.html",
+      "path": "api/types/inline_query_results_button.md",
+      "bytes": 1471,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_checklist",
+      "title": "InputChecklist",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_checklist.html",
+      "path": "api/types/input_checklist.md",
+      "bytes": 2003,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_checklist_task",
+      "title": "InputChecklistTask",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_checklist_task.html",
+      "path": "api/types/input_checklist_task.md",
+      "bytes": 1419,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_contact_message_content",
+      "title": "InputContactMessageContent",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_contact_message_content.html",
+      "path": "api/types/input_contact_message_content.md",
+      "bytes": 978,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_file",
+      "title": "InputFile",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_file.html",
+      "path": "api/types/input_file.md",
+      "bytes": 1850,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_invoice_message_content",
+      "title": "InputInvoiceMessageContent",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_invoice_message_content.html",
+      "path": "api/types/input_invoice_message_content.md",
+      "bytes": 5274,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_location_message_content",
+      "title": "InputLocationMessageContent",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_location_message_content.html",
+      "path": "api/types/input_location_message_content.md",
+      "bytes": 1586,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media",
+      "title": "InputMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media.html",
+      "path": "api/types/input_media.md",
+      "bytes": 1545,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_animation",
+      "title": "InputMediaAnimation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_animation.html",
+      "path": "api/types/input_media_animation.md",
+      "bytes": 3358,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_audio",
+      "title": "InputMediaAudio",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_audio.html",
+      "path": "api/types/input_media_audio.md",
+      "bytes": 2885,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_document",
+      "title": "InputMediaDocument",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_document.html",
+      "path": "api/types/input_media_document.md",
+      "bytes": 2875,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_link",
+      "title": "InputMediaLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_link.html",
+      "path": "api/types/input_media_link.md",
+      "bytes": 516,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_live_photo",
+      "title": "InputMediaLivePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_live_photo.html",
+      "path": "api/types/input_media_live_photo.md",
+      "bytes": 2528,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_location",
+      "title": "InputMediaLocation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_location.html",
+      "path": "api/types/input_media_location.md",
+      "bytes": 865,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_photo",
+      "title": "InputMediaPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_photo.html",
+      "path": "api/types/input_media_photo.md",
+      "bytes": 2181,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_sticker",
+      "title": "InputMediaSticker",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_sticker.html",
+      "path": "api/types/input_media_sticker.md",
+      "bytes": 1096,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_venue",
+      "title": "InputMediaVenue",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_venue.html",
+      "path": "api/types/input_media_venue.md",
+      "bytes": 1495,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_video",
+      "title": "InputMediaVideo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_video.html",
+      "path": "api/types/input_media_video.md",
+      "bytes": 4085,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_media_voice_note",
+      "title": "InputMediaVoiceNote",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_media_voice_note.html",
+      "path": "api/types/input_media_voice_note.md",
+      "bytes": 1879,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_message_content",
+      "title": "InputMessageContent",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_message_content.html",
+      "path": "api/types/input_message_content.md",
+      "bytes": 2019,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_paid_media",
+      "title": "InputPaidMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_paid_media.html",
+      "path": "api/types/input_paid_media.md",
+      "bytes": 1064,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_paid_media_live_photo",
+      "title": "InputPaidMediaLivePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_paid_media_live_photo.html",
+      "path": "api/types/input_paid_media_live_photo.md",
+      "bytes": 1393,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_paid_media_photo",
+      "title": "InputPaidMediaPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_paid_media_photo.html",
+      "path": "api/types/input_paid_media_photo.md",
+      "bytes": 1051,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_paid_media_video",
+      "title": "InputPaidMediaVideo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_paid_media_video.html",
+      "path": "api/types/input_paid_media_video.md",
+      "bytes": 3065,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_poll_media",
+      "title": "InputPollMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_poll_media.html",
+      "path": "api/types/input_poll_media.md",
+      "bytes": 1982,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_poll_option",
+      "title": "InputPollOption",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_poll_option.html",
+      "path": "api/types/input_poll_option.md",
+      "bytes": 1860,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_poll_option_media",
+      "title": "InputPollOptionMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_poll_option_media.html",
+      "path": "api/types/input_poll_option_media.md",
+      "bytes": 1980,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_profile_photo",
+      "title": "InputProfilePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_profile_photo.html",
+      "path": "api/types/input_profile_photo.md",
+      "bytes": 903,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_profile_photo_animated",
+      "title": "InputProfilePhotoAnimated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_profile_photo_animated.html",
+      "path": "api/types/input_profile_photo_animated.md",
+      "bytes": 1292,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_profile_photo_static",
+      "title": "InputProfilePhotoStatic",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_profile_photo_static.html",
+      "path": "api/types/input_profile_photo_static.md",
+      "bytes": 1054,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block",
+      "title": "InputRichBlock",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block.html",
+      "path": "api/types/input_rich_block.md",
+      "bytes": 5465,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_anchor",
+      "title": "InputRichBlockAnchor",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_anchor.html",
+      "path": "api/types/input_rich_block_anchor.md",
+      "bytes": 672,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_animation",
+      "title": "InputRichBlockAnimation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_animation.html",
+      "path": "api/types/input_rich_block_animation.md",
+      "bytes": 1406,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_audio",
+      "title": "InputRichBlockAudio",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_audio.html",
+      "path": "api/types/input_rich_block_audio.md",
+      "bytes": 1306,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_block_quotation",
+      "title": "InputRichBlockBlockQuotation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_block_quotation.html",
+      "path": "api/types/input_rich_block_block_quotation.md",
+      "bytes": 4907,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_collage",
+      "title": "InputRichBlockCollage",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_collage.html",
+      "path": "api/types/input_rich_block_collage.md",
+      "bytes": 5127,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_details",
+      "title": "InputRichBlockDetails",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_details.html",
+      "path": "api/types/input_rich_block_details.md",
+      "bytes": 5004,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_divider",
+      "title": "InputRichBlockDivider",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_divider.html",
+      "path": "api/types/input_rich_block_divider.md",
+      "bytes": 584,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_footer",
+      "title": "InputRichBlockFooter",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_footer.html",
+      "path": "api/types/input_rich_block_footer.md",
+      "bytes": 652,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_list",
+      "title": "InputRichBlockList",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_list.html",
+      "path": "api/types/input_rich_block_list.md",
+      "bytes": 1041,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_list_item",
+      "title": "InputRichBlockListItem",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_list_item.html",
+      "path": "api/types/input_rich_block_list_item.md",
+      "bytes": 5268,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_map",
+      "title": "InputRichBlockMap",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_map.html",
+      "path": "api/types/input_rich_block_map.md",
+      "bytes": 1489,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_mathematical_expression",
+      "title": "InputRichBlockMathematicalExpression",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_mathematical_expression.html",
+      "path": "api/types/input_rich_block_mathematical_expression.md",
+      "bytes": 897,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_paragraph",
+      "title": "InputRichBlockParagraph",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_paragraph.html",
+      "path": "api/types/input_rich_block_paragraph.md",
+      "bytes": 685,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_photo",
+      "title": "InputRichBlockPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_photo.html",
+      "path": "api/types/input_rich_block_photo.md",
+      "bytes": 1299,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_preformatted",
+      "title": "InputRichBlockPreformatted",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_preformatted.html",
+      "path": "api/types/input_rich_block_preformatted.md",
+      "bytes": 827,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_pull_quotation",
+      "title": "InputRichBlockPullQuotation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_pull_quotation.html",
+      "path": "api/types/input_rich_block_pull_quotation.md",
+      "bytes": 853,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_section_heading",
+      "title": "InputRichBlockSectionHeading",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_section_heading.html",
+      "path": "api/types/input_rich_block_section_heading.md",
+      "bytes": 867,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_slideshow",
+      "title": "InputRichBlockSlideshow",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_slideshow.html",
+      "path": "api/types/input_rich_block_slideshow.md",
+      "bytes": 5151,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_table",
+      "title": "InputRichBlockTable",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_table.html",
+      "path": "api/types/input_rich_block_table.md",
+      "bytes": 1324,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_thinking",
+      "title": "InputRichBlockThinking",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_thinking.html",
+      "path": "api/types/input_rich_block_thinking.md",
+      "bytes": 1453,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_video",
+      "title": "InputRichBlockVideo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_video.html",
+      "path": "api/types/input_rich_block_video.md",
+      "bytes": 1301,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_block_voice_note",
+      "title": "InputRichBlockVoiceNote",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_block_voice_note.html",
+      "path": "api/types/input_rich_block_voice_note.md",
+      "bytes": 1422,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_message",
+      "title": "InputRichMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_message.html",
+      "path": "api/types/input_rich_message.md",
+      "bytes": 6333,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_message_content",
+      "title": "InputRichMessageContent",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_message_content.html",
+      "path": "api/types/input_rich_message_content.md",
+      "bytes": 880,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_rich_message_media",
+      "title": "InputRichMessageMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_rich_message_media.html",
+      "path": "api/types/input_rich_message_media.md",
+      "bytes": 1536,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_sticker",
+      "title": "InputSticker",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_sticker.html",
+      "path": "api/types/input_sticker.md",
+      "bytes": 1912,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_story_content",
+      "title": "InputStoryContent",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_story_content.html",
+      "path": "api/types/input_story_content.md",
+      "bytes": 883,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_story_content_photo",
+      "title": "InputStoryContentPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_story_content_photo.html",
+      "path": "api/types/input_story_content_photo.md",
+      "bytes": 985,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_story_content_video",
+      "title": "InputStoryContentVideo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_story_content_video.html",
+      "path": "api/types/input_story_content_video.md",
+      "bytes": 1547,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_text_message_content",
+      "title": "InputTextMessageContent",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_text_message_content.html",
+      "path": "api/types/input_text_message_content.md",
+      "bytes": 1968,
+      "status": 200
+    },
+    {
+      "docname": "api/types/input_venue_message_content",
+      "title": "InputVenueMessageContent",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/input_venue_message_content.html",
+      "path": "api/types/input_venue_message_content.md",
+      "bytes": 1544,
+      "status": 200
+    },
+    {
+      "docname": "api/types/invoice",
+      "title": "Invoice",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/invoice.html",
+      "path": "api/types/invoice.md",
+      "bytes": 1214,
+      "status": 200
+    },
+    {
+      "docname": "api/types/keyboard_button",
+      "title": "KeyboardButton",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/keyboard_button.html",
+      "path": "api/types/keyboard_button.md",
+      "bytes": 5978,
+      "status": 200
+    },
+    {
+      "docname": "api/types/keyboard_button_poll_type",
+      "title": "KeyboardButtonPollType",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/keyboard_button_poll_type.html",
+      "path": "api/types/keyboard_button_poll_type.md",
+      "bytes": 771,
+      "status": 200
+    },
+    {
+      "docname": "api/types/keyboard_button_request_chat",
+      "title": "KeyboardButtonRequestChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/keyboard_button_request_chat.html",
+      "path": "api/types/keyboard_button_request_chat.md",
+      "bytes": 3867,
+      "status": 200
+    },
+    {
+      "docname": "api/types/keyboard_button_request_managed_bot",
+      "title": "KeyboardButtonRequestManagedBot",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/keyboard_button_request_managed_bot.html",
+      "path": "api/types/keyboard_button_request_managed_bot.md",
+      "bytes": 1116,
+      "status": 200
+    },
+    {
+      "docname": "api/types/keyboard_button_request_user",
+      "title": "KeyboardButtonRequestUser",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/keyboard_button_request_user.html",
+      "path": "api/types/keyboard_button_request_user.md",
+      "bytes": 1512,
+      "status": 200
+    },
+    {
+      "docname": "api/types/keyboard_button_request_users",
+      "title": "KeyboardButtonRequestUsers",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/keyboard_button_request_users.html",
+      "path": "api/types/keyboard_button_request_users.md",
+      "bytes": 1990,
+      "status": 200
+    },
+    {
+      "docname": "api/types/labeled_price",
+      "title": "LabeledPrice",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/labeled_price.html",
+      "path": "api/types/labeled_price.md",
+      "bytes": 895,
+      "status": 200
+    },
+    {
+      "docname": "api/types/link",
+      "title": "Link",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/link.html",
+      "path": "api/types/link.md",
+      "bytes": 329,
+      "status": 200
+    },
+    {
+      "docname": "api/types/link_preview_options",
+      "title": "LinkPreviewOptions",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/link_preview_options.html",
+      "path": "api/types/link_preview_options.md",
+      "bytes": 1799,
+      "status": 200
+    },
+    {
+      "docname": "api/types/live_photo",
+      "title": "LivePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/live_photo.html",
+      "path": "api/types/live_photo.md",
+      "bytes": 1714,
+      "status": 200
+    },
+    {
+      "docname": "api/types/location",
+      "title": "Location",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/location.html",
+      "path": "api/types/location.md",
+      "bytes": 1273,
+      "status": 200
+    },
+    {
+      "docname": "api/types/location_address",
+      "title": "LocationAddress",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/location_address.html",
+      "path": "api/types/location_address.md",
+      "bytes": 806,
+      "status": 200
+    },
+    {
+      "docname": "api/types/login_url",
+      "title": "LoginUrl",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/login_url.html",
+      "path": "api/types/login_url.md",
+      "bytes": 2045,
+      "status": 200
+    },
+    {
+      "docname": "api/types/managed_bot_created",
+      "title": "ManagedBotCreated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/managed_bot_created.html",
+      "path": "api/types/managed_bot_created.md",
+      "bytes": 896,
+      "status": 200
+    },
+    {
+      "docname": "api/types/managed_bot_updated",
+      "title": "ManagedBotUpdated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/managed_bot_updated.html",
+      "path": "api/types/managed_bot_updated.md",
+      "bytes": 1117,
+      "status": 200
+    },
+    {
+      "docname": "api/types/mask_position",
+      "title": "MaskPosition",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/mask_position.html",
+      "path": "api/types/mask_position.md",
+      "bytes": 1106,
+      "status": 200
+    },
+    {
+      "docname": "api/types/maybe_inaccessible_message",
+      "title": "MaybeInaccessibleMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/maybe_inaccessible_message.html",
+      "path": "api/types/maybe_inaccessible_message.md",
+      "bytes": 783,
+      "status": 200
+    },
+    {
+      "docname": "api/types/menu_button",
+      "title": "MenuButton",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/menu_button.html",
+      "path": "api/types/menu_button.md",
+      "bytes": 2366,
+      "status": 200
+    },
+    {
+      "docname": "api/types/menu_button_commands",
+      "title": "MenuButtonCommands",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/menu_button_commands.html",
+      "path": "api/types/menu_button_commands.md",
+      "bytes": 734,
+      "status": 200
+    },
+    {
+      "docname": "api/types/menu_button_default",
+      "title": "MenuButtonDefault",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/menu_button_default.html",
+      "path": "api/types/menu_button_default.md",
+      "bytes": 718,
+      "status": 200
+    },
+    {
+      "docname": "api/types/menu_button_web_app",
+      "title": "MenuButtonWebApp",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/menu_button_web_app.html",
+      "path": "api/types/menu_button_web_app.md",
+      "bytes": 1472,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message",
+      "title": "Message",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message.html",
+      "path": "api/types/message.md",
+      "bytes": 285386,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_auto_delete_timer_changed",
+      "title": "MessageAutoDeleteTimerChanged",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_auto_delete_timer_changed.html",
+      "path": "api/types/message_auto_delete_timer_changed.md",
+      "bytes": 637,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_entity",
+      "title": "MessageEntity",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_entity.html",
+      "path": "api/types/message_entity.md",
+      "bytes": 3121,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_id",
+      "title": "MessageId",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_id.html",
+      "path": "api/types/message_id.md",
+      "bytes": 680,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_origin",
+      "title": "MessageOrigin",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_origin.html",
+      "path": "api/types/message_origin.md",
+      "bytes": 1219,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_origin_channel",
+      "title": "MessageOriginChannel",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_origin_channel.html",
+      "path": "api/types/message_origin_channel.md",
+      "bytes": 1181,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_origin_chat",
+      "title": "MessageOriginChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_origin_chat.html",
+      "path": "api/types/message_origin_chat.md",
+      "bytes": 1136,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_origin_hidden_user",
+      "title": "MessageOriginHiddenUser",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_origin_hidden_user.html",
+      "path": "api/types/message_origin_hidden_user.md",
+      "bytes": 940,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_origin_user",
+      "title": "MessageOriginUser",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_origin_user.html",
+      "path": "api/types/message_origin_user.md",
+      "bytes": 922,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_reaction_count_updated",
+      "title": "MessageReactionCountUpdated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_reaction_count_updated.html",
+      "path": "api/types/message_reaction_count_updated.md",
+      "bytes": 1256,
+      "status": 200
+    },
+    {
+      "docname": "api/types/message_reaction_updated",
+      "title": "MessageReactionUpdated",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/message_reaction_updated.html",
+      "path": "api/types/message_reaction_updated.md",
+      "bytes": 2868,
+      "status": 200
+    },
+    {
+      "docname": "api/types/order_info",
+      "title": "OrderInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/order_info.html",
+      "path": "api/types/order_info.md",
+      "bytes": 993,
+      "status": 200
+    },
+    {
+      "docname": "api/types/owned_gift",
+      "title": "OwnedGift",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/owned_gift.html",
+      "path": "api/types/owned_gift.md",
+      "bytes": 748,
+      "status": 200
+    },
+    {
+      "docname": "api/types/owned_gift_regular",
+      "title": "OwnedGiftRegular",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/owned_gift_regular.html",
+      "path": "api/types/owned_gift_regular.md",
+      "bytes": 3543,
+      "status": 200
+    },
+    {
+      "docname": "api/types/owned_gift_unique",
+      "title": "OwnedGiftUnique",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/owned_gift_unique.html",
+      "path": "api/types/owned_gift_unique.md",
+      "bytes": 2265,
+      "status": 200
+    },
+    {
+      "docname": "api/types/owned_gifts",
+      "title": "OwnedGifts",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/owned_gifts.html",
+      "path": "api/types/owned_gifts.md",
+      "bytes": 1066,
+      "status": 200
+    },
+    {
+      "docname": "api/types/paid_media",
+      "title": "PaidMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/paid_media.html",
+      "path": "api/types/paid_media.md",
+      "bytes": 1088,
+      "status": 200
+    },
+    {
+      "docname": "api/types/paid_media_info",
+      "title": "PaidMediaInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/paid_media_info.html",
+      "path": "api/types/paid_media_info.md",
+      "bytes": 1244,
+      "status": 200
+    },
+    {
+      "docname": "api/types/paid_media_live_photo",
+      "title": "PaidMediaLivePhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/paid_media_live_photo.html",
+      "path": "api/types/paid_media_live_photo.md",
+      "bytes": 852,
+      "status": 200
+    },
+    {
+      "docname": "api/types/paid_media_photo",
+      "title": "PaidMediaPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/paid_media_photo.html",
+      "path": "api/types/paid_media_photo.md",
+      "bytes": 754,
+      "status": 200
+    },
+    {
+      "docname": "api/types/paid_media_preview",
+      "title": "PaidMediaPreview",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/paid_media_preview.html",
+      "path": "api/types/paid_media_preview.md",
+      "bytes": 904,
+      "status": 200
+    },
+    {
+      "docname": "api/types/paid_media_purchased",
+      "title": "PaidMediaPurchased",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/paid_media_purchased.html",
+      "path": "api/types/paid_media_purchased.md",
+      "bytes": 708,
+      "status": 200
+    },
+    {
+      "docname": "api/types/paid_media_video",
+      "title": "PaidMediaVideo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/paid_media_video.html",
+      "path": "api/types/paid_media_video.md",
+      "bytes": 688,
+      "status": 200
+    },
+    {
+      "docname": "api/types/paid_message_price_changed",
+      "title": "PaidMessagePriceChanged",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/paid_message_price_changed.html",
+      "path": "api/types/paid_message_price_changed.md",
+      "bytes": 662,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_data",
+      "title": "PassportData",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_data.html",
+      "path": "api/types/passport_data.md",
+      "bytes": 1342,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error",
+      "title": "PassportElementError",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error.html",
+      "path": "api/types/passport_element_error.md",
+      "bytes": 3103,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error_data_field",
+      "title": "PassportElementErrorDataField",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error_data_field.html",
+      "path": "api/types/passport_element_error_data_field.md",
+      "bytes": 1189,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error_file",
+      "title": "PassportElementErrorFile",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error_file.html",
+      "path": "api/types/passport_element_error_file.md",
+      "bytes": 1042,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error_files",
+      "title": "PassportElementErrorFiles",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error_files.html",
+      "path": "api/types/passport_element_error_files.md",
+      "bytes": 1085,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error_front_side",
+      "title": "PassportElementErrorFrontSide",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error_front_side.html",
+      "path": "api/types/passport_element_error_front_side.md",
+      "bytes": 1127,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error_reverse_side",
+      "title": "PassportElementErrorReverseSide",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error_reverse_side.html",
+      "path": "api/types/passport_element_error_reverse_side.md",
+      "bytes": 1108,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error_selfie",
+      "title": "PassportElementErrorSelfie",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error_selfie.html",
+      "path": "api/types/passport_element_error_selfie.md",
+      "bytes": 1048,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error_translation_file",
+      "title": "PassportElementErrorTranslationFile",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error_translation_file.html",
+      "path": "api/types/passport_element_error_translation_file.md",
+      "bytes": 1271,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error_translation_files",
+      "title": "PassportElementErrorTranslationFiles",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error_translation_files.html",
+      "path": "api/types/passport_element_error_translation_files.md",
+      "bytes": 1308,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_element_error_unspecified",
+      "title": "PassportElementErrorUnspecified",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_element_error_unspecified.html",
+      "path": "api/types/passport_element_error_unspecified.md",
+      "bytes": 974,
+      "status": 200
+    },
+    {
+      "docname": "api/types/passport_file",
+      "title": "PassportFile",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/passport_file.html",
+      "path": "api/types/passport_file.md",
+      "bytes": 1001,
+      "status": 200
+    },
+    {
+      "docname": "api/types/photo_size",
+      "title": "PhotoSize",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/photo_size.html",
+      "path": "api/types/photo_size.md",
+      "bytes": 961,
+      "status": 200
+    },
+    {
+      "docname": "api/types/poll",
+      "title": "Poll",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/poll.html",
+      "path": "api/types/poll.md",
+      "bytes": 5584,
+      "status": 200
+    },
+    {
+      "docname": "api/types/poll_answer",
+      "title": "PollAnswer",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/poll_answer.html",
+      "path": "api/types/poll_answer.md",
+      "bytes": 1308,
+      "status": 200
+    },
+    {
+      "docname": "api/types/poll_media",
+      "title": "PollMedia",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/poll_media.html",
+      "path": "api/types/poll_media.md",
+      "bytes": 3410,
+      "status": 200
+    },
+    {
+      "docname": "api/types/poll_option",
+      "title": "PollOption",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/poll_option.html",
+      "path": "api/types/poll_option.md",
+      "bytes": 2324,
+      "status": 200
+    },
+    {
+      "docname": "api/types/poll_option_added",
+      "title": "PollOptionAdded",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/poll_option_added.html",
+      "path": "api/types/poll_option_added.md",
+      "bytes": 1611,
+      "status": 200
+    },
+    {
+      "docname": "api/types/poll_option_deleted",
+      "title": "PollOptionDeleted",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/poll_option_deleted.html",
+      "path": "api/types/poll_option_deleted.md",
+      "bytes": 1633,
+      "status": 200
+    },
+    {
+      "docname": "api/types/pre_checkout_query",
+      "title": "PreCheckoutQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/pre_checkout_query.html",
+      "path": "api/types/pre_checkout_query.md",
+      "bytes": 3911,
+      "status": 200
+    },
+    {
+      "docname": "api/types/prepared_inline_message",
+      "title": "PreparedInlineMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/prepared_inline_message.html",
+      "path": "api/types/prepared_inline_message.md",
+      "bytes": 696,
+      "status": 200
+    },
+    {
+      "docname": "api/types/prepared_keyboard_button",
+      "title": "PreparedKeyboardButton",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/prepared_keyboard_button.html",
+      "path": "api/types/prepared_keyboard_button.md",
+      "bytes": 505,
+      "status": 200
+    },
+    {
+      "docname": "api/types/proximity_alert_triggered",
+      "title": "ProximityAlertTriggered",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/proximity_alert_triggered.html",
+      "path": "api/types/proximity_alert_triggered.md",
+      "bytes": 987,
+      "status": 200
+    },
+    {
+      "docname": "api/types/reaction_count",
+      "title": "ReactionCount",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/reaction_count.html",
+      "path": "api/types/reaction_count.md",
+      "bytes": 1048,
+      "status": 200
+    },
+    {
+      "docname": "api/types/reaction_type",
+      "title": "ReactionType",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/reaction_type.html",
+      "path": "api/types/reaction_type.md",
+      "bytes": 999,
+      "status": 200
+    },
+    {
+      "docname": "api/types/reaction_type_custom_emoji",
+      "title": "ReactionTypeCustomEmoji",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/reaction_type_custom_emoji.html",
+      "path": "api/types/reaction_type_custom_emoji.md",
+      "bytes": 688,
+      "status": 200
+    },
+    {
+      "docname": "api/types/reaction_type_emoji",
+      "title": "ReactionTypeEmoji",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/reaction_type_emoji.html",
+      "path": "api/types/reaction_type_emoji.md",
+      "bytes": 1512,
+      "status": 200
+    },
+    {
+      "docname": "api/types/reaction_type_paid",
+      "title": "ReactionTypePaid",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/reaction_type_paid.html",
+      "path": "api/types/reaction_type_paid.md",
+      "bytes": 508,
+      "status": 200
+    },
+    {
+      "docname": "api/types/refunded_payment",
+      "title": "RefundedPayment",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/refunded_payment.html",
+      "path": "api/types/refunded_payment.md",
+      "bytes": 1425,
+      "status": 200
+    },
+    {
+      "docname": "api/types/reply_keyboard_markup",
+      "title": "ReplyKeyboardMarkup",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/reply_keyboard_markup.html",
+      "path": "api/types/reply_keyboard_markup.md",
+      "bytes": 2867,
+      "status": 200
+    },
+    {
+      "docname": "api/types/reply_keyboard_remove",
+      "title": "ReplyKeyboardRemove",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/reply_keyboard_remove.html",
+      "path": "api/types/reply_keyboard_remove.md",
+      "bytes": 1899,
+      "status": 200
+    },
+    {
+      "docname": "api/types/reply_parameters",
+      "title": "ReplyParameters",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/reply_parameters.html",
+      "path": "api/types/reply_parameters.md",
+      "bytes": 3469,
+      "status": 200
+    },
+    {
+      "docname": "api/types/response_parameters",
+      "title": "ResponseParameters",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/response_parameters.html",
+      "path": "api/types/response_parameters.md",
+      "bytes": 1018,
+      "status": 200
+    },
+    {
+      "docname": "api/types/revenue_withdrawal_state",
+      "title": "RevenueWithdrawalState",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/revenue_withdrawal_state.html",
+      "path": "api/types/revenue_withdrawal_state.md",
+      "bytes": 1315,
+      "status": 200
+    },
+    {
+      "docname": "api/types/revenue_withdrawal_state_failed",
+      "title": "RevenueWithdrawalStateFailed",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/revenue_withdrawal_state_failed.html",
+      "path": "api/types/revenue_withdrawal_state_failed.md",
+      "bytes": 652,
+      "status": 200
+    },
+    {
+      "docname": "api/types/revenue_withdrawal_state_pending",
+      "title": "RevenueWithdrawalStatePending",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/revenue_withdrawal_state_pending.html",
+      "path": "api/types/revenue_withdrawal_state_pending.md",
+      "bytes": 637,
+      "status": 200
+    },
+    {
+      "docname": "api/types/revenue_withdrawal_state_succeeded",
+      "title": "RevenueWithdrawalStateSucceeded",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/revenue_withdrawal_state_succeeded.html",
+      "path": "api/types/revenue_withdrawal_state_succeeded.md",
+      "bytes": 896,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block",
+      "title": "RichBlock",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block.html",
+      "path": "api/types/rich_block.md",
+      "bytes": 4602,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_anchor",
+      "title": "RichBlockAnchor",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_anchor.html",
+      "path": "api/types/rich_block_anchor.md",
+      "bytes": 624,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_animation",
+      "title": "RichBlockAnimation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_animation.html",
+      "path": "api/types/rich_block_animation.md",
+      "bytes": 1356,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_audio",
+      "title": "RichBlockAudio",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_audio.html",
+      "path": "api/types/rich_block_audio.md",
+      "bytes": 1106,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_block_quotation",
+      "title": "RichBlockBlockQuotation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_block_quotation.html",
+      "path": "api/types/rich_block_block_quotation.md",
+      "bytes": 4167,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_caption",
+      "title": "RichBlockCaption",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_caption.html",
+      "path": "api/types/rich_block_caption.md",
+      "bytes": 586,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_collage",
+      "title": "RichBlockCollage",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_collage.html",
+      "path": "api/types/rich_block_collage.md",
+      "bytes": 4387,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_details",
+      "title": "RichBlockDetails",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_details.html",
+      "path": "api/types/rich_block_details.md",
+      "bytes": 4260,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_divider",
+      "title": "RichBlockDivider",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_divider.html",
+      "path": "api/types/rich_block_divider.md",
+      "bytes": 536,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_footer",
+      "title": "RichBlockFooter",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_footer.html",
+      "path": "api/types/rich_block_footer.md",
+      "bytes": 604,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_list",
+      "title": "RichBlockList",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_list.html",
+      "path": "api/types/rich_block_list.md",
+      "bytes": 927,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_list_item",
+      "title": "RichBlockListItem",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_list_item.html",
+      "path": "api/types/rich_block_list_item.md",
+      "bytes": 4576,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_map",
+      "title": "RichBlockMap",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_map.html",
+      "path": "api/types/rich_block_map.md",
+      "bytes": 1348,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_mathematical_expression",
+      "title": "RichBlockMathematicalExpression",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_mathematical_expression.html",
+      "path": "api/types/rich_block_mathematical_expression.md",
+      "bytes": 849,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_paragraph",
+      "title": "RichBlockParagraph",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_paragraph.html",
+      "path": "api/types/rich_block_paragraph.md",
+      "bytes": 637,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_photo",
+      "title": "RichBlockPhoto",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_photo.html",
+      "path": "api/types/rich_block_photo.md",
+      "bytes": 1334,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_preformatted",
+      "title": "RichBlockPreformatted",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_preformatted.html",
+      "path": "api/types/rich_block_preformatted.md",
+      "bytes": 779,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_pull_quotation",
+      "title": "RichBlockPullQuotation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_pull_quotation.html",
+      "path": "api/types/rich_block_pull_quotation.md",
+      "bytes": 805,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_section_heading",
+      "title": "RichBlockSectionHeading",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_section_heading.html",
+      "path": "api/types/rich_block_section_heading.md",
+      "bytes": 819,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_slideshow",
+      "title": "RichBlockSlideshow",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_slideshow.html",
+      "path": "api/types/rich_block_slideshow.md",
+      "bytes": 4411,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_table",
+      "title": "RichBlockTable",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_table.html",
+      "path": "api/types/rich_block_table.md",
+      "bytes": 1268,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_table_cell",
+      "title": "RichBlockTableCell",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_table_cell.html",
+      "path": "api/types/rich_block_table_cell.md",
+      "bytes": 1185,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_thinking",
+      "title": "RichBlockThinking",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_thinking.html",
+      "path": "api/types/rich_block_thinking.md",
+      "bytes": 1405,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_video",
+      "title": "RichBlockVideo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_video.html",
+      "path": "api/types/rich_block_video.md",
+      "bytes": 1251,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_block_voice_note",
+      "title": "RichBlockVoiceNote",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_block_voice_note.html",
+      "path": "api/types/rich_block_voice_note.md",
+      "bytes": 1168,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_message",
+      "title": "RichMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_message.html",
+      "path": "api/types/rich_message.md",
+      "bytes": 3931,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text",
+      "title": "RichText",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text.html",
+      "path": "api/types/rich_text.md",
+      "bytes": 5503,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_anchor",
+      "title": "RichTextAnchor",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_anchor.html",
+      "path": "api/types/rich_text_anchor.md",
+      "bytes": 543,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_anchor_link",
+      "title": "RichTextAnchorLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_anchor_link.html",
+      "path": "api/types/rich_text_anchor_link.md",
+      "bytes": 761,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_bank_card_number",
+      "title": "RichTextBankCardNumber",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_bank_card_number.html",
+      "path": "api/types/rich_text_bank_card_number.md",
+      "bytes": 747,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_bold",
+      "title": "RichTextBold",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_bold.html",
+      "path": "api/types/rich_text_bold.md",
+      "bytes": 531,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_bot_command",
+      "title": "RichTextBotCommand",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_bot_command.html",
+      "path": "api/types/rich_text_bot_command.md",
+      "bytes": 668,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_cashtag",
+      "title": "RichTextCashtag",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_cashtag.html",
+      "path": "api/types/rich_text_cashtag.md",
+      "bytes": 615,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_code",
+      "title": "RichTextCode",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_code.html",
+      "path": "api/types/rich_text_code.md",
+      "bytes": 536,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_custom_emoji",
+      "title": "RichTextCustomEmoji",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_custom_emoji.html",
+      "path": "api/types/rich_text_custom_emoji.md",
+      "bytes": 1034,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_date_time",
+      "title": "RichTextDateTime",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_date_time.html",
+      "path": "api/types/rich_text_date_time.md",
+      "bytes": 917,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_email_address",
+      "title": "RichTextEmailAddress",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_email_address.html",
+      "path": "api/types/rich_text_email_address.md",
+      "bytes": 709,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_hashtag",
+      "title": "RichTextHashtag",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_hashtag.html",
+      "path": "api/types/rich_text_hashtag.md",
+      "bytes": 615,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_italic",
+      "title": "RichTextItalic",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_italic.html",
+      "path": "api/types/rich_text_italic.md",
+      "bytes": 558,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_marked",
+      "title": "RichTextMarked",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_marked.html",
+      "path": "api/types/rich_text_marked.md",
+      "bytes": 553,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_mathematical_expression",
+      "title": "RichTextMathematicalExpression",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_mathematical_expression.html",
+      "path": "api/types/rich_text_mathematical_expression.md",
+      "bytes": 746,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_mention",
+      "title": "RichTextMention",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_mention.html",
+      "path": "api/types/rich_text_mention.md",
+      "bytes": 632,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_phone_number",
+      "title": "RichTextPhoneNumber",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_phone_number.html",
+      "path": "api/types/rich_text_phone_number.md",
+      "bytes": 694,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_reference",
+      "title": "RichTextReference",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_reference.html",
+      "path": "api/types/rich_text_reference.md",
+      "bytes": 658,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_reference_link",
+      "title": "RichTextReferenceLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_reference_link.html",
+      "path": "api/types/rich_text_reference_link.md",
+      "bytes": 727,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_spoiler",
+      "title": "RichTextSpoiler",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_spoiler.html",
+      "path": "api/types/rich_text_spoiler.md",
+      "bytes": 577,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_strikethrough",
+      "title": "RichTextStrikethrough",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_strikethrough.html",
+      "path": "api/types/rich_text_strikethrough.md",
+      "bytes": 630,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_subscript",
+      "title": "RichTextSubscript",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_subscript.html",
+      "path": "api/types/rich_text_subscript.md",
+      "bytes": 586,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_superscript",
+      "title": "RichTextSuperscript",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_superscript.html",
+      "path": "api/types/rich_text_superscript.md",
+      "bytes": 608,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_text_mention",
+      "title": "RichTextTextMention",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_text_mention.html",
+      "path": "api/types/rich_text_text_mention.md",
+      "bytes": 830,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_underline",
+      "title": "RichTextUnderline",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_underline.html",
+      "path": "api/types/rich_text_underline.md",
+      "bytes": 588,
+      "status": 200
+    },
+    {
+      "docname": "api/types/rich_text_url",
+      "title": "RichTextUrl",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/rich_text_url.html",
+      "path": "api/types/rich_text_url.md",
+      "bytes": 580,
+      "status": 200
+    },
+    {
+      "docname": "api/types/sent_guest_message",
+      "title": "SentGuestMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/sent_guest_message.html",
+      "path": "api/types/sent_guest_message.md",
+      "bytes": 481,
+      "status": 200
+    },
+    {
+      "docname": "api/types/sent_web_app_message",
+      "title": "SentWebAppMessage",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/sent_web_app_message.html",
+      "path": "api/types/sent_web_app_message.md",
+      "bytes": 713,
+      "status": 200
+    },
+    {
+      "docname": "api/types/shared_user",
+      "title": "SharedUser",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/shared_user.html",
+      "path": "api/types/shared_user.md",
+      "bytes": 1907,
+      "status": 200
+    },
+    {
+      "docname": "api/types/shipping_address",
+      "title": "ShippingAddress",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/shipping_address.html",
+      "path": "api/types/shipping_address.md",
+      "bytes": 846,
+      "status": 200
+    },
+    {
+      "docname": "api/types/shipping_option",
+      "title": "ShippingOption",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/shipping_option.html",
+      "path": "api/types/shipping_option.md",
+      "bytes": 780,
+      "status": 200
+    },
+    {
+      "docname": "api/types/shipping_query",
+      "title": "ShippingQuery",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/shipping_query.html",
+      "path": "api/types/shipping_query.md",
+      "bytes": 3155,
+      "status": 200
+    },
+    {
+      "docname": "api/types/star_amount",
+      "title": "StarAmount",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/star_amount.html",
+      "path": "api/types/star_amount.md",
+      "bytes": 668,
+      "status": 200
+    },
+    {
+      "docname": "api/types/star_transaction",
+      "title": "StarTransaction",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/star_transaction.html",
+      "path": "api/types/star_transaction.md",
+      "bytes": 4919,
+      "status": 200
+    },
+    {
+      "docname": "api/types/star_transactions",
+      "title": "StarTransactions",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/star_transactions.html",
+      "path": "api/types/star_transactions.md",
+      "bytes": 731,
+      "status": 200
+    },
+    {
+      "docname": "api/types/sticker",
+      "title": "Sticker",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/sticker.html",
+      "path": "api/types/sticker.md",
+      "bytes": 5299,
+      "status": 200
+    },
+    {
+      "docname": "api/types/sticker_set",
+      "title": "StickerSet",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/sticker_set.html",
+      "path": "api/types/sticker_set.md",
+      "bytes": 1733,
+      "status": 200
+    },
+    {
+      "docname": "api/types/story",
+      "title": "Story",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/story.html",
+      "path": "api/types/story.md",
+      "bytes": 561,
+      "status": 200
+    },
+    {
+      "docname": "api/types/story_area",
+      "title": "StoryArea",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/story_area.html",
+      "path": "api/types/story_area.md",
+      "bytes": 1704,
+      "status": 200
+    },
+    {
+      "docname": "api/types/story_area_position",
+      "title": "StoryAreaPosition",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/story_area_position.html",
+      "path": "api/types/story_area_position.md",
+      "bytes": 1225,
+      "status": 200
+    },
+    {
+      "docname": "api/types/story_area_type",
+      "title": "StoryAreaType",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/story_area_type.html",
+      "path": "api/types/story_area_type.md",
+      "bytes": 1576,
+      "status": 200
+    },
+    {
+      "docname": "api/types/story_area_type_link",
+      "title": "StoryAreaTypeLink",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/story_area_type_link.html",
+      "path": "api/types/story_area_type_link.md",
+      "bytes": 692,
+      "status": 200
+    },
+    {
+      "docname": "api/types/story_area_type_location",
+      "title": "StoryAreaTypeLocation",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/story_area_type_location.html",
+      "path": "api/types/story_area_type_location.md",
+      "bytes": 1162,
+      "status": 200
+    },
+    {
+      "docname": "api/types/story_area_type_suggested_reaction",
+      "title": "StoryAreaTypeSuggestedReaction",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/story_area_type_suggested_reaction.html",
+      "path": "api/types/story_area_type_suggested_reaction.md",
+      "bytes": 1596,
+      "status": 200
+    },
+    {
+      "docname": "api/types/story_area_type_unique_gift",
+      "title": "StoryAreaTypeUniqueGift",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/story_area_type_unique_gift.html",
+      "path": "api/types/story_area_type_unique_gift.md",
+      "bytes": 729,
+      "status": 200
+    },
+    {
+      "docname": "api/types/story_area_type_weather",
+      "title": "StoryAreaTypeWeather",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/story_area_type_weather.html",
+      "path": "api/types/story_area_type_weather.md",
+      "bytes": 900,
+      "status": 200
+    },
+    {
+      "docname": "api/types/successful_payment",
+      "title": "SuccessfulPayment",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/successful_payment.html",
+      "path": "api/types/successful_payment.md",
+      "bytes": 2514,
+      "status": 200
+    },
+    {
+      "docname": "api/types/suggested_post_approval_failed",
+      "title": "SuggestedPostApprovalFailed",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/suggested_post_approval_failed.html",
+      "path": "api/types/suggested_post_approval_failed.md",
+      "bytes": 1480,
+      "status": 200
+    },
+    {
+      "docname": "api/types/suggested_post_approved",
+      "title": "SuggestedPostApproved",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/suggested_post_approved.html",
+      "path": "api/types/suggested_post_approved.md",
+      "bytes": 1515,
+      "status": 200
+    },
+    {
+      "docname": "api/types/suggested_post_declined",
+      "title": "SuggestedPostDeclined",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/suggested_post_declined.html",
+      "path": "api/types/suggested_post_declined.md",
+      "bytes": 1077,
+      "status": 200
+    },
+    {
+      "docname": "api/types/suggested_post_info",
+      "title": "SuggestedPostInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/suggested_post_info.html",
+      "path": "api/types/suggested_post_info.md",
+      "bytes": 1312,
+      "status": 200
+    },
+    {
+      "docname": "api/types/suggested_post_paid",
+      "title": "SuggestedPostPaid",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/suggested_post_paid.html",
+      "path": "api/types/suggested_post_paid.md",
+      "bytes": 1673,
+      "status": 200
+    },
+    {
+      "docname": "api/types/suggested_post_parameters",
+      "title": "SuggestedPostParameters",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/suggested_post_parameters.html",
+      "path": "api/types/suggested_post_parameters.md",
+      "bytes": 1310,
+      "status": 200
+    },
+    {
+      "docname": "api/types/suggested_post_price",
+      "title": "SuggestedPostPrice",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/suggested_post_price.html",
+      "path": "api/types/suggested_post_price.md",
+      "bytes": 859,
+      "status": 200
+    },
+    {
+      "docname": "api/types/suggested_post_refunded",
+      "title": "SuggestedPostRefunded",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/suggested_post_refunded.html",
+      "path": "api/types/suggested_post_refunded.md",
+      "bytes": 1240,
+      "status": 200
+    },
+    {
+      "docname": "api/types/switch_inline_query_chosen_chat",
+      "title": "SwitchInlineQueryChosenChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/switch_inline_query_chosen_chat.html",
+      "path": "api/types/switch_inline_query_chosen_chat.md",
+      "bytes": 1320,
+      "status": 200
+    },
+    {
+      "docname": "api/types/text_quote",
+      "title": "TextQuote",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/text_quote.html",
+      "path": "api/types/text_quote.md",
+      "bytes": 1371,
+      "status": 200
+    },
+    {
+      "docname": "api/types/transaction_partner",
+      "title": "TransactionPartner",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/transaction_partner.html",
+      "path": "api/types/transaction_partner.md",
+      "bytes": 2303,
+      "status": 200
+    },
+    {
+      "docname": "api/types/transaction_partner_affiliate_program",
+      "title": "TransactionPartnerAffiliateProgram",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/transaction_partner_affiliate_program.html",
+      "path": "api/types/transaction_partner_affiliate_program.md",
+      "bytes": 1266,
+      "status": 200
+    },
+    {
+      "docname": "api/types/transaction_partner_chat",
+      "title": "TransactionPartnerChat",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/transaction_partner_chat.html",
+      "path": "api/types/transaction_partner_chat.md",
+      "bytes": 1017,
+      "status": 200
+    },
+    {
+      "docname": "api/types/transaction_partner_fragment",
+      "title": "TransactionPartnerFragment",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/transaction_partner_fragment.html",
+      "path": "api/types/transaction_partner_fragment.md",
+      "bytes": 1583,
+      "status": 200
+    },
+    {
+      "docname": "api/types/transaction_partner_other",
+      "title": "TransactionPartnerOther",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/transaction_partner_other.html",
+      "path": "api/types/transaction_partner_other.md",
+      "bytes": 622,
+      "status": 200
+    },
+    {
+      "docname": "api/types/transaction_partner_telegram_ads",
+      "title": "TransactionPartnerTelegramAds",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/transaction_partner_telegram_ads.html",
+      "path": "api/types/transaction_partner_telegram_ads.md",
+      "bytes": 693,
+      "status": 200
+    },
+    {
+      "docname": "api/types/transaction_partner_telegram_api",
+      "title": "TransactionPartnerTelegramApi",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/transaction_partner_telegram_api.html",
+      "path": "api/types/transaction_partner_telegram_api.md",
+      "bytes": 887,
+      "status": 200
+    },
+    {
+      "docname": "api/types/transaction_partner_user",
+      "title": "TransactionPartnerUser",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/transaction_partner_user.html",
+      "path": "api/types/transaction_partner_user.md",
+      "bytes": 3659,
+      "status": 200
+    },
+    {
+      "docname": "api/types/unique_gift",
+      "title": "UniqueGift",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/unique_gift.html",
+      "path": "api/types/unique_gift.md",
+      "bytes": 3280,
+      "status": 200
+    },
+    {
+      "docname": "api/types/unique_gift_backdrop",
+      "title": "UniqueGiftBackdrop",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/unique_gift_backdrop.html",
+      "path": "api/types/unique_gift_backdrop.md",
+      "bytes": 1051,
+      "status": 200
+    },
+    {
+      "docname": "api/types/unique_gift_backdrop_colors",
+      "title": "UniqueGiftBackdropColors",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/unique_gift_backdrop_colors.html",
+      "path": "api/types/unique_gift_backdrop_colors.md",
+      "bytes": 868,
+      "status": 200
+    },
+    {
+      "docname": "api/types/unique_gift_colors",
+      "title": "UniqueGiftColors",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/unique_gift_colors.html",
+      "path": "api/types/unique_gift_colors.md",
+      "bytes": 1159,
+      "status": 200
+    },
+    {
+      "docname": "api/types/unique_gift_info",
+      "title": "UniqueGiftInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/unique_gift_info.html",
+      "path": "api/types/unique_gift_info.md",
+      "bytes": 2499,
+      "status": 200
+    },
+    {
+      "docname": "api/types/unique_gift_model",
+      "title": "UniqueGiftModel",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/unique_gift_model.html",
+      "path": "api/types/unique_gift_model.md",
+      "bytes": 1050,
+      "status": 200
+    },
+    {
+      "docname": "api/types/unique_gift_symbol",
+      "title": "UniqueGiftSymbol",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/unique_gift_symbol.html",
+      "path": "api/types/unique_gift_symbol.md",
+      "bytes": 854,
+      "status": 200
+    },
+    {
+      "docname": "api/types/update",
+      "title": "Update",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/update.html",
+      "path": "api/types/update.md",
+      "bytes": 13666,
+      "status": 200
+    },
+    {
+      "docname": "api/types/user",
+      "title": "User",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/user.html",
+      "path": "api/types/user.md",
+      "bytes": 7796,
+      "status": 200
+    },
+    {
+      "docname": "api/types/user_chat_boosts",
+      "title": "UserChatBoosts",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/user_chat_boosts.html",
+      "path": "api/types/user_chat_boosts.md",
+      "bytes": 682,
+      "status": 200
+    },
+    {
+      "docname": "api/types/user_profile_audios",
+      "title": "UserProfileAudios",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/user_profile_audios.html",
+      "path": "api/types/user_profile_audios.md",
+      "bytes": 725,
+      "status": 200
+    },
+    {
+      "docname": "api/types/user_profile_photos",
+      "title": "UserProfilePhotos",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/user_profile_photos.html",
+      "path": "api/types/user_profile_photos.md",
+      "bytes": 803,
+      "status": 200
+    },
+    {
+      "docname": "api/types/user_rating",
+      "title": "UserRating",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/user_rating.html",
+      "path": "api/types/user_rating.md",
+      "bytes": 1040,
+      "status": 200
+    },
+    {
+      "docname": "api/types/user_shared",
+      "title": "UserShared",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/user_shared.html",
+      "path": "api/types/user_shared.md",
+      "bytes": 1312,
+      "status": 200
+    },
+    {
+      "docname": "api/types/users_shared",
+      "title": "UsersShared",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/users_shared.html",
+      "path": "api/types/users_shared.md",
+      "bytes": 1682,
+      "status": 200
+    },
+    {
+      "docname": "api/types/venue",
+      "title": "Venue",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/venue.html",
+      "path": "api/types/venue.md",
+      "bytes": 1384,
+      "status": 200
+    },
+    {
+      "docname": "api/types/video",
+      "title": "Video",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/video.html",
+      "path": "api/types/video.md",
+      "bytes": 2644,
+      "status": 200
+    },
+    {
+      "docname": "api/types/video_chat_ended",
+      "title": "VideoChatEnded",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/video_chat_ended.html",
+      "path": "api/types/video_chat_ended.md",
+      "bytes": 474,
+      "status": 200
+    },
+    {
+      "docname": "api/types/video_chat_participants_invited",
+      "title": "VideoChatParticipantsInvited",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/video_chat_participants_invited.html",
+      "path": "api/types/video_chat_participants_invited.md",
+      "bytes": 717,
+      "status": 200
+    },
+    {
+      "docname": "api/types/video_chat_scheduled",
+      "title": "VideoChatScheduled",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/video_chat_scheduled.html",
+      "path": "api/types/video_chat_scheduled.md",
+      "bytes": 642,
+      "status": 200
+    },
+    {
+      "docname": "api/types/video_chat_started",
+      "title": "VideoChatStarted",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/video_chat_started.html",
+      "path": "api/types/video_chat_started.md",
+      "bytes": 437,
+      "status": 200
+    },
+    {
+      "docname": "api/types/video_note",
+      "title": "VideoNote",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/video_note.html",
+      "path": "api/types/video_note.md",
+      "bytes": 1421,
+      "status": 200
+    },
+    {
+      "docname": "api/types/video_quality",
+      "title": "VideoQuality",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/video_quality.html",
+      "path": "api/types/video_quality.md",
+      "bytes": 1267,
+      "status": 200
+    },
+    {
+      "docname": "api/types/voice",
+      "title": "Voice",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/voice.html",
+      "path": "api/types/voice.md",
+      "bytes": 1193,
+      "status": 200
+    },
+    {
+      "docname": "api/types/web_app_data",
+      "title": "WebAppData",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/web_app_data.html",
+      "path": "api/types/web_app_data.md",
+      "bytes": 686,
+      "status": 200
+    },
+    {
+      "docname": "api/types/web_app_info",
+      "title": "WebAppInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/web_app_info.html",
+      "path": "api/types/web_app_info.md",
+      "bytes": 556,
+      "status": 200
+    },
+    {
+      "docname": "api/types/webhook_info",
+      "title": "WebhookInfo",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/webhook_info.html",
+      "path": "api/types/webhook_info.md",
+      "bytes": 2033,
+      "status": 200
+    },
+    {
+      "docname": "api/types/write_access_allowed",
+      "title": "WriteAccessAllowed",
+      "url": "https://docs.aiogram.dev/en/latest/api/types/write_access_allowed.html",
+      "path": "api/types/write_access_allowed.md",
+      "bytes": 1308,
+      "status": 200
+    },
+    {
+      "docname": "api/upload_file",
+      "title": "How to upload file?",
+      "url": "https://docs.aiogram.dev/en/latest/api/upload_file.html",
+      "path": "api/upload_file.md",
+      "bytes": 3797,
+      "status": 200
+    },
+    {
+      "docname": "changelog",
+      "title": "Changelog",
+      "url": "https://docs.aiogram.dev/en/latest/changelog.html",
+      "path": "changelog.md",
+      "bytes": 217356,
+      "status": 200
+    },
+    {
+      "docname": "contributing",
+      "title": "Contributing",
+      "url": "https://docs.aiogram.dev/en/latest/contributing.html",
+      "path": "contributing.md",
+      "bytes": 8794,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/base",
+      "title": "BaseHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/base.html",
+      "path": "dispatcher/class_based_handlers/base.md",
+      "bytes": 933,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/callback_query",
+      "title": "CallbackQueryHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/callback_query.html",
+      "path": "dispatcher/class_based_handlers/callback_query.md",
+      "bytes": 1099,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/chat_member",
+      "title": "ChatMemberHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/chat_member.html",
+      "path": "dispatcher/class_based_handlers/chat_member.md",
+      "bytes": 614,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/chosen_inline_result",
+      "title": "ChosenInlineResultHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/chosen_inline_result.html",
+      "path": "dispatcher/class_based_handlers/chosen_inline_result.md",
+      "bytes": 698,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/error",
+      "title": "ErrorHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/error.html",
+      "path": "dispatcher/class_based_handlers/error.md",
+      "bytes": 773,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/index",
+      "title": "Class based handlers",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/index.html",
+      "path": "dispatcher/class_based_handlers/index.md",
+      "bytes": 2270,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/inline_query",
+      "title": "InlineQueryHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/inline_query.html",
+      "path": "dispatcher/class_based_handlers/inline_query.md",
+      "bytes": 637,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/message",
+      "title": "MessageHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/message.html",
+      "path": "dispatcher/class_based_handlers/message.md",
+      "bytes": 671,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/poll",
+      "title": "PollHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/poll.html",
+      "path": "dispatcher/class_based_handlers/poll.md",
+      "bytes": 596,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/pre_checkout_query",
+      "title": "PreCheckoutQueryHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/pre_checkout_query.html",
+      "path": "dispatcher/class_based_handlers/pre_checkout_query.md",
+      "bytes": 635,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/class_based_handlers/shipping_query",
+      "title": "ShippingQueryHandler",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/class_based_handlers/shipping_query.html",
+      "path": "dispatcher/class_based_handlers/shipping_query.md",
+      "bytes": 614,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/dependency_injection",
+      "title": "Dependency injection",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/dependency_injection.html",
+      "path": "dispatcher/dependency_injection.md",
+      "bytes": 6958,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/dispatcher",
+      "title": "Dispatcher",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/dispatcher.html",
+      "path": "dispatcher/dispatcher.md",
+      "bytes": 6260,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/errors",
+      "title": "Errors",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/errors.html",
+      "path": "dispatcher/errors.md",
+      "bytes": 4512,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/filters/callback_data",
+      "title": "Callback Data Factory & Filter",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/filters/callback_data.html",
+      "path": "dispatcher/filters/callback_data.md",
+      "bytes": 3621,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/filters/chat_member_updated",
+      "title": "ChatMemberUpdated",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/filters/chat_member_updated.html",
+      "path": "dispatcher/filters/chat_member_updated.md",
+      "bytes": 2960,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/filters/command",
+      "title": "Command",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/filters/command.html",
+      "path": "dispatcher/filters/command.md",
+      "bytes": 3409,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/filters/exception",
+      "title": "Exceptions",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/filters/exception.html",
+      "path": "dispatcher/filters/exception.md",
+      "bytes": 594,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/filters/index",
+      "title": "Filtering events",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/filters/index.html",
+      "path": "dispatcher/filters/index.md",
+      "bytes": 3631,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/filters/magic_data",
+      "title": "MagicData",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/filters/magic_data.html",
+      "path": "dispatcher/filters/magic_data.md",
+      "bytes": 842,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/filters/magic_filters",
+      "title": "Magic filters",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/filters/magic_filters.html",
+      "path": "dispatcher/filters/magic_filters.md",
+      "bytes": 4313,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/finite_state_machine/index",
+      "title": "Finite State Machine",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/finite_state_machine/index.html",
+      "path": "dispatcher/finite_state_machine/index.md",
+      "bytes": 15811,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/finite_state_machine/scene",
+      "title": "Scenes Wizard",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/finite_state_machine/scene.html",
+      "path": "dispatcher/finite_state_machine/scene.md",
+      "bytes": 35573,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/finite_state_machine/storages",
+      "title": "Storages",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/finite_state_machine/storages.html",
+      "path": "dispatcher/finite_state_machine/storages.md",
+      "bytes": 3218,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/finite_state_machine/strategy",
+      "title": "Strategy",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/finite_state_machine/strategy.html",
+      "path": "dispatcher/finite_state_machine/strategy.md",
+      "bytes": 954,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/flags",
+      "title": "Flags",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/flags.html",
+      "path": "dispatcher/flags.md",
+      "bytes": 3160,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/index",
+      "title": "Handling events",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/index.html",
+      "path": "dispatcher/index.md",
+      "bytes": 26857,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/long_polling",
+      "title": "Long-polling",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/long_polling.html",
+      "path": "dispatcher/long_polling.md",
+      "bytes": 3160,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/middlewares",
+      "title": "Middlewares",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/middlewares.html",
+      "path": "dispatcher/middlewares.md",
+      "bytes": 3736,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/router",
+      "title": "Router",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/router.html",
+      "path": "dispatcher/router.md",
+      "bytes": 6427,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/testing",
+      "title": "Testing",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/testing.html",
+      "path": "dispatcher/testing.md",
+      "bytes": 2803,
+      "status": 200
+    },
+    {
+      "docname": "dispatcher/webhook",
+      "title": "Webhook",
+      "url": "https://docs.aiogram.dev/en/latest/dispatcher/webhook.html",
+      "path": "dispatcher/webhook.md",
+      "bytes": 18134,
+      "status": 200
+    },
+    {
+      "docname": "index",
+      "title": "aiogram",
+      "url": "https://docs.aiogram.dev/en/latest/index.html",
+      "path": "index.md",
+      "bytes": 28068,
+      "status": 200
+    },
+    {
+      "docname": "install",
+      "title": "Installation",
+      "url": "https://docs.aiogram.dev/en/latest/install.html",
+      "path": "install.md",
+      "bytes": 457,
+      "status": 200
+    },
+    {
+      "docname": "migration_2_to_3",
+      "title": "Migration FAQ (2.x -> 3.0)",
+      "url": "https://docs.aiogram.dev/en/latest/migration_2_to_3.html",
+      "path": "migration_2_to_3.md",
+      "bytes": 15230,
+      "status": 200
+    },
+    {
+      "docname": "utils/callback_answer",
+      "title": "Callback answer",
+      "url": "https://docs.aiogram.dev/en/latest/utils/callback_answer.html",
+      "path": "utils/callback_answer.md",
+      "bytes": 5441,
+      "status": 200
+    },
+    {
+      "docname": "utils/chat_action",
+      "title": "Chat action sender",
+      "url": "https://docs.aiogram.dev/en/latest/utils/chat_action.html",
+      "path": "utils/chat_action.md",
+      "bytes": 6070,
+      "status": 200
+    },
+    {
+      "docname": "utils/deep_linking",
+      "title": "Deep Linking",
+      "url": "https://docs.aiogram.dev/en/latest/utils/deep_linking.html",
+      "path": "utils/deep_linking.md",
+      "bytes": 3480,
+      "status": 200
+    },
+    {
+      "docname": "utils/formatting",
+      "title": "Formatting",
+      "url": "https://docs.aiogram.dev/en/latest/utils/formatting.html",
+      "path": "utils/formatting.md",
+      "bytes": 20759,
+      "status": 200
+    },
+    {
+      "docname": "utils/i18n",
+      "title": "Translation",
+      "url": "https://docs.aiogram.dev/en/latest/utils/i18n.html",
+      "path": "utils/i18n.md",
+      "bytes": 8065,
+      "status": 200
+    },
+    {
+      "docname": "utils/index",
+      "title": "Utils",
+      "url": "https://docs.aiogram.dev/en/latest/utils/index.html",
+      "path": "utils/index.md",
+      "bytes": 15933,
+      "status": 200
+    },
+    {
+      "docname": "utils/keyboard",
+      "title": "Keyboard builder",
+      "url": "https://docs.aiogram.dev/en/latest/utils/keyboard.html",
+      "path": "utils/keyboard.md",
+      "bytes": 8610,
+      "status": 200
+    },
+    {
+      "docname": "utils/media_group",
+      "title": "Media group builder",
+      "url": "https://docs.aiogram.dev/en/latest/utils/media_group.html",
+      "path": "utils/media_group.md",
+      "bytes": 15645,
+      "status": 200
+    },
+    {
+      "docname": "utils/serialization",
+      "title": "Telegram object serialization",
+      "url": "https://docs.aiogram.dev/en/latest/utils/serialization.html",
+      "path": "utils/serialization.md",
+      "bytes": 3626,
+      "status": 200
+    },
+    {
+      "docname": "utils/web_app",
+      "title": "WebApp",
+      "url": "https://docs.aiogram.dev/en/latest/utils/web_app.html",
+      "path": "utils/web_app.md",
+      "bytes": 7504,
+      "status": 200
+    }
+  ]
+}

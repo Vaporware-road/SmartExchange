@@ -1,0 +1,20 @@
+---
+description: telegram_app — use TelegramLibrarySkill and repo invariants
+globs: backend/telegram_app/**
+alwaysApply: false
+---
+
+# telegram_app
+
+Follow [TelegramLibrarySkill/SKILL.md](../../.claude/skills/TelegramLibrarySkill/SKILL.md) and [smartexchange.md](../../.claude/skills/TelegramLibrarySkill/smartexchange.md).
+
+Before coding: search aiogram docs via MCP (`search_aiogram_docs`) or `scripts/aiogram_docs_scraper/search.py` — do not grep the full `reference/` mirror.
+
+## Invariants
+
+- Customer menus: **reply keyboards** (`ReplyKeyboardMarkup`), not inline message buttons.
+- Channel price broadcasts may use inline URL buttons.
+- Sync Django/Celery call sites: `telegram_app.services.telegram_client.TelegramService`.
+- FSM state: Django `BotSession` via custom storage — no second session store.
+- Poller: one asyncio loop; never `asyncio.run()` per update.
+- Do not touch Iraniu / Request-Manage-System bots.

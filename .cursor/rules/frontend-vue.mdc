@@ -1,0 +1,22 @@
+---
+description: Vue 3 SPA conventions for SmartExchange frontend
+globs: frontend/**
+alwaysApply: false
+---
+
+# SmartExchange frontend
+
+Location: `frontend/src/`.
+
+## Conventions
+
+- Vue 3 + Vite 6, Pinia stores, Vue Router, vue-i18n, Tailwind.
+- API calls go through services under `src/services/` — base URL `/api` (Vite dev proxy to Django `:8000`).
+- Site branding/contact fields come from `SiteSettings` via the Pinia store — avoid hardcoding phones, addresses, or URLs.
+- Production build outputs to `backend/static/vue/`; Django serves the SPA via catch-all `SPAView`.
+
+## Verify
+
+```bash
+cd frontend && npm run build
+```

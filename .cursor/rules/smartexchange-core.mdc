@@ -1,0 +1,33 @@
+---
+description: SmartExchange Panel stack, app boundaries, and core workflows
+alwaysApply: true
+---
+
+# SmartExchange core
+
+Read [AGENTS.md](../../AGENTS.md) (local, comprehensive) and [docs/PROJECT_OVERVIEW.md](../../docs/PROJECT_OVERVIEW.md) before broad exploration.
+
+## Boundaries
+
+- Main product: `backend/` Django apps + `frontend/` Vue SPA.
+- **Iraniu** (`Request-Manage-System/`) is a separate product — do not mix imports, URLs, or models.
+- Do not edit `venv/`, `public/`, collected static, or the aiogram docs mirror tree.
+
+## Auth and permissions
+
+- JWT via SimpleJWT; `JWTAuthenticationWithTokenVersion` checks `token_version` on refresh.
+- RBAC: `IsSuperAdmin`, `IsManagement`, `IsSuperAdminOrManagement`.
+
+## Finalize → publish pipeline
+
+1. Prices change in `change_price/` or `special_price/`.
+2. Finalize in `finalize/` queues Celery tasks in `price_publisher/`.
+3. On success: Telegram publish, optional Instagram, external WordPress rates API.
+4. Honor `FINALIZE_STRICT_TELEGRAM` — Telegram failure can return 503 and skip persisting finalization.
+
+## Verify changes
+
+```bash
+cd backend && python manage.py check
+cd frontend && npm run build
+```
