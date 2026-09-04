@@ -184,7 +184,15 @@ import WidgetLibraryPanel from './WidgetLibraryPanel.vue'
 import TemplateInspectorPanel from './TemplateInspectorPanel.vue'
 import WidgetPreviewHost from '@/components/template-editor/player/widgets/WidgetPreviewHost.vue'
 import { fitFontSizeToWidgetBox } from '@/utils/fitTextToBox.js'
-import { normalizeMediaUrl } from '@/utils/normalizeMediaUrl.js'
+import {
+  TEXT_LIKE_WIDGETS,
+  normalizeTemplateImageUrl,
+  pctToPx,
+  pxToPct,
+  widgetDomStyle,
+  widgetInnerChromeClass,
+  widgetsToPercentPayload,
+} from './templateEditorCanvasUtils.js'
 
 const route = useRoute()
 const toast = useToast()
@@ -288,10 +296,6 @@ function alignSelectedToBackgroundEdge(edge) {
   clampWidgetToCanvas(w)
 }
 
-function normalizeTemplateImageUrl(rawUrl) {
-  return normalizeMediaUrl(rawUrl)
-}
-
 const moveableTarget = computed(() => {
   if (!selectedId.value) return null
   return widgetEls.get(selectedId.value) || null
@@ -300,15 +304,6 @@ const moveableTarget = computed(() => {
 function setWidgetEl(id, el) {
   if (el) widgetEls.set(id, el)
   else widgetEls.delete(id)
-}
-
-function widgetDomStyle(w) {
-  return {
-    width: `${w.width}px`,
-    height: `${w.height}px`,
-    transform: `translate(${w.x}px, ${w.y}px) rotate(${w.rotation || 0}deg)`,
-    zIndex: w.zIndex ?? 1,
-  }
 }
 
 function clampWidgetToCanvas(w) {
@@ -321,16 +316,7 @@ function clampWidgetToCanvas(w) {
   w.y = Math.min(maxY, Math.max(0, w.y || 0))
 }
 
-const TEXT_LIKE_WIDGETS = new Set(['text', 'date', 'clock', 'weekday'])
-
 /** Editor-only frame: text-like widgets show raw text; image keeps a light frame. */
-function widgetInnerChromeClass(type) {
-  if (TEXT_LIKE_WIDGETS.has(type)) {
-    return 'h-full min-h-0 w-full min-w-0 overflow-hidden rounded-none bg-transparent'
-  }
-  return 'h-full w-full overflow-hidden rounded-md border border-[var(--border-card)] bg-[var(--bg-input)]/50 dark:border-white/10 dark:bg-black/25'
-}
-
 function selectWidget(id) {
   selectedId.value = id
 }
@@ -620,39 +606,6 @@ function onRotateEnd(e) {
   if (target?.dataset?.wid) syncWidgetFromTarget(target)
 }
 
-function pxToPct(px, total) {
-  if (!total) return '0%'
-  return `${((Number(px) / total) * 100).toFixed(4)}%`
-}
-
-function pctToPx(val, total) {
-  if (val == null) return 0
-  if (typeof val === 'number' && !Number.isNaN(val)) return (val / 100) * total
-  const s = String(val).trim().replace('%', '')
-  const n = parseFloat(s)
-  if (Number.isNaN(n)) return 0
-  return (n / 100) * total
-}
-
-function widgetsToPercentPayload() {
-  const cw = canvasW.value
-  const ch = canvasH.value
-  return widgets.value.map((w) => ({
-    id: w.id,
-    type: w.type,
-    name: w.name,
-    x: pxToPct(w.x, cw),
-    y: pxToPct(w.y, ch),
-    width: pxToPct(w.width, cw),
-    height: pxToPct(w.height, ch),
-    rotation: w.rotation || 0,
-    zIndex: w.zIndex ?? 1,
-    visible: w.visible !== false,
-    content: w.content ?? '',
-    style: w.style && typeof w.style === 'object' ? { ...w.style } : {},
-  }))
-}
-
 function loadWidgetsFromConfigJson(cj) {
   const cw = canvasW.value
   const ch = canvasH.value
@@ -683,7 +636,7 @@ async function save() {
   try {
     const config_json = {
       backgroundColor: backgroundColor.value,
-      widgets: widgetsToPercentPayload(),
+      widgets: widgetsToPercentPayload(widgets.value, canvasW.value, canvasH.value),
     }
     await templatesStore.saveConfigJsonOnly(template.value.id, {
       config_json,

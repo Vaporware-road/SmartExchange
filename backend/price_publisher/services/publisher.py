@@ -43,6 +43,10 @@ from template_editor.dynamic_data import (
     build_dynamic_data_for_special_offer,
 )
 from template_editor.render import render_price_template
+from template_editor.services.screenshot_engine import (
+    ScreenshotEngineError,
+    generate_template_screenshot,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -333,8 +337,9 @@ class PricePublisherService:
                 dynamic_data = build_dynamic_data_for_special_offer(
                     special_price_type, price_history, matched_category_price_type
                 )
-                pil_image = render_price_template(te_template, SPECIAL_OFFER, dynamic_data)
-                image = self._pil_image_to_rendered(pil_image)
+                image = self._render_template_editor_image(
+                    te_template, SPECIAL_OFFER, dynamic_data
+                )
                 if getattr(te_template, "is_active", True):
                     self._mark_category_template_used(
                         getattr(matched_category_price_type, "category", None), te_template
@@ -570,10 +575,12 @@ class PricePublisherService:
                     if usage_type == TETHER_BOARD
                     else build_dynamic_data_for_category_board(category, price_items, timestamp)
                 )
-                pil_image = render_price_template(te_template, usage_type, dynamic_data)
+                image = self._render_template_editor_image(
+                    te_template, usage_type, dynamic_data, price_items=price_items
+                )
                 if getattr(te_template, "is_active", True):
                     self._mark_category_template_used(category, te_template)
-                return self._pil_image_to_rendered(pil_image), te_template, "category_template_editor", None
+                return image, te_template, "category_template_editor", None
             if not te_template:
                 logger.warning(
                     "template_editor category fallback: no template category_id=%s",
@@ -626,6 +633,43 @@ class PricePublisherService:
         if not template:
             return None, None
         return template, matched_price_type
+
+    def _render_template_editor_image(
+        self, te_template, usage_type: str, dynamic_data: dict, price_items=None
+    ) -> RenderedPriceImage:
+        """Render a template_editor Template, headless first when it is switched on.
+
+        Playwright reproduces the editor pixel for pixel; Pillow approximates it.
+        A browser that is missing, slow or crashing must never stop a publish,
+        so any engine error falls through to the Pillow renderer.
+        """
+        if getattr(SiteSettings.load(), "use_playwright_for_template_render", False):
+            try:
+                png_bytes = generate_template_screenshot(
+                    template_id=te_template.id,
+                    dynamic_data=dynamic_data,
+                    price_items=price_items,
+                )
+                return self._bytes_to_rendered(png_bytes)
+            except ScreenshotEngineError:
+                logger.exception(
+                    "Playwright render failed; falling back to Pillow template_id=%s",
+                    getattr(te_template, "id", None),
+                )
+        return self._pil_image_to_rendered(
+            render_price_template(te_template, usage_type, dynamic_data)
+        )
+
+    @staticmethod
+    def _bytes_to_rendered(png_bytes: bytes) -> RenderedPriceImage:
+        from PIL import Image
+
+        buf = io.BytesIO(png_bytes)
+        buf.name = "prices.png"
+        with Image.open(io.BytesIO(png_bytes)) as probe:
+            width, height = probe.size
+        buf.seek(0)
+        return RenderedPriceImage(stream=buf, width=width, height=height)
 
     @staticmethod
     def _pil_image_to_rendered(pil_image) -> RenderedPriceImage:

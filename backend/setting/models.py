@@ -118,6 +118,13 @@ class SiteSettings(models.Model):
             "and render_price_template instead of legacy renderers."
         ),
     )
+    use_playwright_for_template_render = models.BooleanField(
+        default=False,
+        help_text=(
+            "If enabled, Telegram template boards are rendered via headless Vue screenshot "
+            "(Playwright). Falls back to Pillow on error."
+        ),
+    )
     upload_max_file_size_mb = models.PositiveIntegerField(
         default=5,
         help_text="Maximum upload size in MB for managed uploads.",

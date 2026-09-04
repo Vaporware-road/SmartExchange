@@ -349,6 +349,23 @@ DOCKER_COMPOSE_COMMAND = os.environ.get(
 ).split()
 
 # -----------------------------
+# Headless template rendering (Playwright)
+# -----------------------------
+# Off by default and per-install: SiteSettings.use_playwright_for_template_render
+# is the switch, these only tune it. The engine loads the SPA's
+# /headless-render/<id> route in a real browser and screenshots it, so the PNG a
+# channel receives matches the editor exactly; any failure falls back to Pillow.
+PLAYWRIGHT_FRONTEND_BASE_URL = os.environ.get(
+    'PLAYWRIGHT_FRONTEND_BASE_URL', 'http://127.0.0.1:5250'
+).rstrip('/')
+PLAYWRIGHT_SCREENSHOT_TIMEOUT_MS = int(
+    os.environ.get('PLAYWRIGHT_SCREENSHOT_TIMEOUT_MS', '30000')
+)
+# Chromium is memory-hungry; two at a time is what a small VPS survives.
+PLAYWRIGHT_MAX_CONCURRENT = int(os.environ.get('PLAYWRIGHT_MAX_CONCURRENT', '2'))
+SCREENSHOT_CACHE_TTL = int(os.environ.get('SCREENSHOT_CACHE_TTL', '300'))
+
+# -----------------------------
 # Self-serve signup — email address in, own panel out, trial running
 # -----------------------------
 # A signup creates a role=management account that owns its own workspace: it is

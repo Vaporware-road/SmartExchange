@@ -694,3 +694,50 @@ class TemplateCategoryPriceTypesAPIView(APIView):
             .values("id", "name", "slug", "trade_type")
         )
         return Response(list(price_types))
+
+
+class HeadlessRenderContextAPIView(APIView):
+    """
+    GET /api/template-editor/headless-render/context/?token=<signed>
+
+    Serves one template's render context to the headless browser. Public by
+    necessity — the Playwright page carries no session — but gated by a
+    short-lived signed token that is bound to a single template and context.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def get(self, request):
+        from .render_tokens import load_headless_render_context, verify_headless_render_token
+
+        token = (request.query_params.get("token") or "").strip()
+        if not token:
+            return error_response(
+                "Render token is required.",
+                code="headless_render_token_required",
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+        try:
+            parsed = verify_headless_render_token(token)
+        except ValueError as exc:
+            return error_response(
+                str(exc),
+                code="headless_render_token_invalid",
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        context = load_headless_render_context(parsed["context_id"])
+        if not context:
+            return error_response(
+                "Render context expired or not found.",
+                code="headless_render_context_missing",
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+        if int(context.get("template_id") or 0) != int(parsed["template_id"]):
+            return error_response(
+                "Render token does not match template.",
+                code="headless_render_template_mismatch",
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+        return Response(context)

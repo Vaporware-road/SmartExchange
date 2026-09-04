@@ -71,6 +71,7 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "linkedin_link",
             "auto_post_on_update",
             "use_template_editor_for_boards",
+            "use_playwright_for_template_render",
             "ui_font_filename_rtl",
             "ui_font_filename_ltr",
             "prices_webhook_url",

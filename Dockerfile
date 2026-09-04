@@ -18,6 +18,15 @@ COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt \
     && pip install --no-cache-dir supervisor
 
+# Chromium for the headless template renderer. Opt-in at runtime
+# (SiteSettings.use_playwright_for_template_render) but installed here so
+# switching it on does not need a rebuild; set PLAYWRIGHT_SKIP_BROWSER=1 to
+# build a slimmer image for installs that will only ever use Pillow.
+ARG PLAYWRIGHT_SKIP_BROWSER=0
+RUN if [ "$PLAYWRIGHT_SKIP_BROWSER" != "1" ]; then \
+        playwright install --with-deps chromium; \
+    fi
+
 COPY frontend/package*.json /app/frontend/
 RUN cd /app/frontend && npm ci
 

@@ -41,6 +41,16 @@ const routes = [
     meta: { public: true },
   },
   {
+    // Loaded by the Playwright screenshot engine, not by a person: it renders one
+    // template on a bare page at exact pixel size so the PNG the customer's
+    // channel receives is what the editor showed. Public because the browser it
+    // runs in carries a one-shot render token instead of a session.
+    path: '/headless-render/:templateId',
+    name: 'headless-render',
+    component: () => import('@/views/templates/HeadlessTemplateRenderer.vue'),
+    meta: { public: true, headlessRender: true },
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('@/views/auth/AboutView.vue'),
