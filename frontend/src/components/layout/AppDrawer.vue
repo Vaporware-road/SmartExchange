@@ -46,6 +46,7 @@
                   >
                     <i :class="link.icon" class="text-base w-5 text-center" />
                     <span class="font-medium">{{ $t(link.labelKey) }}</span>
+                    <OrderQueueBadge v-if="link.to === '/orders'" inline />
                   </router-link>
                 </li>
               </ul>
@@ -63,6 +64,7 @@ import { useRoute } from 'vue-router'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useAuthStore } from '@/stores/auth'
 import { navLinkIsActive, visibleNavLinks } from '@/config/navLinks'
+import OrderQueueBadge from '@/components/layout/OrderQueueBadge.vue'
 import AppBrandLogo from '@/components/layout/AppBrandLogo.vue'
 
 defineProps({

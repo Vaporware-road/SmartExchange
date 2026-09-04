@@ -27,6 +27,15 @@ const routes = [
     meta: { public: true },
   },
   {
+    // The customer-facing order form: opened inside Telegram as a Mini App with
+    // an auth_token, or from a WhatsApp button with no token at all. It carries
+    // its own shell (WebAppLayout) rather than the panel chrome.
+    path: '/webapp/order',
+    name: 'webapp-order',
+    component: () => import('@/views/webapp/OrderIntakeView.vue'),
+    meta: { public: true, titleKey: 'routes.webappOrder' },
+  },
+  {
     path: '/signup',
     name: 'signup',
     component: () => import('@/views/auth/SignupView.vue'),
@@ -267,6 +276,12 @@ const routes = [
         meta: { titleKey: 'routes.templateEditor' },
       },
       {
+        path: '/orders',
+        name: 'orders',
+        component: () => import('@/views/orders/OrdersQueueView.vue'),
+        meta: { titleKey: 'routes.orders' },
+      },
+      {
         path: '/settings',
         name: 'settings',
         component: () => import('@/views/settings/SettingsView.vue'),
@@ -387,6 +402,8 @@ router.beforeEach(async (to, from, next) => {
     // Permission-based access: finalize and settings require super_admin or management
     const path = to.path
     if (path.startsWith('/finalize') && !auth.can('finalize')) {
+      next({ name: 'error-403' })
+    } else if (path.startsWith('/orders') && !auth.can('orders')) {
       next({ name: 'error-403' })
     } else if ((path === '/settings' || path.startsWith('/settings/')) && !auth.can('settings')) {
       next({ name: 'error-403' })

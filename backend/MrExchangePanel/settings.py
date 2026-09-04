@@ -70,6 +70,8 @@ INSTALLED_APPS = [
     'landing',
     'instagram_hub',
     'fleet',
+    'bot_gateway',
+    'orders',
     # third-party apps
     'corsheaders',
     'rest_framework',
@@ -102,6 +104,10 @@ REST_FRAMEWORK = {
         # Registration is anonymous and creates rows; keep it well under the
         # generic anon rate so a script cannot fill the user table.
         'signup': '10/hour',
+        # Anonymous customers submitting orders from WhatsApp or the Telegram
+        # Mini App; generous enough for a real conversation, tight enough that
+        # a leaked webapp link cannot flood the queue.
+        'bot_gateway': '60/hour',
     },
 }
 
@@ -347,6 +353,19 @@ TRIAL_ADMIN_USERNAME = os.environ.get('TRIAL_ADMIN_USERNAME', 'admin')
 DOCKER_COMPOSE_COMMAND = os.environ.get(
     'DOCKER_COMPOSE_COMMAND', 'docker compose'
 ).split()
+
+# -----------------------------
+# Bot gateway — WhatsApp and the Telegram Mini App order form
+# -----------------------------
+# Customers here are BotCustomer rows, not panel users: they authenticate with a
+# short-lived token of their own (bot_gateway.auth), never a staff JWT.
+BOT_CUSTOMER_JWT_LIFETIME_MINUTES = int(
+    os.environ.get('BOT_CUSTOMER_JWT_LIFETIME_MINUTES', '60')
+)
+# Absolute base the Mini App is opened at, e.g. https://panel.mrexchange.co.uk
+BOT_GATEWAY_FRONTEND_URL = os.environ.get(
+    'BOT_GATEWAY_FRONTEND_URL', 'http://localhost:3000'
+).rstrip('/')
 
 # -----------------------------
 # Headless template rendering (Playwright)

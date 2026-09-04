@@ -44,13 +44,18 @@
               !isCollapsed ? 'lg:px-4' : 'lg:justify-center lg:px-2',
             ]"
           >
-            <i :class="link.icon" class="text-base w-5 text-center shrink-0 flex-shrink-0" />
+            <span class="relative shrink-0 flex-shrink-0">
+              <i :class="link.icon" class="text-base w-5 text-center" />
+              <!-- Collapsed rail has no label to sit beside, so the count rides the icon. -->
+              <OrderQueueBadge v-if="link.to === '/orders'" />
+            </span>
             <!-- Label hidden on tablet and when collapsed; only icon visible -->
             <span
-              class="font-medium whitespace-nowrap overflow-hidden hidden md:hidden"
-              :class="!isCollapsed ? 'lg:inline-block' : ''"
+              class="font-medium whitespace-nowrap overflow-hidden hidden md:hidden items-center gap-2"
+              :class="!isCollapsed ? 'lg:inline-flex' : ''"
             >
               {{ $t(link.labelKey) }}
+              <OrderQueueBadge v-if="link.to === '/orders'" inline />
             </span>
           </router-link>
         </li>
@@ -75,6 +80,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
+import OrderQueueBadge from '@/components/layout/OrderQueueBadge.vue'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useAuthStore } from '@/stores/auth'
 import { useSidebarStore } from '@/stores/sidebar'

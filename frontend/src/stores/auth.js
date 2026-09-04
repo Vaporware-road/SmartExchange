@@ -56,6 +56,10 @@ export const useAuthStore = defineStore('auth', {
     canDeleteItems() {
       return canPermission(this.role, 'deleteItems')
     },
+    /** صف سفارش‌ها — super_admin، management و employee */
+    canAccessOrders() {
+      return canPermission(this.role, 'orders')
+    },
     canAccessProgrammerHub() {
       return canPermission(this.role, 'programmerHub')
     },

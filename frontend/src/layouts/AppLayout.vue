@@ -52,7 +52,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { AppSidebar, AppHeader, AppDrawer, AppFooter, AppBreadcrumb, AppBottomNav } from '@/components/layout'
 import DemoBanner from '@/components/demo/DemoBanner.vue'
@@ -61,6 +61,7 @@ import DemoTour from '@/components/demo/DemoTour.vue'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useSidebarStore } from '@/stores/sidebar'
 import { useAuthStore } from '@/stores/auth'
+import { useOrdersQueueStore } from '@/stores/ordersQueue'
 import { STORAGE_DEMO_TOUR_SEEN, storageGet, storageSet } from '@/constants/branding'
 
 const route = useRoute()
@@ -71,6 +72,7 @@ const tourOpen = ref(false)
 const siteSettings = useSiteSettingsStore()
 const sidebarStore = useSidebarStore()
 const auth = useAuthStore()
+const ordersQueue = useOrdersQueueStore()
 
 const isTemplateEditorLayout = computed(() => Boolean(route.meta.templateEditorLayout))
 
@@ -79,11 +81,29 @@ async function exitImpersonation() {
   router.push('/programmer')
 }
 
+/* Only poll for someone who can actually open the queue, and stop the moment
+   they cannot — an impersonation exit or a logout must not leave a timer
+   hitting an endpoint that will 403. */
+function syncOrdersPolling() {
+  if (auth.isAuthenticated && auth.can('orders')) {
+    ordersQueue.startPolling()
+  } else {
+    ordersQueue.stopPolling()
+  }
+}
+
+watch(() => [auth.isAuthenticated, auth.role], syncOrdersPolling)
+
 onMounted(() => {
   siteSettings.fetch()
+  syncOrdersPolling()
   if (auth.isDemo && !storageGet(STORAGE_DEMO_TOUR_SEEN)) {
     tourOpen.value = true
     storageSet(STORAGE_DEMO_TOUR_SEEN, null, '1')
   }
+})
+
+onUnmounted(() => {
+  ordersQueue.stopPolling()
 })
 </script>

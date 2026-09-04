@@ -16,7 +16,10 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token')
-  if (token) {
+  // Never overwrite a header the caller set: the bot gateway passes a customer
+  // token of its own, and a staff session in the same browser would otherwise
+  // replace it and get the customer endpoints 403ed.
+  if (token && !config.headers.Authorization) {
     config.headers.Authorization = `Bearer ${token}`
   }
   // Default instance sets application/json; FormData must use multipart boundary from the browser.
@@ -461,6 +464,49 @@ export const templateApi = {
   get: (id) => api.get(`/templates/${id}/`),
   update: (id, data) => api.put(`/templates/${id}/`, data),
   delete: (id) => api.delete(`/templates/${id}/`),
+}
+
+function botAuthHeaders(token) {
+  return { Authorization: `Bearer ${token}` }
+}
+
+/**
+ * Customer-facing bot surfaces: WhatsApp and the Telegram Mini App. These carry
+ * a short-lived BotCustomer token, never a staff JWT, and must fail quietly —
+ * a customer in a Mini App has no login page to be redirected to.
+ */
+export const botGatewayApi = {
+  verifyAuth: (token) =>
+    api.get('/bot-gateway/auth/me/', {
+      headers: botAuthHeaders(token),
+      silent: true,
+      skipGlobalErrorRedirect: true,
+    }),
+  submitOrder: (token, payload) =>
+    api.post('/bot-gateway/orders/', payload, {
+      headers: botAuthHeaders(token),
+      silent: true,
+      skipGlobalErrorRedirect: true,
+    }),
+  publicIntake: () =>
+    api.get('/bot-gateway/public/intake/', {
+      silent: true,
+      skipGlobalErrorRedirect: true,
+    }),
+  submitPublicOrder: (payload) =>
+    api.post('/bot-gateway/public/orders/', payload, {
+      silent: true,
+      skipGlobalErrorRedirect: true,
+    }),
+  stats: () => api.get('/bot-gateway/stats/'),
+}
+
+export const ordersApi = {
+  pendingCount: () => api.get('/orders/pending-count/', { silent: true }),
+  intakeLink: () => api.get('/orders/intake-link/'),
+  list: (params) => api.get('/orders/', { params }),
+  review: (uuid, data) => api.patch(`/orders/${uuid}/review/`, data),
+  remove: (uuid) => api.delete(`/orders/${uuid}/`, { silent: true }),
 }
 
 export const templateEditorApi = {
