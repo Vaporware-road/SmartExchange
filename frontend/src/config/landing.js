@@ -29,11 +29,12 @@ export function whatsappHref(message) {
 /** Instant demo: `?demo=1` autologs into the shared demo account (LoginView). */
 export const DEMO_URL = '/login?demo=1'
 /**
- * Trials are provisioned by us, not self-serve — the CTA goes to the contact
- * page, which shows the trial-specific note when `intent=trial`. Pointing it at
- * a login form gave the visitor nothing to do.
+ * Trials are self-serve: the visitor signs up with an email address and lands
+ * in their own panel with the clock already running. Kept in sync with the
+ * backend's INDIVIDUAL_TRIAL_DAYS — this constant only writes the copy.
  */
-export const TRIAL_URL = '/contact?intent=trial'
+export const TRIAL_URL = '/signup'
+export const TRIAL_DAYS = 14
 
 /** Bundle price. One-off — the only recurring line is the optional support add-on. */
 export const BUNDLE_PRICE = 399

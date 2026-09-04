@@ -275,6 +275,9 @@ export const authApi = {
   login: (username, password) =>
     api.post('/auth/login/', { username, password }),
   demoLogin: () => api.post('/auth/demo-login/'),
+  signup: (data) => api.post('/auth/signup/', data),
+  verifyEmail: (token) => api.post('/auth/verify-email/', { token }),
+  resendVerification: () => api.post('/auth/verify-email/resend/'),
   logout: (refresh) => api.post('/auth/logout/', { refresh }),
   me: () => api.get('/auth/me/'),
   users: {

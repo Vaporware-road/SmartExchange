@@ -27,6 +27,20 @@ const routes = [
     meta: { public: true },
   },
   {
+    path: '/signup',
+    name: 'signup',
+    component: () => import('@/views/auth/SignupView.vue'),
+    meta: { public: true },
+  },
+  {
+    // Opened from the confirmation email, often in a browser with no session,
+    // so it must stay public: the signed token in the path is the proof.
+    path: '/verify-email/:token',
+    name: 'verify-email',
+    component: () => import('@/views/auth/VerifyEmailView.vue'),
+    meta: { public: true },
+  },
+  {
     path: '/about',
     name: 'about',
     component: () => import('@/views/auth/AboutView.vue'),
@@ -352,7 +366,7 @@ router.beforeEach(async (to, from, next) => {
   await auth.ensureInitialized()
 
   if (to.meta.public) {
-    if (auth.isAuthenticated && to.name === 'login') {
+    if (auth.isAuthenticated && (to.name === 'login' || to.name === 'signup')) {
       next({ name: 'dashboard' })
     } else {
       next()

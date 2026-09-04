@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateAPIView, ListAPIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -14,8 +15,10 @@ from .models import CustomUser, UserActivityLog
 from .plans import allowed_plans_for, is_impersonating, user_plan
 from .trial import ensure_trial_started, trial_is_expired
 from .tokens import issue_tokens_for_user
+from .emails import mark_email_verified, read_verification_token, send_verification_email
 from .serializers import (
     LoginSerializer,
+    SignupSerializer,
     UserSerializer,
     UserCreateSerializer,
     UserUpdateSerializer,
@@ -155,6 +158,89 @@ class LoginAPIView(APIView):
             'access': str(refresh.access_token),
             'refresh': str(refresh),
         })
+
+
+class SignupAPIView(APIView):
+    """POST: register with an email address and land straight in your own panel.
+
+    Access is granted immediately — the trial clock starts here, not at
+    verification — so a wrong SMTP setting can never cost a customer their
+    signup. The verification mail is sent best-effort and only clears the
+    banner in the panel.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    throttle_scope = "signup"
+    throttle_classes = [ScopedRateThrottle]
+
+    def post(self, request):
+        if not settings.SIGNUP_ENABLED:
+            return error_response(
+                "Self-serve signup is disabled on this install.",
+                code="signup_disabled",
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
+
+        serializer = SignupSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
+
+        send_verification_email(user)
+        log_activity(
+            user,
+            UserActivityLog.ACTION_LOGIN_SUCCESS,
+            request,
+            details="self_serve_signup",
+        )
+
+        refresh = issue_tokens_for_user(user)
+        return Response(
+            {
+                "user": UserSerializer(user).data,
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+            },
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class VerifyEmailAPIView(APIView):
+    """POST: confirm an address from the link in the signup email.
+
+    Anonymous on purpose — the signed token is the proof, and the customer may
+    open the link in a browser that never held their session.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+
+    def post(self, request):
+        token = (request.data.get("token") or "").strip()
+        user = read_verification_token(token) if token else None
+        if user is None:
+            return error_response(
+                "This confirmation link is invalid or has expired.",
+                code="verification_invalid",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        mark_email_verified(user)
+        return Response({"verified": True, "email": user.email})
+
+
+class ResendVerificationAPIView(APIView):
+    """POST: send the confirmation link again to the signed-in account."""
+
+    permission_classes = [IsAuthenticated]
+    throttle_scope = "signup"
+    throttle_classes = [ScopedRateThrottle]
+
+    def post(self, request):
+        user = request.user
+        if user.email_verified_at is not None:
+            return Response({"sent": False, "already_verified": True})
+        sent = send_verification_email(user)
+        return Response({"sent": bool(sent), "already_verified": False})
 
 
 class DemoLoginAPIView(APIView):

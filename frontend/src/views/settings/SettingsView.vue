@@ -175,7 +175,7 @@
                   <button
                     type="button"
                     class="btn-luxury-outline border-red-500/50 text-red-400 hover:bg-red-500/10 hover:border-red-500/70 min-h-[48px]"
-                    :disabled="!canEditSiteSettings || clearingCache"
+                    :disabled="!canSeeGlobalSettings || clearingCache"
                     @click="showClearCacheModal = true"
                   >
                     <i class="fas fa-trash-alt" />
@@ -234,13 +234,13 @@
                     type="file"
                     accept=".ttf,.otf,font/ttf,font/otf"
                     class="hidden"
-                    :disabled="!canEditSiteSettings || fontsUploading"
+                    :disabled="!canSeeGlobalSettings || fontsUploading"
                     @change="onFontFileSelected"
                   >
                   <button
                     type="button"
                     class="btn-luxury-outline min-h-[48px]"
-                    :disabled="!canEditSiteSettings || fontsUploading"
+                    :disabled="!canSeeGlobalSettings || fontsUploading"
                     @click="fontFileInputRef?.click()"
                   >
                     <i class="fas fa-upload" />
@@ -254,7 +254,7 @@
                       <tr class="border-b text-[var(--text-secondary)]" style="border-color: var(--glass-border);">
                         <th class="py-3 px-4 font-medium">{{ $t('settings.fonts.tableFile') }}</th>
                         <th class="py-3 px-4 font-medium">{{ $t('settings.fonts.tableDisplay') }}</th>
-                        <th v-if="canEditSiteSettings" class="py-3 px-4 w-24" />
+                        <th v-if="canSeeGlobalSettings" class="py-3 px-4 w-24" />
                       </tr>
                     </thead>
                     <tbody>
@@ -265,7 +265,7 @@
                       >
                         <td class="py-2 px-4 font-mono text-xs break-all">{{ row.filename }}</td>
                         <td class="py-2 px-4">{{ row.display_name || row.filename }}</td>
-                        <td v-if="canEditSiteSettings" class="py-2 px-4">
+                        <td v-if="canSeeGlobalSettings" class="py-2 px-4">
                           <button
                             type="button"
                             class="text-red-400 hover:text-red-300 text-xs min-h-[40px]"
@@ -366,7 +366,7 @@
             </div>
 
             <!-- Logs -->
-            <div v-else-if="activeTab === 'logs'" key="logs" class="p-4 sm:p-6 w-full min-w-0 overflow-x-auto overflow-y-hidden">
+            <div v-else-if="activeTab === 'logs' && canSeeGlobalSettings" key="logs" class="p-4 sm:p-6 w-full min-w-0 overflow-x-auto overflow-y-hidden">
               <LogsView embedded />
             </div>
 
@@ -541,15 +541,17 @@ const siteSettings = useSiteSettingsStore()
 const currenciesStore = useCurrenciesStore()
 const auth = useAuthStore()
 
-const tabs = [
+const allTabs = [
   { id: 'general', labelKey: 'settings.tabs.general', icon: 'fas fa-sliders-h' },
   { id: 'uploads', labelKey: 'settings.tabs.uploads', icon: 'fas fa-cloud-upload-alt' },
   { id: 'instagram', labelKey: 'settings.tabs.instagram', icon: 'fab fa-instagram' },
   { id: 'fonts', labelKey: 'settings.tabs.fonts', icon: 'fas fa-font' },
   { id: 'api', labelKey: 'settings.tabs.api', icon: 'fas fa-code' },
-  { id: 'logs', labelKey: 'settings.tabs.logs', icon: 'fas fa-list' },
+  { id: 'logs', labelKey: 'settings.tabs.logs', icon: 'fas fa-list', adminOnly: true },
   { id: 'install-app', labelKey: 'settings.tabs.installApp', icon: 'fas fa-mobile-alt' },
 ]
+
+const tabs = computed(() => allTabs.filter((t) => !t.adminOnly || canSeeGlobalSettings.value))
 
 const activeTab = ref('general')
 const showClearCacheModal = ref(false)
@@ -575,7 +577,11 @@ const isIos = computed(() => {
 })
 
 const deferredPrompt = ref(null)
-const canEditSiteSettings = computed(() => auth.isSuperAdmin)
+// Branding, uploads, fonts and the webhook belong to whoever owns the
+// workspace; bots, channels and the activity log stay global (IsSuperAdmin),
+// so the Logs tab is dropped rather than shown and 403ing on load.
+const canEditSiteSettings = computed(() => auth.canAccessSettings)
+const canSeeGlobalSettings = computed(() => auth.canAccessSettingsAdmin)
 
 // General form: platform name from store, rest local
 const generalForm = reactive({
@@ -676,7 +682,7 @@ function setTab(id) {
 
 function initFromHash() {
   const hash = window.location.hash?.slice(1)
-  if (hash && tabs.some(t => t.id === hash)) {
+  if (hash && tabs.value.some(t => t.id === hash)) {
     activeTab.value = hash
   }
 }
@@ -888,7 +894,7 @@ async function saveFontsSettings() {
 
 async function onFontFileSelected(event) {
   const file = event.target?.files?.[0]
-  if (!file || !canEditSiteSettings.value) return
+  if (!file || !canSeeGlobalSettings.value) return
   fontsUploading.value = true
   try {
     const formData = new FormData()
@@ -911,7 +917,7 @@ function openDeleteFontModal(filename) {
 
 async function confirmDeleteFont() {
   const name = fontPendingDelete.value
-  if (!name || !canEditSiteSettings.value) {
+  if (!name || !canSeeGlobalSettings.value) {
     showDeleteFontModal.value = false
     return
   }
@@ -933,7 +939,7 @@ async function confirmDeleteFont() {
 }
 
 async function clearCache() {
-  if (!canEditSiteSettings.value) {
+  if (!canSeeGlobalSettings.value) {
     toast.error(t('errors.forbidden'))
     return
   }

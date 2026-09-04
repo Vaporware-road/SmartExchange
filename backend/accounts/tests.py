@@ -1,6 +1,10 @@
+from django.conf import settings
+from django.core import mail
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import override_settings
 from rest_framework.test import APITestCase
 
+from accounts.emails import make_verification_token
 from accounts.models import CustomUser, UserActivityLog
 from accounts.plans import PLAN_BRONZE, PLAN_GOLD
 from price_publisher.models import PriceTemplate
@@ -291,3 +295,137 @@ class ProgrammerDelegatedOperatorApiTests(APITestCase):
         user.refresh_from_db()
         self.assertIsNone(user.owner)
         self.assertFalse(BotAdmin.objects.filter(bot=self.bot, user=user).exists())
+
+
+class SelfServeSignupTests(APITestCase):
+    """Signup must hand back a usable session and a running trial in one call."""
+
+    SIGNUP_URL = "/api/auth/signup/"
+
+    def _payload(self, **overrides):
+        payload = {
+            "email": "owner@exchange.test",
+            "password": "correct-horse-9",
+            "first_name": "Sara",
+            "last_name": "Ahmadi",
+            "exchange_name": "Sara Exchange",
+        }
+        payload.update(overrides)
+        return payload
+
+    def test_signup_creates_a_management_account_on_a_running_trial(self):
+        r = self.client.post(self.SIGNUP_URL, self._payload(), format="json")
+        self.assertEqual(r.status_code, 201, r.content)
+        body = r.json()
+        self.assertTrue(body["access"])
+        self.assertTrue(body["refresh"])
+
+        user = CustomUser.objects.get(email="owner@exchange.test")
+        self.assertEqual(user.role, CustomUser.ROLE_MANAGEMENT)
+        self.assertEqual(user.sub_role, CustomUser.SUB_ROLE_ADMIN)
+        self.assertEqual(user.plan, PLAN_BRONZE)
+        self.assertIsNotNone(user.trial_started_at)
+        self.assertIsNotNone(user.trial_expires_at)
+        self.assertIsNone(user.registered_by)
+        self.assertEqual(
+            (user.trial_expires_at - user.trial_started_at).days,
+            settings.INDIVIDUAL_TRIAL_DAYS,
+        )
+
+    def test_signup_grants_panel_access_before_the_email_is_verified(self):
+        r = self.client.post(self.SIGNUP_URL, self._payload(), format="json")
+        self.assertEqual(r.status_code, 201)
+        self.assertIsNone(r.json()["user"]["email_verified_at"])
+
+        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {r.json()['access']}")
+        me = self.client.get("/api/auth/me/")
+        self.assertEqual(me.status_code, 200)
+        self.assertEqual(me.json()["email"], "owner@exchange.test")
+
+    def test_signup_sends_a_verification_email_that_verifies_once(self):
+        mail.outbox = []
+        r = self.client.post(self.SIGNUP_URL, self._payload(), format="json")
+        self.assertEqual(r.status_code, 201)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("owner@exchange.test", mail.outbox[0].to)
+
+        user = CustomUser.objects.get(email="owner@exchange.test")
+        token = make_verification_token(user)
+        confirm = self.client.post(
+            "/api/auth/verify-email/", {"token": token}, format="json"
+        )
+        self.assertEqual(confirm.status_code, 200, confirm.content)
+        user.refresh_from_db()
+        self.assertIsNotNone(user.email_verified_at)
+
+    def test_a_tampered_or_unknown_token_is_rejected(self):
+        r = self.client.post(
+            "/api/auth/verify-email/", {"token": "not-a-real-token"}, format="json"
+        )
+        self.assertEqual(r.status_code, 400)
+        self.assertEqual(r.json()["code"], "verification_invalid")
+
+    def test_changing_the_email_invalidates_an_outstanding_link(self):
+        self.client.post(self.SIGNUP_URL, self._payload(), format="json")
+        user = CustomUser.objects.get(email="owner@exchange.test")
+        token = make_verification_token(user)
+
+        user.email = "moved@exchange.test"
+        user.save(update_fields=["email"])
+
+        r = self.client.post("/api/auth/verify-email/", {"token": token}, format="json")
+        self.assertEqual(r.status_code, 400)
+
+    def test_a_taken_email_is_refused(self):
+        self.client.post(self.SIGNUP_URL, self._payload(), format="json")
+        r = self.client.post(self.SIGNUP_URL, self._payload(), format="json")
+        self.assertEqual(r.status_code, 400)
+        self.assertIn("email", r.json().get("errors", {}))
+
+    def test_a_weak_password_is_refused(self):
+        r = self.client.post(
+            self.SIGNUP_URL, self._payload(password="12345678"), format="json"
+        )
+        self.assertEqual(r.status_code, 400)
+        self.assertIn("password", r.json().get("errors", {}))
+
+    @override_settings(SIGNUP_ENABLED=False)
+    def test_signup_can_be_switched_off_per_install(self):
+        r = self.client.post(self.SIGNUP_URL, self._payload(), format="json")
+        self.assertEqual(r.status_code, 403)
+        self.assertEqual(r.json()["code"], "signup_disabled")
+
+
+class SettingsAccessTests(APITestCase):
+    """The workspace owner configures the workspace; the rest stays super-admin."""
+
+    def setUp(self):
+        self.owner = CustomUser.objects.create_user(
+            username="owner", password="pass12345", role=CustomUser.ROLE_MANAGEMENT
+        )
+        self.employee = CustomUser.objects.create_user(
+            username="clerk", password="pass12345", role=CustomUser.ROLE_EMPLOYEE
+        )
+        self.admin = CustomUser.objects.create_user(
+            username="boss", password="pass12345", role=CustomUser.ROLE_SUPER_ADMIN
+        )
+
+    def test_owner_can_save_site_settings(self):
+        self.client.force_authenticate(self.owner)
+        r = self.client.put(
+            "/api/settings/site/", {"site_name": "Sara Exchange"}, format="json"
+        )
+        self.assertEqual(r.status_code, 200, r.content)
+
+    def test_employee_still_cannot_save_site_settings(self):
+        self.client.force_authenticate(self.employee)
+        r = self.client.put(
+            "/api/settings/site/", {"site_name": "nope"}, format="json"
+        )
+        self.assertEqual(r.status_code, 403)
+
+    def test_activity_log_stays_super_admin_only(self):
+        self.client.force_authenticate(self.owner)
+        self.assertEqual(self.client.get("/api/auth/activity/").status_code, 403)
+        self.client.force_authenticate(self.admin)
+        self.assertEqual(self.client.get("/api/auth/activity/").status_code, 200)

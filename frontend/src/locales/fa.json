@@ -116,7 +116,32 @@
     "username": "نام کاربری",
     "password": "رمز عبور",
     "loginButton": "ورود",
-    "loggingIn": "در حال ورود..."
+    "loggingIn": "در حال ورود...",
+    "email": "نشانی ایمیل",
+    "emailPlaceholder": "you@yourexchange.com",
+    "firstName": "نام",
+    "lastName": "نام خانوادگی",
+    "exchangeName": "نام صرافی",
+    "exchangeNamePlaceholder": "نامی که مشتریان شما می‌شناسند",
+    "passwordHint": "حداقل ۸ نویسه.",
+    "signupTitle": "شروع دوره آزمایشی رایگان {days} روزه",
+    "signupButton": "شروع {days} روز رایگان",
+    "signingUp": "در حال ساخت پنل شما…",
+    "signupNoCard": "بدون نیاز به کارت بانکی. پنل شما بلافاصله باز می‌شود.",
+    "haveAccount": "قبلاً حساب دارید؟",
+    "verifying": "در حال تأیید نشانی ایمیل…",
+    "verifiedTitle": "ایمیل تأیید شد",
+    "verifiedText": "ممنون — حالا می‌توانیم با شما در تماس باشیم. دوره آزمایشی شما تغییری نکرده است.",
+    "verifyFailedTitle": "این پیوند کار نکرد",
+    "verifyFailedText": "ممکن است منقضی شده باشد. از نوار بالای پنل، پیوند تازه بخواهید.",
+    "goToPanel": "رفتن به پنل",
+    "verifyBanner": {
+      "title": "ایمیل خود را تأیید کنید",
+      "text": "پیوندی به {email} فرستادیم. پنل شما در هر صورت کار می‌کند.",
+      "resend": "دوباره بفرست",
+      "sent": "ایمیل تأیید فرستاده شد.",
+      "sendFailed": "ارسال ایمیل ممکن نشد. کمی بعد دوباره تلاش کنید."
+    }
   },
   "routes": {
     "dashboard": "داشبورد",

@@ -123,7 +123,32 @@
     "loginButton": "Login",
     "loggingIn": "Logging in...",
     "exploreDemo": "Explore Demo",
-    "signingIn": "Signing in…"
+    "signingIn": "Signing in…",
+    "email": "Email address",
+    "emailPlaceholder": "you@yourexchange.com",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "exchangeName": "Exchange name",
+    "exchangeNamePlaceholder": "The name your customers know",
+    "passwordHint": "At least 8 characters.",
+    "signupTitle": "Start your {days}-day free trial",
+    "signupButton": "Start my {days} free days",
+    "signingUp": "Creating your panel…",
+    "signupNoCard": "No card needed. Your panel opens straight away.",
+    "haveAccount": "Already have an account?",
+    "verifying": "Confirming your email address…",
+    "verifiedTitle": "Email confirmed",
+    "verifiedText": "Thanks — we can reach you now. Your trial is unaffected.",
+    "verifyFailedTitle": "That link did not work",
+    "verifyFailedText": "It may have expired. Request a new one from the banner in your panel.",
+    "goToPanel": "Go to my panel",
+    "verifyBanner": {
+      "title": "Confirm your email",
+      "text": "We sent a link to {email}. Your panel works either way.",
+      "resend": "Send it again",
+      "sent": "Confirmation email sent.",
+      "sendFailed": "We could not send the email. Try again in a moment."
+    }
   },
   "routes": {
     "dashboard": "Dashboard",

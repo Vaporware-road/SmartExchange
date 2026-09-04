@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.utils import timezone
 from rest_framework import serializers
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -63,6 +65,7 @@ class UserSerializer(serializers.ModelSerializer):
             "trial_expires_at",
             "trial_expiry_notified_at",
             "trial_days_remaining",
+            "email_verified_at",
             "is_active",
             "date_joined",
             "telegram_bot_token_masked",
@@ -73,11 +76,6 @@ class UserSerializer(serializers.ModelSerializer):
     registered_by_name = serializers.SerializerMethodField()
     owner_name = serializers.SerializerMethodField()
     owner_username = serializers.SerializerMethodField()
-
-    def get_trial_days_remaining(self, obj):
-        from fleet.services import days_remaining
-
-        return days_remaining(obj)
 
     def get_registered_by_name(self, obj):
         staff = obj.registered_by
@@ -166,6 +164,57 @@ def unique_username_from_email(email):
         candidate = f"{base}{n}"
         n += 1
     return candidate
+
+
+class SignupSerializer(serializers.Serializer):
+    """Self-serve registration: an email address in, a working panel out.
+
+    Creates the same shape of account the programmer hub creates for a client
+    (role=management, its own workspace, trial clock running) minus the
+    BotFather token, which the customer adds from the panel once they are in.
+    """
+
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True, min_length=8, max_length=128)
+    first_name = serializers.CharField(max_length=150)
+    last_name = serializers.CharField(max_length=150, allow_blank=True, required=False, default="")
+    exchange_name = serializers.CharField(max_length=255, allow_blank=True, required=False, default="")
+    country = serializers.CharField(max_length=120, allow_blank=True, required=False, default="")
+    phone = serializers.CharField(max_length=40, allow_blank=True, required=False, default="")
+
+    def validate_email(self, value):
+        email = value.strip().lower()
+        if CustomUser.objects.filter(email__iexact=email).exists():
+            # Deliberately explicit: this is a signup form, not a login form, so
+            # saying the address is taken helps the owner far more than it helps
+            # an enumerator who could learn the same from the login page.
+            raise serializers.ValidationError("An account with this email already exists.")
+        return email
+
+    def validate_password(self, value):
+        validate_password(value)
+        return value
+
+    def create(self, validated_data):
+        started_at = timezone.now()
+        email = validated_data["email"]
+        user = CustomUser.objects.create_user(
+            unique_username_from_email(email),
+            password=validated_data["password"],
+            email=email,
+            first_name=validated_data["first_name"].strip(),
+            last_name=(validated_data.get("last_name") or "").strip(),
+            exchange_name=(validated_data.get("exchange_name") or "").strip(),
+            country=(validated_data.get("country") or "").strip(),
+            phone=(validated_data.get("phone") or "").strip(),
+            plan=PLAN_BRONZE,
+            role=CustomUser.ROLE_MANAGEMENT,
+            sub_role=CustomUser.SUB_ROLE_ADMIN,
+            is_active=True,
+            trial_started_at=started_at,
+            trial_expires_at=trial_expires_at(started_at),
+        )
+        return user
 
 
 class ProgrammerRegisterSerializer(serializers.Serializer):

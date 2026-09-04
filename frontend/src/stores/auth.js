@@ -32,9 +32,13 @@ export const useAuthStore = defineStore('auth', {
     canAccessFinalize() {
       return canPermission(this.role, 'finalize')
     },
-    /** دسترسی به تنظیمات پنل — فقط super_admin (backend: IsSuperAdmin) */
+    /** دسترسی به تنظیمات پنل — super_admin و management (backend: IsSuperAdminOrManagement) */
     canAccessSettings() {
       return canPermission(this.role, 'settings')
+    },
+    /** بخش‌های سراسری تنظیمات (ربات، کانال، لاگ) — فقط super_admin (backend: IsSuperAdmin) */
+    canAccessSettingsAdmin() {
+      return canPermission(this.role, 'settingsAdmin')
     },
     /** دسترسی به تحلیل — همه نقش‌ها */
     canAccessAnalysis() {
@@ -61,6 +65,13 @@ export const useAuthStore = defineStore('auth', {
     /** Shared public demo account — the panel labels the session and offers the tour. */
     isDemo() {
       return Boolean(this.user?.is_demo)
+    },
+    /** Signup grants access before the address is proven; the banner asks for it. */
+    needsEmailVerification() {
+      return Boolean(this.user) && !this.user?.email_verified_at && Boolean(this.user?.email)
+    },
+    trialDaysRemaining() {
+      return this.user?.trial_days_remaining ?? null
     },
     shouldOpenProgrammerHub() {
       return this.canAccessProgrammerHub && !this.isImpersonating
@@ -106,6 +117,28 @@ export const useAuthStore = defineStore('auth', {
       } finally {
         this.loading = false
       }
+    },
+
+    /** Register and land signed in — the trial is already running server-side. */
+    async signup(payload) {
+      this.loading = true
+      try {
+        const { data } = await authApi.signup(payload)
+        if (data.access) localStorage.setItem('access_token', data.access)
+        if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
+        sessionStorage.removeItem('programmer_access_token')
+        sessionStorage.removeItem('programmer_refresh_token')
+        this.user = data.user ?? data
+        useTelegramHubStore().clearSession()
+        return this.user
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async resendVerification() {
+      const { data } = await authApi.resendVerification()
+      return data
     },
 
     async demoLogin() {

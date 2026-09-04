@@ -6,7 +6,13 @@
  * that 403s on click, which is exactly what used to happen here:
  *   - `settings` was ALL_PANEL_ROLES, but SiteSettings/bots/channels/logs are IsSuperAdmin.
  *   - `adminManagement` allowed `management`, but User Management is IsSuperAdmin.
- * Both are narrowed below to match the backend.
+ * Both were narrowed to match. `settings` has since been widened again to
+ * super_admin + management — a self-serve signup owns its workspace with
+ * role=management and has to be able to configure branding, uploads, fonts and
+ * the webhook — and the backend was widened with it (SiteSettings and the
+ * upload policy now accept IsSuperAdminOrManagement). The pieces that stayed
+ * IsSuperAdmin — bots, channels and the activity log — are hidden inside the
+ * page via `settingsAdmin` rather than by closing the whole page again.
  */
 
 export const ROLES = {
@@ -42,8 +48,10 @@ export const PERMISSIONS = {
   analysis: ALL_PANEL_ROLES,
   /** نهایی‌سازی و انتشار به تلگرام — IsSuperAdminOrManagement */
   finalize: SUPER_ADMIN_OR_MANAGEMENT,
-  /** تنظیمات پنل (سایت، ربات، کانال، لاگ‌ها) — IsSuperAdmin */
-  settings: SUPER_ADMIN_ONLY,
+  /** تنظیمات پنل (برندینگ، آپلود، فونت، وبهوک) — IsSuperAdminOrManagement */
+  settings: SUPER_ADMIN_OR_MANAGEMENT,
+  /** بخش‌های سراسری تنظیمات (ربات، کانال، لاگ‌ها) — IsSuperAdmin */
+  settingsAdmin: SUPER_ADMIN_ONLY,
   /** ربات و کانال تلگرام — IsSuperAdminOrManagementOrEmployee */
   telegram: SUPER_ADMIN_OR_MANAGEMENT_OR_EMPLOYEE,
   /** حذف آیتم‌ها (دسته‌بندی، قالب و غیره) — IsSuperAdminOrManagement */

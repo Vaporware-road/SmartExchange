@@ -60,6 +60,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     trial_started_at = models.DateTimeField(null=True, blank=True)
     trial_expires_at = models.DateTimeField(null=True, blank=True)
     trial_expiry_notified_at = models.DateTimeField(null=True, blank=True)
+    # Self-serve signups reach their panel immediately; this only records that
+    # the address was later proven, so the panel can nag and staff can filter.
+    email_verified_at = models.DateTimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

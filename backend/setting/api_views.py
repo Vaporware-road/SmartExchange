@@ -80,7 +80,13 @@ def _public_site_settings_fallback():
 
 
 class SiteSettingsAPIView(APIView):
-    """GET: public branding (login/landing). PUT: super admin only."""
+    """GET: public branding (login/landing). PUT: the workspace owner.
+
+    Widened from IsSuperAdmin to IsSuperAdminOrManagement: a self-serve signup
+    owns its install with role=management and must be able to set its own
+    branding, fonts and webhook. Bots, channels and the activity log below stay
+    IsSuperAdmin — they are global, not per-workspace.
+    """
 
     permission_classes = [AllowAny]
     throttle_scope = "settings"
@@ -90,7 +96,7 @@ class SiteSettingsAPIView(APIView):
     def get_permissions(self):
         if self.request.method == 'GET':
             return [AllowAny()]
-        return [IsAuthenticated(), IsSuperAdmin()]
+        return [IsAuthenticated(), IsSuperAdminOrManagement()]
 
     def get(self, request):
         try:
@@ -211,10 +217,10 @@ def _human_gb(bytes_value: int) -> str:
 class UploadSettingsAPIView(APIView):
     """
     GET: upload policy + temp/cache storage usage.
-    PUT: update upload policy (super admin).
+    PUT: update upload policy (workspace owner).
     """
 
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
     throttle_scope = "settings"
     throttle_classes = [ScopedRateThrottle]
 

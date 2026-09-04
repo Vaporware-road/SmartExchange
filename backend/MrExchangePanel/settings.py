@@ -99,6 +99,9 @@ REST_FRAMEWORK = {
         # One heartbeat a day per install; the headroom absorbs restarts and
         # retries without letting an unknown key hammer the endpoint.
         'fleet_checkin': '60/hour',
+        # Registration is anonymous and creates rows; keep it well under the
+        # generic anon rate so a script cannot fill the user table.
+        'signup': '10/hour',
     },
 }
 
@@ -344,6 +347,44 @@ TRIAL_ADMIN_USERNAME = os.environ.get('TRIAL_ADMIN_USERNAME', 'admin')
 DOCKER_COMPOSE_COMMAND = os.environ.get(
     'DOCKER_COMPOSE_COMMAND', 'docker compose'
 ).split()
+
+# -----------------------------
+# Self-serve signup — email address in, own panel out, trial running
+# -----------------------------
+# A signup creates a role=management account that owns its own workspace: it is
+# the same shape of account the programmer hub creates for a client, minus the
+# BotFather token, which the customer adds from the panel afterwards.
+SIGNUP_ENABLED = os.environ.get('SIGNUP_ENABLED', 'True').lower() in ('true', '1', 'yes')
+# Access is granted immediately; the verification link only clears the banner.
+# Kept separate from SIGNUP_ENABLED so a deployment can stop sending mail
+# without closing registration.
+SIGNUP_EMAIL_VERIFICATION = os.environ.get(
+    'SIGNUP_EMAIL_VERIFICATION', 'True'
+).lower() in ('true', '1', 'yes')
+# How long a verification link stays valid, in seconds (default 3 days).
+EMAIL_VERIFICATION_TIMEOUT = int(os.environ.get('EMAIL_VERIFICATION_TIMEOUT', '259200'))
+# Absolute base for links inside outgoing mail. Falls back to the first
+# non-wildcard allowed host so a misconfigured deployment still sends a
+# clickable link rather than "http://None/".
+PUBLIC_BASE_URL = os.environ.get('PUBLIC_BASE_URL', '').strip().rstrip('/')
+
+# -----------------------------
+# Outgoing email
+# -----------------------------
+# No SMTP host configured means console output: development and CI print the
+# verification link instead of failing, and nothing silently disappears.
+EMAIL_HOST = os.environ.get('EMAIL_HOST', '').strip()
+if EMAIL_HOST:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_PORT = int(os.environ.get('EMAIL_PORT', '587'))
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1', 'yes')
+EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 'yes')
+EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', '10'))
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'MrExchange <no-reply@mrexchange.co.uk>')
 
 # -----------------------------
 # Fleet — how this install reports to the owner panel

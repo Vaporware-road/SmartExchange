@@ -18,6 +18,7 @@
         </button>
       </div>
       <DemoBanner v-if="auth.isDemo" @open-tour="tourOpen = true" />
+      <VerifyEmailBanner v-if="auth.needsEmailVerification" />
       <AppHeader @toggle-drawer="drawerOpen = !drawerOpen" />
       <main
         class="flex min-w-0 flex-1 flex-col overflow-x-hidden"
@@ -55,6 +56,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { AppSidebar, AppHeader, AppDrawer, AppFooter, AppBreadcrumb, AppBottomNav } from '@/components/layout'
 import DemoBanner from '@/components/demo/DemoBanner.vue'
+import VerifyEmailBanner from '@/components/layout/VerifyEmailBanner.vue'
 import DemoTour from '@/components/demo/DemoTour.vue'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useSidebarStore } from '@/stores/sidebar'

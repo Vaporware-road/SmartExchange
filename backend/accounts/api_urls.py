@@ -6,6 +6,13 @@ from .serializers import TokenRefreshWithVersionSerializer
 
 urlpatterns = [
     path("login/", api_views.LoginAPIView.as_view(), name="api-login"),
+    path("signup/", api_views.SignupAPIView.as_view(), name="api-signup"),
+    path("verify-email/", api_views.VerifyEmailAPIView.as_view(), name="api-verify-email"),
+    path(
+        "verify-email/resend/",
+        api_views.ResendVerificationAPIView.as_view(),
+        name="api-verify-email-resend",
+    ),
     path("demo-login/", api_views.DemoLoginAPIView.as_view(), name="api-demo-login"),
     path("logout/", api_views.LogoutAPIView.as_view(), name="api-logout"),
     path("me/", api_views.MeAPIView.as_view(), name="api-me"),
