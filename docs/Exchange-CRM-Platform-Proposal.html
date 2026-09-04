@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Exchange CRM Platform — Product Proposal</title>
+<style>
+  /* ============ PAGE SETUP ============ */
+  @page {
+    size: A4;
+    margin: 22mm 16mm 20mm 16mm;
+    @top-left {
+      content: "EXCHANGE CRM PLATFORM";
+      font-family: Lato, "DejaVu Sans", sans-serif;
+      font-size: 7.5pt;
+      letter-spacing: 1.6pt;
+      color: #8A93A5;
+      vertical-align: bottom;
+      padding-bottom: 5mm;
+    }
+    @top-right {
+      content: "Product Proposal";
+      font-family: Lato, "DejaVu Sans", sans-serif;
+      font-size: 7.5pt;
+      letter-spacing: 0.6pt;
+      color: #8A93A5;
+      vertical-align: bottom;
+      padding-bottom: 5mm;
+    }
+    @bottom-left {
+      content: "Confidential — prepared for the client";
+      font-family: Lato, "DejaVu Sans", sans-serif;
+      font-size: 7pt;
+      color: #A2AAB8;
+      vertical-align: top;
+      padding-top: 4mm;
+    }
+    @bottom-right {
+      content: counter(page);
+      font-family: Lato, "DejaVu Sans", sans-serif;
+      font-size: 9pt;
+      font-weight: 700;
+      color: #0F1A2B;
+      vertical-align: top;
+      padding-top: 3.4mm;
+    }
+  }
+  @page cover {
+    margin: 0;
+    @top-left { content: ""; }
+    @top-right { content: ""; }
+    @bottom-left { content: ""; }
+    @bottom-right { content: ""; }
+  }
+  @page dark {
+    margin: 0;
+    @top-left { content: ""; }
+    @top-right { content: ""; }
+    @bottom-left { content: ""; }
+    @bottom-right { content: ""; }
+  }
+
+  /* ============ BASE ============ */
+  * { box-sizing: border-box; }
+  html {
+    font-family: Lato, "DejaVu Sans", sans-serif;
+    font-size: 10pt;
+    color: #2B3648;
+    line-height: 1.55;
+  }
+  body { margin: 0; }
+  p { margin: 0 0 7pt 0; }
+  strong { color: #14243B; font-weight: 700; }
+  h1, h2, h3, h4 { margin: 0; color: #0F1A2B; font-weight: 900; letter-spacing: -0.2pt; }
+
+  /* ============ COVER ============ */
+  .cover {
+    page: cover;
+    height: 297mm;
+    width: 210mm;
+    background: #0F1A2B;
+    position: relative;
+    overflow: hidden;
+    color: #FFFFFF;
+  }
+  .cover-band {
+    position: absolute;
+    top: 0; left: 0;
+    width: 210mm; height: 8mm;
+    background: linear-gradient(90deg, #C9A227 0%, #FFD700 45%, #7C6512 100%);
+  }
+  .cover-glow {
+    position: absolute;
+    right: -60mm; top: 40mm;
+    width: 170mm; height: 170mm;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,215,0,0.14) 0%, rgba(15,26,43,0) 68%);
+  }
+  .cover-grid {
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 210mm; height: 120mm;
+    background-image:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.05) 0mm, rgba(255,255,255,0.05) 0.2mm, rgba(255,255,255,0) 0.2mm, rgba(255,255,255,0) 14mm),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.05) 0mm, rgba(255,255,255,0.05) 0.2mm, rgba(255,255,255,0) 0.2mm, rgba(255,255,255,0) 14mm);
+  }
+  .cover-inner { position: absolute; left: 22mm; right: 22mm; top: 24mm; }
+  .cover-logo { width: 52mm; display: block; }
+  .cover-eyebrow {
+    margin-top: 18mm;
+    font-size: 8.5pt;
+    letter-spacing: 4pt;
+    color: #FFD700;
+    font-weight: 700;
+  }
+  .cover-title {
+    margin-top: 6mm;
+    font-size: 36pt;
+    line-height: 1.05;
+    color: #FFFFFF;
+    font-weight: 900;
+    letter-spacing: -1.2pt;
+  }
+  .cover-title span { color: #FFD700; }
+  .cover-rule { width: 26mm; height: 2.4pt; background: #FFD700; margin: 8mm 0 7mm 0; }
+  .cover-sub {
+    font-size: 13pt;
+    color: #C8D2E0;
+    font-weight: 300;
+    line-height: 1.5;
+    max-width: 128mm;
+  }
+  .cover-value {
+    margin-top: 9mm;
+    padding: 6mm 7mm;
+    border-left: 2.5pt solid #FFD700;
+    background: rgba(255,255,255,0.045);
+    font-size: 10pt;
+    color: #E8EDF4;
+    font-weight: 300;
+    line-height: 1.55;
+    max-width: 152mm;
+  }
+  .cover-value b { color: #FFD700; font-weight: 700; }
+  .cover-foot {
+    position: absolute;
+    left: 22mm; right: 22mm; bottom: 18mm;
+  }
+
+  /* ---- COMMERCIAL PANEL (COVER) ---- */
+  .commercial {
+    border: 1px solid rgba(255,215,0,0.35);
+    border-top: 2.5pt solid #FFD700;
+    border-radius: 2mm;
+    background: rgba(255,255,255,0.05);
+    padding: 6.5mm 7mm 5.5mm 7mm;
+    margin-bottom: 6mm;
+  }
+  .commercial-head {
+    font-size: 7.5pt;
+    letter-spacing: 2.6pt;
+    color: #FFD700;
+    font-weight: 900;
+    margin-bottom: 4.5mm;
+  }
+  .comm-tbl { width: 100%; border-collapse: collapse; }
+  .comm-tbl td { vertical-align: bottom; padding: 0; }
+  .comm-tbl td.sep { width: 8mm; }
+  .comm-l { display: block; font-size: 7pt; letter-spacing: 1.4pt; color: #94A2B8; margin-bottom: 2.4mm; }
+  .comm-price { font-size: 38pt; font-weight: 900; color: #FFD700; line-height: 0.95; letter-spacing: -1.5pt; }
+  .comm-price .cur { font-size: 24pt; vertical-align: 6pt; margin-right: 0.6mm; }
+  .comm-price .unit { display: block; font-size: 7.5pt; font-weight: 400; letter-spacing: 1.2pt; color: #A9B6C9; margin-top: 2.6mm; }
+  .comm-v { font-size: 15pt; font-weight: 900; color: #FFFFFF; line-height: 1.15; }
+  .comm-v .note { display: block; font-size: 8.8pt; font-weight: 400; color: #C6D2E1; line-height: 1.45; margin-top: 2.4mm; }
+  .comm-rule { border-left: 1px solid rgba(255,255,255,0.16); }
+  .comm-terms {
+    margin-top: 5.5mm;
+    padding-top: 4.5mm;
+    border-top: 1px solid rgba(255,255,255,0.14);
+    font-size: 10.5pt;
+    color: #E8EDF4;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+  .comm-terms b { color: #FFD700; font-weight: 900; letter-spacing: 0.3pt; }
+  .cover-meta { font-size: 8pt; color: #8494AC; letter-spacing: 0.8pt; }
+
+  /* ============ SECTION HEADINGS ============ */
+  .section { page-break-before: always; }
+  .sec-head { margin-bottom: 7mm; }
+  .sec-num {
+    display: inline-block;
+    font-size: 8pt;
+    font-weight: 900;
+    letter-spacing: 2.4pt;
+    color: #B8860B;
+    margin-bottom: 2.5mm;
+  }
+  .sec-title { font-size: 21pt; line-height: 1.15; }
+  .sec-rule { width: 18mm; height: 2.2pt; background: #FFD700; margin-top: 4mm; }
+  .lede { font-size: 11pt; font-weight: 300; color: #45536B; line-height: 1.6; margin-bottom: 6mm; }
+
+  h3.blk {
+    font-size: 12.5pt;
+    margin: 8mm 0 3mm 0;
+    padding-bottom: 2mm;
+    border-bottom: 1px solid #E3E8EF;
+  }
+  h4.mini { font-size: 9pt; letter-spacing: 1.4pt; color: #6B7789; margin: 6mm 0 2.5mm 0; }
+
+  /* ============ MODULE CARD ============ */
+  .module {
+    border: 1px solid #E1E7EE;
+    border-top: 3pt solid #0F1A2B;
+    border-radius: 2mm;
+    padding: 8mm 8mm 7mm 8mm;
+    margin-bottom: 6mm;
+    page-break-inside: avoid;
+    background: #FFFFFF;
+  }
+  .mod-head { width: 100%; border-collapse: collapse; margin-bottom: 3.5mm; }
+  .mod-head td { vertical-align: middle; padding: 0; }
+  .mod-icon {
+    width: 13mm;
+  }
+  .icon-box {
+    width: 11mm; height: 11mm;
+    background: #0F1A2B;
+    border-radius: 2mm;
+    text-align: center;
+    line-height: 11mm;
+  }
+  .icon-box svg { vertical-align: middle; }
+  .mod-index { font-size: 7.5pt; letter-spacing: 2pt; color: #B8860B; font-weight: 900; }
+  .mod-title { font-size: 14pt; line-height: 1.2; margin-top: 0.6mm; }
+  .mod-purpose { color: #3B475C; margin-bottom: 4mm; }
+
+  .benefit-strip {
+    background: #FBF7E7;
+    border-left: 2.5pt solid #FFD700;
+    padding: 3.5mm 4.5mm;
+    margin-bottom: 4.5mm;
+    font-size: 9.5pt;
+    color: #4A4022;
+  }
+  .benefit-strip b { color: #6B5A10; letter-spacing: 0.6pt; font-size: 8pt; display: block; margin-bottom: 1.2mm; text-transform: uppercase; }
+
+  /* ============ CAPABILITY LISTS ============ */
+  .caps { width: 100%; border-collapse: collapse; }
+  .caps td { width: 50%; vertical-align: top; padding: 0 4mm 0 0; }
+  ul.tick { list-style: none; margin: 0; padding: 0; }
+  ul.tick li {
+    position: relative;
+    padding-left: 5.2mm;
+    margin-bottom: 1.8mm;
+    font-size: 9.5pt;
+    color: #37435A;
+    line-height: 1.45;
+  }
+  ul.tick li:before {
+    content: "";
+    position: absolute;
+    left: 0; top: 1.55mm;
+    width: 2mm; height: 2mm;
+    background: #FFD700;
+    border-radius: 0.4mm;
+    transform: rotate(45deg);
+  }
+  ul.plain { list-style: none; margin: 0 0 4mm 0; padding: 0; }
+  ul.plain li { padding-left: 4mm; margin-bottom: 1.6mm; font-size: 9.5pt; border-left: 1.5pt solid #E7EBF1; }
+
+  /* ============ TABLES ============ */
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 3mm 0 6mm 0;
+    font-size: 9pt;
+  }
+  table.data thead { display: table-header-group; }
+  table.data tr { page-break-inside: avoid; }
+  .module table.data { page-break-inside: avoid; }
+  .brk { page-break-before: always; }
+  table.data th {
+    background: #0F1A2B;
+    color: #FFFFFF;
+    text-align: left;
+    font-size: 8pt;
+    letter-spacing: 1pt;
+    padding: 3mm 3.5mm;
+    font-weight: 700;
+  }
+  table.data td {
+    padding: 3mm 3.5mm;
+    border-bottom: 1px solid #E7EBF1;
+    vertical-align: top;
+    color: #3A4659;
+  }
+  table.data tr:nth-child(even) td { background: #FAFBFD; }
+  table.data td.k { font-weight: 700; color: #14243B; width: 32%; }
+
+  /* ============ WORKFLOW ============ */
+  .flow { width: 100%; border-collapse: collapse; margin: 4mm 0 5mm 0; page-break-inside: avoid; }
+  .flow td { vertical-align: middle; text-align: center; padding: 0; }
+  .flow .step {
+    border: 1px solid #D8E0EA;
+    border-bottom: 2.2pt solid #FFD700;
+    border-radius: 1.6mm;
+    padding: 3.2mm 1.5mm;
+    font-size: 8.2pt;
+    font-weight: 700;
+    color: #14243B;
+    background: #FFFFFF;
+    line-height: 1.25;
+  }
+  .flow .arw { width: 6mm; color: #B8860B; font-size: 11pt; font-weight: 700; }
+
+  /* ============ ARCHITECTURE DIAGRAM ============ */
+  .arch { background: #0F1A2B; border-radius: 2.5mm; padding: 9mm 8mm; page-break-inside: avoid; }
+  .arch-node {
+    background: #1B2C46;
+    border: 1px solid #2F425F;
+    border-radius: 1.8mm;
+    color: #FFFFFF;
+    text-align: center;
+    padding: 4mm 3mm;
+    font-size: 9.5pt;
+    font-weight: 700;
+    line-height: 1.25;
+  }
+  .arch-node .sub { display: block; font-size: 7pt; font-weight: 400; color: #93A4BE; letter-spacing: 0.6pt; margin-top: 1.2mm; }
+  .arch-node.core {
+    background: linear-gradient(90deg, #C9A227, #FFD700);
+    border-color: #FFD700;
+    color: #16233A;
+    font-size: 12pt;
+  }
+  .arch-node.core .sub { color: #4A3F12; }
+  .arch-node.api { background: #22344F; border-color: #FFD700; color: #FFD700; }
+  .arch-node.leaf { background: rgba(255,255,255,0.05); border-color: #33456180; font-size: 8.2pt; padding: 3.2mm 2mm; }
+  .conn { text-align: center; }
+  .conn .bar { display: inline-block; width: 1.5pt; height: 6mm; background: #FFD700; }
+  .hbar { height: 1.5pt; background: #3B4F6E; margin: 0 12%; }
+  .arch table { width: 100%; border-collapse: separate; border-spacing: 3mm 0; }
+  .arch table td { vertical-align: top; }
+  .arch-cap { color: #93A4BE; font-size: 8pt; letter-spacing: 1.2pt; text-align: center; margin-top: 6mm; }
+
+  /* ============ BENEFIT CARDS ============ */
+  .cards { width: 100%; border-collapse: separate; border-spacing: 3.5mm 3.5mm; margin: 0 -3.5mm; }
+  .cards td {
+    width: 50%;
+    vertical-align: top;
+    border: 1px solid #E1E7EE;
+    border-radius: 2mm;
+    padding: 4.5mm 5mm;
+    background: #FFFFFF;
+  }
+  .card-t { font-size: 10.5pt; font-weight: 900; color: #0F1A2B; margin-bottom: 1.5mm; }
+  .card-b { font-size: 9pt; color: #4A5668; line-height: 1.45; }
+  .card-kpi { font-size: 7.5pt; letter-spacing: 1pt; color: #B8860B; font-weight: 900; margin-bottom: 2mm; }
+
+  /* ============ CALLOUT ============ */
+  .callout {
+    background: #F6F8FB;
+    border: 1px solid #E1E7EE;
+    border-left: 3pt solid #0F1A2B;
+    border-radius: 1.5mm;
+    padding: 5mm 6mm;
+    margin: 5mm 0;
+    page-break-inside: avoid;
+  }
+  .callout h4 { font-size: 10.5pt; margin-bottom: 2mm; }
+  .callout p { font-size: 9.5pt; color: #46536A; margin: 0; }
+
+  /* ============ CLOSING PAGE ============ */
+  .closing {
+    page: dark;
+    height: 297mm; width: 210mm;
+    background: #0F1A2B;
+    position: relative;
+    color: #FFFFFF;
+    page-break-before: always;
+  }
+  .closing-inner { position: absolute; left: 22mm; right: 22mm; top: 40mm; }
+  .closing h2 { color: #FFFFFF; font-size: 26pt; line-height: 1.15; }
+  .closing .rule { width: 22mm; height: 2.4pt; background: #FFD700; margin: 7mm 0; }
+  .closing p { color: #C4CFDE; font-size: 11pt; font-weight: 300; line-height: 1.65; max-width: 145mm; }
+  .chain {
+    margin: 12mm 0;
+    padding: 6mm 0;
+    border-top: 1px solid rgba(255,255,255,0.14);
+    border-bottom: 1px solid rgba(255,255,255,0.14);
+    color: #FFD700;
+    font-size: 10pt;
+    font-weight: 700;
+    letter-spacing: 1pt;
+    line-height: 2;
+  }
+  .chain span { color: #5E718D; font-weight: 400; }
+  .closing-foot { position: absolute; left: 22mm; right: 22mm; bottom: 22mm; color: #7D8DA6; font-size: 8pt; letter-spacing: 1pt; }
+
+  /* ============ TOC ============ */
+  .toc { width: 100%; border-collapse: collapse; margin-top: 4mm; }
+  .toc td { padding: 3.2mm 0; border-bottom: 1px solid #E7EBF1; vertical-align: baseline; }
+  .toc td.n { width: 12mm; color: #B8860B; font-weight: 900; font-size: 9pt; }
+  .toc td.t { font-weight: 700; color: #14243B; font-size: 10.5pt; }
+  .toc td.d { color: #6B7789; font-size: 9pt; text-align: right; }
+</style>
+</head>
+<body>
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <div class="cover-band"></div>
+  <div class="cover-glow"></div>
+  <div class="cover-grid"></div>
+  <div class="cover-inner">
+    <img class="cover-logo" src="data:image/png;base64,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" alt="Cybercina">
+    <div class="cover-eyebrow">PRODUCT PROPOSAL</div>
+    <div class="cover-title">Exchange<br><span>CRM Platform</span></div>
+    <div class="cover-rule"></div>
+    <div class="cover-sub">
+      A unified digital operating system for currency exchange businesses —
+      rates, customers, transactions, verification and marketing in one platform.
+    </div>
+    <div class="cover-value">
+      <b>What we are proposing.</b> We will design, build and deliver the complete
+      Exchange CRM Platform described in this document — the six core modules, the CRM
+      and verification layer, the customer portal and the API-first foundation behind
+      them — as one working product owned by the client, including development, testing,
+      deployment and handover. The fee below is the agreed price for building that
+      platform.
+    </div>
+  </div>
+  <div class="cover-foot">
+    <div class="commercial">
+      <div class="commercial-head">COMMERCIAL SUMMARY</div>
+      <table class="comm-tbl">
+        <tr>
+          <td style="width:44%">
+            <span class="comm-l">TOTAL PROJECT PRICE</span>
+            <div class="comm-price"><span class="cur">£</span>2,500<span class="unit">BRITISH POUNDS (GBP)</span></div>
+          </td>
+          <td class="sep comm-rule"></td>
+          <td>
+            <span class="comm-l">DELIVERY TIMELINE</span>
+            <div class="comm-v">2 – 3 months
+              <span class="note">Any change to the agreed deadline is reviewed and
+              confirmed with the client before it takes effect.</span>
+            </div>
+          </td>
+        </tr>
+      </table>
+      <div class="comm-terms">
+        <b>Application support.</b> Ongoing support and maintenance of the application
+        after delivery is charged separately and is not included in the project price —
+        the support scope and its fee are agreed with the client.
+      </div>
+    </div>
+    <div class="cover-meta">PREPARED FOR THE CLIENT &nbsp;·&nbsp; CONFIDENTIAL &nbsp;·&nbsp; VERSION 1.0</div>
+  </div>
+</div>
+
+<!-- ==================== CONTENTS + EXEC SUMMARY ==================== -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-num">CONTENTS</div>
+    <div class="sec-title">What This Document Covers</div>
+    <div class="sec-rule"></div>
+  </div>
+  <table class="toc">
+    <tr><td class="n">01</td><td class="t">Executive Summary</td><td class="d">The business problem and the solution</td></tr>
+    <tr><td class="n">02</td><td class="t">Project Overview</td><td class="d">Scope, users and operating model</td></tr>
+    <tr><td class="n">03</td><td class="t">Core Features &amp; Modules</td><td class="d">Six functional pillars of the platform</td></tr>
+    <tr><td class="n">04</td><td class="t">Advanced CRM Capabilities</td><td class="d">Customers, KYC, notifications, analytics, roles</td></tr>
+    <tr><td class="n">05</td><td class="t">Platform Architecture Vision</td><td class="d">API-first, integration-ready design</td></tr>
+    <tr><td class="n">06</td><td class="t">Business Benefits</td><td class="d">Operational and commercial impact</td></tr>
+    <tr><td class="n">07</td><td class="t">Future Expansion</td><td class="d">The roadmap beyond launch</td></tr>
+    <tr><td class="n">08</td><td class="t">Conclusion</td><td class="d">Why this is a complete transformation</td></tr>
+  </table>
+
+  <h3 class="blk" style="margin-top:12mm;">01 &nbsp;·&nbsp; Executive Summary</h3>
+
+  <h4 class="mini">THE BUSINESS PROBLEM</h4>
+  <p>Most exchange businesses still run on tools that were never designed for them. Rates live in a
+  spreadsheet, customer requests arrive through messaging apps, banner graphics are made by hand for
+  every price change, and banking details are re-typed from photographs. The result is predictable:
+  slow response times, pricing that is out of date the moment it is published, avoidable transfer
+  errors, and no reliable record of who did what.</p>
+
+  <p>As transaction volume grows, this model does not scale. Staff spend their day on repetitive
+  administration instead of serving customers, and management has no consolidated view of
+  performance, currency demand or customer value.</p>
+
+  <h4 class="mini">HOW THE PLATFORM SOLVES IT</h4>
+  <p>The <strong>Exchange CRM Platform</strong> consolidates every daily operation into one connected
+  system. A single rate table feeds the customer portal, the marketing designs, the public website
+  widget and the API at the same moment. Customer requests arrive as structured records instead of
+  free-text messages. Banking information is validated automatically before money moves. Every
+  approval, status change and completed transaction is logged against a customer profile.</p>
+
+  <div class="callout">
+    <h4>One source of truth, many destinations</h4>
+    <p>Publish a rate once — it appears instantly in the customer portal, the Instagram banner, the
+    Telegram post, the website widget and the public API. No duplicate entry, no version conflicts,
+    no outdated prices in circulation.</p>
+  </div>
+
+  <h4 class="mini">VALUE FOR THE EXCHANGE BUSINESS</h4>
+  <table class="data"><thead>
+    <tr><th style="width:34%">AREA</th><th>SHIFT DELIVERED BY THE PLATFORM</th></tr></thead>
+    <tr><td class="k">Rate publishing</td><td>Manual copy across channels &nbsp;→&nbsp; single update, synchronised everywhere</td></tr>
+    <tr><td class="k">Customer requests</td><td>Chat messages and phone calls &nbsp;→&nbsp; structured, trackable workflow</td></tr>
+    <tr><td class="k">Banking data</td><td>Typed by hand, error-prone &nbsp;→&nbsp; automatically detected and verified</td></tr>
+    <tr><td class="k">Marketing content</td><td>External designer per price change &nbsp;→&nbsp; in-house, minutes, on-brand</td></tr>
+    <tr><td class="k">Management visibility</td><td>Estimates and memory &nbsp;→&nbsp; live dashboards and reports</td></tr>
+    <tr><td class="k">Accountability</td><td>Informal &nbsp;→&nbsp; role-based permissions and full audit history</td></tr>
+  </table>
+
+  <h4 class="mini">THE PROPOSAL IN ONE PARAGRAPH</h4>
+  <p>Build one platform that owns the exchange's rates, customers, requests, verification, marketing
+  output and reporting — delivered as six core modules on an API-first foundation, so that the same
+  system can later power mobile apps, bots and partner integrations without being rebuilt. The sections
+  that follow describe each module, the CRM layer around it, the architecture behind it, and the
+  business impact expected from it.</p>
+</div>
+
+<!-- ==================== PROJECT OVERVIEW ==================== -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-num">SECTION 02</div>
+    <div class="sec-title">Project Overview</div>
+    <div class="sec-rule"></div>
+  </div>
+
+  <p class="lede">The Exchange CRM Platform is a comprehensive customer relationship management system
+  built specifically for exchange businesses. Its purpose is to centralise and automate daily
+  operations — customer management, transaction processing, exchange rate management, marketing
+  content creation and online customer services — inside one product.</p>
+
+  <p>Rather than adapting a generic CRM to an industry it was not designed for, the platform is
+  organised around the way an exchange actually works: a rate is set, a customer requests a buy or
+  sell, the request is reviewed and verified, funds move, and the outcome is recorded and reported.
+  Every module in the system serves a step in that chain.</p>
+
+  <h3 class="blk">Who Uses the Platform</h3>
+  <table class="data"><thead>
+    <tr><th style="width:30%">USER</th><th>WHAT THEY DO IN THE SYSTEM</th></tr></thead>
+    <tr><td class="k">Customers</td><td>Register, submit buy and sell requests, upload documents, track status and review history through the self-service portal.</td></tr>
+    <tr><td class="k">Operators</td><td>Receive incoming requests, verify customer and banking information, process transactions and update status.</td></tr>
+    <tr><td class="k">Exchange managers</td><td>Set and publish rates, approve high-value transactions, oversee the daily queue and monitor performance.</td></tr>
+    <tr><td class="k">Marketing staff</td><td>Produce rate banners and promotional content for Instagram, Telegram and the website directly from live prices.</td></tr>
+    <tr><td class="k">Accountants</td><td>Reconcile completed transactions and draw revenue, volume and currency-demand reports.</td></tr>
+    <tr><td class="k">Administrators</td><td>Manage users, roles, permissions, integrations and platform configuration.</td></tr>
+  </table>
+
+  <h3 class="blk">The Operating Cycle</h3>
+  <p>The platform closes the loop between pricing, demand and fulfilment. Rates published to the market
+  generate customer requests; requests are verified and processed; completed transactions feed the
+  analytics that inform the next pricing decision.</p>
+
+  <table class="flow">
+    <tr>
+      <td><div class="step">Set &amp; Publish<br>Rates</div></td>
+      <td class="arw">→</td>
+      <td><div class="step">Distribute<br>Across Channels</div></td>
+      <td class="arw">→</td>
+      <td><div class="step">Customer<br>Submits Request</div></td>
+      <td class="arw">→</td>
+      <td><div class="step">Verify &amp;<br>Approve</div></td>
+      <td class="arw">→</td>
+      <td><div class="step">Process<br>Transaction</div></td>
+      <td class="arw">→</td>
+      <td><div class="step">Report &amp;<br>Analyse</div></td>
+    </tr>
+  </table>
+
+  <h3 class="blk">Design Principles</h3>
+  <table class="caps">
+    <tr>
+      <td>
+        <ul class="tick">
+          <li><strong>Single source of truth</strong> — one rate table drives every channel.</li>
+          <li><strong>Structured over informal</strong> — every request is a record, not a message.</li>
+          <li><strong>Verify before value moves</strong> — validation built into the workflow.</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="tick">
+          <li><strong>API-first</strong> — every capability is available to other systems.</li>
+          <li><strong>Role-aware</strong> — staff see and do only what their role allows.</li>
+          <li><strong>Built to extend</strong> — mobile, bots and partners plug into the same core.</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+
+  <h3 class="blk">Module Map</h3>
+  <p>The platform is delivered as six core modules, supported by the CRM capability layer described in
+  Section 04. Each is detailed on the following pages.</p>
+  <table class="data">
+    <tr><th style="width:8%">#</th><th style="width:38%">MODULE</th><th>WHAT IT DELIVERS</th></tr>
+    <tr><td class="k">01</td><td class="k">Exchange Rate Management</td><td>One authoritative rate table for every currency and price type</td></tr>
+    <tr><td class="k">02</td><td class="k">Banner &amp; Content Creator</td><td>In-house marketing graphics driven by live prices</td></tr>
+    <tr><td class="k">03</td><td class="k">Customer Portal</td><td>Self-service requests, tracking and history for customers</td></tr>
+    <tr><td class="k">04</td><td class="k">Banking Verification</td><td>Automatic validation of customer banking information</td></tr>
+    <tr><td class="k">05</td><td class="k">Transaction Management</td><td>End-to-end workflow from request to completion</td></tr>
+    <tr><td class="k">06</td><td class="k">Rate Web Service</td><td>Public API and widgets for websites and partners</td></tr>
+  </table>
+</div>
+
+<!-- ==================== CORE MODULES ==================== -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-num">SECTION 03</div>
+    <div class="sec-title">Core Features &amp; Modules</div>
+    <div class="sec-rule"></div>
+  </div>
+  <p class="lede">Six functional pillars cover the full operational surface of an exchange business.
+  Each module works independently and gains value from the others through shared data.</p>
+
+  <!-- MODULE 1 -->
+  <div class="module">
+    <table class="mod-head">
+      <tr>
+        <td class="mod-icon">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 17l5-5 4 3 6-7"/><polyline points="15,8 19,8 19,12"/><line x1="3" y1="21" x2="21" y2="21"/>
+            </svg>
+          </div>
+        </td>
+        <td>
+          <div class="mod-index">MODULE 01</div>
+          <div class="mod-title">Exchange Rate Management System</div>
+        </td>
+      </tr>
+    </table>
+    <p class="mod-purpose"><strong>Purpose.</strong> Give the exchange one authoritative place to define,
+    price and publish every currency it trades — with full control over how each price type is
+    calculated and where it appears.</p>
+    <div class="benefit-strip">
+      <b>Business benefit</b>
+      Prices stay consistent across every channel and update in real time, removing the risk of trading
+      against a stale rate and eliminating the daily work of re-publishing prices by hand.
+    </div>
+    <h4 class="mini">KEY CAPABILITIES</h4>
+    <table class="caps">
+      <tr>
+        <td>
+          <ul class="tick">
+            <li>Multi-currency support — USD, EUR, GBP, TRY, USDT and more</li>
+            <li>Separate buying and selling prices per currency</li>
+            <li>Real-time price updates across all connected services</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="tick">
+            <li>Price types: cash, transfer, account-based and custom rules</li>
+            <li>Centralised rate management for portal, banners, widgets and API</li>
+            <li>Custom pricing rules for segments and special agreements</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+    <h4 class="mini">PRICE TYPES SUPPORTED</h4>
+    <table class="data" style="margin-bottom:0;"><thead>
+      <tr><th style="width:26%">TYPE</th><th>TYPICAL USE</th></tr></thead>
+      <tr><td class="k">Cash</td><td>Over-the-counter physical currency exchange at the branch</td></tr>
+      <tr><td class="k">Transfer</td><td>International or interbank transfers where settlement differs from cash</td></tr>
+      <tr><td class="k">Account-based</td><td>Balance-to-balance movements for registered customers</td></tr>
+      <tr><td class="k">Custom rules</td><td>VIP tiers, volume pricing and negotiated corporate rates</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 2 -->
+  <div class="module brk">
+    <table class="mod-head">
+      <tr>
+        <td class="mod-icon">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.6"/><path d="M21 15l-5-5L5 21"/>
+            </svg>
+          </div>
+        </td>
+        <td>
+          <div class="mod-index">MODULE 02</div>
+          <div class="mod-title">Digital Banner &amp; Marketing Content Creator</div>
+        </td>
+      </tr>
+    </table>
+    <p class="mod-purpose"><strong>Purpose.</strong> Put a professional design studio inside the CRM.
+    Staff build rate banners and promotional graphics with a drag-and-drop editor that works like
+    modern design platforms — with live prices injected automatically.</p>
+    <div class="benefit-strip">
+      <b>Business benefit</b>
+      Marketing that used to take an external designer and half a day now takes minutes, stays on brand,
+      and can never show an outdated price — because the numbers come from the live rate table.
+    </div>
+    <h4 class="mini">KEY CAPABILITIES</h4>
+    <table class="caps">
+      <tr>
+        <td>
+          <ul class="tick">
+            <li>Drag &amp; drop visual design editor</li>
+            <li>Ready-to-use, reusable templates</li>
+            <li>Dynamic price variables bound to live rates</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="tick">
+            <li>Automatic insertion of the latest exchange rates</li>
+            <li>Publish or download directly from the platform</li>
+            <li>Brand-consistent output across every channel</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+    <h4 class="mini">OUTPUT FORMATS</h4>
+    <table class="flow" style="margin-bottom:0;">
+      <tr>
+        <td><div class="step">Instagram<br>Story</div></td>
+        <td style="width:4mm"></td>
+        <td><div class="step">Instagram<br>Post</div></td>
+        <td style="width:4mm"></td>
+        <td><div class="step">Telegram<br>Banner</div></td>
+        <td style="width:4mm"></td>
+        <td><div class="step">Website<br>Banner</div></td>
+      </tr>
+    </table>
+
+    <h4 class="mini">HOW IT WORKS</h4>
+    <table class="flow" style="margin-bottom:0;">
+      <tr>
+        <td><div class="step">Choose a<br>Template</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Bind Live<br>Price Variables</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Customise<br>Design</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Publish or<br>Download</div></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- MODULE 3 -->
+  <div class="module brk">
+    <table class="mod-head">
+      <tr>
+        <td class="mod-icon">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="8" r="3.4"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0"/>
+            </svg>
+          </div>
+        </td>
+        <td>
+          <div class="mod-index">MODULE 03</div>
+          <div class="mod-title">Customer Portal</div>
+        </td>
+      </tr>
+    </table>
+    <p class="mod-purpose"><strong>Purpose.</strong> Give customers a professional self-service channel
+    to submit and follow their exchange requests, replacing phone calls and chat threads with a clear,
+    always-available interface.</p>
+    <div class="benefit-strip">
+      <b>Business benefit</b>
+      Requests arrive complete and structured, staff stop chasing missing details, and customers get
+      transparency into their own transactions around the clock — raising service quality without
+      adding headcount.
+    </div>
+    <h4 class="mini">WHAT CUSTOMERS CAN DO</h4>
+    <table class="caps">
+      <tr>
+        <td>
+          <ul class="tick">
+            <li>Create and manage their profile</li>
+            <li>Submit currency purchase and sale requests</li>
+            <li>Track the live status of every request</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="tick">
+            <li>Review complete transaction history</li>
+            <li>Manage personal and banking information</li>
+            <li>Receive status updates without contacting staff</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+    <h4 class="mini">REQUEST FLOWS</h4>
+    <table class="data" style="margin-bottom:0;"><thead>
+      <tr><th style="width:32%">REQUEST TYPE</th><th>INFORMATION CAPTURED</th></tr></thead>
+      <tr><td class="k">Currency purchase</td><td>Currency type · required amount · payment information · bank account details</td></tr>
+      <tr><td class="k">Currency sale</td><td>Currency type · amount · receiving account information · required transaction details</td></tr>
+    </table>
+
+    <h4 class="mini">CUSTOMER JOURNEY</h4>
+    <table class="flow" style="margin-bottom:0;">
+      <tr>
+        <td><div class="step">Register<br>&amp; Profile</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Submit<br>Request</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Track<br>Status</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Receive<br>Confirmation</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Review<br>History</div></td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- MODULE 4 -->
+  <div class="module brk">
+    <table class="mod-head">
+      <tr>
+        <td class="mod-icon">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2.8l7.5 3v5.6c0 4.4-3.1 8.1-7.5 9.8-4.4-1.7-7.5-5.4-7.5-9.8V5.8z"/><polyline points="8.9,11.8 11.2,14.1 15.4,9.9"/>
+            </svg>
+          </div>
+        </td>
+        <td>
+          <div class="mod-index">MODULE 04</div>
+          <div class="mod-title">Banking Information Verification System</div>
+        </td>
+      </tr>
+    </table>
+    <p class="mod-purpose"><strong>Purpose.</strong> Validate customer banking details automatically
+    through available banking APIs and verification services, before any funds are committed.</p>
+    <div class="benefit-strip">
+      <b>Business benefit</b>
+      Transfers to wrong or mistyped accounts are among the most costly errors an exchange can make.
+      Automatic verification removes that class of error, strengthens compliance posture, and shortens
+      the time an operator spends checking each request.
+    </div>
+    <h4 class="mini">KEY CAPABILITIES</h4>
+    <table class="caps">
+      <tr>
+        <td>
+          <ul class="tick">
+            <li>Detect bank information from card numbers</li>
+            <li>Retrieve card and account details automatically</li>
+            <li>Validate ownership information against the customer record</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="tick">
+            <li>Check the accuracy of customer-provided banking data</li>
+            <li>Reduce human error during transaction processing</li>
+            <li>Process transactions only on verified information</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+    <table class="flow" style="margin-bottom:0;">
+      <tr>
+        <td><div class="step">Customer<br>Enters Details</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Bank Detected<br>From Card</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Account Data<br>Retrieved</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Ownership<br>Validated</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Verified<br>&amp; Approved</div></td>
+      </tr>
+    </table>
+
+    <h4 class="mini">WHAT GETS CHECKED</h4>
+    <table class="data" style="margin-bottom:0;">
+      <tr><th style="width:34%">DATA POINT</th><th>CHECK PERFORMED</th></tr>
+      <tr><td class="k">Card number</td><td>Issuing bank identified automatically, removing manual lookup</td></tr>
+      <tr><td class="k">Account details</td><td>Retrieved and cross-checked against the submitted request</td></tr>
+      <tr><td class="k">Account holder</td><td>Ownership information validated against the customer profile</td></tr>
+      <tr><td class="k">Overall accuracy</td><td>Mismatches flagged to the operator before the transaction proceeds</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 5 -->
+  <div class="module brk">
+    <table class="mod-head">
+      <tr>
+        <td class="mod-icon">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><polyline points="8,16 9.6,17.6 12.6,14.6"/>
+            </svg>
+          </div>
+        </td>
+        <td>
+          <div class="mod-index">MODULE 05</div>
+          <div class="mod-title">Transaction &amp; Request Management</div>
+        </td>
+      </tr>
+    </table>
+    <p class="mod-purpose"><strong>Purpose.</strong> Provide a complete workflow engine for every
+    customer request — from arrival to completion — with clear ownership, status and history at each
+    stage.</p>
+    <div class="benefit-strip">
+      <b>Business benefit</b>
+      Nothing is lost, forgotten or handled twice. Management can see the live queue, measure how long
+      each stage takes, and hold a complete audit trail of who approved what and when.
+    </div>
+    <h4 class="mini">WHAT EXCHANGE STAFF CAN DO</h4>
+    <table class="caps">
+      <tr>
+        <td>
+          <ul class="tick">
+            <li>View and triage all incoming requests</li>
+            <li>Review complete customer information in context</li>
+            <li>Approve or reject transactions with reasons recorded</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="tick">
+            <li>Update transaction status as work progresses</li>
+            <li>Track completed operations and outcomes</li>
+            <li>Maintain a full history against each customer</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+    <h4 class="mini">TRANSACTION WORKFLOW</h4>
+    <table class="flow" style="margin-bottom:0;">
+      <tr>
+        <td><div class="step">New<br>Request</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Review</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Approval</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Processing</div></td>
+        <td class="arw">→</td>
+        <td><div class="step">Completed</div></td>
+      </tr>
+    </table>
+
+    <h4 class="mini">STATUS MODEL</h4>
+    <table class="data" style="margin-bottom:0;">
+      <tr><th style="width:26%">STATUS</th><th style="width:38%">MEANING</th><th>OWNER</th></tr>
+      <tr><td class="k">New request</td><td>Submitted by the customer, awaiting pick-up</td><td>Operator queue</td></tr>
+      <tr><td class="k">Review</td><td>Customer and banking information being checked</td><td>Operator</td></tr>
+      <tr><td class="k">Approval</td><td>Decision recorded, with reason if rejected</td><td>Exchange manager</td></tr>
+      <tr><td class="k">Processing</td><td>Funds being moved and settled</td><td>Operator / accountant</td></tr>
+      <tr><td class="k">Completed</td><td>Closed, archived to the customer's history</td><td>System</td></tr>
+    </table>
+  </div>
+
+  <!-- MODULE 6 -->
+  <div class="module brk">
+    <table class="mod-head">
+      <tr>
+        <td class="mod-icon">
+          <div class="icon-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFD700" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><line x1="3" y1="12" x2="21" y2="12"/>
+            </svg>
+          </div>
+        </td>
+        <td>
+          <div class="mod-index">MODULE 06</div>
+          <div class="mod-title">Exchange Rate Web Service &amp; Website Integration</div>
+        </td>
+      </tr>
+    </table>
+    <p class="mod-purpose"><strong>Purpose.</strong> Expose the exchange's live rates as a service, so
+    they can be displayed on the company website, partner sites and any external application.</p>
+    <div class="benefit-strip">
+      <b>Business benefit</b>
+      The exchange publishes its rates everywhere its customers already are, without maintaining any of
+      those surfaces by hand — and becomes a rate source that partners can build on.
+    </div>
+    <h4 class="mini">KEY CAPABILITIES</h4>
+    <table class="caps">
+      <tr>
+        <td>
+          <ul class="tick">
+            <li>Public API for exchange rates</li>
+            <li>Website-ready rate widgets</li>
+            <li>Customisable display components</li>
+          </ul>
+        </td>
+        <td>
+          <ul class="tick">
+            <li>Real-time synchronisation with the rate table</li>
+            <li>Simple integration with existing websites</li>
+            <li>Consistent publishing across digital channels</li>
+          </ul>
+        </td>
+      </tr>
+    </table>
+
+    <h4 class="mini">WAYS TO CONSUME THE SERVICE</h4>
+    <table class="data" style="margin-bottom:0;">
+      <tr><th style="width:30%">METHOD</th><th>BEST SUITED TO</th></tr>
+      <tr><td class="k">Embeddable widget</td><td>The exchange's own website — a styled rate board that updates itself</td></tr>
+      <tr><td class="k">Custom components</td><td>Landing pages and campaigns needing a specific look or currency subset</td></tr>
+      <tr><td class="k">Public API</td><td>Partner sites, mobile apps, bots and internal tools that need raw rate data</td></tr>
+    </table>
+  </div>
+
+  <div class="callout">
+    <h4>How the six modules compound</h4>
+    <p>Each module is useful alone, but the value is in the connections: rates set in Module 01 populate
+    the banners of Module 02, the portal of Module 03 and the public API of Module 06. Requests raised
+    in the portal are verified by Module 04 and processed by Module 05 — and every step of that chain
+    writes back to the same customer record.</p>
+  </div>
+</div>
+
+<!-- ==================== ADVANCED CRM ==================== -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-num">SECTION 04</div>
+    <div class="sec-title">Advanced CRM Capabilities</div>
+    <div class="sec-rule"></div>
+  </div>
+  <p class="lede">Beyond the six operational modules, the platform provides the CRM layer that turns
+  transactions into relationships — and operations into measurable performance.</p>
+
+  <table class="cards">
+    <tr>
+      <td>
+        <div class="card-kpi">CUSTOMER MANAGEMENT</div>
+        <div class="card-t">Know every customer, not just every transaction</div>
+        <div class="card-b">Complete customer profiles with full transaction history, segmentation,
+        dedicated VIP management and activity tracking — so pricing, service level and outreach can be
+        matched to real customer value.</div>
+      </td>
+      <td>
+        <div class="card-kpi">KYC &amp; IDENTITY VERIFICATION</div>
+        <div class="card-t">Compliance as a workflow, not paperwork</div>
+        <div class="card-b">Structured document collection, a guided identity verification workflow,
+        clear verification status on every profile and controlled customer approval — keeping the
+        business auditable and defensible.</div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="card-kpi">NOTIFICATION SYSTEM</div>
+        <div class="card-t">Customers informed automatically</div>
+        <div class="card-b">Automated SMS, email and Telegram messages for transaction status updates,
+        verification results and important announcements — cutting inbound "where is my request?"
+        traffic to a fraction.</div>
+      </td>
+      <td>
+        <div class="card-kpi">ANALYTICS &amp; REPORTING</div>
+        <div class="card-t">Decisions based on data</div>
+        <div class="card-b">A professional dashboard covering customer statistics, transaction volume,
+        revenue, currency demand analysis, daily and monthly performance, and operational analytics.</div>
+      </td>
+    </tr>
+  </table>
+
+  <h3 class="blk">User Roles &amp; Permission Management</h3>
+  <p>The platform supports multiple internal users with different access levels. Each role carries a
+  permission set matched to its responsibilities, so staff work with exactly the access their job
+  requires — and no more.</p>
+  <table class="data"><thead>
+    <tr><th style="width:28%">ROLE</th><th>TYPICAL SCOPE OF ACCESS</th></tr></thead>
+    <tr><td class="k">Administrator</td><td>Full platform configuration, user and permission management, integrations</td></tr>
+    <tr><td class="k">Exchange Manager</td><td>Rate setting and publishing, transaction approval, oversight of the operational queue</td></tr>
+    <tr><td class="k">Operator</td><td>Request processing, customer verification, status updates</td></tr>
+    <tr><td class="k">Accountant</td><td>Financial records, reconciliation, revenue and volume reporting</td></tr>
+    <tr><td class="k">Sales Staff</td><td>Customer profiles, follow-up, segmentation and relationship activity</td></tr>
+  </table>
+
+  <div class="callout">
+    <h4>Why role separation matters commercially</h4>
+    <p>Clear permission boundaries reduce internal risk, make responsibility traceable during audits or
+    disputes, and let the business grow its team without loosening control over pricing and approvals.</p>
+  </div>
+
+  <h3 class="blk">Capability to Outcome</h3>
+  <table class="data">
+    <tr><th style="width:36%">CAPABILITY</th><th>WHAT THE BUSINESS GETS FROM IT</th></tr>
+    <tr><td class="k">Customer management</td><td>Pricing, service level and outreach matched to actual customer value instead of guesswork</td></tr>
+    <tr><td class="k">KYC &amp; verification</td><td>A defensible compliance record, produced as a by-product of normal work</td></tr>
+    <tr><td class="k">Notifications</td><td>Fewer inbound status enquiries and a customer experience that feels professional</td></tr>
+    <tr><td class="k">Analytics &amp; reporting</td><td>Pricing and staffing decisions supported by live volume, revenue and demand data</td></tr>
+    <tr><td class="k">Roles &amp; permissions</td><td>Safe delegation — the team can grow without widening access to sensitive controls</td></tr>
+  </table>
+</div>
+
+<!-- ==================== ARCHITECTURE ==================== -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-num">SECTION 05</div>
+    <div class="sec-title">Platform Architecture Vision</div>
+    <div class="sec-rule"></div>
+  </div>
+  <p class="lede">The system is designed as a scalable, API-first platform. Every capability in the core
+  is available through the API layer, which means new channels can be added later without rebuilding
+  the business logic behind them.</p>
+
+  <div class="arch">
+    <table>
+      <tr><td><div class="arch-node">Customer Portal<span class="sub">SELF-SERVICE INTERFACE</span></div></td></tr>
+    </table>
+    <div class="conn"><div class="bar"></div></div>
+
+    <table>
+      <tr><td><div class="arch-node core">CRM Core Platform<span class="sub">BUSINESS LOGIC · DATA · WORKFLOW ENGINE</span></div></td></tr>
+    </table>
+    <div class="conn"><div class="bar"></div></div>
+    <div class="hbar"></div>
+    <table>
+      <tr>
+        <td class="conn"><div class="bar"></div></td>
+        <td class="conn"><div class="bar"></div></td>
+        <td class="conn"><div class="bar"></div></td>
+      </tr>
+      <tr>
+        <td><div class="arch-node">Pricing System<span class="sub">RATES &amp; RULES</span></div></td>
+        <td><div class="arch-node">Transactions System<span class="sub">REQUESTS &amp; WORKFLOW</span></div></td>
+        <td><div class="arch-node">CRM System<span class="sub">CUSTOMERS &amp; KYC</span></div></td>
+      </tr>
+    </table>
+
+    <div class="conn"><div class="bar"></div></div>
+    <table>
+      <tr><td><div class="arch-node api">API Layer<span class="sub">UNIFIED, SECURE, VERSIONED ACCESS</span></div></td></tr>
+    </table>
+    <div class="conn"><div class="bar"></div></div>
+    <div class="hbar"></div>
+    <table>
+      <tr>
+        <td class="conn"><div class="bar"></div></td>
+        <td class="conn"><div class="bar"></div></td>
+        <td class="conn"><div class="bar"></div></td>
+        <td class="conn"><div class="bar"></div></td>
+      </tr>
+      <tr>
+        <td><div class="arch-node leaf">Website<br>Widgets</div></td>
+        <td><div class="arch-node leaf">Mobile<br>Apps</div></td>
+        <td><div class="arch-node leaf">Telegram<br>Bots</div></td>
+        <td><div class="arch-node leaf">External<br>Services</div></td>
+      </tr>
+    </table>
+    <div class="arch-cap">ONE CORE · ONE API · MANY CHANNELS</div>
+  </div>
+
+  <h3 class="blk">What API-First Means for the Business</h3>
+  <table class="data"><thead>
+    <tr><th style="width:32%">PRINCIPLE</th><th>COMMERCIAL CONSEQUENCE</th></tr></thead>
+    <tr><td class="k">Single core, many channels</td><td>A new channel — mobile app, partner site, bot — reuses existing logic instead of duplicating it, so it costs a fraction to add.</td></tr>
+    <tr><td class="k">Clean integration surface</td><td>Third-party financial services and business systems can be connected without disruptive rework.</td></tr>
+    <tr><td class="k">Scalable by design</td><td>Growth in customers and transaction volume is handled by scaling the platform, not by hiring more administrators.</td></tr>
+    <tr><td class="k">Future-proof investment</td><td>The platform built today remains the foundation for the products the business launches next.</td></tr>
+  </table>
+
+  <h4 class="mini">READY FOR INTEGRATION WITH</h4>
+  <table class="caps">
+    <tr>
+      <td>
+        <ul class="tick">
+          <li>Exchange websites and public rate pages</li>
+          <li>Mobile applications for customers and staff</li>
+          <li>Telegram bots for rates, requests and notifications</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="tick">
+          <li>External financial and banking services</li>
+          <li>Third-party business and accounting systems</li>
+          <li>Partner and affiliate distribution channels</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+
+  <h3 class="blk">Layer by Layer</h3>
+  <table class="data">
+    <tr><th style="width:30%">LAYER</th><th>RESPONSIBILITY</th></tr>
+    <tr><td class="k">Customer Portal</td><td>The customer-facing surface — registration, requests, tracking and history</td></tr>
+    <tr><td class="k">CRM Core Platform</td><td>Business logic, data ownership and the workflow engine that drives every process</td></tr>
+    <tr><td class="k">Pricing System</td><td>Currencies, price types and rules — the single source of truth for every published rate</td></tr>
+    <tr><td class="k">Transactions System</td><td>Request lifecycle, approvals, status and audit history</td></tr>
+    <tr><td class="k">CRM System</td><td>Customer profiles, segmentation, KYC status and relationship activity</td></tr>
+    <tr><td class="k">API Layer</td><td>One secure, versioned entry point that every internal and external channel consumes</td></tr>
+    <tr><td class="k">Channels</td><td>Website widgets, mobile apps, Telegram bots and external services</td></tr>
+  </table>
+</div>
+
+<!-- ==================== BUSINESS BENEFITS ==================== -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-num">SECTION 06</div>
+    <div class="sec-title">Business Benefits</div>
+    <div class="sec-rule"></div>
+  </div>
+  <p class="lede">The platform is not a technology upgrade for its own sake. Each capability maps to a
+  measurable change in how the exchange operates, competes and protects itself.</p>
+
+  <table class="cards">
+    <tr>
+      <td>
+        <div class="card-kpi">EFFICIENCY</div>
+        <div class="card-t">Reduce manual operations</div>
+        <div class="card-b">Rate publishing, banner production, data entry and status updates move from
+        repetitive manual work to automated workflow — freeing staff for customer-facing work.</div>
+      </td>
+      <td>
+        <div class="card-kpi">ACCURACY</div>
+        <div class="card-t">Increase transaction accuracy</div>
+        <div class="card-b">Structured request forms and automatic banking verification remove the two
+        biggest sources of costly error: mistyped account data and misunderstood instructions.</div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="card-kpi">EXPERIENCE</div>
+        <div class="card-t">Improve customer experience</div>
+        <div class="card-b">Customers submit requests, track progress and view their history at any hour,
+        with automatic notifications at every status change — a modern standard of service.</div>
+      </td>
+      <td>
+        <div class="card-kpi">MARKETING</div>
+        <div class="card-t">Automate marketing processes</div>
+        <div class="card-b">On-brand rate banners for Instagram, Telegram and the website are produced
+        in-house in minutes, always reflecting current prices.</div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="card-kpi">MARKET PRESENCE</div>
+        <div class="card-t">Provide real-time exchange rates</div>
+        <div class="card-b">Live rates published simultaneously to the portal, website widgets, social
+        channels and the public API — one update, full market visibility.</div>
+      </td>
+      <td>
+        <div class="card-kpi">CONTROL</div>
+        <div class="card-t">Improve security and compliance</div>
+        <div class="card-b">KYC workflow, verified banking data, role-based permissions and complete
+        audit history give the business a defensible operational record.</div>
+      </td>
+    </tr>
+  </table>
+
+  <h3 class="blk">Before and After</h3>
+  <table class="data"><thead>
+    <tr><th style="width:26%">DAILY TASK</th><th style="width:37%">TODAY</th><th>WITH THE PLATFORM</th></tr></thead>
+    <tr><td class="k">Publishing a new rate</td><td>Edited in several places, posted manually to each channel</td><td>Updated once, distributed automatically everywhere</td></tr>
+    <tr><td class="k">Producing a rate banner</td><td>Sent to a designer, returned hours later</td><td>Generated in-house from live prices in minutes</td></tr>
+    <tr><td class="k">Receiving a request</td><td>Free-text message, details often incomplete</td><td>Structured form with required fields validated on entry</td></tr>
+    <tr><td class="k">Checking bank details</td><td>Read from an image and typed by hand</td><td>Detected and verified automatically before processing</td></tr>
+    <tr><td class="k">Answering "what is my status?"</td><td>Staff interrupted to check and reply</td><td>Visible in the portal, pushed by automatic notification</td></tr>
+    <tr><td class="k">Monthly reporting</td><td>Assembled manually from records and memory</td><td>Generated from live data on the dashboard</td></tr>
+  </table>
+
+  <h3 class="blk">What to Watch After Launch</h3>
+  <p>The benefits above are observable in ordinary operating data. These are the indicators worth
+  tracking from the first month, using the platform's own dashboard:</p>
+  <table class="caps">
+    <tr>
+      <td>
+        <ul class="tick">
+          <li>Average time from request submitted to request completed</li>
+          <li>Share of requests submitted through the portal rather than by message</li>
+          <li>Number of transactions delayed or reworked due to incorrect banking data</li>
+        </ul>
+      </td>
+      <td>
+        <ul class="tick">
+          <li>Time spent per week producing rate content and banners</li>
+          <li>Volume of inbound "what is my status?" enquiries</li>
+          <li>Repeat transaction rate per customer segment</li>
+        </ul>
+      </td>
+    </tr>
+  </table>
+</div>
+
+<!-- ==================== FUTURE EXPANSION ==================== -->
+<div class="section">
+  <div class="sec-head">
+    <div class="sec-num">SECTION 07</div>
+    <div class="sec-title">Future Expansion</div>
+    <div class="sec-rule"></div>
+  </div>
+  <p class="lede">Because every capability sits behind a shared API layer, the platform's roadmap is
+  additive. Each of the directions below extends the same core rather than replacing it.</p>
+
+  <table class="data"><thead>
+    <tr><th style="width:32%">DIRECTION</th><th>WHAT IT ADDS</th></tr></thead>
+    <tr>
+      <td class="k">Mobile applications</td>
+      <td>Native customer and staff apps for rates, requests, approvals and push notifications — built directly on the existing API.</td>
+    </tr>
+    <tr>
+      <td class="k">AI customer assistant</td>
+      <td>An assistant that answers routine rate and status questions, guides customers through submitting a request, and escalates only what needs a human.</td>
+    </tr>
+    <tr>
+      <td class="k">Advanced analytics</td>
+      <td>Deeper demand forecasting, customer value modelling, margin analysis and trend detection across currencies and segments.</td>
+    </tr>
+    <tr>
+      <td class="k">Automated trading workflows</td>
+      <td>Rule-driven pricing and request handling — automatic rate adjustment against defined conditions and straight-through processing for low-risk transactions.</td>
+    </tr>
+    <tr>
+      <td class="k">More financial integrations</td>
+      <td>Additional banking, payment and verification providers, plus accounting and settlement systems, connected through the same integration surface.</td>
+    </tr>
+  </table>
+
+  <div class="callout">
+    <h4>An investment that compounds</h4>
+    <p>Each phase reuses the customer base, transaction history, rate engine and permission model
+    already in place. The platform becomes more valuable with every module added — and every month of
+    data it accumulates.</p>
+  </div>
+</div>
+
+<!-- ==================== CLOSING ==================== -->
+<div class="closing">
+  <div class="closing-inner">
+    <div style="font-size:8.5pt; letter-spacing:4pt; color:#FFD700; font-weight:700;">SECTION 08 · CONCLUSION</div>
+    <h2 style="margin-top:7mm;">A Complete Digital<br>Transformation for<br>Exchange Businesses</h2>
+    <div class="rule"></div>
+    <p>The Exchange CRM Platform transforms traditional exchange operations into a modern digital
+    ecosystem. It does this not by adding another isolated tool, but by connecting the parts of the
+    business that have always been separate.</p>
+
+    <div class="chain">
+      Exchange Rates <span>→</span> Customer Management <span>→</span> Transaction Processing<br>
+      <span>→</span> Verification <span>→</span> Marketing <span>→</span> Reporting
+    </div>
+
+    <p>The result is a single solution that manages customers, automates workflows, improves security
+    and delivers a professional digital experience — to staff and customers alike. Manual processes are
+    reduced, operational accuracy rises, compliance becomes routine rather than exceptional, and
+    management finally sees the business in real time.</p>
+
+    <p style="margin-top:8mm; color:#FFD700; font-weight:700; font-size:11.5pt;">
+      One platform. Every operation. Built for how exchanges actually work.
+    </p>
+  </div>
+  <div class="closing-foot">EXCHANGE CRM PLATFORM &nbsp;·&nbsp; PRODUCT PROPOSAL &nbsp;·&nbsp; CONFIDENTIAL</div>
+</div>
+
+</body>
+</html>

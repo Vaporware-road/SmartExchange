@@ -151,7 +151,21 @@ def perform_full_oauth_exchange(code: str, redirect_uri: str, config) -> dict:
     expires_at = timezone.now() + timedelta(seconds=expires_in)
 
     step3 = resolve_instagram_business_id(long_token)
+    # Bail before writing anything: without a Business account id the token is
+    # useless for publishing, and saving it left the panel claiming a working
+    # connection that failed at the first post.
+    if not step3.get("success"):
+        return {
+            "success": False,
+            "error": step3.get("error", "Could not resolve Instagram Business account."),
+        }
+
     ig_user_id = step3.get("ig_user_id", "")
+    if not ig_user_id:
+        return {
+            "success": False,
+            "error": "No Instagram Business account ID returned from Meta.",
+        }
 
     config.set_access_token(long_token)
     config.token_expires_at = expires_at

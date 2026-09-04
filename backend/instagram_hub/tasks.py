@@ -134,10 +134,35 @@ def run_post_finalize_to_instagram(
     Logs errors; does not raise. Safe to run in a background thread.
     Failures here must NOT affect the finalize API response (no 500 to frontend).
     """
-    from instagram_hub.services.instagram_config import is_instagram_configured
+    from instagram_hub.services.instagram_config import (
+        get_instagram_readiness,
+        is_instagram_configured,
+        is_ready_for_publish,
+    )
 
     if not is_instagram_configured():
         logger.info("Instagram not configured; skipping post_finalize_to_instagram")
+        return
+
+    # Credentials alone are not enough: Meta fetches the PNG over the public
+    # base URL, so a localhost INSTAGRAM_BASE_URL or an expired token fails at
+    # Meta's end with a message nobody sees. Say so in the log instead.
+    if not is_ready_for_publish():
+        logger.warning(
+            "Instagram credentials present but not ready for publish "
+            "(check INSTAGRAM_BASE_URL and token expiry)"
+        )
+        try:
+            from setting.utils import log_event
+            log_event(
+                level="WARNING",
+                source="other",
+                message="Instagram post skipped: not ready for publish (INSTAGRAM_BASE_URL or token)",
+                details=str(get_instagram_readiness().get("warnings")),
+                user=None,
+            )
+        except Exception:
+            pass
         return
 
     try:
@@ -338,3 +363,72 @@ def enqueue_post_finalize_to_instagram(
         special_price_history_ids=special_price_history_ids,
         theme=theme,
     )
+
+
+@shared_task(name="instagram_hub.refresh_token_if_needed")
+def refresh_instagram_token_if_needed() -> dict:
+    """
+    Refresh long-lived Meta token when within 30 days of expiry.
+    Logs warnings when expired or refresh fails.
+    """
+    from datetime import timedelta
+
+    from instagram_hub.models import InstagramConfig
+    from instagram_hub.services.instagram_config import get_token_status
+    from instagram_hub.services.instagram_oauth import exchange_for_long_lived_token
+
+    config = InstagramConfig.objects.filter(is_active=True).order_by("pk").first()
+    if not config:
+        return {"action": "skip", "reason": "no_config"}
+
+    token = config.get_decrypted_token()
+    if not token:
+        return {"action": "skip", "reason": "no_token"}
+
+    status = get_token_status(config)
+    if status["expired"]:
+        try:
+            from setting.utils import log_event
+            log_event(
+                level="WARNING",
+                source="other",
+                message="Instagram token expired — reconnect from Settings",
+                details=f"ig_user_id={config.ig_user_id}",
+                user=None,
+            )
+        except Exception:
+            pass
+        return {"action": "warn", "reason": "token_expired"}
+
+    days = status["days_remaining"]
+    if days is None or days > 30:
+        return {"action": "skip", "reason": "not_due", "days_remaining": days}
+
+    app_id = (config.app_id or "").strip()
+    app_secret = config.get_app_secret()
+    if not app_id or not app_secret:
+        return {"action": "skip", "reason": "missing_app_credentials"}
+
+    result = exchange_for_long_lived_token(token, app_id, app_secret)
+    if not result.get("success"):
+        try:
+            from setting.utils import log_event
+            log_event(
+                level="WARNING",
+                source="other",
+                message="Instagram token refresh failed",
+                details=str(result.get("error", ""))[:500],
+                user=None,
+            )
+        except Exception:
+            pass
+        return {"action": "failed", "error": result.get("error")}
+
+    from django.utils import timezone
+
+    expires_in = result.get("expires_in", 5184000)
+    config.set_access_token(result["access_token"])
+    config.token_expires_at = timezone.now() + timedelta(seconds=expires_in)
+    config.save(update_fields=["access_token_encrypted", "token_expires_at", "updated_at"])
+    logger.info("Instagram token refreshed; expires in %s days", expires_in // 86400)
+    return {"action": "refreshed", "days_remaining": expires_in // 86400}

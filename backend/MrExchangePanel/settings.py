@@ -589,5 +589,11 @@ CELERY_BEAT_SCHEDULE = {
         "task": "telegram_app.run_due_reengage_campaigns",
         "schedule": float(os.environ.get("TELEGRAM_CAMPAIGN_CHECK_SECONDS", "3600")),
     },
+    # A Meta long-lived token lasts 60 days. Without this, Instagram publishing
+    # stops dead two months after a connect and the only symptom is a failed post.
+    "instagram-refresh-token": {
+        "task": "instagram_hub.refresh_token_if_needed",
+        "schedule": float(os.environ.get("INSTAGRAM_TOKEN_CHECK_SECONDS", "86400")),
+    },
 }
 FINALIZE_TASK_WAIT_TIMEOUT = int(os.environ.get("FINALIZE_TASK_WAIT_TIMEOUT", "75"))
