@@ -102,6 +102,8 @@ whenever the frontend actually changed — commit them with the source change.
 | Visual template editor (backend) | `backend/template_editor/` |
 | Public prices API, webhooks, utils | `backend/core/` |
 | Trial stacks, license keys, fleet check-in | `backend/fleet/` |
+| WhatsApp channel + Telegram Mini App order form | `backend/bot_gateway/` |
+| Order intake queue behind the bot gateway | `backend/orders/` |
 | Vue SPA (all views, stores, services) | `frontend/src/` |
 | Iraniu ad-request system ONLY | `backend/Request-Manage-System/` |
 
@@ -137,7 +139,7 @@ update prices (change_price / special_price)
 ## Frontend patterns
 
 **API service** — all calls go through `frontend/src/services/api.js` (427 lines):
-- Exports: `authApi`, `dashboardApi`, `categoryApi`, `priceTypeApi`, `priceApi`, `specialPriceApi`, `finalizeApi`, `instagramHubApi`, `settingsApi`, `analysisApi`, `telegramApi`, `templateApi`, `templateEditorApi`, `fleetApi`
+- Exports: `authApi`, `dashboardApi`, `categoryApi`, `priceTypeApi`, `priceApi`, `specialPriceApi`, `finalizeApi`, `instagramHubApi`, `settingsApi`, `analysisApi`, `telegramApi`, `templateApi`, `templateEditorApi`, `fleetApi`, `botGatewayApi`, `ordersApi`
 - Auto-injects Bearer token, single-flight JWT refresh + replay, CSRF from cookie
 - Error format: `{ error: true, message: "...", code: "validation_error" }`
 
@@ -215,3 +217,42 @@ The four items tracked in `tel.txt` are all shipped and covered by tests:
 `TelegramMessageView.vue` is the 5-tab hub, `AutoPostConfig` lives in
 `telegram_app/models.py` with CRUD API, and Telegram engagement is part of
 `/api/analysis/dashboard/`. Treat `tel.txt` as history, not as a plan.
+
+---
+
+## Two customer bot stacks, and which is which
+
+`telegram_app` owns Telegram. It is the full customer bot — aiogram, sessions,
+customer profiles, exchange requests, price alerts, re-engagement — and it owns
+this install's Telegram webhook.
+
+`bot_gateway` owns WhatsApp and the order form. It came from a fork that also
+had its own Telegram bot; that half was dropped on merge because two webhooks
+would fight over the same updates. What is left is the WhatsApp Cloud API
+channel and the customer-facing order form at `/webapp/order`, which writes
+`orders.OrderIntake` rows for the panel queue at `/orders`.
+
+Bot customers are `bot_gateway.BotCustomer`, not panel users, and authenticate
+with their own short-lived token (`bot_gateway/auth.py`). Never mix that with a
+staff JWT — `api.js` deliberately leaves an explicitly-set Authorization header
+alone so the two cannot collide in one browser.
+
+To give Telegram customers the same order form, have `telegram_app` send the
+button built by `bot_gateway.services.dispatcher._build_order_button`; that is
+the only piece the dropped Telegram half was still providing.
+
+---
+
+## Rendering a template: two engines
+
+`SiteSettings.use_playwright_for_template_render` picks between them, and
+`PricePublisher._render_template_editor_image` is the only place that decides:
+
+- **Pillow** (default) — `template_editor/render.py`, approximates the editor.
+- **Playwright** — loads the SPA's `/headless-render/<id>` in Chromium and
+  screenshots it, so output matches the editor exactly. Any engine error falls
+  back to Pillow, so a missing browser never blocks a publish.
+
+Both read the same canvas helpers from
+`frontend/src/pages/templates/templateEditorCanvasUtils.js`. Keep it that way —
+the editor and the headless page have to agree pixel for pixel.
