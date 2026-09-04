@@ -33,6 +33,8 @@ export const PERMISSIONS = {
   deleteItems: ALL_PANEL_ROLES,
   /** مدیریت کاربران / ادمین‌ها (اضافه، ویرایش، حذف، لاگ فعالیت) — فقط super_admin و management */
   adminManagement: ADMIN_MANAGEMENT_ROLES,
+  /** صف سفارش‌های ربات — همه */
+  orders: ALL_PANEL_ROLES,
 }
 
 function normalizeRole(role) {

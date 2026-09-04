@@ -401,7 +401,7 @@ class InstagramFinalizeEnqueueTest(TestCase):
         )
 
     @patch("finalize.api_views.schedule_instagram_post_finalize")
-    @patch("finalize.api_views.is_instagram_configured", return_value=True)
+    @patch("finalize.api_views.is_ready_for_publish", return_value=True)
     @patch("finalize.api_views.publish_category_prices_task.apply_async")
     def test_category_finalize_schedules_instagram_on_commit(
         self, mock_apply_async, _mock_ig_configured, mock_schedule_ig
@@ -435,7 +435,7 @@ class InstagramFinalizeEnqueueTest(TestCase):
         )
 
     @patch("finalize.api_views.schedule_instagram_post_finalize")
-    @patch("finalize.api_views.is_instagram_configured", return_value=False)
+    @patch("finalize.api_views.is_ready_for_publish", return_value=False)
     @patch("finalize.api_views.publish_category_prices_task.apply_async")
     def test_category_finalize_does_not_schedule_instagram_when_not_configured(
         self, mock_apply_async, _mock_ig_off, mock_schedule_ig
@@ -465,7 +465,7 @@ class InstagramFinalizeEnqueueTest(TestCase):
         mock_schedule_ig.assert_not_called()
 
     @patch("finalize.api_views.schedule_instagram_post_finalize")
-    @patch("finalize.api_views.is_instagram_configured", return_value=True)
+    @patch("finalize.api_views.is_ready_for_publish", return_value=True)
     @patch("finalize.api_views.publish_special_price_task.apply_async")
     def test_special_price_finalize_schedules_instagram_on_commit(
         self, mock_apply_async, _mock_ig_configured, mock_schedule_ig

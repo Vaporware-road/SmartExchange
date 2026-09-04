@@ -5,6 +5,8 @@ from pathlib import Path
 
 from django.conf import settings
 
+from instagram_hub.services.instagram_config import normalize_instagram_base_url
+
 
 def path_to_public_url(image_path: str, request=None) -> str | None:
     """
@@ -23,7 +25,7 @@ def path_to_public_url(image_path: str, request=None) -> str | None:
     except ValueError:
         return None
     rel_str = str(rel).replace("\\", "/")
-    base = (
+    base = normalize_instagram_base_url(
         (getattr(settings, "INSTAGRAM_BASE_URL", None) or "").strip()
         or os.environ.get("INSTAGRAM_BASE_URL", "").strip()
     )

@@ -38,20 +38,39 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { AppSidebar, AppHeader, AppDrawer, AppFooter, AppBreadcrumb, AppBottomNav } from '@/components/layout'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useSidebarStore } from '@/stores/sidebar'
+import { useAuthStore } from '@/stores/auth'
+import { useOrdersQueueStore } from '@/stores/ordersQueue'
 
 const route = useRoute()
 const drawerOpen = ref(false)
 const siteSettings = useSiteSettingsStore()
 const sidebarStore = useSidebarStore()
+const auth = useAuthStore()
+const ordersQueue = useOrdersQueueStore()
 
 const isTemplateEditorLayout = computed(() => Boolean(route.meta.templateEditorLayout))
 
+function syncOrdersPolling() {
+  if (auth.isAuthenticated && auth.can('orders')) {
+    ordersQueue.startPolling()
+  } else {
+    ordersQueue.stopPolling()
+  }
+}
+
+watch(() => auth.isAuthenticated, syncOrdersPolling)
+
 onMounted(() => {
   siteSettings.fetch()
+  syncOrdersPolling()
+})
+
+onUnmounted(() => {
+  ordersQueue.stopPolling()
 })
 </script>

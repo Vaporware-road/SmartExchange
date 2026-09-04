@@ -5,7 +5,7 @@
         to="/update"
         class="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors font-medium"
       >
-        <i class="fas" :class="isRtl ? 'fa-arrow-right' : 'fa-arrow-left'" />
+        <i class="fas fa-arrow-left icon-back me-2" />
         {{ $t('priceHub.backToHub') }}
       </router-link>
     </nav>

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h1 class="text-2xl font-bold text-gold mb-6">{{ tr('userCenter.title', 'مدیریت ادمین‌ها', 'Admin Management') }}</h1>
+    <h1 class="text-2xl font-bold text-gold mb-6">{{ t('userCenter.title') }}</h1>
 
     <div class="flex gap-2 mb-6 border-b" style="border-color: var(--border-card);">
       <button
@@ -9,7 +9,7 @@
         :class="activeTab === 'users' ? 'text-gold border-b-2 border-gold bg-[var(--bg-hover)]' : 'text-[var(--text-secondary)] hover:text-[var(--primary)]'"
         @click="activeTab = 'users'"
       >
-        <i class="fas fa-users me-2"></i>{{ tr('userCenter.users', 'کاربران', 'Users') }}
+        <i class="fas fa-users me-2"></i>{{ t('userCenter.users') }}
       </button>
       <button
         type="button"
@@ -17,16 +17,16 @@
         :class="activeTab === 'activity' ? 'text-gold border-b-2 border-gold bg-[var(--bg-hover)]' : 'text-[var(--text-secondary)] hover:text-[var(--primary)]'"
         @click="activeTab = 'activity'"
       >
-        <i class="fas fa-history me-2"></i>{{ tr('userCenter.activity', 'فعالیت‌ها', 'Activity') }}
+        <i class="fas fa-history me-2"></i>{{ t('userCenter.activity') }}
       </button>
     </div>
 
     <!-- Users tab -->
     <div v-show="activeTab === 'users'">
       <div class="flex justify-between items-center mb-4">
-        <p class="text-[var(--text-secondary)]">{{ tr('userCenter.manageUsers', 'مدیریت کاربران', 'Manage users') }}</p>
+        <p class="text-[var(--text-secondary)]">{{ t('userCenter.manageUsers') }}</p>
         <button type="button" class="btn-luxury" @click="openUserModal()">
-          <i class="fas fa-user-plus me-2"></i>{{ tr('userCenter.addUser', 'افزودن ادمین', 'Add admin') }}
+          <i class="fas fa-user-plus me-2"></i>{{ t('userCenter.addUser') }}
         </button>
       </div>
       <div v-if="usersLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -58,9 +58,9 @@
               </span>
               <span
                 v-if="!u.is_active"
-                class="inline-block ml-1 px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400"
+                class="inline-block ms-1 px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400"
               >
-                {{ tr('userCenter.inactive', 'غیرفعال', 'Inactive') }}
+                {{ t('userCenter.inactive') }}
               </span>
             </div>
             <div class="flex flex-col gap-2 shrink-0">
@@ -74,7 +74,7 @@
               <button
                 type="button"
                 class="btn-luxury-outline text-sm py-1.5 !border-rose-500/50 !text-rose-400 hover:!bg-rose-500/10"
-                :title="tr('userCenter.forceLogout', 'خروج اجباری', 'Force logout')"
+                :title="t('userCenter.forceLogout')"
                 @click="forceLogout(u)"
               >
                 <i class="fas fa-sign-out-alt"></i>
@@ -84,7 +84,7 @@
         </BaseCard>
       </div>
       <p v-if="!usersLoading && !users.length" class="text-center text-[var(--text-secondary)] py-8">
-        {{ tr('userCenter.noUsers', 'کاربری یافت نشد', 'No users found') }}
+        {{ t('userCenter.noUsers') }}
       </p>
     </div>
 
@@ -95,7 +95,7 @@
           v-model="activityFilters.action_type"
           class="input-luxury py-2 w-40 text-sm"
         >
-          <option value="">{{ tr('userCenter.allActions', 'همه عملیات', 'All actions') }}</option>
+          <option value="">{{ t('userCenter.allActions') }}</option>
           <option value="login_success">{{ actionTypeLabel('login_success') }}</option>
           <option value="login_failed">{{ actionTypeLabel('login_failed') }}</option>
           <option value="logout">{{ actionTypeLabel('logout') }}</option>
@@ -116,10 +116,10 @@
           <table class="w-full min-w-[600px]">
             <thead>
               <tr class="border-b border-[var(--border-color)]">
-                <th class="text-start py-4 px-4 text-gold font-semibold">{{ tr('userCenter.actionType', 'نوع عملیات', 'Action type') }}</th>
-                <th class="text-start py-4 px-4 text-gold font-semibold">{{ tr('userCenter.user', 'کاربر', 'User') }}</th>
-                <th class="text-start py-4 px-4 text-gold font-semibold">{{ tr('userCenter.details', 'جزئیات', 'Details') }}</th>
-                <th class="text-start py-4 px-4 text-gold font-semibold">{{ tr('userCenter.ip', 'IP', 'IP') }}</th>
+                <th class="text-start py-4 px-4 text-gold font-semibold">{{ t('userCenter.actionType') }}</th>
+                <th class="text-start py-4 px-4 text-gold font-semibold">{{ t('userCenter.user') }}</th>
+                <th class="text-start py-4 px-4 text-gold font-semibold">{{ t('userCenter.details') }}</th>
+                <th class="text-start py-4 px-4 text-gold font-semibold">{{ t('userCenter.ip') }}</th>
                 <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('logs.date') }}</th>
               </tr>
             </thead>
@@ -163,19 +163,19 @@
               </span>
               <span class="text-xs text-[var(--text-secondary)]">{{ formatDate(log.created_at) }}</span>
             </div>
-            <p class="text-sm text-[var(--text-secondary)]">{{ tr('userCenter.user', 'کاربر', 'User') }}: {{ log.user_display || '—' }}</p>
+            <p class="text-sm text-[var(--text-secondary)]">{{ t('userCenter.user') }}: {{ log.user_display || '—' }}</p>
             <p class="text-sm text-[var(--text-primary)] break-words" :title="log.details">{{ log.details || '—' }}</p>
-            <p class="text-xs text-[var(--text-secondary)]">{{ tr('userCenter.ip', 'IP', 'IP') }}: {{ log.ip_address || '—' }}</p>
+            <p class="text-xs text-[var(--text-secondary)]">{{ t('userCenter.ip') }}: {{ log.ip_address || '—' }}</p>
           </div>
         </div>
-        <p v-if="!activity.length" class="text-center text-[var(--text-secondary)] py-8">{{ tr('userCenter.noActivity', 'فعالیتی ثبت نشده است', 'No activity found') }}</p>
+        <p v-if="!activity.length" class="text-center text-[var(--text-secondary)] py-8">{{ t('userCenter.noActivity') }}</p>
       </div>
     </div>
 
     <!-- User create/edit modal -->
     <BaseModal
       v-model="userModalOpen"
-      :title="editingUser ? tr('userCenter.editUser', 'ویرایش ادمین', 'Edit admin') : tr('userCenter.addUser', 'افزودن ادمین', 'Add admin')"
+      :title="editingUser ? t('userCenter.editUser') : t('userCenter.addUser')"
     >
       <form @submit.prevent="saveUser" class="space-y-4">
         <div>
@@ -199,21 +199,21 @@
           />
         </div>
         <div v-if="editingUser">
-          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ tr('userCenter.newPasswordOptional', 'رمز عبور جدید (اختیاری)', 'New password (optional)') }}</label>
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ t('userCenter.newPasswordOptional') }}</label>
           <input
             v-model="userForm.password"
             type="password"
             class="input-luxury w-full"
             minlength="8"
-            :placeholder="tr('userCenter.leaveBlankToKeepCurrent', 'برای حفظ رمز فعلی، خالی بگذارید', 'Leave blank to keep current')"
+            :placeholder="t('userCenter.leaveBlankToKeepCurrent')"
           />
         </div>
         <div>
-          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ tr('userCenter.fullName', 'نام کامل', 'Full name') }}</label>
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ t('userCenter.fullName') }}</label>
           <input v-model="userForm.full_name" type="text" class="input-luxury w-full" />
         </div>
         <div>
-          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ tr('userCenter.role', 'نقش', 'Role') }}</label>
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ t('userCenter.role') }}</label>
           <select v-model="userForm.role" class="input-luxury w-full" required>
             <option value="super_admin">{{ roleLabel('super_admin') }}</option>
             <option value="management">{{ roleLabel('management') }}</option>
@@ -222,7 +222,7 @@
           </select>
         </div>
         <div v-if="editingUser" class="flex items-center gap-2">
-          <BaseCheckbox id="user-active" v-model="userForm.is_active">{{ tr('userCenter.active', 'فعال', 'Active') }}</BaseCheckbox>
+          <BaseCheckbox id="user-active" v-model="userForm.is_active">{{ t('userCenter.active') }}</BaseCheckbox>
         </div>
         <div class="flex gap-3 justify-end pt-4">
           <button type="button" class="btn-luxury-outline" @click="userModalOpen = false">
@@ -250,7 +250,7 @@ import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 
 const toast = useToast()
-const { t, te, locale } = useI18n()
+const { t } = useI18n()
 const activeTab = ref('users')
 const users = ref([])
 const usersLoading = ref(true)
@@ -272,29 +272,24 @@ const activityFilters = reactive({
   action_type: '',
 })
 
-function tr(key, faText, enText) {
-  if (te(key)) return t(key)
-  return locale.value === 'fa' ? faText : enText
-}
-
 function roleLabel(role) {
   const map = {
-    super_admin: tr('userCenter.roles.super_admin', 'مدیر کل', 'Super Admin'),
-    management: tr('userCenter.roles.management', 'مدیریت', 'Management'),
-    developer: tr('userCenter.roles.developer', 'توسعه‌دهنده', 'Developer'),
-    employee: tr('userCenter.roles.employee', 'کارمند', 'Employee'),
+    super_admin: t('userCenter.roles.super_admin'),
+    management: t('userCenter.roles.management'),
+    developer: t('userCenter.roles.developer'),
+    employee: t('userCenter.roles.employee'),
   }
   return map[role] ?? role
 }
 
 function actionTypeLabel(actionType) {
   const map = {
-    login_success: tr('userCenter.actionTypes.login_success', 'ورود موفق', 'Login success'),
-    login_failed: tr('userCenter.actionTypes.login_failed', 'ورود ناموفق', 'Login failed'),
-    logout: tr('userCenter.actionTypes.logout', 'خروج', 'Logout'),
-    price_update: tr('userCenter.actionTypes.price_update', 'بروزرسانی قیمت', 'Price update'),
-    bulk_price_update: tr('userCenter.actionTypes.bulk_price_update', 'بروزرسانی گروهی قیمت', 'Bulk price update'),
-    special_price_update: tr('userCenter.actionTypes.special_price_update', 'بروزرسانی قیمت ویژه', 'Special price update'),
+    login_success: t('userCenter.actionTypes.login_success'),
+    login_failed: t('userCenter.actionTypes.login_failed'),
+    logout: t('userCenter.actionTypes.logout'),
+    price_update: t('userCenter.actionTypes.price_update'),
+    bulk_price_update: t('userCenter.actionTypes.bulk_price_update'),
+    special_price_update: t('userCenter.actionTypes.special_price_update'),
   }
   return map[actionType] ?? actionType
 }
@@ -389,7 +384,7 @@ async function saveUser() {
       }
       if (userForm.password) payload.password = userForm.password
       await authApi.users.update(editingUser.value.id, payload)
-      toast.success(tr('userCenter.userUpdated', 'کاربر با موفقیت ویرایش شد', 'User updated'))
+      toast.success(t('userCenter.userUpdated'))
     } else {
       await authApi.users.create({
         username: userForm.username,
@@ -398,12 +393,12 @@ async function saveUser() {
         role: userForm.role,
         is_active: true,
       })
-      toast.success(tr('userCenter.userCreated', 'کاربر با موفقیت ایجاد شد', 'User created'))
+      toast.success(t('userCenter.userCreated'))
     }
     userModalOpen.value = false
     await fetchUsers()
   } catch (err) {
-    const msg = err.response?.data?.username?.[0] || err.response?.data?.detail || tr('userCenter.failedToSave', 'ذخیره انجام نشد', 'Failed to save')
+    const msg = err.response?.data?.username?.[0] || err.response?.data?.detail || t('userCenter.failedToSave')
     toast.error(msg)
   } finally {
     saveUserLoading.value = false
@@ -411,12 +406,12 @@ async function saveUser() {
 }
 
 async function forceLogout(user) {
-  if (!confirm(tr('userCenter.forceLogoutConfirm', 'این کاربر از همه دستگاه‌ها خارج شود؟ تمام نشست‌ها نامعتبر می‌شوند.', 'Force logout this user? All their sessions will be invalidated.'))) return
+  if (!confirm(t('userCenter.forceLogoutConfirm'))) return
   try {
     await authApi.users.forceLogout(user.id)
-    toast.success(tr('userCenter.userLoggedOutAllDevices', 'کاربر از همه دستگاه‌ها خارج شد', 'User logged out from all devices'))
+    toast.success(t('userCenter.userLoggedOutAllDevices'))
   } catch {
-    toast.error(tr('userCenter.failedToForceLogout', 'خروج اجباری انجام نشد', 'Failed to force logout'))
+    toast.error(t('userCenter.failedToForceLogout'))
   }
 }
 

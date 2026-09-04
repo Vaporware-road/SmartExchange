@@ -9,7 +9,7 @@
       </p>
     </div>
 
-    <div class="justify-self-end text-right">
+    <div class="justify-self-end text-end">
       <InlinePriceInput
         v-if="isEditing"
         :model-value="priceType.latest_price"
@@ -33,7 +33,7 @@
 
     <div class="flex items-center gap-2 justify-self-end self-center">
       <span class="rounded-full px-2 py-0.5 text-xs font-medium" :class="trendClass">
-        <i class="fas mr-1" :class="trendIcon"></i>
+        <i class="fas me-1" :class="trendIcon"></i>
         {{ trendText }}
       </span>
       <router-link
@@ -50,9 +50,9 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import InlinePriceInput from '@/components/prices/InlinePriceInput.vue'
-import { formatAppNumber, formatAppDecimal } from '@/utils/localeFormat.js'
+import { formatAppNumber, formatAppDecimal, resolveFormatLocale } from '@/utils/localeFormat.js'
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const props = defineProps({
   categoryId: {
@@ -82,7 +82,7 @@ const targetCode = computed(() =>
   props.priceType?.target_currency?.code ?? props.priceType?.target_currency ?? '—'
 )
 
-const appLoc = computed(() => (locale.value === 'fa' ? 'fa' : 'en'))
+const appLoc = computed(() => resolveFormatLocale(locale.value))
 
 const formattedPrice = computed(() => {
   const value = Number(props.priceType?.latest_price)
@@ -124,19 +124,11 @@ const relativeUpdatedAt = computed(() => {
   const diffMs = Math.max(now - date.getTime(), 0)
   const diffMin = Math.floor(diffMs / 60000)
   const loc = appLoc.value
-  if (loc === 'fa') {
-    if (diffMin < 1) return 'همین الان'
-    if (diffMin < 60) return `${formatAppNumber('fa', diffMin)} دقیقه پیش`
-    const diffHours = Math.floor(diffMin / 60)
-    if (diffHours < 24) return `${formatAppNumber('fa', diffHours)} ساعت پیش`
-    const diffDays = Math.floor(diffHours / 24)
-    return `${formatAppNumber('fa', diffDays)} روز پیش`
-  }
-  if (diffMin < 1) return 'Just now'
-  if (diffMin < 60) return `${formatAppNumber('en', diffMin)}m ago`
+  if (diffMin < 1) return t('common.relative.justNow')
+  if (diffMin < 60) return t('common.relative.minutesAgo', { count: formatAppNumber(loc, diffMin) })
   const diffHours = Math.floor(diffMin / 60)
-  if (diffHours < 24) return `${formatAppNumber('en', diffHours)}h ago`
+  if (diffHours < 24) return t('common.relative.hoursAgo', { count: formatAppNumber(loc, diffHours) })
   const diffDays = Math.floor(diffHours / 24)
-  return `${formatAppNumber('en', diffDays)}d ago`
+  return t('common.relative.daysAgo', { count: formatAppNumber(loc, diffDays) })
 })
 </script>

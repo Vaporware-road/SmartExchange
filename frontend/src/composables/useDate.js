@@ -2,13 +2,13 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { format as jalaliFormat } from 'date-fns-jalali'
 import { toPersianDigits } from '@/utils/persianDigits.js'
-import { createAppDateTimeFormat, formatAppNumber } from '@/utils/localeFormat.js'
+import { createAppDateTimeFormat, formatAppNumber, resolveFormatLocale } from '@/utils/localeFormat.js'
 
 export function useDate() {
   const { locale } = useI18n()
 
   const isJalali = computed(() => locale.value === 'fa')
-  const appLoc = computed(() => (locale.value === 'fa' ? 'fa' : 'en'))
+  const appLoc = computed(() => resolveFormatLocale(locale.value))
 
   function formatDate(dateInput, pattern) {
     if (!dateInput) return '—'

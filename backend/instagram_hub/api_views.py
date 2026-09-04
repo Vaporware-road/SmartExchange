@@ -12,6 +12,8 @@ from accounts.permissions import IsSuperAdminOrManagement
 from instagram_hub.services.image_generator import generate_price_images
 from instagram_hub.utils import path_to_public_url
 
+from instagram_hub.services.instagram_config import get_instagram_readiness
+
 logger = logging.getLogger(__name__)
 
 
@@ -118,14 +120,24 @@ class PreviewAPIView(APIView):
 
 
 class StatusAPIView(APIView):
-    """GET /api/instagram-hub/status/ — whether Instagram is configured (for Finalize)."""
+    """GET /api/instagram-hub/status/ — Instagram readiness for Finalize and hub UI."""
 
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
 
     def get(self, request):
-        from instagram_hub.services.instagram_config import is_instagram_configured
-        ok = is_instagram_configured()
-        return Response({"instagram_configured": ok}, status=status.HTTP_200_OK)
+        readiness = get_instagram_readiness()
+        return Response(
+            {
+                "instagram_configured": readiness["configured"],
+                "ready_for_publish": readiness["ready_for_publish"],
+                "public_base_url_configured": readiness["public_base_url_configured"],
+                "token_expired": readiness["token_expired"],
+                "token_expiring_soon": readiness["token_expiring_soon"],
+                "days_until_token_expiry": readiness["days_until_token_expiry"],
+                "warnings": readiness["warnings"],
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 def _active_instagram_config_qs():
@@ -136,6 +148,14 @@ def _active_instagram_config_qs():
         "feed_caption_suffix",
         "feed_hashtags",
     )
+
+
+def _oauth_redirect_uri(request) -> str:
+    try:
+        from django.urls import reverse
+        return request.build_absolute_uri(reverse("instagram_hub:callback"))
+    except Exception:
+        return request.build_absolute_uri("/instagram-hub/callback/")
 
 
 def _read_optional_caption_fields(config) -> tuple[str, str]:
@@ -149,6 +169,27 @@ def _read_optional_caption_fields(config) -> tuple[str, str]:
     except Exception:
         logger.warning("Instagram caption fields unreadable (missing DB columns?)", exc_info=True)
         return "", ""
+
+
+def _config_response_payload(request, config, connect_url: str) -> dict:
+    readiness = get_instagram_readiness()
+    suffix, hashtags = _read_optional_caption_fields(config)
+    return {
+        "has_app_id": readiness["has_app_id"],
+        "has_token": readiness["has_token"],
+        "token_expires_at": config.token_expires_at.isoformat() if config and config.token_expires_at else None,
+        "connect_url": connect_url,
+        "feed_caption_suffix": suffix,
+        "feed_hashtags": hashtags,
+        "oauth_redirect_uri": _oauth_redirect_uri(request),
+        "public_base_url": readiness["public_base_url"],
+        "public_base_url_configured": readiness["public_base_url_configured"],
+        "ready_for_publish": readiness["ready_for_publish"],
+        "token_expired": readiness["token_expired"],
+        "token_expiring_soon": readiness["token_expiring_soon"],
+        "days_until_token_expiry": readiness["days_until_token_expiry"],
+        "warnings": readiness["warnings"],
+    }
 
 
 class ConfigAPIView(APIView):
@@ -166,35 +207,12 @@ class ConfigAPIView(APIView):
             logger.exception("Instagram hub config GET failed: %s", exc)
             return Response(
                 {
-                    "has_app_id": False,
-                    "has_token": False,
-                    "token_expires_at": None,
-                    "connect_url": connect_url,
-                    "feed_caption_suffix": "",
-                    "feed_hashtags": "",
+                    **_config_response_payload(request, None, connect_url),
                     "detail": "Could not read Instagram settings. Run: python manage.py migrate instagram_hub",
                 },
                 status=status.HTTP_200_OK,
             )
-        if not config:
-            return Response({
-                "has_app_id": False,
-                "has_token": False,
-                "token_expires_at": None,
-                "connect_url": connect_url,
-                "feed_caption_suffix": "",
-                "feed_hashtags": "",
-            })
-        has_token = bool(config.get_decrypted_token() and (config.ig_user_id or "").strip())
-        suffix, hashtags = _read_optional_caption_fields(config)
-        return Response({
-            "has_app_id": bool((config.app_id or "").strip()),
-            "has_token": has_token,
-            "token_expires_at": config.token_expires_at.isoformat() if config.token_expires_at else None,
-            "connect_url": connect_url,
-            "feed_caption_suffix": suffix,
-            "feed_hashtags": hashtags,
-        })
+        return Response(_config_response_payload(request, config, connect_url))
 
     def patch(self, request):
         from django.db import DatabaseError

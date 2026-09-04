@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center">
     <nav class="mb-6 w-full">
       <router-link to="/finalize" class="text-gray-400 hover:text-gold transition-colors">
-        <i class="fas" :class="isRtl ? 'fa-arrow-right' : 'fa-arrow-left'" />
+        <i class="fas fa-arrow-left icon-back me-2" />
         <span class="ms-2">{{ $t('finalize.backToList') }}</span>
       </router-link>
     </nav>
@@ -149,7 +149,7 @@
 
         <div class="flex gap-4 pt-2 justify-center">
           <router-link v-if="phase === 'done' || phase === 'error'" to="/finalize" class="btn-luxury">
-            <i class="fas fa-arrow-left" />
+            <i class="fas fa-arrow-left icon-back" />
             {{ $t('common.back') }}
           </router-link>
           <button v-if="phase === 'error'" class="btn-luxury-outline" @click="retryFinalize">
@@ -201,7 +201,7 @@ import { finalizeApi, telegramApi, getApiErrorDetails } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import FloatingInput from '@/components/ui/FloatingInput.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
-import { formatAppDecimal } from '@/utils/localeFormat.js'
+import { formatAppDecimal, resolveFormatLocale } from '@/utils/localeFormat.js'
 
 const { t, locale } = useI18n()
 const toast = useToast()
@@ -281,7 +281,7 @@ function formatPrice(value) {
   if (value == null || value === '') return '—'
   const num = typeof value === 'string' ? parseFloat(value) : value
   if (Number.isNaN(num)) return String(value)
-  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  const appLoc = resolveFormatLocale(locale.value)
   return formatAppDecimal(appLoc, num, 2)
 }
 

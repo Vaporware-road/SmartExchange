@@ -2,7 +2,7 @@
   <div>
     <nav class="mb-6">
       <router-link to="/update" class="text-[var(--text-secondary)] hover:text-gold transition-colors">
-        <i class="fas me-2" :class="$i18n.locale === 'fa' ? 'fa-arrow-right' : 'fa-arrow-left'"></i>{{ $t('priceHub.backToHub') }}
+        <i class="fas fa-arrow-left icon-back me-2"></i>{{ $t('priceHub.backToHub') }}
       </router-link>
     </nav>
     <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('specialPrices.updateTitle') }}</h1>

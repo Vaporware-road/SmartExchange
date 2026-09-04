@@ -16,6 +16,12 @@ const routes = [
     meta: { public: true },
   },
   {
+    path: '/webapp/order',
+    name: 'webapp-order',
+    component: () => import('@/views/webapp/OrderIntakeView.vue'),
+    meta: { public: true, titleKey: 'routes.webappOrder' },
+  },
+  {
     path: '/error/404',
     name: 'error-404',
     component: () => import('@/views/errors/ErrorView.vue'),
@@ -35,6 +41,12 @@ const routes = [
     component: () => import('@/views/errors/ErrorView.vue'),
     props: { code: 403 },
     meta: { public: true },
+  },
+  {
+    path: '/headless-render/:templateId',
+    name: 'headless-render',
+    component: () => import('@/views/templates/HeadlessTemplateRenderer.vue'),
+    meta: { public: true, headlessRender: true },
   },
   {
     path: '/',
@@ -245,6 +257,12 @@ const routes = [
         meta: { titleKey: 'routes.instagramHub' },
       },
       {
+        path: 'orders',
+        name: 'orders',
+        component: () => import('@/views/orders/OrdersQueueView.vue'),
+        meta: { titleKey: 'routes.orders', permission: 'orders' },
+      },
+      {
         path: 'templates/new',
         name: 'template-new',
         component: () => import('@/views/templates/TemplateFormView.vue'),
@@ -296,6 +314,8 @@ router.beforeEach(async (to, from, next) => {
     if (path.startsWith('/finalize') && !auth.can('finalize')) {
       next({ name: 'error-403' })
     } else if ((path === '/settings' || path.startsWith('/settings/')) && !auth.can('settings')) {
+      next({ name: 'error-403' })
+    } else if (path.startsWith('/orders') && !auth.can('orders')) {
       next({ name: 'error-403' })
     } else if (to.meta.roles && !to.meta.roles.includes(auth.role)) {
       next({ name: 'error-403' })

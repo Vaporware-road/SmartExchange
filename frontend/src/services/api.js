@@ -16,7 +16,10 @@ const api = axios.create({
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token')
-  if (token) {
+  const hasAuth =
+    config.headers?.Authorization ||
+    config.headers?.authorization
+  if (token && !hasAuth) {
     config.headers.Authorization = `Bearer ${token}`
   }
   // Default instance sets application/json; FormData must use multipart boundary from the browser.
@@ -242,7 +245,7 @@ export const categoryApi = {
   get: (id) => api.get(`/categories/${id}/`),
   update: (id, data) => api.put(`/categories/${id}/`, data),
   patch: (id, data) => api.patch(`/categories/${id}/`, data),
-  delete: (id) => api.delete(`/categories/${id}/`),
+  delete: (id) => api.delete(`/categories/${id}/`, { silent: true }),
   addPriceType: (categoryId, data) =>
     api.post(`/categories/${categoryId}/price-types/`, data),
   reorderPriceTypes: (categoryId, orderIds) =>
@@ -347,6 +350,44 @@ export const templateApi = {
   delete: (id) => api.delete(`/templates/${id}/`),
 }
 
+function botAuthHeaders(token) {
+  return { Authorization: `Bearer ${token}` }
+}
+
+export const botGatewayApi = {
+  verifyAuth: (token) =>
+    api.get('/bot-gateway/auth/me/', {
+      headers: botAuthHeaders(token),
+      silent: true,
+      skipGlobalErrorRedirect: true,
+    }),
+  submitOrder: (token, payload) =>
+    api.post('/bot-gateway/orders/', payload, {
+      headers: botAuthHeaders(token),
+      silent: true,
+      skipGlobalErrorRedirect: true,
+    }),
+  publicIntake: () =>
+    api.get('/bot-gateway/public/intake/', {
+      silent: true,
+      skipGlobalErrorRedirect: true,
+    }),
+  submitPublicOrder: (payload) =>
+    api.post('/bot-gateway/public/orders/', payload, {
+      silent: true,
+      skipGlobalErrorRedirect: true,
+    }),
+  stats: () => api.get('/bot-gateway/stats/'),
+}
+
+export const ordersApi = {
+  pendingCount: () => api.get('/orders/pending-count/', { silent: true }),
+  intakeLink: () => api.get('/orders/intake-link/'),
+  list: (params) => api.get('/orders/', { params }),
+  review: (uuid, data) => api.patch(`/orders/${uuid}/review/`, data),
+  remove: (uuid) => api.delete(`/orders/${uuid}/`, { silent: true }),
+}
+
 export const templateEditorApi = {
   list: () => api.get('/template-editor/templates/'),
   get: (id) => api.get(`/template-editor/templates/${id}/`),
@@ -373,6 +414,8 @@ export const templateEditorApi = {
     api.delete(`/template-editor/fonts/${encodeURIComponent(filename)}/`),
   priceBindingsPreview: (params = {}) => api.get('/template-editor/price-bindings-preview/', { params }),
   categoryPriceTypes: (params = {}) => api.get('/template-editor/category-price-types/', { params }),
+  headlessRenderContext: (token) =>
+    api.get('/template-editor/headless-render/context/', { params: { token } }),
 }
 
 export default api

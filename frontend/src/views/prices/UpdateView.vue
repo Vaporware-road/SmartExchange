@@ -33,7 +33,7 @@
               <div
                 class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors bg-primary-muted"
               >
-                <i class="fas fa-chevron-left text-gold text-lg group-hover:translate-x-[-2px] transition-transform"></i>
+                <i class="fas fa-chevron-left icon-back text-gold text-lg group-hover:translate-x-[-2px] transition-transform"></i>
               </div>
             </div>
           </router-link>
@@ -70,7 +70,7 @@
                 class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl transition-colors bg-primary-muted"
               >
                 <i v-if="sp.icon" :class="sp.icon" class="text-gold text-lg"></i>
-                <i v-else class="fas fa-chevron-left text-gold text-lg group-hover:translate-x-[-2px] transition-transform"></i>
+                <i v-else class="fas fa-chevron-left icon-back text-gold text-lg group-hover:translate-x-[-2px] transition-transform"></i>
               </div>
             </div>
           </router-link>

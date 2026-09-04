@@ -190,6 +190,40 @@
               <h2 class="text-lg font-semibold text-gold mb-4 sm:mb-6">{{ $t('settings.tabs.instagram') }}</h2>
               <div class="space-y-4 md:space-y-6 w-full max-w-xl min-w-0">
                 <p class="text-sm text-[var(--text-secondary)]">{{ $t('settings.instagram.description') }}</p>
+
+                <div
+                  v-if="instagramConfig.token_expired"
+                  class="p-3 rounded-xl border border-red-500/30 bg-red-500/10 text-sm text-[var(--text-primary)]"
+                >
+                  <i class="fas fa-exclamation-triangle text-red-400" />
+                  {{ $t('settings.instagram.tokenExpired') }}
+                </div>
+                <div
+                  v-else-if="instagramConfig.token_expiring_soon"
+                  class="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-sm text-[var(--text-primary)]"
+                >
+                  <i class="fas fa-clock text-amber-400" />
+                  {{ $t('settings.instagram.tokenExpiringSoon', { days: instagramConfig.days_until_token_expiry }) }}
+                </div>
+                <div
+                  v-if="instagramConfig.has_token && !instagramConfig.public_base_url_configured"
+                  class="p-3 rounded-xl border border-amber-500/30 bg-amber-500/10 text-sm text-[var(--text-primary)]"
+                >
+                  <i class="fas fa-link text-amber-400" />
+                  {{ $t('settings.instagram.missingPublicBaseUrl') }}
+                  <span v-if="instagramConfig.public_base_url" class="block mt-1 text-xs text-[var(--text-secondary)]">
+                    INSTAGRAM_BASE_URL={{ instagramConfig.public_base_url }}
+                  </span>
+                </div>
+                <div
+                  v-if="instagramConfig.oauth_redirect_uri"
+                  class="p-3 rounded-xl border text-sm"
+                  style="border-color: var(--glass-border); background: var(--bg-input);"
+                >
+                  <p class="text-xs text-[var(--text-secondary)] mb-1">{{ $t('settings.instagram.oauthRedirectUri') }}</p>
+                  <code class="text-xs break-all text-[var(--text-primary)]">{{ instagramConfig.oauth_redirect_uri }}</code>
+                  <p class="text-xs text-[var(--text-secondary)] mt-2">{{ $t('settings.instagram.oauthRedirectHint') }}</p>
+                </div>
                 <div>
                   <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.instagram.appId') }}</label>
                   <input v-model="instagramForm.appId" type="text" class="input-luxury w-full min-w-0 min-h-[48px]" :placeholder="$t('settings.instagram.appIdPlaceholder')" />
@@ -216,6 +250,24 @@
                   <i class="fas fa-check-circle text-emerald-400" />
                   {{ $t('settings.instagram.connected') }}
                   <span v-if="instagramConfig.token_expires_at" class="block mt-1 text-[var(--text-secondary)]">{{ $t('settings.instagram.tokenExpires') }}: {{ instagramConfig.token_expires_at }}</span>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.instagram.captionSuffix') }}</label>
+                  <textarea
+                    v-model="instagramForm.captionSuffix"
+                    rows="2"
+                    class="input-luxury w-full min-w-0"
+                    :placeholder="$t('settings.instagram.captionSuffixPlaceholder')"
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('settings.instagram.hashtags') }}</label>
+                  <textarea
+                    v-model="instagramForm.hashtags"
+                    rows="2"
+                    class="input-luxury w-full min-w-0"
+                    :placeholder="$t('settings.instagram.hashtagsPlaceholder')"
+                  />
                 </div>
               </div>
             </div>
@@ -536,7 +588,7 @@ import BaseSwitch from '@/components/ui/BaseSwitch.vue'
 
 const route = useRoute()
 const toast = useToast()
-const { t, locale } = useI18n()
+const { t, locale, tm } = useI18n()
 const siteSettings = useSiteSettingsStore()
 const currenciesStore = useCurrenciesStore()
 const auth = useAuthStore()
@@ -592,8 +644,19 @@ const uploadsForm = reactive({
 const storageUsedPercent = ref(0)
 const storageTotalGb = ref('10 GB')
 
-const instagramForm = reactive({ appId: '', appSecret: '' })
-const instagramConfig = ref({ has_app_id: false, has_token: false, token_expires_at: null })
+const instagramForm = reactive({ appId: '', appSecret: '', captionSuffix: '', hashtags: '' })
+const instagramConfig = ref({
+  has_app_id: false,
+  has_token: false,
+  token_expires_at: null,
+  token_expired: false,
+  token_expiring_soon: false,
+  days_until_token_expiry: null,
+  public_base_url: null,
+  public_base_url_configured: false,
+  ready_for_publish: false,
+  oauth_redirect_uri: '',
+})
 const instagramConnectUrl = ref('')
 
 const fontsList = ref([])
@@ -647,21 +710,10 @@ const fontsGroupedForLtr = computed(() => {
   return { ltr, both, other }
 })
 
-const iosInstallSteps = computed(() =>
-  locale.value === 'fa'
-    ? [
-      'حتماً مرورگر Safari را استفاده کنید (در Chrome آیفون گزینه نصب نمایش داده نمی‌شود).',
-      'روی دکمه Share بزنید و گزینه Add to Home Screen را انتخاب کنید.',
-      'در صفحه بعد روی Add بزنید تا آیکن برنامه به صفحه اصلی اضافه شود.',
-      'بعد از نصب، برنامه را از Home Screen باز کنید تا مثل اپ کامل اجرا شود.',
-    ]
-    : [
-      'Use Safari on iPhone/iPad (install option is not available in Chrome).',
-      'Tap Share, then choose Add to Home Screen.',
-      'Tap Add on the next screen to place the app icon on your home screen.',
-      'Open it from Home Screen for full app-like experience.',
-    ]
-)
+const iosInstallSteps = computed(() => {
+  const steps = tm('settings.pwa.iosInstallSteps')
+  return Array.isArray(steps) ? steps : []
+})
 
 function setTab(id) {
   activeTab.value = id
@@ -789,6 +841,8 @@ async function saveInstagramConfig() {
     await instagramHubApi.patchConfig({
       app_id: instagramForm.appId || undefined,
       app_secret: instagramForm.appSecret || undefined,
+      feed_caption_suffix: instagramForm.captionSuffix,
+      feed_hashtags: instagramForm.hashtags,
     })
     toast.success(t('toast.saveSuccess'))
     if (instagramForm.appSecret) instagramForm.appSecret = ''
@@ -805,8 +859,17 @@ async function loadInstagramConfig() {
       has_app_id: data?.has_app_id ?? false,
       has_token: data?.has_token ?? false,
       token_expires_at: data?.token_expires_at ?? null,
+      token_expired: data?.token_expired ?? false,
+      token_expiring_soon: data?.token_expiring_soon ?? false,
+      days_until_token_expiry: data?.days_until_token_expiry ?? null,
+      public_base_url: data?.public_base_url ?? null,
+      public_base_url_configured: data?.public_base_url_configured ?? false,
+      ready_for_publish: data?.ready_for_publish ?? false,
+      oauth_redirect_uri: data?.oauth_redirect_uri ?? '',
     }
-    instagramConnectUrl.value = instagramConnectHref(Boolean(data?.has_app_id))
+    instagramForm.captionSuffix = data?.feed_caption_suffix ?? ''
+    instagramForm.hashtags = data?.feed_hashtags ?? ''
+    instagramConnectUrl.value = instagramConnectHref(Boolean(data?.has_app_id), 'settings')
     if (data?.has_app_id && !instagramForm.appId) instagramForm.appId = '••••••••'
   } catch {
     instagramConnectUrl.value = ''

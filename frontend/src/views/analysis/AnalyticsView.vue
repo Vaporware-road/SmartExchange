@@ -397,7 +397,7 @@ import { analysisApi, authApi } from '@/services/api'
 import { useThemeStore } from '@/stores/theme'
 import { useAuthStore } from '@/stores/auth'
 import { useDate } from '@/composables/useDate'
-import { formatAppNumber, createAppDateTimeFormat } from '@/utils/localeFormat.js'
+import { formatAppNumber, createAppDateTimeFormat, resolveFormatLocale } from '@/utils/localeFormat.js'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseButton from '@/components/ui/BaseButton.vue'
@@ -832,7 +832,7 @@ const doughnutOptions = computed(() => {
 
 function formatNumber(val) {
   if (val == null) return '—'
-  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  const appLoc = resolveFormatLocale(locale.value)
   return formatAppNumber(appLoc, val, { maximumFractionDigits: 2 })
 }
 
@@ -849,7 +849,7 @@ function buildChartFromTimeline(datasets) {
   const labels = [...allTimestamps].sort()
   if (!labels.length) return null
 
-  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  const appLoc = resolveFormatLocale(locale.value)
   const shortLabels = labels.map((iso) => {
     const d = new Date(iso)
     return isNaN(d.getTime()) ? iso : createAppDateTimeFormat(appLoc, { month: 'short', day: 'numeric' }).format(d)
@@ -899,7 +899,7 @@ function formatTimestamp(iso) {
   try {
     const d = new Date(iso)
     if (isNaN(d.getTime())) return String(iso)
-    const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+    const appLoc = resolveFormatLocale(locale.value)
     return createAppDateTimeFormat(appLoc, {
       year: 'numeric',
       month: '2-digit',

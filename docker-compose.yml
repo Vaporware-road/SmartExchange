@@ -27,7 +27,8 @@ services:
     env_file:
       - .env.docker
     command: >
-      sh -c "mkdir -p /app/backend/data /app/backend/public/media /app/backend/public/staticfiles &&
+      sh -c "pip install --no-cache-dir -q django-redis>=5.4.0 PyJWT>=2.8.0 &&
+             mkdir -p /app/backend/data /app/backend/public/media /app/backend/public/staticfiles &&
              cd /app/backend &&
              python manage.py migrate --noinput &&
              python manage.py collectstatic --noinput &&
@@ -47,6 +48,12 @@ services:
       CHOKIDAR_USEPOLLING: "true"
       WATCHPACK_POLLING: "true"
       VITE_API_PROXY_TARGET: "http://127.0.0.1:8000"
+      PLAYWRIGHT_FRONTEND_BASE_URL: "http://127.0.0.1:5173"
+      PLAYWRIGHT_MAX_CONCURRENT: "2"
+      SCREENSHOT_CACHE_TTL: "300"
+      REDIS_CACHE_URL: "redis://redis:6379/2"
+      BOT_GATEWAY_FRONTEND_URL: "http://localhost:5250"
+      BOT_GATEWAY_RATES_CACHE_TTL: "15"
     volumes:
       - ./backend:/app/backend
       - ./frontend:/app/frontend
@@ -70,12 +77,19 @@ services:
     env_file:
       - .env.docker
     command: >
-      sh -c "cd /app/backend &&
+      sh -c "pip install --no-cache-dir -q django-redis>=5.4.0 PyJWT>=2.8.0 &&
+             cd /app/backend &&
              celery -A SmartExchangePanel worker --loglevel=INFO --concurrency=2"
     environment:
       PYTHONUNBUFFERED: "1"
       PYTHONDONTWRITEBYTECODE: "1"
       SQLITE_PATH: "/app/backend/data/db.sqlite3"
+      PLAYWRIGHT_FRONTEND_BASE_URL: "http://app:5173"
+      PLAYWRIGHT_MAX_CONCURRENT: "2"
+      SCREENSHOT_CACHE_TTL: "300"
+      REDIS_CACHE_URL: "redis://redis:6379/2"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/1"
     volumes:
       - ./backend:/app/backend
       - media_data:/app/backend/public/media
@@ -94,12 +108,16 @@ services:
     env_file:
       - .env.docker
     command: >
-      sh -c "cd /app/backend &&
+      sh -c "pip install --no-cache-dir -q django-redis>=5.4.0 PyJWT>=2.8.0 &&
+             cd /app/backend &&
              celery -A SmartExchangePanel beat --loglevel=INFO"
     environment:
       PYTHONUNBUFFERED: "1"
       PYTHONDONTWRITEBYTECODE: "1"
       SQLITE_PATH: "/app/backend/data/db.sqlite3"
+      REDIS_CACHE_URL: "redis://redis:6379/2"
+      CELERY_BROKER_URL: "redis://redis:6379/0"
+      CELERY_RESULT_BACKEND: "redis://redis:6379/1"
     volumes:
       - ./backend:/app/backend
       - media_data:/app/backend/public/media

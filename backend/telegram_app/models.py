@@ -1,3 +1,5 @@
+import uuid
+
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -44,6 +46,33 @@ class TelegramBot(models.Model):
         default=False,
         verbose_name="Log all messages",
         help_text="If set, log all messages sent via this bot",
+    )
+    webhook_secret_token = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        db_index=True,
+        verbose_name="Webhook Secret",
+        help_text="Secret UUID used in inbound webhook URL",
+    )
+    gateway_enabled = models.BooleanField(
+        default=False,
+        verbose_name="Gateway Enabled",
+        help_text="Enable inbound auto-reply for customer messages",
+    )
+    default_category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="gateway_bots",
+        verbose_name="Default Price Board",
+        help_text="Category board shown when no currency keyword is matched",
+    )
+    order_button_text = models.CharField(
+        max_length=128,
+        default="🛒 ثبت سفارش سریع",
+        blank=True,
+        verbose_name="Order Button Text",
     )
     created_at = models.DateTimeField(
         auto_now_add=True,

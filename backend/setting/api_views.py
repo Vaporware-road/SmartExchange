@@ -72,6 +72,7 @@ def _public_site_settings_fallback():
         "linkedin_link": "",
         "auto_post_on_update": False,
         "use_template_editor_for_boards": False,
+        "use_playwright_for_template_render": False,
         "ui_font_filename_rtl": "",
         "ui_font_filename_ltr": "",
         "prices_webhook_url": "",

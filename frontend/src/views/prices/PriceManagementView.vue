@@ -84,7 +84,7 @@
 import { ref, onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 import { useI18n } from 'vue-i18n'
-import { formatAppNumber } from '@/utils/localeFormat.js'
+import { formatAppNumber, resolveFormatLocale } from '@/utils/localeFormat.js'
 import { categoryApi, specialPriceApi, priceApi, formatDrfError } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import CategoryGroup from '@/components/prices/CategoryGroup.vue'
@@ -100,7 +100,7 @@ const toast = useToast()
 function formatPrice(value) {
   if (value == null || Number.isNaN(value)) return '—'
   const n = Number(value)
-  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  const appLoc = resolveFormatLocale(locale.value)
   if (n >= 1e9) return formatAppNumber(appLoc, n / 1e9, { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + 'B'
   if (n >= 1e6) return formatAppNumber(appLoc, n / 1e6, { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + 'M'
   if (n >= 1e3) return formatAppNumber(appLoc, n / 1e3, { maximumFractionDigits: 1, minimumFractionDigits: 1 }) + 'K'

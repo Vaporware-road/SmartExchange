@@ -13,7 +13,8 @@
     "instagramHub": "Instagram Hub",
     "settings": "Settings",
     "userCenter": "Admin Management",
-    "adminManagement": "Admin Management"
+    "adminManagement": "Admin Management",
+    "orders": "Orders Queue"
   },
   "common": {
     "save": "Save",
@@ -27,6 +28,7 @@
     "loading": "Loading...",
     "search": "Search...",
     "noData": "No data available",
+    "refresh": "Refresh",
     "confirm": "Confirm",
     "close": "Close",
     "panel": "Management Panel",
@@ -38,23 +40,40 @@
     "description": "Description",
     "date": "Date",
     "logout": "Logout",
-    "login": "Login"
+    "login": "Login",
+    "saving": "Saving?",
+    "type": "Type",
+    "category": "Category",
+    "buy": "Buy",
+    "sell": "Sell",
+    "id": "ID",
+    "copyLink": "Copy link",
+    "uploading": "Uploading?",
+    "deleting": "Deleting?",
+    "relative": {
+      "justNow": "Just now",
+      "minutesAgo": "{count}m ago",
+      "hoursAgo": "{count}h ago",
+      "daysAgo": "{count}d ago"
+    }
   },
   "header": {
     "openMenu": "Open menu",
-    "closeMenu": "Close menu"
+    "closeMenu": "Close menu",
+    "selectLanguage": "Select language"
   },
   "footer": {
-    "copyright": "© {year} {name}. All rights reserved.",
-    "support": "Support"
+    "copyright": "? {year} {name}. All rights reserved.",
+    "support": "Support",
+    "poweredBy": "Powered by Siavash"
   },
   "breadcrumb": {
     "home": "Home"
   },
   "errors": {
     "forbidden": "You do not have permission for this action",
-    "serverError": "Server error — please try again",
-    "networkError": "Network error — check your internet connection",
+    "serverError": "Server error ? please try again",
+    "networkError": "Network error ? check your internet connection",
     "unknown": "An error occurred",
     "priceNotFound": "Price type not found or no longer available."
   },
@@ -84,7 +103,10 @@
     "finalizeSuccess": "Finalization completed successfully",
     "finalizeFailed": "Finalization failed",
     "pricesUpdatedBroadcast": "Prices Updated & Broadcasted to Telegram",
-    "cacheCleared": "Temporary uploads and cache cleared."
+    "cacheCleared": "Temporary uploads and cache cleared.",
+    "saveFailed": "Save failed",
+    "linkCopied": "Link copied",
+    "copyFailed": "Could not copy"
   },
   "emptyState": {
     "noCategories": "No categories yet",
@@ -143,13 +165,93 @@
     "templateMediaLibrary": "Media library",
     "telegramStudio": "Telegram Message Studio",
     "instagramHub": "Instagram Hub",
-    "userCenter": "Admin Management"
+    "userCenter": "Admin Management",
+    "orders": "Orders Queue",
+    "webappOrder": "Place Order"
+  },
+  "webapp": {
+    "orderTitle": "Quick Order",
+    "welcome": "Hello {name}",
+    "tradeType": "Trade type",
+    "buy": "Buy",
+    "sell": "Sell",
+    "category": "Currency / category",
+    "selectCategory": "Select",
+    "amount": "Amount",
+    "note": "Notes",
+    "notePlaceholder": "Optional notes...",
+    "submitOrder": "Submit order",
+    "orderSubmitted": "Your order was submitted successfully",
+    "orderContactMessage": "Our team will contact you shortly at the phone number you provided.",
+    "orderContactMessageBot": "Our team will contact you shortly on Telegram.",
+    "orderPendingReview": "Please keep your phone available. Thank you for your patience.",
+    "missingToken": "Invalid link. Please use the bot button.",
+    "authFailed": "Authentication failed. The link may have expired.",
+    "submitFailed": "Could not submit the order.",
+    "publicIntro": "View live rates and submit your order.",
+    "liveRates": "Live rates",
+    "customerName": "Full name",
+    "customerPhone": "Phone number",
+    "priceType": "Rate type",
+    "selectPriceType": "Select rate type (optional)",
+    "selectPriceTypeLabel": "Select a rate",
+    "ratesUpdated": "Updated",
+    "noRatesYet": "No rates available yet.",
+    "selectedRate": "Your selected rate",
+    "formSection": "Order details",
+    "customerNamePlaceholder": "e.g. John Smith",
+    "amountPlaceholder": "Enter amount",
+    "phonePlaceholder": "0912..."
+  },
+  "orders": {
+    "queueTitle": "Bot orders queue",
+    "customerLinkTitle": "Customer order link",
+    "customerLinkHint": "Share this link with customers. They see live rates and orders appear in this queue.",
+    "copyLink": "Copy link",
+    "copied": "Copied",
+    "copyFailed": "Could not copy link",
+    "openLink": "Open",
+    "pendingBadge": "{count} pending orders",
+    "empty": "No orders found.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "viewDetails": "View details",
+    "detailTitle": "Order details",
+    "sectionStatus": "Status",
+    "sectionCustomer": "Customer",
+    "sectionOrder": "Order",
+    "sectionMetadata": "Captured data",
+    "platform": "Source",
+    "platformTelegram": "Telegram",
+    "platformWhatsapp": "WhatsApp",
+    "platformWeb": "Web / public link",
+    "telegramChatId": "Telegram chat ID",
+    "telegramUsername": "Telegram username",
+    "customerId": "Customer ID",
+    "reviewedAt": "Reviewed at",
+    "adminNote": "Admin note",
+    "adminNotePlaceholder": "Optional note...",
+    "metaSource": "Submission source",
+    "metaUserAgent": "Browser / device",
+    "deleteOrder": "Delete order",
+    "deleteConfirm": "Permanently delete order \"{name}\"? Required before deleting its category.",
+    "deleteSuccess": "Order deleted.",
+    "reviewSuccess": "Order status updated.",
+    "status": {
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "cancelled": "Cancelled",
+      "all": "All"
+    }
   },
   "instagramHub": {
     "description": "Generate post and story images from your finalized prices. Choose a theme and categories, then preview before publishing to Instagram.",
     "statusDescription": "Instagram is configured in Settings. When you finalize prices, they are automatically posted to your connected Instagram account (like Telegram).",
     "connected": "Connected",
     "disconnected": "Not connected",
+    "readyForPublish": "Ready ? finalize will post to Instagram automatically.",
+    "partiallyConfigured": "Connected but not ready ? check token and INSTAGRAM_BASE_URL in Settings.",
     "configureInSettings": "Configure App ID and Secret in Settings, then connect below.",
     "reconnect": "Reconnect",
     "setAppIdFirst": "Set App ID and App Secret in Settings first.",
@@ -163,8 +265,10 @@
     "previewStory": "Story"
   },
   "lang": {
-    "fa": "فارسی",
-    "en": "English"
+    "en": "English",
+    "fa": "?????",
+    "ar": "???????",
+    "es": "Espa?ol"
   },
   "validation": {
     "required": "This field is required"
@@ -215,8 +319,8 @@
     "snapToGrid": "Snap to grid",
     "inspectorTypography": "Typography",
     "priceDigitLocale": "Price numerals",
-    "priceDigitsEnglish": "English (0–9)",
-    "priceDigitsPersian": "Persian (۰–۹)",
+    "priceDigitsEnglish": "English (0?9)",
+    "priceDigitsPersian": "Persian (???)",
     "priceDigitLocaleHint": "Applies to editor preview and exported PNG. Use Persian digits with Persian fonts.",
     "inspectorAppearance": "Appearance",
     "inspectorPosition": "Position",
@@ -232,27 +336,136 @@
     "dateSourceHelp": "Uses live values when the template is published. The editor shows a sample for each format.",
     "weekdaySource": "Weekday source",
     "dateFormats": {
-      "date_fa": "Persian — day, month name, year",
-      "farsi_date": "Persian — same as full Persian date",
-      "date_fa_slash": "Persian — Jalali YYYY/MM/DD (Persian digits)",
-      "date_fa_slash_short": "Persian — Jalali Y/M/D (Persian digits)",
-      "date_fa_iso": "Persian — Jalali YYYY-MM-DD (Persian digits)",
-      "date_en": "English — long (Month DD, YYYY)",
-      "english_date": "English — same as long English date",
-      "date_en_iso": "English — ISO YYYY-MM-DD",
-      "date_en_dmy": "English — DD/MM/YYYY",
-      "date_en_mdy": "English — MM/DD/YYYY (US)",
-      "date_en_short": "English — short (e.g. 21 Apr 2026)",
-      "date_en_weekday_long": "English — weekday + long date",
-      "tether_date": "English — day mon (tether style)",
-      "tether_year": "English — year (YYYY)"
+      "date_fa": "Persian ? day, month name, year",
+      "farsi_date": "Persian ? same as full Persian date",
+      "date_fa_slash": "Persian ? Jalali YYYY/MM/DD (Persian digits)",
+      "date_fa_slash_short": "Persian ? Jalali Y/M/D (Persian digits)",
+      "date_fa_iso": "Persian ? Jalali YYYY-MM-DD (Persian digits)",
+      "date_en": "English ? long (Month DD, YYYY)",
+      "english_date": "English ? same as long English date",
+      "date_en_iso": "English ? ISO YYYY-MM-DD",
+      "date_en_dmy": "English ? DD/MM/YYYY",
+      "date_en_mdy": "English ? MM/DD/YYYY (US)",
+      "date_en_short": "English ? short (e.g. 21 Apr 2026)",
+      "date_en_weekday_long": "English ? weekday + long date",
+      "tether_date": "English ? day mon (tether style)",
+      "tether_year": "English ? year (YYYY)"
     },
     "weekdayFormats": {
       "farsi_weekday": "Persian weekday name",
       "english_weekday": "English weekday name"
     },
     "arabicShapingLabel": "Persian/Arabic shaping (export)",
-    "arabicShapingHelp": "Uses arabic reshaper + bidi so RTL text draws correctly in PNG when Pillow has no libraqm. Editor preview follows the same shaping when ON."
+    "arabicShapingHelp": "Uses arabic reshaper + bidi so RTL text draws correctly in PNG when Pillow has no libraqm. Editor preview follows the same shaping when ON.",
+    "workspace": {
+      "back": "Back",
+      "untitledTemplate": "Template",
+      "lastSaveAt": "Last save: {time}",
+      "canvasSize": "Canvas {w}?{h}",
+      "fitZoom": "Fit",
+      "uploadBackground": "Upload background image",
+      "uploadBackgroundHint": "Start your design by setting a base canvas image.",
+      "saveStatus": {
+        "error": "Save failed",
+        "saving": "Saving",
+        "dirty": "Unsaved changes",
+        "saved": "Saved"
+      },
+      "noCategory": "No category",
+      "saveSuccess": "Template saved ({category})",
+      "backgroundUploaded": "Background image uploaded",
+      "backgroundUploadFailed": "Background upload failed",
+      "missingTemplateId": "Missing template id",
+      "loadFailed": "Failed to load template"
+    },
+    "inspector": {
+      "title": "Inspector",
+      "templateSettings": "Template settings",
+      "templateName": "Template name",
+      "width": "Width",
+      "height": "Height",
+      "canvasBackground": "Canvas background",
+      "selectWidget": "Select a widget to edit style, typography and data bindings.",
+      "tabs": {
+        "appearance": "Appearance",
+        "typography": "Typography",
+        "data": "Data"
+      },
+      "priceTypeBinding": "PriceType binding",
+      "selectPriceType": "Select PriceType",
+      "stableKey": "Stable key:",
+      "previewSource": "Preview source:",
+      "previewValue": "Value:",
+      "fallbackValue": "Fallback value (used when live value is unavailable)",
+      "clockUsesServerTime": "Uses time from server data.",
+      "typography": "Typography",
+      "fontSize": "Font size",
+      "textColor": "Text color",
+      "pickColor": "Pick color",
+      "fontFile": "Font file (PNG export)",
+      "defaultServerFont": "Default (server)",
+      "align": "Align",
+      "verticalAlign": "Vertical (in box)",
+      "weight": "Weight",
+      "lineHeight": "Line height (optional)",
+      "lineHeightPlaceholder": "e.g. 1.2 or 32",
+      "plainTextExport": "Plain text on export (no outline / shadow)",
+      "dropShadow": "Drop shadow (PNG)",
+      "textOutline": "Text outline (PNG)",
+      "snapToBackground": "Snap to background image",
+      "snapHelp": "Moves the widget box to the edges of the visible image (letterboxing excluded).",
+      "snapLeft": "Left",
+      "snapHMid": "H mid",
+      "snapRight": "Right",
+      "snapTop": "Top",
+      "snapVMid": "V mid",
+      "snapBottom": "Bottom",
+      "imageUrl": "Image URL",
+      "imageUrlPlaceholder": "https://? or /media/?",
+      "uploadImage": "Upload image",
+      "openMediaLibrary": "Open media library",
+      "opacity": "Opacity (editor + PNG)",
+      "zIndex": "z-index",
+      "rotation": "Rotation",
+      "deleteWidget": "Delete widget",
+      "imageUploaded": "Image uploaded",
+      "alignLeft": "Left",
+      "alignCenter": "Center",
+      "alignRight": "Right",
+      "valignMiddle": "Middle",
+      "valignTop": "Top",
+      "valignBottom": "Bottom",
+      "weightNormal": "Normal",
+      "weightBold": "Bold",
+      "uploadBackground": "Upload background image"
+    },
+    "widgetLibrary": {
+      "title": "Widget library",
+      "widgetPreview": "{label} preview",
+      "priceBindings": "Price bindings",
+      "mediaLibrary": "Media library",
+      "uploadBaseImage": "Upload base image",
+      "setCanvasBackgroundFirst": "Set canvas background first",
+      "noUploads": "No uploads yet.",
+      "mediaLoadFailed": "Could not load media",
+      "imageWidgetAdded": "Image widget added ? select it to move or resize",
+      "sections": {
+        "textTime": "Text & time",
+        "media": "Media"
+      },
+      "widgets": {
+        "text": "Text",
+        "textHint": "Headline or note",
+        "date": "Date",
+        "dateHint": "Localized date",
+        "weekday": "Weekday",
+        "weekdayHint": "Day of week",
+        "clock": "Clock",
+        "clockHint": "Live server time",
+        "image": "Image",
+        "imageHint": "Static logo or photo"
+      }
+    }
   },
   "categories": {
     "backToList": "Back to Categories",
@@ -308,7 +521,11 @@
       "RUB": "Preset category for Russian ruble related rates.",
       "USDT": "Preset category for Tether related rates.",
       "XAU": "Preset category for gold related rates."
-    }
+    },
+    "addPriceType": "Add Price Type",
+    "deletePriceTypeConfirm": "Delete price type \"{name}\"?",
+    "deleteConfirmAria": "Delete category confirmation",
+    "selectCategory": "Select category"
   },
   "bulkUpdate": {
     "backToCategories": "Back to Categories",
@@ -419,7 +636,9 @@
     "offline": "Offline",
     "connectionStatus": "Connection",
     "cashPrice": "Cash",
-    "accountPrice": "Account"
+    "accountPrice": "Account",
+    "lastPriceUpdateBy": "Last price update by",
+    "topCategoriesChartTitle": "Top Categories by Price Types"
   },
   "finalize": {
     "title": "Finalize Category",
@@ -532,7 +751,16 @@
       "connected": "Instagram account connected.",
       "tokenExpires": "Token expires",
       "connectSuccess": "Instagram connected successfully.",
-      "connectError": "Instagram connection failed."
+      "connectError": "Instagram connection failed.",
+      "captionSuffix": "Caption suffix (feed posts)",
+      "captionSuffixPlaceholder": "e.g. Contact line or office address",
+      "hashtags": "Hashtags (feed posts)",
+      "hashtagsPlaceholder": "e.g. #exchange #rates",
+      "tokenExpired": "Instagram token has expired. Click Connect to reconnect.",
+      "tokenExpiringSoon": "Instagram token expires in {days} day(s). Reconnect soon.",
+      "missingPublicBaseUrl": "Set INSTAGRAM_BASE_URL to your public site URL (without /media) so Meta can fetch generated images.",
+      "oauthRedirectUri": "OAuth redirect URI (add in Meta Developer portal)",
+      "oauthRedirectHint": "Must match exactly under Facebook Login ? Valid OAuth Redirect URIs."
     },
     "fonts": {
       "description": "Upload .ttf or .otf files for template rendering and optional panel typography. Fonts are stored alongside template assets.",
@@ -544,7 +772,7 @@
       "saveUiFonts": "Save UI font choices",
       "uploadSuccess": "Font uploaded",
       "deleteConfirm": "Delete font \"{name}\"? It cannot be restored. Templates using it may need updating.",
-      "deleteBlocked": "Cannot delete a font selected for UI — change UI fonts first.",
+      "deleteBlocked": "Cannot delete a font selected for UI ? change UI fonts first.",
       "noFonts": "No custom fonts yet. Upload a font to get started.",
       "tableFile": "File",
       "tableDisplay": "Display name",
@@ -563,6 +791,16 @@
       "copyLink": "Copy link",
       "copied": "Copied",
       "save": "Save API settings"
+    },
+    "confirmClearCacheAria": "Confirm clear cache",
+    "confirmDeleteFontAria": "Confirm delete font",
+    "pwa": {
+      "iosInstallSteps": [
+        "Open this page in Safari on your iPhone or iPad.",
+        "Tap the Share button at the bottom of the screen.",
+        "Scroll down and tap \"Add to Home Screen\".",
+        "Tap \"Add\" in the top-right corner."
+      ]
     }
   },
   "specialPrices": {
@@ -604,7 +842,23 @@
     "showDetails": "Show details",
     "hideDetails": "Hide details",
     "apply": "Apply",
-    "clearFilters": "Clear"
+    "clearFilters": "Clear",
+    "levels": {
+      "DEBUG": "Debug",
+      "INFO": "Info",
+      "WARNING": "Warning",
+      "ERROR": "Error",
+      "CRITICAL": "Critical"
+    },
+    "sources": {
+      "telegram": "Telegram",
+      "finalize": "Finalize",
+      "price_publisher": "Price Publisher",
+      "instagram": "Instagram",
+      "auth": "Auth",
+      "api": "API",
+      "system": "System"
+    }
   },
   "finalizeDashboard": {
     "allUpToDate": "All prices are up to date. Nothing to finalize.",
@@ -660,9 +914,9 @@
       "channelDefault": "No channel selected",
       "bannerLabel": "Banner",
       "bannerNone": "No banner",
-      "bannerBuyDouble": "Buy GBP – Double Price",
-      "bannerSellDouble": "Sell GBP – Double Price",
-      "bannerGenericSingle": "Generic – Single Price",
+      "bannerBuyDouble": "Buy GBP ? Double Price",
+      "bannerSellDouble": "Sell GBP ? Double Price",
+      "bannerGenericSingle": "Generic ? Single Price",
       "cashPrice": "Cash Price",
       "accountPrice": "Account Price",
       "price": "Price",
@@ -750,19 +1004,19 @@
     "uploadImage": "Click to upload",
     "mediaHint": "Image for the Telegram message.",
     "changeImage": "Change image",
-    "uploading": "Uploading…",
+    "uploading": "Uploading?",
     "description": "Description",
     "insertVariable": "Insert variable",
     "priceTypes": "Price types",
     "noPriceTypes": "No price types in this category.",
-    "descriptionPlaceholder": "Message text under the image…",
+    "descriptionPlaceholder": "Message text under the image?",
     "inlineButtons": "Inline buttons",
     "buttonLabel": "Label",
     "buttonUrl": "URL",
     "addButton": "Add button",
     "livePreview": "Live preview",
     "saveSync": "Save & Sync",
-    "saving": "Saving…",
+    "saving": "Saving?",
     "categoryNotFound": "Category not found.",
     "previewImageError": "Image",
     "incompleteMessage": "Media or message description is not set. The Telegram message may appear incomplete."
@@ -811,5 +1065,119 @@
       "unknown": "Something went wrong. Please try again."
     },
     "fields": {}
+  },
+  "a11y": {
+    "breadcrumb": "Breadcrumb",
+    "toggleSidebar": "Toggle sidebar",
+    "toggleTheme": "Toggle theme",
+    "dismiss": "Dismiss",
+    "categoryIcon": "{name} icon"
+  },
+  "landing": {
+    "accessPanel": "Access Panel"
+  },
+  "priceTypeForm": {
+    "backToCategories": "Back to Categories",
+    "sourceCurrency": "Source Currency",
+    "targetCurrency": "Target Currency",
+    "tradeType": "Trade Type (Buy / Sell)",
+    "tradeTypeHelp": "Choose how this price is used in Bulk Update columns and final publish logic.",
+    "descriptionOptional": "Description (optional)",
+    "loadCurrenciesError": "Could not load currencies",
+    "missingCategoryId": "Missing category id",
+    "selectBothCurrencies": "Please select both source and target currencies.",
+    "createSuccess": "Price type created successfully",
+    "updateSuccess": "Price type updated successfully",
+    "saveError": "Could not save price type",
+    "loadPriceTypeError": "Could not load price type",
+    "pageTitleCreate": "New Price Type",
+    "pageTitleEdit": "Edit Price Type"
+  },
+  "userCenter": {
+    "title": "Admin Management",
+    "users": "Users",
+    "activity": "Activity",
+    "manageUsers": "Manage users",
+    "addUser": "Add admin",
+    "inactive": "Inactive",
+    "forceLogout": "Force logout",
+    "noUsers": "No users found",
+    "allActions": "All actions",
+    "actionType": "Action type",
+    "user": "User",
+    "details": "Details",
+    "ip": "IP",
+    "noActivity": "No activity found",
+    "editUser": "Edit admin",
+    "newPasswordOptional": "New password (optional)",
+    "leaveBlankToKeepCurrent": "Leave blank to keep current",
+    "fullName": "Full name",
+    "role": "Role",
+    "active": "Active",
+    "userUpdated": "User updated",
+    "userCreated": "User created",
+    "failedToSave": "Failed to save",
+    "forceLogoutConfirm": "Force logout this user? All their sessions will be invalidated.",
+    "userLoggedOutAllDevices": "User logged out from all devices",
+    "failedToForceLogout": "Failed to force logout",
+    "roles": {
+      "super_admin": "Super Admin",
+      "management": "Management",
+      "developer": "Developer",
+      "employee": "Employee"
+    },
+    "actionTypes": {
+      "login_success": "Login success",
+      "login_failed": "Login failed",
+      "logout": "Logout",
+      "price_update": "Price update",
+      "bulk_price_update": "Bulk price update",
+      "special_price_update": "Special price update"
+    }
+  },
+  "templates": {
+    "addTemplate": "Add Template",
+    "openEditor": "Editor",
+    "templateNumber": "Template {id}",
+    "unassigned": "Unassigned",
+    "deleteConfirm": "Are you sure you want to delete this template?",
+    "deleteSuccess": "Template deleted successfully.",
+    "createFailed": "Create failed",
+    "nameRequired": "Please enter a template name.",
+    "categoryRequired": "A category is required to create a template."
+  },
+  "templateMedia": {
+    "formatHint": "JPG, PNG, GIF, WebP ? copy URLs into image widgets or upload new assets.",
+    "uploadImages": "Upload images",
+    "uploadSuccess": "Uploaded: {name}"
+  },
+  "templateRenderer": {
+    "missingToken": "Missing render token",
+    "loadFailed": "Failed to load render context"
+  },
+  "prices": {
+    "backToList": "Back to Prices",
+    "newPrice": "New Price",
+    "notesOptional": "Notes (optional)",
+    "notesPlaceholder": "Optional notes",
+    "columns": {
+      "priceType": "Price Type",
+      "category": "Category",
+      "pair": "Pair",
+      "latestPrice": "Latest Price",
+      "actions": "Actions"
+    }
+  },
+  "priceHistory": {
+    "columns": {
+      "price": "Price",
+      "date": "Date",
+      "notes": "Notes"
+    }
+  },
+  "commandPalette": {
+    "navigate": "navigate",
+    "select": "select",
+    "close": "close"
   }
 }

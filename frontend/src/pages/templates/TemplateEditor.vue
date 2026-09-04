@@ -8,15 +8,15 @@
           to="/templates"
           class="inline-flex items-center gap-2 rounded-lg px-2 py-1.5 text-sm text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-hover)] hover:text-[var(--primary)]"
         >
-          <i class="fas fa-arrow-left" />
-          <span>Back</span>
+          <i class="fas fa-arrow-left icon-back" />
+          <span>{{ $t('templateEditor.workspace.back') }}</span>
         </router-link>
       </div>
       <div class="min-w-0 flex-1 text-center">
         <h1 v-if="template" class="truncate text-sm font-semibold text-[var(--primary)] sm:text-base" :title="template.name">
           {{ template.name }}
         </h1>
-        <span v-else class="text-sm text-[var(--text-secondary)]">Template</span>
+        <span v-else class="text-sm text-[var(--text-secondary)]">{{ $t('templateEditor.workspace.untitledTemplate') }}</span>
       </div>
       <div class="flex w-48 shrink-0 items-center justify-end gap-2">
         <div class="flex flex-col items-end gap-0.5">
@@ -28,17 +28,17 @@
             {{ saveStatusLabel }}
           </span>
           <span v-if="lastSavedAt" class="text-[10px] text-[var(--text-secondary)]">
-            {{ `Last save: ${lastSavedAt.toLocaleTimeString()}` }}
+            {{ $t('templateEditor.workspace.lastSaveAt', { time: lastSavedAt.toLocaleTimeString() }) }}
           </span>
         </div>
         <button type="button" class="btn-luxury py-1.5 px-4 text-sm" :disabled="isSaving" @click="save">
-          {{ isSaving ? 'Saving…' : 'Save' }}
+          {{ isSaving ? $t('common.saving') : $t('common.save') }}
         </button>
       </div>
     </header>
 
     <div v-if="loadError" class="p-8 text-center text-red-600 dark:text-red-300">{{ loadError }}</div>
-    <div v-else-if="loading" class="flex flex-1 items-center justify-center p-8 text-[var(--text-secondary)]">Loading…</div>
+    <div v-else-if="loading" class="flex flex-1 items-center justify-center p-8 text-[var(--text-secondary)]">{{ $t('common.loading') }}</div>
 
     <div v-else class="flex min-h-0 min-w-0 flex-1 gap-2 overflow-hidden p-2 sm:p-3">
       <WidgetLibraryPanel :category-id="template?.category ?? null" />
@@ -48,7 +48,7 @@
         <div
           class="flex shrink-0 items-center justify-between gap-2 border-b border-[var(--border-card)] bg-[var(--bg-input)]/80 px-3 py-2 text-xs"
         >
-          <span class="text-[var(--text-secondary)]">Canvas {{ canvasW }}×{{ canvasH }}</span>
+          <span class="text-[var(--text-secondary)]">{{ $t('templateEditor.workspace.canvasSize', { w: canvasW, h: canvasH }) }}</span>
           <div class="flex items-center gap-1">
             <button
               type="button"
@@ -70,7 +70,7 @@
               class="rounded-md border border-[var(--border-card)] px-2 py-0.5 text-[var(--text-primary)] hover:bg-[var(--bg-hover)]"
               @click="fitZoom"
             >
-              Fit
+              {{ $t('templateEditor.workspace.fitZoom') }}
             </button>
           </div>
         </div>
@@ -152,8 +152,8 @@
               <span class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--primary)]/15 text-[var(--primary)]">
                 <i class="fas fa-image text-2xl" />
               </span>
-              <span class="text-lg leading-tight">Upload background image</span>
-              <span class="text-sm font-medium leading-relaxed text-slate-600">Start your design by setting a base canvas image.</span>
+              <span class="text-lg leading-tight">{{ $t('templateEditor.workspace.uploadBackground') }}</span>
+              <span class="text-sm font-medium leading-relaxed text-slate-600">{{ $t('templateEditor.workspace.uploadBackgroundHint') }}</span>
             </button>
           </div>
         </div>
@@ -173,6 +173,7 @@
 <script setup>
 import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import Moveable from 'vue3-moveable'
 import { formatDrfError, templateEditorApi } from '@/services/api'
@@ -183,8 +184,21 @@ import WidgetLibraryPanel from './WidgetLibraryPanel.vue'
 import TemplateInspectorPanel from './TemplateInspectorPanel.vue'
 import WidgetPreviewHost from '@/components/template-editor/player/widgets/WidgetPreviewHost.vue'
 import { fitFontSizeToWidgetBox } from '@/utils/fitTextToBox.js'
+import {
+  pctToPx,
+  pxToPct,
+  normalizeTemplateImageUrl,
+  widgetDomStyle,
+  widgetInnerChromeClass,
+  parseWidgetsFromConfigJson,
+  widgetsToPercentPayload,
+  defaultWidgetName,
+  buildPriceBindingPreviewMap,
+  TEXT_LIKE_WIDGETS,
+} from './templateEditorCanvasUtils.js'
 
 const route = useRoute()
+const { t } = useI18n()
 const toast = useToast()
 const templatesStore = useTemplatesStore()
 
@@ -215,10 +229,10 @@ const scale = ref(0.35)
 const selectedWidget = computed(() => widgets.value.find((w) => w.id === selectedId.value) || null)
 const isSaving = computed(() => templatesStore.saving || saveState.value === 'saving')
 const saveStatusLabel = computed(() => {
-  if (saveState.value === 'error') return 'Save failed'
-  if (isSaving.value) return 'Saving'
-  if (saveState.value === 'dirty') return 'Unsaved changes'
-  return 'Saved'
+  if (saveState.value === 'error') return t('templateEditor.workspace.saveStatus.error')
+  if (isSaving.value) return t('templateEditor.workspace.saveStatus.saving')
+  if (saveState.value === 'dirty') return t('templateEditor.workspace.saveStatus.dirty')
+  return t('templateEditor.workspace.saveStatus.saved')
 })
 const saveIndicatorClass = computed(() => {
   if (saveState.value === 'error') return 'bg-red-500'
@@ -285,23 +299,6 @@ function alignSelectedToBackgroundEdge(edge) {
   clampWidgetToCanvas(w)
 }
 
-function normalizeTemplateImageUrl(rawUrl) {
-  if (!rawUrl || typeof rawUrl !== 'string') return ''
-  const u = rawUrl.trim()
-  if (!u) return ''
-  if (u.startsWith('/')) return u
-  if (!u.startsWith('http://') && !u.startsWith('https://')) return ''
-  try {
-    const parsed = new URL(u)
-    if (parsed.pathname.startsWith('/media/')) {
-      return `${parsed.pathname}${parsed.search}${parsed.hash}`
-    }
-    return u
-  } catch {
-    return ''
-  }
-}
-
 const moveableTarget = computed(() => {
   if (!selectedId.value) return null
   return widgetEls.get(selectedId.value) || null
@@ -312,15 +309,6 @@ function setWidgetEl(id, el) {
   else widgetEls.delete(id)
 }
 
-function widgetDomStyle(w) {
-  return {
-    width: `${w.width}px`,
-    height: `${w.height}px`,
-    transform: `translate(${w.x}px, ${w.y}px) rotate(${w.rotation || 0}deg)`,
-    zIndex: w.zIndex ?? 1,
-  }
-}
-
 function clampWidgetToCanvas(w) {
   if (!w) return
   w.width = Math.max(24, Math.min(w.width || 0, canvasW.value))
@@ -329,16 +317,6 @@ function clampWidgetToCanvas(w) {
   const maxY = Math.max(0, canvasH.value - w.height)
   w.x = Math.min(maxX, Math.max(0, w.x || 0))
   w.y = Math.min(maxY, Math.max(0, w.y || 0))
-}
-
-const TEXT_LIKE_WIDGETS = new Set(['text', 'date', 'clock', 'weekday'])
-
-/** Editor-only frame: text-like widgets show raw text; image keeps a light frame. */
-function widgetInnerChromeClass(type) {
-  if (TEXT_LIKE_WIDGETS.has(type)) {
-    return 'h-full min-h-0 w-full min-w-0 overflow-hidden rounded-none bg-transparent'
-  }
-  return 'h-full w-full overflow-hidden rounded-md border border-[var(--border-card)] bg-[var(--bg-input)]/50 dark:border-white/10 dark:bg-black/25'
 }
 
 function selectWidget(id) {
@@ -352,17 +330,6 @@ function clearSelection() {
 function nextZIndex() {
   const zs = widgets.value.map((w) => w.zIndex || 0)
   return (zs.length ? Math.max(...zs) : 0) + 1
-}
-
-function defaultName(type) {
-  const map = {
-    text: 'Text',
-    image: 'Image',
-    date: 'Date',
-    weekday: 'Weekday',
-    clock: 'Clock',
-  }
-  return map[type] || type
 }
 
 /** Date / weekday / clock: scale box + font from canvas size so large banners stay readable (library adds only). */
@@ -389,7 +356,7 @@ function addWidget(type, extra = null) {
   const base = {
     id,
     type,
-    name: defaultName(type),
+    name: defaultWidgetName(type),
     x: cw * 0.08,
     y: ch * 0.08,
     width: Math.min(520, cw * 0.35),
@@ -481,24 +448,7 @@ async function loadPriceBindingPreviewValues() {
   try {
     const { data } = await templateEditorApi.priceBindingsPreview({ category: categoryId })
     const rows = Array.isArray(data) ? data : []
-    const mapped = {}
-    for (const row of rows) {
-      const key = String(row?.key || '').trim()
-      if (!key) continue
-      const entry = {
-        value: row?.previous_price != null ? String(row.previous_price) : '',
-        source: row?.source || 'none',
-        hasValue: Boolean(row?.has_value),
-        label: row?.label || key,
-        bindingKey: key,
-      }
-      mapped[key] = entry
-      const ptid = row?.price_type_id
-      if (ptid != null && ptid !== '') {
-        mapped[`price_type__${ptid}`] = entry
-      }
-    }
-    priceBindingPreviewMap.value = mapped
+    priceBindingPreviewMap.value = buildPriceBindingPreviewMap(rows)
   } catch {
     priceBindingPreviewMap.value = {}
   }
@@ -630,61 +580,8 @@ function onRotateEnd(e) {
   if (target?.dataset?.wid) syncWidgetFromTarget(target)
 }
 
-function pxToPct(px, total) {
-  if (!total) return '0%'
-  return `${((Number(px) / total) * 100).toFixed(4)}%`
-}
-
-function pctToPx(val, total) {
-  if (val == null) return 0
-  if (typeof val === 'number' && !Number.isNaN(val)) return (val / 100) * total
-  const s = String(val).trim().replace('%', '')
-  const n = parseFloat(s)
-  if (Number.isNaN(n)) return 0
-  return (n / 100) * total
-}
-
-function widgetsToPercentPayload() {
-  const cw = canvasW.value
-  const ch = canvasH.value
-  return widgets.value.map((w) => ({
-    id: w.id,
-    type: w.type,
-    name: w.name,
-    x: pxToPct(w.x, cw),
-    y: pxToPct(w.y, ch),
-    width: pxToPct(w.width, cw),
-    height: pxToPct(w.height, ch),
-    rotation: w.rotation || 0,
-    zIndex: w.zIndex ?? 1,
-    visible: w.visible !== false,
-    content: w.content ?? '',
-    style: w.style && typeof w.style === 'object' ? { ...w.style } : {},
-  }))
-}
-
 function loadWidgetsFromConfigJson(cj) {
-  const cw = canvasW.value
-  const ch = canvasH.value
-  const list = Array.isArray(cj?.widgets) ? cj.widgets : []
-  widgets.value = list.map((raw) => {
-    const rawType = String(raw.type || 'text').trim() || 'text'
-    const widgetType = rawType === 'marquee' ? 'text' : rawType
-    return {
-      id: String(raw.id),
-      type: widgetType,
-      name: raw.name || defaultName(widgetType),
-      x: pctToPx(raw.x, cw),
-      y: pctToPx(raw.y, ch),
-      width: pctToPx(raw.width, cw),
-      height: pctToPx(raw.height, ch),
-      rotation: Number(raw.rotation) || 0,
-      zIndex: Number(raw.zIndex) || 1,
-      visible: raw.visible !== false,
-      content: raw.content ?? '',
-      style: raw.style && typeof raw.style === 'object' ? { ...raw.style } : {},
-    }
-  })
+  widgets.value = parseWidgetsFromConfigJson(cj, canvasW.value, canvasH.value)
 }
 
 async function save() {
@@ -693,7 +590,7 @@ async function save() {
   try {
     const config_json = {
       backgroundColor: backgroundColor.value,
-      widgets: widgetsToPercentPayload(),
+      widgets: widgetsToPercentPayload(widgets.value, canvasW.value, canvasH.value),
     }
     await templatesStore.saveConfigJsonOnly(template.value.id, {
       config_json,
@@ -704,11 +601,11 @@ async function save() {
     await Promise.all([loadPriceBindingPreviewValues(), loadCategoryPriceTypes()])
     lastSavedAt.value = new Date()
     saveState.value = 'saved'
-    const categoryLabel = template.value?.category_name || (template.value?.category ? `#${template.value.category}` : 'No category')
-    toast.success(`Template saved (${categoryLabel})`)
+    const categoryLabel = template.value?.category_name || (template.value?.category ? `#${template.value.category}` : t('templateEditor.workspace.noCategory'))
+    toast.success(t('templateEditor.workspace.saveSuccess', { category: categoryLabel }))
   } catch (e) {
     saveState.value = 'error'
-    toast.error(formatDrfError(e.response?.data) || 'Save failed')
+    toast.error(formatDrfError(e.response?.data) || t('toast.saveFailed'))
   }
 }
 
@@ -736,10 +633,10 @@ async function onBackgroundFile(ev) {
     saveState.value = 'saved'
     lastSavedAt.value = new Date()
     nextTick(() => fitZoom())
-    toast.success('Background image uploaded')
+    toast.success(t('templateEditor.workspace.backgroundUploaded'))
   } catch (e) {
     saveState.value = 'error'
-    const msg = e?.response?.data ? formatDrfError(e.response.data) : (e?.message || 'Background upload failed')
+    const msg = e?.response?.data ? formatDrfError(e.response.data) : (e?.message || t('templateEditor.workspace.backgroundUploadFailed'))
     toast.error(msg)
   }
 }
@@ -825,7 +722,7 @@ provideTemplateEditor({
 onMounted(async () => {
   const id = route.params.id
   if (!id) {
-    loadError.value = 'Missing template id'
+    loadError.value = t('templateEditor.workspace.missingTemplateId')
     loading.value = false
     return
   }
@@ -855,7 +752,7 @@ onMounted(async () => {
     hasLoadedOnce.value = true
     saveState.value = 'saved'
   } catch (e) {
-    loadError.value = e?.response?.data?.detail || 'Failed to load template'
+    loadError.value = e?.response?.data?.detail || t('templateEditor.workspace.loadFailed')
   } finally {
     loading.value = false
   }

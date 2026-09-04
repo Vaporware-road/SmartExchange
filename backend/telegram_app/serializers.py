@@ -14,10 +14,14 @@ class TelegramBotSerializer(serializers.ModelSerializer):
             "is_active",
             "restrict_to_known_channels",
             "log_all_messages",
+            "gateway_enabled",
+            "default_category",
+            "order_button_text",
+            "webhook_secret_token",
             "created_at",
             "updated_at",
         ]
-        read_only_fields = ["id", "created_at", "updated_at"]
+        read_only_fields = ["id", "webhook_secret_token", "created_at", "updated_at"]
 
 
 class TelegramBotDetailSerializer(serializers.ModelSerializer):
@@ -34,9 +38,14 @@ class TelegramBotDetailSerializer(serializers.ModelSerializer):
             "is_active",
             "restrict_to_known_channels",
             "log_all_messages",
+            "gateway_enabled",
+            "default_category",
+            "order_button_text",
+            "webhook_secret_token",
             "created_at",
             "updated_at",
         ]
+        read_only_fields = ["id", "webhook_secret_token", "created_at", "updated_at"]
         extra_kwargs = {"token": {"write_only": True}}
 
 

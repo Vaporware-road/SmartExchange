@@ -293,7 +293,7 @@ import { useDate } from '@/composables/useDate'
 import { dashboardApi, categoryApi, specialPriceApi, analysisApi } from '@/services/api'
 import { useAuthStore } from '@/stores/auth'
 import { useThemeStore } from '@/stores/theme'
-import { formatAppNumber, formatAppDecimal, createAppDateTimeFormat } from '@/utils/localeFormat.js'
+import { formatAppNumber, formatAppDecimal, createAppDateTimeFormat, resolveFormatLocale } from '@/utils/localeFormat.js'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import CategoryIcon from '@/components/ui/CategoryIcon.vue'
@@ -329,11 +329,9 @@ const lastTrendLabel = ref('')
 let clockIntervalId = null
 
 const liveClock = computed(() => formatDateTime(now.value))
-const lastPriceUpdateByLabel = computed(() =>
-  locale.value === 'fa' ? 'آخرین بروزرسانی قیمت توسط' : 'Last price update by'
-)
+const lastPriceUpdateByLabel = computed(() => t('dashboard.lastPriceUpdateBy'))
 
-const appLoc = computed(() => (locale.value === 'fa' ? 'fa' : 'en'))
+const appLoc = computed(() => resolveFormatLocale(locale.value))
 
 function fmtInt(v) {
   return formatAppNumber(appLoc.value, v, { maximumFractionDigits: 0 })
@@ -497,11 +495,7 @@ const lineChartOptions = computed(() => {
   }
 })
 
-const topCategoriesChartTitle = computed(() =>
-  locale.value === 'fa'
-    ? 'پُرکارترین دسته‌بندی‌ها (بر اساس نوع قیمت)'
-    : 'Top Categories by Price Types'
-)
+const topCategoriesChartTitle = computed(() => t('dashboard.topCategoriesChartTitle'))
 
 const topCategoriesData = computed(() => {
   if (!categories.value?.length) return { labels: [], datasets: [{ data: [] }] }

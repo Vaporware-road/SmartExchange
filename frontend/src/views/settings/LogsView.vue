@@ -2,7 +2,7 @@
   <div>
     <nav v-if="!embedded" class="mb-6">
       <router-link to="/settings" class="text-[var(--text-secondary)] hover:text-gold transition-colors">
-        <i class="fas me-2" :class="$i18n.locale === 'fa' ? 'fa-arrow-right' : 'fa-arrow-left'"></i>{{ $t('logs.backToSettings') }}
+        <i class="fas fa-arrow-left icon-back me-2"></i>{{ $t('logs.backToSettings') }}
       </router-link>
     </nav>
     <h1 v-if="!embedded" class="text-2xl font-bold text-gold mb-6">{{ $t('logs.title') }}</h1>

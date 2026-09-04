@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen flex items-center justify-center px-4 py-12 relative" style="background: var(--bg-base);">
-    <div class="absolute top-4 right-4 flex items-center gap-2">
+    <div class="absolute top-4 end-4 flex items-center gap-2">
       <LanguageSwitcher />
       <ThemeToggle />
     </div>

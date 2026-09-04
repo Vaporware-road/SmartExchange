@@ -225,7 +225,7 @@
               :key="b.id"
               class="card-luxury px-4 py-4 relative min-w-0 hover-lift transition-all"
             >
-              <div class="absolute top-3 right-3 flex gap-2 rtl:flex-row-reverse">
+              <div class="absolute top-3 end-3 flex gap-2">
                 <button
                   type="button"
                   class="btn-luxury-outline p-2 rounded-lg text-sm"
@@ -243,8 +243,8 @@
                   <i class="fas fa-trash" />
                 </button>
               </div>
-              <div class="pr-24 rtl:pr-4 rtl:pl-24">
-                <h3 class="text-[var(--text-primary)] font-semibold truncate">
+              <div class="pe-24 min-w-0">
+                <h3 class="text-[var(--text-primary)] font-semibold truncate" dir="auto">
                   {{ b.name || `Bot #${b.id}` }}
                 </h3>
                 <p
@@ -380,11 +380,11 @@
                 <table class="w-full text-sm min-w-[500px]">
                 <thead>
                   <tr class="text-[var(--text-secondary)] border-b" style="border-color: var(--glass-border);">
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('telegram.channels.bot') }}</th>
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('telegram.channels.channelName') }}</th>
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('telegram.channels.channelId') }}</th>
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('common.status') }}</th>
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('common.actions') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('telegram.channels.bot') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('telegram.channels.channelName') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('telegram.channels.channelId') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('common.status') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('common.actions') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -485,7 +485,7 @@
               <BaseCheckbox v-model="autoPostOnUpdate" :disabled="automationSettingsSaving" @update:model-value="saveAutoPostOnUpdate">
                 {{ $t('telegram.automation.autoPostOnUpdate') }}
               </BaseCheckbox>
-              <p class="text-xs text-gray-500 mt-1 ml-8">
+              <p class="text-xs text-gray-500 mt-1 ms-8">
                 {{ $t('telegram.automation.autoPostOnUpdateHint') }}
               </p>
             </div>
@@ -560,12 +560,12 @@
                 <table class="w-full text-sm min-w-[500px]">
                 <thead>
                   <tr class="text-[var(--text-secondary)] border-b" style="border-color: var(--glass-border);">
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('telegram.channels.channelName') }}</th>
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('telegram.automation.target') }}</th>
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('telegram.automation.time') }}</th>
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('telegram.automation.timezone') }}</th>
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('common.status') }}</th>
-                    <th class="text-left py-3 px-4 font-medium">{{ $t('common.actions') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('telegram.channels.channelName') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('telegram.automation.target') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('telegram.automation.time') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('telegram.automation.timezone') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('common.status') }}</th>
+                    <th class="text-start py-3 px-4 font-medium">{{ $t('common.actions') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -617,7 +617,7 @@ import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { telegramApi, categoryApi, specialPriceApi } from '@/services/api'
-import { createAppDateTimeFormat } from '@/utils/localeFormat.js'
+import { createAppDateTimeFormat, resolveFormatLocale } from '@/utils/localeFormat.js'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
 
@@ -730,7 +730,7 @@ const previewPriceLine = computed(() => {
 
 const previewTimestamp = computed(() => {
   const now = new Date()
-  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  const appLoc = resolveFormatLocale(locale.value)
   return createAppDateTimeFormat(appLoc, { hour: '2-digit', minute: '2-digit' }).format(now)
 })
 
@@ -963,7 +963,7 @@ function formatBotCreatedAt(dateStr) {
   try {
     const d = new Date(dateStr)
     if (Number.isNaN(d.getTime())) return '—'
-    const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+    const appLoc = resolveFormatLocale(locale.value)
     return createAppDateTimeFormat(appLoc, { year: 'numeric', month: 'short', day: 'numeric' }).format(d)
   } catch {
     return '—'

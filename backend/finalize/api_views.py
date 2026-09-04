@@ -23,7 +23,7 @@ from telegram_app.models import TelegramChannel
 from price_publisher.tasks import publish_category_prices_task, publish_special_price_task
 from setting.utils import log_finalize_event, log_telegram_event
 
-from instagram_hub.services.instagram_config import is_instagram_configured
+from instagram_hub.services.instagram_config import is_ready_for_publish
 from instagram_hub.tasks import schedule_instagram_post_finalize
 
 from .models import Finalization, FinalizedPriceHistory, SpecialPriceFinalization
@@ -82,11 +82,11 @@ def _get_publication_destinations():
         {"id": "telegram", "label": "Telegram Channel", "enabled": True},
     ]
     try:
-        from instagram_hub.services.instagram_config import is_instagram_configured
+        from instagram_hub.services.instagram_config import is_ready_for_publish
         destinations.append({
             "id": "instagram",
             "label": "Instagram",
-            "enabled": is_instagram_configured(),
+            "enabled": is_ready_for_publish(),
         })
     except Exception:
         destinations.append({"id": "instagram", "label": "Instagram", "enabled": False})
@@ -423,7 +423,7 @@ class FinalizeCategoryAPIView(APIView):
                     price_history_ids=[price_history.id for _, price_history in price_items]
                 )
             )
-            if is_instagram_configured():
+            if is_ready_for_publish():
                 transaction.on_commit(
                     lambda cid=category.id: schedule_instagram_post_finalize(
                         category_ids=[cid],
@@ -557,7 +557,7 @@ class FinalizeSpecialPriceAPIView(APIView):
                     special_price_history_ids=[special_price_history.id]
                 )
             )
-            if is_instagram_configured():
+            if is_ready_for_publish():
                 transaction.on_commit(
                     lambda spid=special_price_history.id: schedule_instagram_post_finalize(
                         category_ids=[],
@@ -726,7 +726,7 @@ class FinalizeAllAPIView(APIView):
                     "error": str(exc) or "Unknown error",
                 })
 
-        if is_instagram_configured() and (category_ids or special_price_history_ids):
+        if is_ready_for_publish() and (category_ids or special_price_history_ids):
             transaction.on_commit(
                 lambda cids=list(category_ids), spids=list(special_price_history_ids): schedule_instagram_post_finalize(
                     category_ids=cids,

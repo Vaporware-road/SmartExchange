@@ -6,7 +6,7 @@ import asyncio
 import logging
 from typing import Any, Iterable, List, Mapping, Optional
 
-from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Bot, InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from telegram.error import TelegramError, BadRequest, TimedOut, NetworkError
 
 logger = logging.getLogger(__name__)
@@ -46,7 +46,11 @@ class TelegramService:
                 if not text:
                     continue
                 kwargs = {}
-                if "url" in button:
+                if "web_app" in button and isinstance(button["web_app"], dict):
+                    url = button["web_app"].get("url")
+                    if url:
+                        kwargs["web_app"] = WebAppInfo(url=str(url))
+                elif "url" in button:
                     kwargs["url"] = button["url"]
                 elif "callback_data" in button:
                     kwargs["callback_data"] = button["callback_data"]

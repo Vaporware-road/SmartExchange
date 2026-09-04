@@ -1,5 +1,5 @@
 <template>
-  <nav v-if="crumbs.length > 1" class="flex items-center gap-1 text-sm py-3" aria-label="Breadcrumb">
+  <nav v-if="crumbs.length > 1" class="flex items-center gap-1 text-sm py-3" :aria-label="$t('a11y.breadcrumb')">
     <template v-for="(crumb, idx) in crumbs">
       <router-link
         v-if="idx < crumbs.length - 1"
@@ -26,11 +26,12 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { isRtlLocale } from '@/constants/locales.js'
 
 const route = useRoute()
 const { t, locale } = useI18n()
 
-const isRtl = computed(() => locale.value === 'fa')
+const isRtl = computed(() => isRtlLocale(locale.value))
 
 const crumbs = computed(() => {
   return route.matched

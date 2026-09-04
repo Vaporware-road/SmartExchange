@@ -204,6 +204,11 @@ Key values used in deployment:
 - `CELERY_TASK_TIME_LIMIT`
 - `CELERY_TASK_SOFT_TIME_LIMIT`
 - `FINALIZE_TASK_WAIT_TIMEOUT`
+- `REDIS_CACHE_URL` (Django cache DB index for bot gateway live rates)
+- `BOT_GATEWAY_FRONTEND_URL` (public Vue URL for Telegram Web App order button)
+- `BOT_GATEWAY_RATES_CACHE_TTL` (seconds, default `15`)
+- `BOT_CUSTOMER_JWT_LIFETIME_MINUTES` (default `60`)
+- `BOT_GATEWAY_RATE_LIMIT` / `BOT_GATEWAY_RATE_WINDOW` (per-customer message throttle)
 - `DEFAULT_ADMIN_USERNAME`
 - `DEFAULT_ADMIN_PASSWORD`
 - `DEFAULT_ADMIN_SYNC_PASSWORD` (optional; avoid `true` in production)
@@ -216,6 +221,8 @@ See `.env.docker.example` for a template.
 
 - `SQLITE_PATH=/app/backend/data/db.sqlite3`
 - `VITE_API_PROXY_TARGET=http://127.0.0.1:8000`
+- `PLAYWRIGHT_FRONTEND_BASE_URL=http://app:5173` (Celery worker → Vite in `app` container)
+- `PLAYWRIGHT_MAX_CONCURRENT=2`, `SCREENSHOT_CACHE_TTL=300`
 - polling options for file-watch stability on Windows
 - dedicated `celery-worker` and `celery-beat` services
 
@@ -223,12 +230,13 @@ See `.env.docker.example` for a template.
 
 ## Main Functional Areas
 
+- **Bot Gateway:** inbound Telegram/WhatsApp auto-replies with Redis-cached rates, Web App order intake, admin orders queue
 - **Auth & User management:** login/logout/me, role-based access, activity logs
 - **Price management:** categories, price types, regular prices, history
 - **Special prices:** separate flow and history
 - **Finalize pipeline:** confirm and publish final values
 - **Telegram:** bots/channels, manual sending, automation settings
-- **Template editor:** visual configuration and media tools
+- **Template editor:** visual configuration and media tools; optional **Playwright headless render** for Telegram boards (Site Settings → `use_playwright_for_template_render`, falls back to Pillow)
 - **Settings:** site branding/settings, logs, upload policy
 - **Analysis:** dashboard + pricing endpoints
 - **Instagram Hub (optional):** config/status/preview flow
@@ -253,6 +261,15 @@ Common groups:
 - `/api/templates/`
 - `/api/template-editor/`
 - `/api/instagram-hub/`
+- `/api/bot-gateway/` (Telegram/WhatsApp webhooks, bot customer auth, order submit)
+- `/api/orders/` (staff order queue review)
+
+Bot gateway setup:
+
+1. Enable `gateway_enabled` on a Telegram bot (API or Django admin).
+2. Register webhook: `python manage.py setup_bot_webhook --bot-id=N --base-url=https://your-domain`
+3. Configure `BOT_GATEWAY_FRONTEND_URL` to the public Vue origin (e.g. `https://panel.example.com` or dev port `5250`).
+4. For WhatsApp: create `WhatsAppConfig` in Django admin with Meta Cloud API credentials and subscribe webhook to `/api/bot-gateway/webhook/whatsapp/`.
 
 Auth model:
 

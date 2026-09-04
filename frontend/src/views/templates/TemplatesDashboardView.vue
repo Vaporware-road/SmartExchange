@@ -14,7 +14,7 @@
           to="/templates/new"
           class="btn-luxury inline-flex w-full items-center justify-center gap-2 sm:w-auto"
         >
-          <i class="fas fa-plus"></i> Add Template
+          <i class="fas fa-plus"></i> {{ $t('templates.addTemplate') }}
         </router-link>
       </div>
     </div>
@@ -39,7 +39,7 @@
       v-else-if="!templates || !templates.length"
       class="card-luxury p-12 text-center"
     >
-      <p class="text-[var(--text-secondary)] mb-4">{{ $t('emptyState.noTemplates') || 'No templates yet.' }}</p>
+      <p class="text-[var(--text-secondary)] mb-4">{{ $t('emptyState.noTemplates') }}</p>
       <router-link to="/templates/new" class="btn-luxury">
         <i class="fas fa-plus"></i> Add Template
       </router-link>
@@ -97,14 +97,14 @@
           <div class="flex items-center gap-2 min-w-0">
             <i class="fab fa-telegram text-lg text-[var(--primary)] shrink-0" />
             <span class="font-semibold text-gold truncate" :title="t.name">
-              {{ t.name ?? `Template ${t.id}` }}
+              {{ t.name ?? $t('templates.templateNumber', { id: t.id }) }}
             </span>
           </div>
           <router-link
             :to="`/templates/${t.id}/editor`"
             class="btn-luxury-outline text-sm py-2 w-full sm:w-auto"
           >
-            <i class="fas fa-edit"></i> Editor
+            <i class="fas fa-edit"></i> {{ $t('templates.openEditor') }}
           </router-link>
           <button
             type="button"
@@ -113,7 +113,7 @@
             @click="deleteTemplate(t)"
           >
             <i class="fas fa-trash"></i>
-            {{ deletingId === t.id ? 'Deleting...' : 'Delete' }}
+            {{ deletingId === t.id ? $t('common.deleting') : $t('common.delete') }}
           </button>
         </div>
       </div>
@@ -123,6 +123,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { getApiErrorDetails, templateEditorApi } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
@@ -130,6 +131,7 @@ import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 const loading = ref(true)
 const templates = ref([])
 const deletingId = ref(null)
+const { t } = useI18n()
 const toast = useToast()
 
 /** Extract up to 5 variable_key values from config (themes or legacy fields) for preview. */
@@ -166,7 +168,7 @@ function getPreviewVariableKeys(template) {
 function getTemplateBadgeLabel(template) {
   if (template?.category_name) return template.category_name
   if (template?.category) return `Category #${template.category}`
-  return 'Unassigned'
+  return t('templates.unassigned')
 }
 
 /** Telegram bubble background: subtle green/blue tint (sent message style). */
@@ -177,7 +179,7 @@ async function deleteTemplate(template) {
   if (!template?.id || deletingId.value != null) return
   const name = String(template?.name ?? '').trim() || `Template #${template.id}`
   const confirmed = window.confirm(
-    `Are you sure you want to delete "${name}"?\nThis action cannot be undone.`
+    t('templates.deleteConfirm')
   )
   if (!confirmed) return
 
@@ -185,7 +187,7 @@ async function deleteTemplate(template) {
   try {
     await templateEditorApi.delete(template.id)
     templates.value = templates.value.filter((t) => t.id !== template.id)
-    toast.success('Template deleted successfully.')
+    toast.success(t('templates.deleteSuccess'))
   } catch (error) {
     toast.error(getApiErrorDetails(error).message)
   } finally {

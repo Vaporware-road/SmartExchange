@@ -7,8 +7,11 @@ export const INSTAGRAM_OAUTH_CONNECT_PATH = '/instagram-hub/connect/'
 
 /**
  * @param {boolean} hasAppId — from GET /api/instagram-hub/config/ (App ID configured).
+ * @param {'settings'|'instagram'} [returnTo] — where to land after OAuth callback.
  * @returns {string} href for <a> or empty when OAuth cannot start yet.
  */
-export function instagramConnectHref(hasAppId) {
-  return hasAppId ? INSTAGRAM_OAUTH_CONNECT_PATH : ''
+export function instagramConnectHref(hasAppId, returnTo = 'instagram') {
+  if (!hasAppId) return ''
+  const params = returnTo === 'settings' ? '?return_to=settings' : ''
+  return `${INSTAGRAM_OAUTH_CONNECT_PATH}${params}`
 }

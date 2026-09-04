@@ -2,7 +2,7 @@
   <div class="w-full min-w-0 overflow-hidden">
     <nav class="mb-6">
       <router-link to="/categories" class="inline-flex items-center gap-2 text-gray-400 hover:text-gold transition-colors">
-        <i class="fas" :class="$i18n.locale === 'fa' ? 'fa-arrow-right' : 'fa-arrow-left'"></i>
+        <i class="fas fa-arrow-left icon-back me-2"></i>
         {{ $t('categories.backToList') }}
       </router-link>
     </nav>
@@ -17,8 +17,8 @@
         <table class="w-full min-w-[280px]">
         <thead>
           <tr class="border-b border-[var(--border-color)]">
-            <th class="text-left py-4 px-4 text-gold font-semibold">Price</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Date</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('priceHistory.columns.price') }}</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('priceHistory.columns.date') }}</th>
           </tr>
         </thead>
         <tbody>

@@ -2,6 +2,7 @@
 
 import logging
 from urllib.parse import quote
+
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -12,6 +13,9 @@ from instagram_hub.services import instagram_oauth
 
 logger = logging.getLogger(__name__)
 
+OAUTH_RETURN_SESSION_KEY = "instagram_oauth_return_to"
+ALLOWED_RETURN_PATHS = frozenset({"settings", "instagram"})
+
 
 def _get_config_for_oauth():
     """First active config with app_id and app_secret set."""
@@ -21,13 +25,31 @@ def _get_config_for_oauth():
     return None
 
 
+def _store_oauth_return_path(request) -> None:
+    return_to = (request.GET.get("return_to") or "").strip().lower()
+    if return_to in ALLOWED_RETURN_PATHS:
+        request.session[OAUTH_RETURN_SESSION_KEY] = return_to
+
+
+def _pop_oauth_return_path(request) -> str:
+    return request.session.pop(OAUTH_RETURN_SESSION_KEY, "instagram")
+
+
+def _frontend_redirect(query: str, return_path: str) -> str:
+    if return_path == "settings":
+        return f"/settings?{query}"
+    return f"/instagram?{query}"
+
+
 @login_required
 @require_GET
 def instagram_connect(request):
     """Start OAuth: save state, redirect to Meta."""
     config = _get_config_for_oauth()
     if not config:
-        return redirect(_frontend_instagram_hub("error=App+ID+or+App+Secret+not+configured"))
+        return redirect(_frontend_redirect("instagram_callback=error&msg=App+ID+or+App+Secret+not+configured", "instagram"))
+
+    _store_oauth_return_path(request)
 
     app_id = (config.app_id or "").strip()
     redirect_uri = request.build_absolute_uri(reverse("instagram_hub:callback"))
@@ -42,32 +64,35 @@ def instagram_connect(request):
 @login_required
 @require_GET
 def instagram_callback(request):
-    """OAuth callback: validate state, exchange code, save token, redirect to Instagram Hub."""
+    """OAuth callback: validate state, exchange code, save token, redirect to frontend."""
+    return_path = _pop_oauth_return_path(request)
+
     error = request.GET.get("error")
     if error:
         desc = request.GET.get("error_description") or request.GET.get("error_reason") or error
-        return redirect(_frontend_instagram_hub("instagram_callback=error&msg=" + quote(desc)))
+        return redirect(_frontend_redirect("instagram_callback=error&msg=" + quote(desc), return_path))
 
     code = (request.GET.get("code") or "").strip()
     state = (request.GET.get("state") or "").strip()
     if not code:
-        return redirect(_frontend_instagram_hub("instagram_callback=error&msg=No+authorization+code"))
+        return redirect(_frontend_redirect("instagram_callback=error&msg=No+authorization+code", return_path))
 
     config = _get_config_for_oauth()
     if not config or (config.oauth_state or "").strip() != state:
         if config:
             config.oauth_state = ""
             config.save(update_fields=["oauth_state", "updated_at"])
-        return redirect(_frontend_instagram_hub("instagram_callback=error&msg=State+mismatch"))
+        return redirect(_frontend_redirect("instagram_callback=error&msg=State+mismatch", return_path))
 
     redirect_uri = request.build_absolute_uri(reverse("instagram_hub:callback"))
     result = instagram_oauth.perform_full_oauth_exchange(code, redirect_uri, config)
 
     if result.get("success"):
-        return redirect(_frontend_instagram_hub("instagram_callback=success"))
-    return redirect(_frontend_instagram_hub("instagram_callback=error&msg=" + quote(result.get("error", "Unknown"))))
-
-
-def _frontend_instagram_hub(query: str) -> str:
-    """Redirect to frontend /instagram with instagram callback result in query."""
-    return f"/instagram?{query}"
+        suffix = "#instagram" if return_path == "settings" else ""
+        return redirect(_frontend_redirect("instagram_callback=success", return_path) + suffix)
+    return redirect(
+        _frontend_redirect(
+            "instagram_callback=error&msg=" + quote(result.get("error", "Unknown")),
+            return_path,
+        )
+    )

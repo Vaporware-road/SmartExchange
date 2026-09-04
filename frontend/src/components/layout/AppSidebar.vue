@@ -44,13 +44,20 @@
               !isCollapsed ? 'lg:px-4' : 'lg:justify-center lg:px-2',
             ]"
           >
-            <i :class="link.icon" class="text-base w-5 text-center shrink-0 flex-shrink-0" />
+            <span class="relative shrink-0 flex items-center justify-center w-5">
+              <i :class="link.icon" class="text-base w-5 text-center" />
+              <OrderQueueBadge
+                v-if="link.to === '/orders'"
+                :class="!isCollapsed ? 'lg:hidden' : ''"
+              />
+            </span>
             <!-- Label hidden on tablet and when collapsed; only icon visible -->
             <span
-              class="font-medium whitespace-nowrap overflow-hidden hidden md:hidden"
-              :class="!isCollapsed ? 'lg:inline-block' : ''"
+              class="font-medium whitespace-nowrap overflow-hidden hidden md:hidden flex items-center gap-2"
+              :class="!isCollapsed ? 'lg:inline-flex' : ''"
             >
               {{ $t(link.labelKey) }}
+              <OrderQueueBadge v-if="link.to === '/orders'" inline />
             </span>
           </router-link>
         </li>
@@ -60,12 +67,11 @@
       <button
         type="button"
         class="w-full flex items-center justify-center py-2.5 rounded-xl transition-all duration-300 ease-in-out border border-[var(--border-color)] bg-[var(--bg-navbar)] hover:bg-[var(--bg-hover)] hover:border-[var(--border-card-hover)] text-[var(--text-secondary)] hover:text-[var(--primary)]"
-        aria-label="Toggle sidebar"
+        :aria-label="$t('a11y.toggleSidebar')"
         @click="toggleSidebar"
       >
         <i
-          :class="isCollapsed ? 'fas fa-chevron-right' : 'fas fa-chevron-left'"
-          class="text-sm"
+          :class="['fas', 'text-sm', sidebarToggleIcon]"
         />
       </button>
     </div>
@@ -79,8 +85,11 @@ import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useAuthStore } from '@/stores/auth'
 import { useSidebarStore } from '@/stores/sidebar'
 import AppBrandLogo from '@/components/layout/AppBrandLogo.vue'
+import OrderQueueBadge from '@/components/layout/OrderQueueBadge.vue'
+import { useAppDirection } from '@/composables/useAppDirection.js'
 
 const route = useRoute()
+const { isRtl } = useAppDirection()
 const siteSettings = useSiteSettingsStore()
 const auth = useAuthStore()
 const sidebarStore = useSidebarStore()
@@ -90,6 +99,13 @@ watch(isCollapsed, (v) => { sidebarStore.isCollapsed = v }, { immediate: true })
 function toggleSidebar() {
   isCollapsed.value = !isCollapsed.value
 }
+
+const sidebarToggleIcon = computed(() => {
+  if (isRtl.value) {
+    return isCollapsed.value ? 'fa-chevron-left' : 'fa-chevron-right'
+  }
+  return isCollapsed.value ? 'fa-chevron-right' : 'fa-chevron-left'
+})
 
 const siteName = computed(() => siteSettings.siteName)
 const tagline = computed(() => siteSettings.tagline)
@@ -101,6 +117,7 @@ const allNavLinks = [
   { to: '/finalize', labelKey: 'sidebar.finalize', icon: 'fas fa-check-circle', exact: false, permission: 'finalize', activeColor: 'buy' },
   { to: '/categories', labelKey: 'sidebar.categories', icon: 'fas fa-tags', exact: false, activeColor: 'gold' },
   { to: '/analysis', labelKey: 'sidebar.analysis', icon: 'fas fa-chart-line', exact: false, permission: 'analysis', activeColor: 'info' },
+  { to: '/orders', labelKey: 'sidebar.orders', icon: 'fas fa-shopping-cart', exact: false, permission: 'orders', activeColor: 'buy' },
   { to: '/telegram/send', labelKey: 'sidebar.telegram', icon: 'fab fa-telegram', exact: false, activeColor: 'info' },
   { to: '/instagram', labelKey: 'sidebar.instagramHub', icon: 'fab fa-instagram', exact: false, activeColor: 'gold' },
   { to: '/templates', labelKey: 'sidebar.templates', icon: 'fas fa-file-image', exact: false, activeColor: 'template' },

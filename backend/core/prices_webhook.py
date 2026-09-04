@@ -13,9 +13,21 @@ WEBHOOK_TIMEOUT_SEC = 8
 
 def notify_prices_webhook(source: str) -> None:
     """
-    If SiteSettings.prices_webhook_url is set, POST JSON {event, source, prices} in a daemon thread.
+    Refresh bot gateway rates cache and, if configured, POST outbound webhook.
     Never raises to callers; logs failures.
     """
+    try:
+        from bot_gateway.services.rates_cache import refresh_live_rates_cache
+
+        prices = refresh_live_rates_cache(source)
+    except Exception:
+        logger.exception("prices_webhook: cache refresh failed (source=%s)", source)
+        try:
+            prices = build_prices_public_snapshot()
+        except Exception:
+            logger.exception("prices_webhook: snapshot failed (source=%s)", source)
+            return
+
     try:
         site = SiteSettings.load()
     except Exception:
@@ -24,12 +36,6 @@ def notify_prices_webhook(source: str) -> None:
 
     url = (getattr(site, "prices_webhook_url", None) or "").strip()
     if not url:
-        return
-
-    try:
-        prices = build_prices_public_snapshot()
-    except Exception:
-        logger.exception("prices_webhook: snapshot failed (source=%s)", source)
         return
 
     payload = {

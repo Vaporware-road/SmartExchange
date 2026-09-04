@@ -2,22 +2,22 @@
   <div>
     <nav class="mb-6">
       <router-link to="/templates" class="text-[var(--text-secondary)] hover:text-gold transition-colors inline-flex items-center gap-2">
-        <i class="fas fa-arrow-left me-2"></i>{{ $t('templateEditor.backToTemplates') }}
+        <i class="fas fa-arrow-left icon-back me-2"></i>{{ $t('templateEditor.backToTemplates') }}
       </router-link>
     </nav>
     <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('routes.templateNew') }}</h1>
     <form @submit.prevent="handleSubmit" class="card-luxury max-w-md space-y-4">
       <p v-if="presetCategory" class="text-sm text-[var(--text-secondary)] rounded-xl px-3 py-2 bg-[var(--bg-input)]">
-        {{ $t('categories.templateForCategory') || 'Creating template for category' }}: <strong class="text-gold">{{ presetCategory.name }}</strong>
+        {{ $t('categories.templateForCategory')  }}: <strong class="text-gold">{{ presetCategory.name }}</strong>
       </p>
       <div>
         <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('common.name') }}</label>
         <input v-model="name" type="text" class="input-luxury" required />
       </div>
       <div>
-        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Category</label>
+        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('common.category') }}</label>
         <select v-model.number="selectedCategoryId" class="input-luxury" required>
-          <option :value="null" disabled>Select category</option>
+          <option :value="null" disabled>{{ $t('categories.selectCategory') }}</option>
           <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
       </div>
@@ -33,11 +33,13 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useToast } from 'vue-toastification'
+import { useI18n } from 'vue-i18n'
 import { templateEditorApi, categoryApi } from '@/services/api'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 const toast = useToast()
 const name = ref('')
 const submitting = ref(false)
@@ -72,7 +74,7 @@ onMounted(async () => {
 })
 
 function formatCreateError(data) {
-  if (!data || typeof data !== 'object') return 'Create failed'
+  if (!data || typeof data !== 'object') return t('templates.createFailed')
   if (typeof data.detail === 'string') return data.detail
   const parts = []
   for (const [key, val] of Object.entries(data)) {
@@ -80,20 +82,20 @@ function formatCreateError(data) {
     const msg = Array.isArray(val) ? val.join(' ') : String(val)
     parts.push(`${key}: ${msg}`)
   }
-  return parts.length ? parts.join(' ') : 'Create failed'
+  return parts.length ? parts.join(' ') : t('templates.createFailed')
 }
 
 async function handleSubmit() {
   const trimmed = name.value.trim()
   if (!trimmed) {
-    toast.error('Please enter a template name.')
+    toast.error(t('templates.nameRequired'))
     return
   }
   submitting.value = true
   try {
     const cid = selectedCategoryId.value ?? categoryIdFromQuery.value
     if (cid == null || !Number.isFinite(Number(cid))) {
-      toast.error('A category is required to create template.')
+      toast.error(t('templates.categoryRequired'))
       return
     }
     const payload = { name: trimmed }

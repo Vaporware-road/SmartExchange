@@ -1,14 +1,16 @@
 import { createI18n } from 'vue-i18n'
 import fa from '@/locales/fa.json'
 import en from '@/locales/en.json'
+import ar from '@/locales/ar.json'
+import es from '@/locales/es.json'
 import {
   STORAGE_LOCALE,
   STORAGE_LOCALE_LEGACY,
   storageGet,
   storageSet,
 } from '@/constants/branding.js'
+import { isRtlLocale, SUPPORTED_LOCALE_CODES } from '@/constants/locales.js'
 
-const SUPPORTED_LOCALES = ['en', 'fa']
 const safeStorage = {
   get() {
     return storageGet(STORAGE_LOCALE, STORAGE_LOCALE_LEGACY)
@@ -19,11 +21,12 @@ const safeStorage = {
 }
 
 const savedLocale = safeStorage.get() || 'en'
-const initialLocale = SUPPORTED_LOCALES.includes(savedLocale) ? savedLocale : 'en'
+const initialLocale = SUPPORTED_LOCALE_CODES.includes(savedLocale) ? savedLocale : 'en'
 
-// Some bundlers may expose JSON as { default: ... }
 const enMessages = en?.default ?? en
 const faMessages = fa?.default ?? fa
+const arMessages = ar?.default ?? ar
+const esMessages = es?.default ?? es
 
 /** Resolve nested key (e.g. "dashboard.title") from a messages object */
 function getMessageByPath(obj, path) {
@@ -39,10 +42,9 @@ function getMessageByPath(obj, path) {
 
 function applyDocumentLocale(locale) {
   document.documentElement.lang = locale
-  document.documentElement.dir = locale === 'fa' ? 'rtl' : 'ltr'
+  document.documentElement.dir = isRtlLocale(locale) ? 'rtl' : 'ltr'
 }
 
-// Use legacy: true so $t() in templates resolves correctly (vue-i18n v12 alpha issue with legacy: false)
 const i18n = createI18n({
   legacy: true,
   locale: initialLocale,
@@ -53,9 +55,10 @@ const i18n = createI18n({
   messages: {
     en: enMessages,
     fa: faMessages,
+    ar: arMessages,
+    es: esMessages,
   },
   missing: (locale, key) => {
-    // If key is missing in current locale, return fallback (en) message so raw key is never shown
     const fallback = getMessageByPath(enMessages, key)
     return fallback ?? key
   },
@@ -64,7 +67,7 @@ const i18n = createI18n({
 applyDocumentLocale(initialLocale)
 
 export function setLocale(locale) {
-  const next = SUPPORTED_LOCALES.includes(locale) ? locale : 'en'
+  const next = SUPPORTED_LOCALE_CODES.includes(locale) ? locale : 'en'
   const g = i18n.global
   if (typeof g.locale === 'string') {
     g.locale = next

@@ -16,7 +16,8 @@ RUN ln -sf /usr/local/lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
 
 COPY backend/requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir -r /app/backend/requirements.txt \
-    && pip install --no-cache-dir supervisor
+    && pip install --no-cache-dir supervisor \
+    && playwright install --with-deps chromium
 
 COPY frontend/package*.json /app/frontend/
 RUN cd /app/frontend && npm ci

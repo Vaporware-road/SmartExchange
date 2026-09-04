@@ -3,7 +3,7 @@
     <button
       ref="triggerRef"
       type="button"
-      class="input-luxury flex w-full items-center justify-between gap-2 text-left"
+      class="input-luxury flex w-full items-center justify-between gap-2 text-start"
       :class="{ 'opacity-60 cursor-not-allowed': disabled }"
       :disabled="disabled"
       :aria-expanded="open ? 'true' : 'false'"
@@ -73,7 +73,7 @@
                 />
                 <span v-else class="text-[10px] font-semibold">{{ item.code.slice(0, 2) }}</span>
               </span>
-              <span class="min-w-0 flex-1 truncate text-left">{{ item.code }} - {{ item.name }}</span>
+              <span class="min-w-0 flex-1 truncate text-start">{{ item.code }} - {{ item.name }}</span>
               <span v-if="item.symbol" class="text-xs opacity-80">{{ item.symbol }}</span>
             </button>
           </li>

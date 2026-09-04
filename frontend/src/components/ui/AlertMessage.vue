@@ -12,7 +12,7 @@
       v-if="dismissible"
       @click="$emit('dismiss')"
       class="p-1 rounded hover:bg-white/10 transition-colors"
-      aria-label="Dismiss"
+      :aria-label="$t('a11y.dismiss')"
     >
       <i class="fas fa-times"></i>
     </button>

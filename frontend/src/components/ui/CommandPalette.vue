@@ -49,7 +49,7 @@
                   >
                     <i :class="item.icon" class="text-sm w-5 text-center text-[var(--text-secondary)]" />
                     <span class="flex-1 truncate" v-html="highlight(item.label)" />
-                    <i class="fas fa-arrow-left text-xs text-[var(--text-secondary)] rtl:rotate-180" />
+                    <i class="fas fa-arrow-left icon-back text-xs text-[var(--text-secondary)]" />
                   </button>
                 </div>
               </template>

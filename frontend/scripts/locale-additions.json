@@ -1,0 +1,1256 @@
+{
+  "en": {
+    "common": {
+      "saving": "Saving…",
+      "type": "Type",
+      "category": "Category",
+      "buy": "Buy",
+      "sell": "Sell",
+      "id": "ID",
+      "copyLink": "Copy link",
+      "uploading": "Uploading…",
+      "deleting": "Deleting…",
+      "relative": {
+        "justNow": "Just now",
+        "minutesAgo": "{count}m ago",
+        "hoursAgo": "{count}h ago",
+        "daysAgo": "{count}d ago"
+      }
+    },
+    "a11y": {
+      "breadcrumb": "Breadcrumb",
+      "toggleSidebar": "Toggle sidebar",
+      "toggleTheme": "Toggle theme",
+      "dismiss": "Dismiss",
+      "categoryIcon": "{name} icon"
+    },
+    "footer": {
+      "poweredBy": "Powered by Siavash"
+    },
+    "landing": {
+      "accessPanel": "Access Panel"
+    },
+    "dashboard": {
+      "lastPriceUpdateBy": "Last price update by",
+      "topCategoriesChartTitle": "Top Categories by Price Types"
+    },
+    "categories": {
+      "addPriceType": "Add Price Type",
+      "deletePriceTypeConfirm": "Delete price type \"{name}\"?",
+      "deleteConfirmAria": "Delete category confirmation",
+      "selectCategory": "Select category"
+    },
+    "priceTypeForm": {
+      "backToCategories": "Back to Categories",
+      "sourceCurrency": "Source Currency",
+      "targetCurrency": "Target Currency",
+      "tradeType": "Trade Type (Buy / Sell)",
+      "tradeTypeHelp": "Choose how this price is used in Bulk Update columns and final publish logic.",
+      "descriptionOptional": "Description (optional)",
+      "loadCurrenciesError": "Could not load currencies",
+      "missingCategoryId": "Missing category id",
+      "selectBothCurrencies": "Please select both source and target currencies.",
+      "createSuccess": "Price type created successfully",
+      "updateSuccess": "Price type updated successfully",
+      "saveError": "Could not save price type",
+      "loadPriceTypeError": "Could not load price type",
+      "pageTitleCreate": "New Price Type",
+      "pageTitleEdit": "Edit Price Type"
+    },
+    "userCenter": {
+      "title": "Admin Management",
+      "users": "Users",
+      "activity": "Activity",
+      "manageUsers": "Manage users",
+      "addUser": "Add admin",
+      "inactive": "Inactive",
+      "forceLogout": "Force logout",
+      "noUsers": "No users found",
+      "allActions": "All actions",
+      "actionType": "Action type",
+      "user": "User",
+      "details": "Details",
+      "ip": "IP",
+      "noActivity": "No activity found",
+      "editUser": "Edit admin",
+      "newPasswordOptional": "New password (optional)",
+      "leaveBlankToKeepCurrent": "Leave blank to keep current",
+      "fullName": "Full name",
+      "role": "Role",
+      "active": "Active",
+      "userUpdated": "User updated",
+      "userCreated": "User created",
+      "failedToSave": "Failed to save",
+      "forceLogoutConfirm": "Force logout this user? All their sessions will be invalidated.",
+      "userLoggedOutAllDevices": "User logged out from all devices",
+      "failedToForceLogout": "Failed to force logout",
+      "roles": {
+        "super_admin": "Super Admin",
+        "management": "Management",
+        "developer": "Developer",
+        "employee": "Employee"
+      },
+      "actionTypes": {
+        "login_success": "Login success",
+        "login_failed": "Login failed",
+        "logout": "Logout",
+        "price_update": "Price update",
+        "bulk_price_update": "Bulk price update",
+        "special_price_update": "Special price update"
+      }
+    },
+    "templates": {
+      "addTemplate": "Add Template",
+      "openEditor": "Editor",
+      "templateNumber": "Template {id}",
+      "unassigned": "Unassigned",
+      "deleteConfirm": "Are you sure you want to delete this template?",
+      "deleteSuccess": "Template deleted successfully.",
+      "createFailed": "Create failed",
+      "nameRequired": "Please enter a template name.",
+      "categoryRequired": "A category is required to create a template."
+    },
+    "templateMedia": {
+      "formatHint": "JPG, PNG, GIF, WebP — copy URLs into image widgets or upload new assets.",
+      "uploadImages": "Upload images",
+      "uploadSuccess": "Uploaded: {name}"
+    },
+    "templateRenderer": {
+      "missingToken": "Missing render token",
+      "loadFailed": "Failed to load render context"
+    },
+    "prices": {
+      "backToList": "Back to Prices",
+      "newPrice": "New Price",
+      "notesOptional": "Notes (optional)",
+      "notesPlaceholder": "Optional notes",
+      "columns": {
+        "priceType": "Price Type",
+        "category": "Category",
+        "pair": "Pair",
+        "latestPrice": "Latest Price",
+        "actions": "Actions"
+      }
+    },
+    "priceHistory": {
+      "columns": {
+        "price": "Price",
+        "date": "Date",
+        "notes": "Notes"
+      }
+    },
+    "logs": {
+      "levels": {
+        "DEBUG": "Debug",
+        "INFO": "Info",
+        "WARNING": "Warning",
+        "ERROR": "Error",
+        "CRITICAL": "Critical"
+      },
+      "sources": {
+        "telegram": "Telegram",
+        "finalize": "Finalize",
+        "price_publisher": "Price Publisher",
+        "instagram": "Instagram",
+        "auth": "Auth",
+        "api": "API",
+        "system": "System"
+      }
+    },
+    "settings": {
+      "confirmClearCacheAria": "Confirm clear cache",
+      "confirmDeleteFontAria": "Confirm delete font",
+      "pwa": {
+        "iosInstallSteps": [
+          "Open this page in Safari on your iPhone or iPad.",
+          "Tap the Share button at the bottom of the screen.",
+          "Scroll down and tap \"Add to Home Screen\".",
+          "Tap \"Add\" in the top-right corner."
+        ]
+      }
+    },
+    "commandPalette": {
+      "navigate": "navigate",
+      "select": "select",
+      "close": "close"
+    },
+    "toast": {
+      "saveFailed": "Save failed",
+      "linkCopied": "Link copied",
+      "copyFailed": "Could not copy"
+    },
+    "templateEditor": {
+      "workspace": {
+        "back": "Back",
+        "untitledTemplate": "Template",
+        "lastSaveAt": "Last save: {time}",
+        "canvasSize": "Canvas {w}×{h}",
+        "fitZoom": "Fit",
+        "uploadBackground": "Upload background image",
+        "uploadBackgroundHint": "Start your design by setting a base canvas image.",
+        "saveStatus": {
+          "error": "Save failed",
+          "saving": "Saving",
+          "dirty": "Unsaved changes",
+          "saved": "Saved"
+        },
+        "noCategory": "No category",
+        "saveSuccess": "Template saved ({category})",
+        "backgroundUploaded": "Background image uploaded",
+        "backgroundUploadFailed": "Background upload failed",
+        "missingTemplateId": "Missing template id",
+        "loadFailed": "Failed to load template"
+      },
+      "inspector": {
+        "title": "Inspector",
+        "templateSettings": "Template settings",
+        "templateName": "Template name",
+        "width": "Width",
+        "height": "Height",
+        "canvasBackground": "Canvas background",
+        "selectWidget": "Select a widget to edit style, typography and data bindings.",
+        "tabs": {
+          "appearance": "Appearance",
+          "typography": "Typography",
+          "data": "Data"
+        },
+        "priceTypeBinding": "PriceType binding",
+        "selectPriceType": "Select PriceType",
+        "stableKey": "Stable key:",
+        "previewSource": "Preview source:",
+        "previewValue": "Value:",
+        "fallbackValue": "Fallback value (used when live value is unavailable)",
+        "clockUsesServerTime": "Uses time from server data.",
+        "typography": "Typography",
+        "fontSize": "Font size",
+        "textColor": "Text color",
+        "pickColor": "Pick color",
+        "fontFile": "Font file (PNG export)",
+        "defaultServerFont": "Default (server)",
+        "align": "Align",
+        "verticalAlign": "Vertical (in box)",
+        "weight": "Weight",
+        "lineHeight": "Line height (optional)",
+        "lineHeightPlaceholder": "e.g. 1.2 or 32",
+        "plainTextExport": "Plain text on export (no outline / shadow)",
+        "dropShadow": "Drop shadow (PNG)",
+        "textOutline": "Text outline (PNG)",
+        "snapToBackground": "Snap to background image",
+        "snapHelp": "Moves the widget box to the edges of the visible image (letterboxing excluded).",
+        "snapLeft": "Left",
+        "snapHMid": "H mid",
+        "snapRight": "Right",
+        "snapTop": "Top",
+        "snapVMid": "V mid",
+        "snapBottom": "Bottom",
+        "imageUrl": "Image URL",
+        "imageUrlPlaceholder": "https://… or /media/…",
+        "uploadImage": "Upload image",
+        "openMediaLibrary": "Open media library",
+        "opacity": "Opacity (editor + PNG)",
+        "zIndex": "z-index",
+        "rotation": "Rotation",
+        "deleteWidget": "Delete widget",
+        "imageUploaded": "Image uploaded",
+        "alignLeft": "Left",
+        "alignCenter": "Center",
+        "alignRight": "Right",
+        "valignMiddle": "Middle",
+        "valignTop": "Top",
+        "valignBottom": "Bottom",
+        "weightNormal": "Normal",
+        "weightBold": "Bold"
+      },
+      "widgetLibrary": {
+        "title": "Widget library",
+        "widgetPreview": "{label} preview",
+        "priceBindings": "Price bindings",
+        "mediaLibrary": "Media library",
+        "uploadBaseImage": "Upload base image",
+        "setCanvasBackgroundFirst": "Set canvas background first",
+        "noUploads": "No uploads yet.",
+        "mediaLoadFailed": "Could not load media",
+        "imageWidgetAdded": "Image widget added — select it to move or resize",
+        "sections": {
+          "textTime": "Text & time",
+          "media": "Media"
+        },
+        "widgets": {
+          "text": "Text",
+          "textHint": "Headline or note",
+          "date": "Date",
+          "dateHint": "Localized date",
+          "weekday": "Weekday",
+          "weekdayHint": "Day of week",
+          "clock": "Clock",
+          "clockHint": "Live server time",
+          "image": "Image",
+          "imageHint": "Static logo or photo"
+        }
+      }
+    },
+    "webapp": {
+      "orderContactMessage": "Our team will contact you shortly at the phone number you provided.",
+      "publicIntro": "View live rates and submit your order.",
+      "liveRates": "Live rates",
+      "customerName": "Full name",
+      "customerPhone": "Phone number",
+      "priceType": "Rate type",
+      "selectPriceType": "Select rate type (optional)",
+      "selectPriceTypeLabel": "Select a rate",
+      "ratesUpdated": "Updated",
+      "noRatesYet": "No rates available yet.",
+      "selectedRate": "Your selected rate",
+      "formSection": "Order details",
+      "customerNamePlaceholder": "e.g. John Smith",
+      "amountPlaceholder": "Enter amount",
+      "phonePlaceholder": "0912..."
+    },
+    "orders": {
+      "customerLinkTitle": "Customer order link",
+      "customerLinkHint": "Share this link with customers. They see live rates and orders appear in this queue.",
+      "copyLink": "Copy link",
+      "copied": "Copied",
+      "copyFailed": "Could not copy link",
+      "openLink": "Open",
+      "pendingBadge": "{count} pending orders"
+    }
+  },
+  "fa": {
+    "common": {
+      "saving": "در حال ذخیره…",
+      "type": "نوع",
+      "category": "دسته‌بندی",
+      "buy": "خرید",
+      "sell": "فروش",
+      "id": "شناسه",
+      "copyLink": "کپی لینک",
+      "uploading": "در حال آپلود…",
+      "deleting": "در حال حذف…",
+      "relative": {
+        "justNow": "همین الان",
+        "minutesAgo": "{count} دقیقه پیش",
+        "hoursAgo": "{count} ساعت پیش",
+        "daysAgo": "{count} روز پیش"
+      }
+    },
+    "a11y": {
+      "breadcrumb": "مسیر ناوبری",
+      "toggleSidebar": "باز/بسته کردن نوار کناری",
+      "toggleTheme": "تغییر تم",
+      "dismiss": "بستن",
+      "categoryIcon": "آیکون {name}"
+    },
+    "footer": {
+      "poweredBy": "قدرت‌گرفته از سیاواش"
+    },
+    "landing": {
+      "accessPanel": "ورود به پنل"
+    },
+    "dashboard": {
+      "lastPriceUpdateBy": "آخرین بروزرسانی قیمت توسط",
+      "topCategoriesChartTitle": "پُرکارترین دسته‌بندی‌ها بر اساس تعداد نوع قیمت"
+    },
+    "categories": {
+      "addPriceType": "افزودن نوع قیمت",
+      "deletePriceTypeConfirm": "نوع قیمت «{name}» حذف شود؟",
+      "deleteConfirmAria": "تأیید حذف دسته‌بندی",
+      "selectCategory": "انتخاب دسته‌بندی"
+    },
+    "priceTypeForm": {
+      "backToCategories": "بازگشت به دسته‌بندی‌ها",
+      "sourceCurrency": "ارز مبدا",
+      "targetCurrency": "ارز مقصد",
+      "tradeType": "نوع معامله (خرید / فروش)",
+      "tradeTypeHelp": "مشخص می‌کند این قیمت در ستون‌های بروزرسانی گروهی و منطق انتشار نهایی چگونه استفاده شود.",
+      "descriptionOptional": "توضیحات (اختیاری)",
+      "loadCurrenciesError": "بارگذاری ارزها انجام نشد",
+      "missingCategoryId": "شناسه دسته‌بندی موجود نیست",
+      "selectBothCurrencies": "لطفاً ارز مبدا و مقصد را انتخاب کنید.",
+      "createSuccess": "نوع قیمت با موفقیت ایجاد شد",
+      "updateSuccess": "نوع قیمت با موفقیت ویرایش شد",
+      "saveError": "ذخیره نوع قیمت انجام نشد",
+      "loadPriceTypeError": "بارگذاری نوع قیمت انجام نشد",
+      "pageTitleCreate": "نوع قیمت جدید",
+      "pageTitleEdit": "ویرایش نوع قیمت"
+    },
+    "userCenter": {
+      "title": "مدیریت ادمین‌ها",
+      "users": "کاربران",
+      "activity": "فعالیت‌ها",
+      "manageUsers": "مدیریت کاربران",
+      "addUser": "افزودن ادمین",
+      "inactive": "غیرفعال",
+      "forceLogout": "خروج اجباری",
+      "noUsers": "کاربری یافت نشد",
+      "allActions": "همه عملیات",
+      "actionType": "نوع عملیات",
+      "user": "کاربر",
+      "details": "جزئیات",
+      "ip": "IP",
+      "noActivity": "فعالیتی ثبت نشده است",
+      "editUser": "ویرایش ادمین",
+      "newPasswordOptional": "رمز عبور جدید (اختیاری)",
+      "leaveBlankToKeepCurrent": "برای حفظ رمز فعلی، خالی بگذارید",
+      "fullName": "نام کامل",
+      "role": "نقش",
+      "active": "فعال",
+      "userUpdated": "کاربر با موفقیت ویرایش شد",
+      "userCreated": "کاربر با موفقیت ایجاد شد",
+      "failedToSave": "ذخیره انجام نشد",
+      "forceLogoutConfirm": "این کاربر از همه دستگاه‌ها خارج شود؟ تمام نشست‌ها نامعتبر می‌شوند.",
+      "userLoggedOutAllDevices": "کاربر از همه دستگاه‌ها خارج شد",
+      "failedToForceLogout": "خروج اجباری انجام نشد",
+      "roles": {
+        "super_admin": "مدیر کل",
+        "management": "مدیریت",
+        "developer": "توسعه‌دهنده",
+        "employee": "کارمند"
+      },
+      "actionTypes": {
+        "login_success": "ورود موفق",
+        "login_failed": "ورود ناموفق",
+        "logout": "خروج",
+        "price_update": "بروزرسانی قیمت",
+        "bulk_price_update": "بروزرسانی گروهی قیمت",
+        "special_price_update": "بروزرسانی قیمت ویژه"
+      }
+    },
+    "templates": {
+      "addTemplate": "افزودن قالب",
+      "openEditor": "ویرایشگر",
+      "templateNumber": "قالب {id}",
+      "unassigned": "بدون دسته",
+      "deleteConfirm": "آیا از حذف این قالب مطمئن هستید؟",
+      "deleteSuccess": "قالب با موفقیت حذف شد.",
+      "createFailed": "ایجاد ناموفق",
+      "nameRequired": "لطفاً نام قالب را وارد کنید.",
+      "categoryRequired": "برای ایجاد قالب، انتخاب دسته‌بندی الزامی است."
+    },
+    "templateMedia": {
+      "formatHint": "JPG، PNG، GIF، WebP — آدرس را در ویجت تصویر کپی کنید یا فایل جدید آپلود کنید.",
+      "uploadImages": "آپلود تصاویر",
+      "uploadSuccess": "آپلود شد: {name}"
+    },
+    "templateRenderer": {
+      "missingToken": "توکن رندر موجود نیست",
+      "loadFailed": "بارگذاری زمینه رندر ناموفق بود"
+    },
+    "prices": {
+      "backToList": "بازگشت به قیمت‌ها",
+      "newPrice": "قیمت جدید",
+      "notesOptional": "یادداشت (اختیاری)",
+      "notesPlaceholder": "یادداشت اختیاری",
+      "columns": {
+        "priceType": "نوع قیمت",
+        "category": "دسته‌بندی",
+        "pair": "جفت ارز",
+        "latestPrice": "آخرین قیمت",
+        "actions": "عملیات"
+      }
+    },
+    "priceHistory": {
+      "columns": {
+        "price": "قیمت",
+        "date": "تاریخ",
+        "notes": "یادداشت"
+      }
+    },
+    "logs": {
+      "levels": {
+        "DEBUG": "اشکال‌زدایی",
+        "INFO": "اطلاعات",
+        "WARNING": "هشدار",
+        "ERROR": "خطا",
+        "CRITICAL": "بحرانی"
+      },
+      "sources": {
+        "telegram": "تلگرام",
+        "finalize": "نهایی‌سازی",
+        "price_publisher": "انتشار قیمت",
+        "instagram": "اینستاگرام",
+        "auth": "احراز هویت",
+        "api": "API",
+        "system": "سیستم"
+      }
+    },
+    "settings": {
+      "confirmClearCacheAria": "تأیید پاک‌سازی کش",
+      "confirmDeleteFontAria": "تأیید حذف فونت",
+      "pwa": {
+        "iosInstallSteps": [
+          "این صفحه را در Safari روی آیفون یا آیپد باز کنید.",
+          "دکمه اشتراک‌گذاری در پایین صفحه را بزنید.",
+          "پایین بروید و «Add to Home Screen» را انتخاب کنید.",
+          "در گوشه بالا روی «Add» بزنید."
+        ]
+      }
+    },
+    "commandPalette": {
+      "navigate": "ناوبری",
+      "select": "انتخاب",
+      "close": "بستن"
+    },
+    "toast": {
+      "saveFailed": "ذخیره ناموفق",
+      "linkCopied": "لینک کپی شد",
+      "copyFailed": "کپی انجام نشد"
+    },
+    "templateEditor": {
+      "workspace": {
+        "back": "بازگشت",
+        "untitledTemplate": "قالب",
+        "lastSaveAt": "آخرین ذخیره: {time}",
+        "canvasSize": "بوم {w}×{h}",
+        "fitZoom": "جا دادن",
+        "uploadBackground": "آپلود تصویر پس‌زمینه",
+        "uploadBackgroundHint": "طراحی را با تنظیم تصویر پایه بوم شروع کنید.",
+        "saveStatus": {
+          "error": "ذخیره ناموفق",
+          "saving": "در حال ذخیره",
+          "dirty": "تغییرات ذخیره‌نشده",
+          "saved": "ذخیره شد"
+        },
+        "noCategory": "بدون دسته",
+        "saveSuccess": "قالب ذخیره شد ({category})",
+        "backgroundUploaded": "تصویر پس‌زمینه آپلود شد",
+        "backgroundUploadFailed": "آپلود پس‌زمینه ناموفق",
+        "missingTemplateId": "شناسه قالب موجود نیست",
+        "loadFailed": "بارگذاری قالب ناموفق"
+      },
+      "inspector": {
+        "title": "بازرس",
+        "templateSettings": "تنظیمات قالب",
+        "templateName": "نام قالب",
+        "width": "عرض",
+        "height": "ارتفاع",
+        "canvasBackground": "پس‌زمینه بوم",
+        "selectWidget": "یک ویجت انتخاب کنید تا استایل، تایپوگرافی و اتصال داده را ویرایش کنید.",
+        "tabs": {
+          "appearance": "ظاهر",
+          "typography": "تایپوگرافی",
+          "data": "داده"
+        },
+        "priceTypeBinding": "اتصال نوع قیمت",
+        "selectPriceType": "انتخاب نوع قیمت",
+        "stableKey": "کلید پایدار:",
+        "previewSource": "منبع پیش‌نمایش:",
+        "previewValue": "مقدار:",
+        "fallbackValue": "مقدار جایگزین (وقتی مقدار زنده در دسترس نیست)",
+        "clockUsesServerTime": "از زمان سرور استفاده می‌کند.",
+        "typography": "تایپوگرافی",
+        "fontSize": "اندازه فونت",
+        "textColor": "رنگ متن",
+        "pickColor": "انتخاب رنگ",
+        "fontFile": "فایل فونت (خروجی PNG)",
+        "defaultServerFont": "پیش‌فرض (سرور)",
+        "align": "تراز افقی",
+        "verticalAlign": "تراز عمودی (در جعبه)",
+        "weight": "ضخامت",
+        "lineHeight": "ارتفاع خط (اختیاری)",
+        "lineHeightPlaceholder": "مثلاً 1.2 یا 32",
+        "plainTextExport": "متن ساده در خروجی (بدون حاشیه / سایه)",
+        "dropShadow": "سایه (PNG)",
+        "textOutline": "حاشیه متن (PNG)",
+        "snapToBackground": "چسبیدن به تصویر پس‌زمینه",
+        "snapHelp": "جعبه ویجت را به لبه تصویر قابل‌مشاهده منتقل می‌کند (بدون حاشیه خالی).",
+        "snapLeft": "چپ",
+        "snapHMid": "وسط افقی",
+        "snapRight": "راست",
+        "snapTop": "بالا",
+        "snapVMid": "وسط عمودی",
+        "snapBottom": "پایین",
+        "imageUrl": "آدرس تصویر",
+        "imageUrlPlaceholder": "https://… یا /media/…",
+        "uploadImage": "آپلود تصویر",
+        "openMediaLibrary": "باز کردن کتابخانه رسانه",
+        "opacity": "شفافیت (ویرایشگر + PNG)",
+        "zIndex": "z-index",
+        "rotation": "چرخش",
+        "deleteWidget": "حذف ویجت",
+        "imageUploaded": "تصویر آپلود شد",
+        "alignLeft": "چپ",
+        "alignCenter": "وسط",
+        "alignRight": "راست",
+        "valignMiddle": "وسط",
+        "valignTop": "بالا",
+        "valignBottom": "پایین",
+        "weightNormal": "معمولی",
+        "weightBold": "ضخیم"
+      },
+      "widgetLibrary": {
+        "title": "کتابخانه ویجت",
+        "widgetPreview": "پیش‌نمایش {label}",
+        "priceBindings": "اتصال قیمت",
+        "mediaLibrary": "کتابخانه رسانه",
+        "uploadBaseImage": "آپلود تصویر پایه",
+        "setCanvasBackgroundFirst": "ابتدا پس‌زمینه بوم را تنظیم کنید",
+        "noUploads": "هنوز آپلودی نیست.",
+        "mediaLoadFailed": "بارگذاری رسانه ناموفق",
+        "imageWidgetAdded": "ویجت تصویر اضافه شد — برای جابه‌جایی یا تغییر اندازه انتخاب کنید",
+        "sections": {
+          "textTime": "متن و زمان",
+          "media": "رسانه"
+        },
+        "widgets": {
+          "text": "متن",
+          "textHint": "تیتر یا یادداشت",
+          "date": "تاریخ",
+          "dateHint": "تاریخ محلی",
+          "weekday": "روز هفته",
+          "weekdayHint": "نام روز",
+          "clock": "ساعت",
+          "clockHint": "زمان زنده سرور",
+          "image": "تصویر",
+          "imageHint": "لوگو یا عکس ثابت"
+        }
+      }
+    }
+  },
+  "ar": {
+    "common": {
+      "saving": "جارٍ الحفظ…",
+      "type": "النوع",
+      "category": "الفئة",
+      "buy": "شراء",
+      "sell": "بيع",
+      "id": "المعرّف",
+      "copyLink": "نسخ الرابط",
+      "uploading": "جارٍ الرفع…",
+      "deleting": "جارٍ الحذف…",
+      "relative": {
+        "justNow": "الآن",
+        "minutesAgo": "منذ {count} د",
+        "hoursAgo": "منذ {count} س",
+        "daysAgo": "منذ {count} ي"
+      }
+    },
+    "a11y": {
+      "breadcrumb": "مسار التنقل",
+      "toggleSidebar": "طي/فتح الشريط الجانبي",
+      "toggleTheme": "تبديل السمة",
+      "dismiss": "إغلاق",
+      "categoryIcon": "أيقونة {name}"
+    },
+    "footer": {
+      "poweredBy": "مدعوم من Siavash"
+    },
+    "landing": {
+      "accessPanel": "الدخول إلى اللوحة"
+    },
+    "dashboard": {
+      "lastPriceUpdateBy": "آخر تحديث للسعر بواسطة",
+      "topCategoriesChartTitle": "أكثر الفئات نشاطاً حسب أنواع الأسعار"
+    },
+    "categories": {
+      "addPriceType": "إضافة نوع سعر",
+      "deletePriceTypeConfirm": "حذف نوع السعر «{name}»؟",
+      "deleteConfirmAria": "تأكيد حذف الفئة",
+      "selectCategory": "اختيار الفئة"
+    },
+    "priceTypeForm": {
+      "backToCategories": "العودة إلى الفئات",
+      "sourceCurrency": "عملة المصدر",
+      "targetCurrency": "عملة الوجهة",
+      "tradeType": "نوع الصفقة (شراء / بيع)",
+      "tradeTypeHelp": "يحدد كيف يُستخدم هذا السعر في أعمدة التحديث الجماعي ومنطق النشر النهائي.",
+      "descriptionOptional": "الوصف (اختياري)",
+      "loadCurrenciesError": "تعذر تحميل العملات",
+      "missingCategoryId": "معرّف الفئة مفقود",
+      "selectBothCurrencies": "يرجى اختيار عملة المصدر والوجهة.",
+      "createSuccess": "تم إنشاء نوع السعر بنجاح",
+      "updateSuccess": "تم تحديث نوع السعر بنجاح",
+      "saveError": "تعذر حفظ نوع السعر",
+      "loadPriceTypeError": "تعذر تحميل نوع السعر",
+      "pageTitleCreate": "نوع سعر جديد",
+      "pageTitleEdit": "تعديل نوع السعر"
+    },
+    "userCenter": {
+      "title": "إدارة المسؤولين",
+      "users": "المستخدمون",
+      "activity": "النشاط",
+      "manageUsers": "إدارة المستخدمين",
+      "addUser": "إضافة مسؤول",
+      "inactive": "غير نشط",
+      "forceLogout": "إخراج إجباري",
+      "noUsers": "لا يوجد مستخدمون",
+      "allActions": "كل العمليات",
+      "actionType": "نوع العملية",
+      "user": "المستخدم",
+      "details": "التفاصيل",
+      "ip": "IP",
+      "noActivity": "لا يوجد نشاط",
+      "editUser": "تعديل المسؤول",
+      "newPasswordOptional": "كلمة مرور جديدة (اختياري)",
+      "leaveBlankToKeepCurrent": "اتركه فارغاً للإبقاء على الحالية",
+      "fullName": "الاسم الكامل",
+      "role": "الدور",
+      "active": "نشط",
+      "userUpdated": "تم تحديث المستخدم",
+      "userCreated": "تم إنشاء المستخدم",
+      "failedToSave": "فشل الحفظ",
+      "forceLogoutConfirm": "إخراج هذا المستخدم من جميع الأجهزة؟ ستُلغى جميع الجلسات.",
+      "userLoggedOutAllDevices": "تم إخراج المستخدم من جميع الأجهزة",
+      "failedToForceLogout": "فشل الإخراج الإجباري",
+      "roles": {
+        "super_admin": "مدير عام",
+        "management": "إدارة",
+        "developer": "مطوّر",
+        "employee": "موظف"
+      },
+      "actionTypes": {
+        "login_success": "دخول ناجح",
+        "login_failed": "دخول فاشل",
+        "logout": "خروج",
+        "price_update": "تحديث سعر",
+        "bulk_price_update": "تحديث جماعي للأسعار",
+        "special_price_update": "تحديث سعر خاص"
+      }
+    },
+    "templates": {
+      "addTemplate": "إضافة قالب",
+      "openEditor": "المحرر",
+      "templateNumber": "قالب {id}",
+      "unassigned": "غير مخصص",
+      "deleteConfirm": "هل أنت متأكد من حذف هذا القالب؟",
+      "deleteSuccess": "تم حذف القالب بنجاح.",
+      "createFailed": "فشل الإنشاء",
+      "nameRequired": "يرجى إدخال اسم القالب.",
+      "categoryRequired": "اختيار الفئة مطلوب لإنشاء قالب."
+    },
+    "templateMedia": {
+      "formatHint": "JPG وPNG وGIF وWebP — انسخ الروابط في عناصر الصور أو ارفع ملفات جديدة.",
+      "uploadImages": "رفع صور",
+      "uploadSuccess": "تم الرفع: {name}"
+    },
+    "templateRenderer": {
+      "missingToken": "رمز العرض مفقود",
+      "loadFailed": "فشل تحميل سياق العرض"
+    },
+    "prices": {
+      "backToList": "العودة إلى الأسعار",
+      "newPrice": "سعر جديد",
+      "notesOptional": "ملاحظات (اختياري)",
+      "notesPlaceholder": "ملاحظات اختيارية",
+      "columns": {
+        "priceType": "نوع السعر",
+        "category": "الفئة",
+        "pair": "الزوج",
+        "latestPrice": "آخر سعر",
+        "actions": "الإجراءات"
+      }
+    },
+    "priceHistory": {
+      "columns": {
+        "price": "السعر",
+        "date": "التاريخ",
+        "notes": "ملاحظات"
+      }
+    },
+    "logs": {
+      "levels": {
+        "DEBUG": "تصحيح",
+        "INFO": "معلومات",
+        "WARNING": "تحذير",
+        "ERROR": "خطأ",
+        "CRITICAL": "حرج"
+      },
+      "sources": {
+        "telegram": "تيليجرام",
+        "finalize": "الاعتماد",
+        "price_publisher": "ناشر الأسعار",
+        "instagram": "إنستغرام",
+        "auth": "المصادقة",
+        "api": "API",
+        "system": "النظام"
+      }
+    },
+    "settings": {
+      "confirmClearCacheAria": "تأكيد مسح الذاكرة المؤقتة",
+      "confirmDeleteFontAria": "تأكيد حذف الخط",
+      "pwa": {
+        "iosInstallSteps": [
+          "افتح هذه الصفحة في Safari على iPhone أو iPad.",
+          "اضغط زر المشاركة في أسفل الشاشة.",
+          "مرّر لأسفل واضغط «Add to Home Screen».",
+          "اضغط «Add» في الزاوية العلوية."
+        ]
+      },
+      "instagram": {
+        "captionSuffix": "لاحقة التعليق (منشورات الخلاصة)",
+        "captionSuffixPlaceholder": "مثال: سطر التواصل أو عنوان المكتب",
+        "hashtags": "الوسوم (منشورات الخلاصة)",
+        "hashtagsPlaceholder": "مثال: #exchange #rates"
+      }
+    },
+    "commandPalette": {
+      "navigate": "تنقل",
+      "select": "اختيار",
+      "close": "إغلاق"
+    },
+    "toast": {
+      "saveFailed": "فشل الحفظ",
+      "linkCopied": "تم نسخ الرابط",
+      "copyFailed": "تعذر النسخ"
+    },
+    "templateEditor": {
+      "workspace": {
+        "back": "رجوع",
+        "untitledTemplate": "قالب",
+        "lastSaveAt": "آخر حفظ: {time}",
+        "canvasSize": "لوحة {w}×{h}",
+        "fitZoom": "ملاءمة",
+        "uploadBackground": "رفع صورة الخلفية",
+        "uploadBackgroundHint": "ابدأ التصميم بتعيين صورة أساسية للوحة.",
+        "saveStatus": {
+          "error": "فشل الحفظ",
+          "saving": "جارٍ الحفظ",
+          "dirty": "تغييرات غير محفوظة",
+          "saved": "تم الحفظ"
+        },
+        "noCategory": "بدون فئة",
+        "saveSuccess": "تم حفظ القالب ({category})",
+        "backgroundUploaded": "تم رفع صورة الخلفية",
+        "backgroundUploadFailed": "فشل رفع الخلفية",
+        "missingTemplateId": "معرّف القالب مفقود",
+        "loadFailed": "فشل تحميل القالب"
+      },
+      "inspector": {
+        "title": "المفتش",
+        "templateSettings": "إعدادات القالب",
+        "templateName": "اسم القالب",
+        "width": "العرض",
+        "height": "الارتفاع",
+        "canvasBackground": "خلفية اللوحة",
+        "selectWidget": "اختر عنصراً لتعديل النمط والخط وربط البيانات.",
+        "tabs": {
+          "appearance": "المظهر",
+          "typography": "الخط",
+          "data": "البيانات"
+        },
+        "priceTypeBinding": "ربط نوع السعر",
+        "selectPriceType": "اختيار نوع السعر",
+        "stableKey": "المفتاح الثابت:",
+        "previewSource": "مصدر المعاينة:",
+        "previewValue": "القيمة:",
+        "fallbackValue": "قيمة احتياطية (عند عدم توفر القيمة المباشرة)",
+        "clockUsesServerTime": "يستخدم الوقت من بيانات الخادم.",
+        "typography": "الخط",
+        "fontSize": "حجم الخط",
+        "textColor": "لون النص",
+        "pickColor": "اختيار اللون",
+        "fontFile": "ملف الخط (تصدير PNG)",
+        "defaultServerFont": "افتراضي (الخادم)",
+        "align": "المحاذاة",
+        "verticalAlign": "عمودي (داخل الصندوق)",
+        "weight": "السُمك",
+        "lineHeight": "ارتفاع السطر (اختياري)",
+        "lineHeightPlaceholder": "مثال: 1.2 أو 32",
+        "plainTextExport": "نص عادي عند التصدير (بدون حدود / ظل)",
+        "dropShadow": "ظل (PNG)",
+        "textOutline": "حدود النص (PNG)",
+        "snapToBackground": "محاذاة لصورة الخلفية",
+        "snapHelp": "ينقل صندوق العنصر إلى حواف الصورة المرئية (باستثناء الحواف الفارغة).",
+        "snapLeft": "يسار",
+        "snapHMid": "وسط أفقي",
+        "snapRight": "يمين",
+        "snapTop": "أعلى",
+        "snapVMid": "وسط عمودي",
+        "snapBottom": "أسفل",
+        "imageUrl": "رابط الصورة",
+        "imageUrlPlaceholder": "https://… أو /media/…",
+        "uploadImage": "رفع صورة",
+        "openMediaLibrary": "فتح مكتبة الوسائط",
+        "opacity": "الشفافية (المحرر + PNG)",
+        "zIndex": "z-index",
+        "rotation": "الدوران",
+        "deleteWidget": "حذف العنصر",
+        "imageUploaded": "تم رفع الصورة",
+        "alignLeft": "يسار",
+        "alignCenter": "وسط",
+        "alignRight": "يمين",
+        "valignMiddle": "وسط",
+        "valignTop": "أعلى",
+        "valignBottom": "أسفل",
+        "weightNormal": "عادي",
+        "weightBold": "عريض"
+      },
+      "widgetLibrary": {
+        "title": "مكتبة العناصر",
+        "widgetPreview": "معاينة {label}",
+        "priceBindings": "ربط الأسعار",
+        "mediaLibrary": "مكتبة الوسائط",
+        "uploadBaseImage": "رفع الصورة الأساسية",
+        "setCanvasBackgroundFirst": "عيّن خلفية اللوحة أولاً",
+        "noUploads": "لا توجد ملفات مرفوعة بعد.",
+        "mediaLoadFailed": "تعذر تحميل الوسائط",
+        "imageWidgetAdded": "تمت إضافة عنصر صورة — اختره للتحريك أو تغيير الحجم",
+        "sections": {
+          "textTime": "النص والوقت",
+          "media": "الوسائط"
+        },
+        "widgets": {
+          "text": "نص",
+          "textHint": "عنوان أو ملاحظة",
+          "date": "تاريخ",
+          "dateHint": "تاريخ محلي",
+          "weekday": "يوم الأسبوع",
+          "weekdayHint": "اسم اليوم",
+          "clock": "ساعة",
+          "clockHint": "وقت الخادم المباشر",
+          "image": "صورة",
+          "imageHint": "شعار أو صورة ثابتة"
+        }
+      }
+    },
+    "webapp": {
+      "orderContactMessage": "سيتواصل فريقنا معك قريباً على رقم الهاتف الذي قدمته.",
+      "publicIntro": "اطلع على الأسعار المباشرة وقدّم طلبك.",
+      "liveRates": "أسعار مباشرة",
+      "customerName": "الاسم الكامل",
+      "customerPhone": "رقم الهاتف",
+      "priceType": "نوع السعر",
+      "selectPriceType": "اختيار نوع السعر (اختياري)",
+      "selectPriceTypeLabel": "اختر سعراً",
+      "ratesUpdated": "محدّث",
+      "noRatesYet": "لا توجد أسعار بعد.",
+      "selectedRate": "السعر المختار",
+      "formSection": "تفاصيل الطلب",
+      "customerNamePlaceholder": "مثال: أحمد محمد",
+      "amountPlaceholder": "أدخل المبلغ",
+      "phonePlaceholder": "0912..."
+    },
+    "orders": {
+      "customerLinkTitle": "رابط طلب العميل",
+      "customerLinkHint": "شارك هذا الرابط مع العملاء. يرون الأسعار المباشرة وتظهر الطلبات في هذا الطابور.",
+      "copyLink": "نسخ الرابط",
+      "copied": "تم النسخ",
+      "copyFailed": "تعذر نسخ الرابط",
+      "openLink": "فتح",
+      "pendingBadge": "{count} طلبات قيد الانتظار"
+    }
+  },
+  "es": {
+    "common": {
+      "saving": "Guardando…",
+      "type": "Tipo",
+      "category": "Categoría",
+      "buy": "Compra",
+      "sell": "Venta",
+      "id": "ID",
+      "copyLink": "Copiar enlace",
+      "uploading": "Subiendo…",
+      "deleting": "Eliminando…",
+      "relative": {
+        "justNow": "Ahora mismo",
+        "minutesAgo": "Hace {count} min",
+        "hoursAgo": "Hace {count} h",
+        "daysAgo": "Hace {count} d"
+      }
+    },
+    "a11y": {
+      "breadcrumb": "Ruta de navegación",
+      "toggleSidebar": "Mostrar/ocultar barra lateral",
+      "toggleTheme": "Cambiar tema",
+      "dismiss": "Cerrar",
+      "categoryIcon": "Icono de {name}"
+    },
+    "footer": {
+      "poweredBy": "Desarrollado por Siavash"
+    },
+    "landing": {
+      "accessPanel": "Acceder al panel"
+    },
+    "dashboard": {
+      "lastPriceUpdateBy": "Última actualización de precio por",
+      "topCategoriesChartTitle": "Categorías principales por tipos de precio"
+    },
+    "categories": {
+      "addPriceType": "Añadir tipo de precio",
+      "deletePriceTypeConfirm": "¿Eliminar el tipo de precio «{name}»?",
+      "deleteConfirmAria": "Confirmar eliminación de categoría",
+      "selectCategory": "Seleccionar categoría"
+    },
+    "priceTypeForm": {
+      "backToCategories": "Volver a categorías",
+      "sourceCurrency": "Moneda origen",
+      "targetCurrency": "Moneda destino",
+      "tradeType": "Tipo de operación (compra / venta)",
+      "tradeTypeHelp": "Define cómo se usa este precio en columnas de actualización masiva y en la publicación final.",
+      "descriptionOptional": "Descripción (opcional)",
+      "loadCurrenciesError": "No se pudieron cargar las monedas",
+      "missingCategoryId": "Falta el id de categoría",
+      "selectBothCurrencies": "Seleccione moneda origen y destino.",
+      "createSuccess": "Tipo de precio creado correctamente",
+      "updateSuccess": "Tipo de precio actualizado correctamente",
+      "saveError": "No se pudo guardar el tipo de precio",
+      "loadPriceTypeError": "No se pudo cargar el tipo de precio",
+      "pageTitleCreate": "Nuevo tipo de precio",
+      "pageTitleEdit": "Editar tipo de precio"
+    },
+    "userCenter": {
+      "title": "Administración",
+      "users": "Usuarios",
+      "activity": "Actividad",
+      "manageUsers": "Gestionar usuarios",
+      "addUser": "Añadir administrador",
+      "inactive": "Inactivo",
+      "forceLogout": "Cerrar sesión forzada",
+      "noUsers": "No hay usuarios",
+      "allActions": "Todas las acciones",
+      "actionType": "Tipo de acción",
+      "user": "Usuario",
+      "details": "Detalles",
+      "ip": "IP",
+      "noActivity": "Sin actividad",
+      "editUser": "Editar administrador",
+      "newPasswordOptional": "Nueva contraseña (opcional)",
+      "leaveBlankToKeepCurrent": "Dejar en blanco para mantener la actual",
+      "fullName": "Nombre completo",
+      "role": "Rol",
+      "active": "Activo",
+      "userUpdated": "Usuario actualizado",
+      "userCreated": "Usuario creado",
+      "failedToSave": "Error al guardar",
+      "forceLogoutConfirm": "¿Cerrar sesión de este usuario en todos los dispositivos? Se invalidarán todas las sesiones.",
+      "userLoggedOutAllDevices": "Usuario desconectado de todos los dispositivos",
+      "failedToForceLogout": "No se pudo forzar el cierre de sesión",
+      "roles": {
+        "super_admin": "Superadministrador",
+        "management": "Gestión",
+        "developer": "Desarrollador",
+        "employee": "Empleado"
+      },
+      "actionTypes": {
+        "login_success": "Inicio de sesión correcto",
+        "login_failed": "Inicio de sesión fallido",
+        "logout": "Cierre de sesión",
+        "price_update": "Actualización de precio",
+        "bulk_price_update": "Actualización masiva de precios",
+        "special_price_update": "Actualización de precio especial"
+      }
+    },
+    "templates": {
+      "addTemplate": "Añadir plantilla",
+      "openEditor": "Editor",
+      "templateNumber": "Plantilla {id}",
+      "unassigned": "Sin asignar",
+      "deleteConfirm": "¿Seguro que desea eliminar esta plantilla?",
+      "deleteSuccess": "Plantilla eliminada correctamente.",
+      "createFailed": "Error al crear",
+      "nameRequired": "Introduzca un nombre de plantilla.",
+      "categoryRequired": "Se requiere una categoría para crear la plantilla."
+    },
+    "templateMedia": {
+      "formatHint": "JPG, PNG, GIF, WebP — copie URLs en widgets de imagen o suba archivos nuevos.",
+      "uploadImages": "Subir imágenes",
+      "uploadSuccess": "Subido: {name}"
+    },
+    "templateRenderer": {
+      "missingToken": "Falta el token de renderizado",
+      "loadFailed": "No se pudo cargar el contexto de renderizado"
+    },
+    "prices": {
+      "backToList": "Volver a precios",
+      "newPrice": "Precio nuevo",
+      "notesOptional": "Notas (opcional)",
+      "notesPlaceholder": "Notas opcionales",
+      "columns": {
+        "priceType": "Tipo de precio",
+        "category": "Categoría",
+        "pair": "Par",
+        "latestPrice": "Último precio",
+        "actions": "Acciones"
+      }
+    },
+    "priceHistory": {
+      "columns": {
+        "price": "Precio",
+        "date": "Fecha",
+        "notes": "Notas"
+      }
+    },
+    "logs": {
+      "levels": {
+        "DEBUG": "Depuración",
+        "INFO": "Información",
+        "WARNING": "Advertencia",
+        "ERROR": "Error",
+        "CRITICAL": "Crítico"
+      },
+      "sources": {
+        "telegram": "Telegram",
+        "finalize": "Finalizar",
+        "price_publisher": "Publicador de precios",
+        "instagram": "Instagram",
+        "auth": "Autenticación",
+        "api": "API",
+        "system": "Sistema"
+      }
+    },
+    "settings": {
+      "confirmClearCacheAria": "Confirmar borrado de caché",
+      "confirmDeleteFontAria": "Confirmar eliminación de fuente",
+      "pwa": {
+        "iosInstallSteps": [
+          "Abra esta página en Safari en su iPhone o iPad.",
+          "Pulse el botón Compartir en la parte inferior.",
+          "Desplácese y pulse «Add to Home Screen».",
+          "Pulse «Add» en la esquina superior derecha."
+        ]
+      },
+      "instagram": {
+        "captionSuffix": "Sufijo del pie (publicaciones del feed)",
+        "captionSuffixPlaceholder": "p. ej. línea de contacto o dirección",
+        "hashtags": "Hashtags (publicaciones del feed)",
+        "hashtagsPlaceholder": "p. ej. #exchange #rates"
+      }
+    },
+    "commandPalette": {
+      "navigate": "navegar",
+      "select": "seleccionar",
+      "close": "cerrar"
+    },
+    "toast": {
+      "saveFailed": "Error al guardar",
+      "linkCopied": "Enlace copiado",
+      "copyFailed": "No se pudo copiar"
+    },
+    "templateEditor": {
+      "workspace": {
+        "back": "Volver",
+        "untitledTemplate": "Plantilla",
+        "lastSaveAt": "Último guardado: {time}",
+        "canvasSize": "Lienzo {w}×{h}",
+        "fitZoom": "Ajustar",
+        "uploadBackground": "Subir imagen de fondo",
+        "uploadBackgroundHint": "Empiece el diseño con una imagen base del lienzo.",
+        "saveStatus": {
+          "error": "Error al guardar",
+          "saving": "Guardando",
+          "dirty": "Cambios sin guardar",
+          "saved": "Guardado"
+        },
+        "noCategory": "Sin categoría",
+        "saveSuccess": "Plantilla guardada ({category})",
+        "backgroundUploaded": "Imagen de fondo subida",
+        "backgroundUploadFailed": "Error al subir el fondo",
+        "missingTemplateId": "Falta el id de plantilla",
+        "loadFailed": "No se pudo cargar la plantilla"
+      },
+      "inspector": {
+        "title": "Inspector",
+        "templateSettings": "Ajustes de plantilla",
+        "templateName": "Nombre de plantilla",
+        "width": "Ancho",
+        "height": "Alto",
+        "canvasBackground": "Fondo del lienzo",
+        "selectWidget": "Seleccione un widget para editar estilo, tipografía y enlaces de datos.",
+        "tabs": {
+          "appearance": "Apariencia",
+          "typography": "Tipografía",
+          "data": "Datos"
+        },
+        "priceTypeBinding": "Enlace de tipo de precio",
+        "selectPriceType": "Seleccionar tipo de precio",
+        "stableKey": "Clave estable:",
+        "previewSource": "Fuente de vista previa:",
+        "previewValue": "Valor:",
+        "fallbackValue": "Valor alternativo (cuando no hay valor en vivo)",
+        "clockUsesServerTime": "Usa la hora de los datos del servidor.",
+        "typography": "Tipografía",
+        "fontSize": "Tamaño de fuente",
+        "textColor": "Color del texto",
+        "pickColor": "Elegir color",
+        "fontFile": "Archivo de fuente (exportación PNG)",
+        "defaultServerFont": "Predeterminado (servidor)",
+        "align": "Alineación",
+        "verticalAlign": "Vertical (en caja)",
+        "weight": "Grosor",
+        "lineHeight": "Altura de línea (opcional)",
+        "lineHeightPlaceholder": "p. ej. 1.2 o 32",
+        "plainTextExport": "Texto plano al exportar (sin contorno / sombra)",
+        "dropShadow": "Sombra (PNG)",
+        "textOutline": "Contorno de texto (PNG)",
+        "snapToBackground": "Ajustar a imagen de fondo",
+        "snapHelp": "Mueve el cuadro del widget a los bordes de la imagen visible (sin bandas).",
+        "snapLeft": "Izquierda",
+        "snapHMid": "Centro H",
+        "snapRight": "Derecha",
+        "snapTop": "Arriba",
+        "snapVMid": "Centro V",
+        "snapBottom": "Abajo",
+        "imageUrl": "URL de imagen",
+        "imageUrlPlaceholder": "https://… o /media/…",
+        "uploadImage": "Subir imagen",
+        "openMediaLibrary": "Abrir biblioteca multimedia",
+        "opacity": "Opacidad (editor + PNG)",
+        "zIndex": "z-index",
+        "rotation": "Rotación",
+        "deleteWidget": "Eliminar widget",
+        "imageUploaded": "Imagen subida",
+        "alignLeft": "Izquierda",
+        "alignCenter": "Centro",
+        "alignRight": "Derecha",
+        "valignMiddle": "Centro",
+        "valignTop": "Arriba",
+        "valignBottom": "Abajo",
+        "weightNormal": "Normal",
+        "weightBold": "Negrita"
+      },
+      "widgetLibrary": {
+        "title": "Biblioteca de widgets",
+        "widgetPreview": "Vista previa de {label}",
+        "priceBindings": "Enlaces de precio",
+        "mediaLibrary": "Biblioteca multimedia",
+        "uploadBaseImage": "Subir imagen base",
+        "setCanvasBackgroundFirst": "Configure primero el fondo del lienzo",
+        "noUploads": "Aún no hay archivos.",
+        "mediaLoadFailed": "No se pudieron cargar los medios",
+        "imageWidgetAdded": "Widget de imagen añadido — selecciónelo para mover o redimensionar",
+        "sections": {
+          "textTime": "Texto y hora",
+          "media": "Medios"
+        },
+        "widgets": {
+          "text": "Texto",
+          "textHint": "Titular o nota",
+          "date": "Fecha",
+          "dateHint": "Fecha localizada",
+          "weekday": "Día de la semana",
+          "weekdayHint": "Nombre del día",
+          "clock": "Reloj",
+          "clockHint": "Hora del servidor en vivo",
+          "image": "Imagen",
+          "imageHint": "Logo o foto estática"
+        }
+      }
+    },
+    "webapp": {
+      "orderContactMessage": "Nuestro equipo se pondrá en contacto pronto al teléfono indicado.",
+      "publicIntro": "Vea tasas en vivo y envíe su pedido.",
+      "liveRates": "Tasas en vivo",
+      "customerName": "Nombre completo",
+      "customerPhone": "Teléfono",
+      "priceType": "Tipo de tasa",
+      "selectPriceType": "Seleccionar tipo de tasa (opcional)",
+      "selectPriceTypeLabel": "Seleccione una tasa",
+      "ratesUpdated": "Actualizado",
+      "noRatesYet": "Aún no hay tasas.",
+      "selectedRate": "Tasa seleccionada",
+      "formSection": "Detalles del pedido",
+      "customerNamePlaceholder": "p. ej. Juan Pérez",
+      "amountPlaceholder": "Introduzca el importe",
+      "phonePlaceholder": "0912..."
+    },
+    "orders": {
+      "customerLinkTitle": "Enlace de pedido para clientes",
+      "customerLinkHint": "Comparta este enlace. Verán tasas en vivo y los pedidos aparecerán en esta cola.",
+      "copyLink": "Copiar enlace",
+      "copied": "Copiado",
+      "copyFailed": "No se pudo copiar el enlace",
+      "openLink": "Abrir",
+      "pendingBadge": "{count} pedidos pendientes"
+    }
+  }
+}

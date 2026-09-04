@@ -5,8 +5,8 @@
         :to="'/categories'"
         class="inline-flex items-center gap-2 text-[var(--text-secondary)] hover:text-gold transition-colors font-medium"
       >
-        <i class="fas" :class="isRtl ? 'fa-arrow-right' : 'fa-arrow-left'" />
-        <span>{{ $t('telegramStudio.backToCategories') || 'Back to Categories' }}</span>
+        <i class="fas fa-arrow-left icon-back me-2" />
+        <span>{{ $t('telegramStudio.backToCategories') }}</span>
       </router-link>
     </nav>
 
@@ -16,7 +16,7 @@
 
     <template v-else-if="category">
       <h1 class="text-2xl font-bold text-gold mb-2 animate-fade-in-up">
-        {{ $t('telegramStudio.title') || 'Telegram Message Studio' }}
+        {{ $t('telegramStudio.title') }}
       </h1>
       <p class="text-[var(--text-secondary)] mb-6">
         {{ category.name }}
@@ -28,7 +28,7 @@
         class="mb-6 rounded-xl border px-4 py-3 text-sm flex items-center gap-2 border-[var(--border-card-hover)] bg-primary-muted text-[var(--text-primary)]"
       >
         <i class="fas fa-exclamation-triangle shrink-0 text-gold" />
-        <span>{{ $t('telegramStudio.incompleteMessage') || 'No active template media found. Preview is unavailable until a template image is set.' }}</span>
+        <span>{{ $t('telegramStudio.incompleteMessage') }}</span>
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 items-start">
@@ -46,7 +46,7 @@
                 <i class="fas fa-image" />
               </span>
               <h2 class="text-lg font-semibold text-gold m-0">
-                {{ $t('telegramStudio.media') || 'Media' }}
+                {{ $t('telegramStudio.media') }}
               </h2>
             </div>
             <div class="flex flex-col sm:flex-row gap-4 items-start">
@@ -61,15 +61,15 @@
                   class="w-full h-full object-contain rounded-lg"
                 />
                 <span v-else class="text-sm text-[var(--text-secondary)] px-2 text-center">
-                  {{ $t('telegramStudio.uploadImage') || 'No template media' }}
+                  {{ $t('telegramStudio.uploadImage') }}
                 </span>
               </div>
               <div class="flex-1 min-w-0">
                 <p class="text-sm text-[var(--text-secondary)] mb-2">
-                  {{ $t('telegramStudio.mediaHint') || 'Media is inherited from the active Template Editor template.' }}
+                  {{ $t('telegramStudio.mediaHint') }}
                 </p>
                 <p v-if="category.last_used_template" class="text-xs text-[var(--text-secondary)]">
-                  {{ $t('telegramStudio.templateMediaHint') || 'Template ID:' }} {{ category.last_used_template }}
+                  {{ $t('telegramStudio.templateMediaHint') }} {{ category.last_used_template }}
                 </p>
               </div>
             </div>
@@ -88,18 +88,18 @@
                   <i class="fas fa-align-left" />
                 </span>
                 <h2 class="text-lg font-semibold text-gold m-0">
-                  {{ $t('telegramStudio.description') || 'Description' }}
+                  {{ $t('telegramStudio.description') }}
                 </h2>
               </div>
               <div class="relative">
                 <button
                   type="button"
                   class="btn-luxury-outline text-sm py-1.5 px-3 gap-1"
-                  :title="$t('telegramStudio.insertVariable') || 'Insert variable'"
+                  :title="$t('telegramStudio.insertVariable')"
                   @click="showVariableMenu = !showVariableMenu"
                 >
                   <i class="fas fa-braces" />
-                  <span class="hidden sm:inline">{{ $t('telegramStudio.insertVariable') || 'Insert variable' }}</span>
+                  <span class="hidden sm:inline">{{ $t('telegramStudio.insertVariable') }}</span>
                 </button>
                 <div
                   v-if="showVariableMenu"
@@ -107,7 +107,7 @@
                   style="border-color: var(--border-card); background: var(--bg-card);"
                 >
                   <p class="px-3 py-1 text-xs text-[var(--text-secondary)]">
-                    {{ $t('telegramStudio.commonVariables') || 'Common variables' }}
+                    {{ $t('telegramStudio.commonVariables') }}
                   </p>
                   <button
                     v-for="v in staticVariables"
@@ -120,7 +120,7 @@
                     {{ v.label }} — <code class="text-gold">{{ variableCode({ slug: v.key, name: v.key }) }}</code>
                   </button>
                   <p class="px-3 py-1 text-xs text-[var(--text-secondary)]">
-                    {{ $t('telegramStudio.priceTypes') || 'Price types' }}
+                    {{ $t('telegramStudio.priceTypes') }}
                   </p>
                   <button
                     v-for="pt in (category.price_types || [])"
@@ -133,7 +133,7 @@
                     {{ pt.name }} — <code class="text-gold">{{ variableCode(pt) }}</code>
                   </button>
                   <p v-if="!(category.price_types || []).length" class="px-3 py-2 text-sm text-[var(--text-secondary)]">
-                    {{ $t('telegramStudio.noPriceTypes') || 'No price types in this category.' }}
+                    {{ $t('telegramStudio.noPriceTypes') }}
                   </p>
                 </div>
               </div>
@@ -142,7 +142,7 @@
               ref="descriptionTextarea"
               v-model="form.telegram_message_description"
               class="input-luxury min-h-[120px] resize-y"
-              :placeholder="$t('telegramStudio.descriptionPlaceholder') || 'Message text under the image…'"
+              :placeholder="$t('telegramStudio.descriptionPlaceholder')"
             />
           </section>
 
@@ -158,7 +158,7 @@
                 <i class="fas fa-th-large" />
               </span>
               <h2 class="text-lg font-semibold text-gold m-0">
-                {{ $t('telegramStudio.inlineButtons') || 'Inline buttons' }}
+                {{ $t('telegramStudio.inlineButtons') }}
               </h2>
             </div>
             <div class="space-y-2">
@@ -172,13 +172,13 @@
                   v-model="btn.label"
                   type="text"
                   class="input-luxury flex-1 min-w-[100px] py-2"
-                  :placeholder="$t('telegramStudio.buttonLabel') || 'Label'"
+                  :placeholder="$t('telegramStudio.buttonLabel')"
                 />
                 <input
                   v-model="btn.url"
                   type="url"
                   class="input-luxury flex-1 min-w-[120px] py-2"
-                  :placeholder="$t('telegramStudio.buttonUrl') || 'URL'"
+                  :placeholder="$t('telegramStudio.buttonUrl')"
                 />
                 <button
                   type="button"
@@ -196,7 +196,7 @@
               @click="addButton"
             >
               <i class="fas fa-plus me-2" />
-              {{ $t('telegramStudio.addButton') || 'Add button' }}
+              {{ $t('telegramStudio.addButton') }}
             </button>
           </section>
 
@@ -211,7 +211,7 @@
             >
               <LoadingSpinner v-if="saving" class="w-5 h-5" />
               <i v-else class="fas fa-check-double" />
-              <span>{{ saving ? ($t('telegramStudio.saving') || 'Saving…') : ($t('telegramStudio.saveSync') || 'Save & Sync') }}</span>
+              <span>{{ saving ? ($t('telegramStudio.saving')) : ($t('telegramStudio.saveSync')) }}</span>
             </button>
           </div>
         </div>
@@ -227,7 +227,7 @@
             >
               <i class="fas fa-mobile-alt text-gold" />
               <h2 class="text-lg font-semibold text-gold m-0">
-                {{ $t('telegramStudio.livePreview') || 'Live preview' }}
+                {{ $t('telegramStudio.livePreview') }}
               </h2>
             </div>
             <TelegramMockup
@@ -242,7 +242,7 @@
     </template>
 
     <div v-else class="card-luxury p-8 text-center text-[var(--text-secondary)]">
-      {{ $t('telegramStudio.categoryNotFound') || 'Category not found.' }}
+      {{ $t('telegramStudio.categoryNotFound') }}
     </div>
   </div>
 </template>
@@ -293,7 +293,7 @@ const staticVariables = [
 ]
 
 const validButtons = computed(() =>
-  (form.value.inline_buttons || []).filter((b) => b && (b.label || b.url)).map((b) => ({ label: b.label || '', url: b.url || '' }))
+  (form.value.inline_buttons || []).filter((b) => b && (b.label || b.url)).map((b) => ({ label: b.label, url: b.url }))
 )
 
 const isIncomplete = computed(() => {
@@ -329,8 +329,8 @@ const variableValues = computed(() => {
   pts.forEach((pt) => {
     const raw = pt.latest_price
     const val = formatPricePreview(raw)
-    const slug = (pt.slug || '').trim()
-    const name = (pt.name || '').trim()
+    const slug = (pt.slug).trim()
+    const name = (pt.name).trim()
     if (slug) out[slug] = val
     if (name) out[name] = val
   })
@@ -346,11 +346,11 @@ async function loadCategory() {
   try {
     const { data } = await categoryApi.get(categoryId.value)
     category.value = data
-    templateMediaUrl.value = (data.template_media_url || '').trim()
+    templateMediaUrl.value = (data.template_media_url).trim()
     if (!templateMediaUrl.value && data.last_used_template) {
       try {
         const templateRes = await templateEditorApi.get(data.last_used_template)
-        templateMediaUrl.value = templateRes?.data?.image || ''
+        templateMediaUrl.value = templateRes?.data?.image
       } catch {
         templateMediaUrl.value = ''
       }
@@ -381,7 +381,7 @@ function insertVariable(slugOrName) {
       ta.setSelectionRange(start + code.length, start + code.length)
     })
   } else {
-    form.value.telegram_message_description = (form.value.telegram_message_description || '') + code
+    form.value.telegram_message_description = (form.value.telegram_message_description) + code
   }
   showVariableMenu.value = false
 }

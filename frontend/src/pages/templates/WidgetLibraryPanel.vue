@@ -1,7 +1,7 @@
 <template>
   <aside class="flex w-64 shrink-0 flex-col gap-2 overflow-hidden rounded-xl border border-[var(--border-card)] bg-[var(--bg-card)] text-sm sm:w-64">
     <h2 class="shrink-0 px-2 pt-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-      Widget library
+      {{ $t('templateEditor.widgetLibrary.title') }}
     </h2>
 
     <div class="min-h-0 flex-1 space-y-2 overflow-y-auto px-2 pb-2">
@@ -12,7 +12,7 @@
       >
         <button
           type="button"
-          class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-hover)]"
+          class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-start text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-hover)]"
           @click="toggle(sec.id)"
         >
           <span class="flex min-w-0 items-center gap-2">
@@ -29,12 +29,12 @@
             v-for="w in sec.widgets"
             :key="w.type + (w.label || '')"
             type="button"
-            class="group flex w-full items-start gap-2 rounded-lg border border-[var(--border-card)] bg-[var(--bg-card)] px-2 py-2 text-left transition-all hover:-translate-y-0.5 hover:border-[var(--primary)]/45 hover:shadow-[var(--shadow-card)]"
+            class="group flex w-full items-start gap-2 rounded-lg border border-[var(--border-card)] bg-[var(--bg-card)] px-2 py-2 text-start transition-all hover:-translate-y-0.5 hover:border-[var(--primary)]/45 hover:shadow-[var(--shadow-card)]"
             @click="add(w.type, w.extra)"
           >
             <div
               class="relative flex h-10 w-14 shrink-0 items-center justify-center overflow-hidden rounded-md border border-[var(--border-card)] bg-[var(--bg-input)]/80"
-              :title="`${w.label} preview`"
+              :title="$t('templateEditor.widgetLibrary.widgetPreview', { label: w.label })"
             >
               <span class="pointer-events-none absolute inset-0 opacity-45" :class="w.thumbClass" />
               <i :class="['fas relative z-10 text-sm text-[var(--primary)]', w.icon]" />
@@ -53,12 +53,12 @@
       >
         <button
           type="button"
-          class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-hover)]"
+          class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-start text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-hover)]"
           @click="toggle('prices')"
         >
           <span class="flex min-w-0 items-center gap-2">
             <i class="fas fa-coins shrink-0 text-[var(--primary)]" />
-            <span class="truncate">Price bindings</span>
+            <span class="truncate">{{ $t('templateEditor.widgetLibrary.priceBindings') }}</span>
           </span>
           <i
             class="fas fa-chevron-down shrink-0 text-xs text-[var(--text-secondary)] transition-transform"
@@ -70,7 +70,7 @@
             v-for="row in priceBindings"
             :key="`${row.key}-${row.price_type_id ?? ''}`"
             type="button"
-            class="btn-luxury-outline flex w-full flex-col items-start gap-0.5 py-2 text-left text-xs"
+            class="btn-luxury-outline flex w-full flex-col items-start gap-0.5 py-2 text-start text-xs"
             @click="addPriceBinding(row)"
           >
             <span class="font-mono text-[10px] text-[var(--text-secondary)]">{{ row.key }}</span>
@@ -82,12 +82,12 @@
       <section class="rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/70">
         <button
           type="button"
-          class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-left text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-hover)]"
+          class="flex w-full items-center justify-between gap-2 px-3 py-2.5 text-start text-sm font-medium text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-hover)]"
           @click="toggle('media_lib')"
         >
           <span class="flex min-w-0 items-center gap-2">
             <i class="fas fa-folder-open shrink-0 text-[var(--primary)]" />
-            <span class="truncate">Media library</span>
+            <span class="truncate">{{ $t('templateEditor.widgetLibrary.mediaLibrary') }}</span>
           </span>
           <i
             class="fas fa-chevron-down shrink-0 text-xs text-[var(--text-secondary)] transition-transform"
@@ -97,19 +97,19 @@
         <div v-show="open.media_lib" class="space-y-2 border-t border-[var(--border-card)] px-2 pb-2 pt-2">
           <button
             type="button"
-            class="group flex w-full items-center gap-2 rounded-lg border border-dashed border-[var(--primary)]/50 bg-[var(--bg-card)] px-2 py-2 text-left transition hover:border-[var(--primary)]"
+            class="group flex w-full items-center gap-2 rounded-lg border border-dashed border-[var(--primary)]/50 bg-[var(--bg-card)] px-2 py-2 text-start transition hover:border-[var(--primary)]"
             @click="te.openBackgroundPicker?.()"
           >
             <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[var(--primary)]/10 text-[var(--primary)]">
               <i class="fas fa-image" />
             </span>
             <span>
-              <span class="block text-xs font-semibold text-[var(--text-primary)]">Upload base image</span>
-              <span class="block text-[10px] text-[var(--text-secondary)]">Set canvas background first</span>
+              <span class="block text-xs font-semibold text-[var(--text-primary)]">{{ $t('templateEditor.widgetLibrary.uploadBaseImage') }}</span>
+              <span class="block text-[10px] text-[var(--text-secondary)]">{{ $t('templateEditor.widgetLibrary.setCanvasBackgroundFirst') }}</span>
             </span>
           </button>
-          <p v-if="mediaLoading" class="px-1 py-2 text-xs text-[var(--text-secondary)]">Loading…</p>
-          <p v-else-if="!mediaItems.length" class="px-1 py-2 text-xs text-[var(--text-secondary)]">No uploads yet.</p>
+          <p v-if="mediaLoading" class="px-1 py-2 text-xs text-[var(--text-secondary)]">{{ $t('common.loading') }}</p>
+          <p v-else-if="!mediaItems.length" class="px-1 py-2 text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.widgetLibrary.noUploads') }}</p>
           <div v-else class="grid max-h-40 grid-cols-3 gap-1 overflow-y-auto">
             <button
               v-for="m in mediaItems"
@@ -129,7 +129,8 @@
 </template>
 
 <script setup>
-import { reactive, ref, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { templateEditorApi, formatDrfError } from '@/services/api'
 import { useTemplateEditorInjected } from './templateEditorInjectionKey.js'
@@ -139,34 +140,35 @@ const props = defineProps({
 })
 
 const te = useTemplateEditorInjected()
+const { t } = useI18n()
 const toast = useToast()
 
-const sections = [
+const sections = computed(() => [
   {
     id: 'text_time',
-    title: 'Text & time',
+    title: t('templateEditor.widgetLibrary.sections.textTime'),
     icon: 'fa-font',
     widgets: [
-      { type: 'text', label: 'Text', icon: 'fa-pen-nib', hint: 'Headline or note', thumbClass: 'bg-gradient-to-r from-slate-300/60 to-transparent', extra: null },
-      { type: 'date', label: 'Date', icon: 'fa-calendar-alt', hint: 'Localized date', thumbClass: 'bg-gradient-to-b from-slate-300/50 to-transparent', extra: { style: { dateKey: 'date_fa' } } },
+      { type: 'text', label: t('templateEditor.widgetLibrary.widgets.text'), icon: 'fa-pen-nib', hint: t('templateEditor.widgetLibrary.widgets.textHint'), thumbClass: 'bg-gradient-to-r from-slate-300/60 to-transparent', extra: null },
+      { type: 'date', label: t('templateEditor.widgetLibrary.widgets.date'), icon: 'fa-calendar-alt', hint: t('templateEditor.widgetLibrary.widgets.dateHint'), thumbClass: 'bg-gradient-to-b from-slate-300/50 to-transparent', extra: { style: { dateKey: 'date_fa' } } },
       {
         type: 'weekday',
-        label: 'Weekday',
+        label: t('templateEditor.widgetLibrary.widgets.weekday'),
         icon: 'fa-calendar-day',
-        hint: 'Day of week',
+        hint: t('templateEditor.widgetLibrary.widgets.weekdayHint'),
         thumbClass: 'bg-gradient-to-br from-slate-300/45 to-transparent',
         extra: { style: { dateKey: 'farsi_weekday' } },
       },
-      { type: 'clock', label: 'Clock', icon: 'fa-clock', hint: 'Live server time', thumbClass: 'bg-[radial-gradient(circle_at_50%_50%,rgba(148,163,184,0.45),transparent_65%)]', extra: null },
+      { type: 'clock', label: t('templateEditor.widgetLibrary.widgets.clock'), icon: 'fa-clock', hint: t('templateEditor.widgetLibrary.widgets.clockHint'), thumbClass: 'bg-[radial-gradient(circle_at_50%_50%,rgba(148,163,184,0.45),transparent_65%)]', extra: null },
     ],
   },
   {
     id: 'media',
-    title: 'Media',
+    title: t('templateEditor.widgetLibrary.sections.media'),
     icon: 'fa-photo-video',
-    widgets: [{ type: 'image', label: 'Image', icon: 'fa-image', hint: 'Static logo or photo', thumbClass: 'bg-[linear-gradient(135deg,rgba(59,130,246,0.35),rgba(16,185,129,0.3))]', extra: null }],
+    widgets: [{ type: 'image', label: t('templateEditor.widgetLibrary.widgets.image'), icon: 'fa-image', hint: t('templateEditor.widgetLibrary.widgets.imageHint'), thumbClass: 'bg-[linear-gradient(135deg,rgba(59,130,246,0.35),rgba(16,185,129,0.3))]', extra: null }],
   },
-]
+])
 
 const open = reactive({
   text_time: false,
@@ -212,7 +214,7 @@ async function loadMedia() {
     mediaItems.value = Array.isArray(data?.results) ? data.results : []
   } catch (e) {
     mediaItems.value = []
-    toast.error(formatDrfError(e.response?.data) || 'Could not load media')
+    toast.error(formatDrfError(e.response?.data) || t('templateEditor.widgetLibrary.mediaLoadFailed'))
   } finally {
     mediaLoading.value = false
   }
@@ -256,7 +258,7 @@ function insertMediaUrl(url) {
     content: url,
     name: 'Image',
   })
-  toast.success('Image widget added — select it to move or resize')
+  toast.success(t('templateEditor.widgetLibrary.imageWidgetAdded'))
 }
 
 watch(

@@ -6,12 +6,12 @@
           to="/templates"
           class="inline-flex w-fit items-center gap-2 text-sm text-[var(--primary)] hover:underline"
         >
-          <i class="fas fa-arrow-left" />
+          <i class="fas fa-arrow-left icon-back" />
           {{ $t('common.back') }}
         </router-link>
         <h1 class="text-2xl font-bold text-gold">{{ $t('routes.templateMediaLibrary') }}</h1>
         <p class="text-sm text-[var(--text-secondary)]">
-          JPG, PNG, GIF, WebP — copy URLs for image widgets in the template editor.
+          {{ $t('templateMedia.formatHint') }} for image widgets in the template editor.
         </p>
       </div>
       <label
@@ -26,7 +26,7 @@
           @change="onFilesSelected"
         />
         <i class="fas fa-cloud-upload-alt" />
-        {{ uploading ? $t('common.loading') : 'Upload images' }}
+        {{ uploading ? $t('common.loading') : $t('templateMedia.uploadImages') }}
       </label>
     </div>
 
@@ -68,7 +68,7 @@
             @click="copyLink(row.url)"
           >
             <i class="fas fa-link" />
-            Copy link
+            {{ $t('common.copyLink') }}
           </button>
         </div>
       </article>
@@ -99,7 +99,7 @@ async function copyLink(url) {
       : `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`
   try {
     await navigator.clipboard.writeText(text)
-    toast.success('Link copied')
+    toast.success(t('toast.linkCopied'))
   } catch {
     const ta = document.createElement('textarea')
     ta.value = text
@@ -111,7 +111,7 @@ async function copyLink(url) {
     try {
       const ok = document.execCommand('copy')
       if (ok) toast.success('Link copied')
-      else toast.error('Could not copy')
+      else toast.error(t('toast.copyFailed'))
     } catch {
       toast.error('Could not copy')
     }
@@ -131,7 +131,7 @@ async function onFilesSelected(ev) {
     try {
       await templateEditorApi.uploadMedia(fd)
       anyOk = true
-      toast.success(`Uploaded: ${file.name}`)
+      toast.success(t('templateMedia.uploadSuccess', { name: file.name }))
     } catch (e) {
       toast.error(formatDrfError(e.response?.data) || file.name)
     }

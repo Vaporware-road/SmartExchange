@@ -3,7 +3,7 @@
     class="mt-auto border-t border-[var(--border-card)]/40 bg-[var(--bg-footer)] px-3 py-2 md:px-4 md:py-2.5 pb-[max(3.1rem,calc(2.4rem+env(safe-area-inset-bottom,0px)))] md:pb-2.5"
   >
     <div class="flex items-center justify-between gap-3">
-      <p class="m-0 text-[11px] md:text-xs leading-none text-slate-400/90 dark:text-slate-500/90">
+      <p class="m-0 text-[11px] md:text-xs leading-none text-slate-400/90 dark:text-slate-500/90" dir="ltr">
         Powered by Siavash
       </p>
       <div class="flex items-center gap-1.5 min-w-0">

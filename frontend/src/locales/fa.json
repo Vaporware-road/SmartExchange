@@ -13,7 +13,8 @@
     "instagramHub": "هاب اینستاگرام",
     "settings": "تنظیمات",
     "userCenter": "مدیریت ادمین‌ها",
-    "adminManagement": "مدیریت ادمین"
+    "adminManagement": "مدیریت ادمین",
+    "orders": "صف سفارش‌ها"
   },
   "common": {
     "save": "ذخیره",
@@ -27,6 +28,7 @@
     "loading": "در حال بارگذاری...",
     "search": "جستجو...",
     "noData": "داده‌ای موجود نیست",
+    "refresh": "بارگذاری مجدد",
     "confirm": "تأیید",
     "close": "بستن",
     "panel": "پنل مدیریت",
@@ -38,15 +40,32 @@
     "description": "توضیحات",
     "date": "تاریخ",
     "logout": "خروج",
-    "login": "ورود"
+    "login": "ورود",
+    "saving": "در حال ذخیره…",
+    "type": "نوع",
+    "category": "دسته‌بندی",
+    "buy": "خرید",
+    "sell": "فروش",
+    "id": "شناسه",
+    "copyLink": "کپی لینک",
+    "uploading": "در حال آپلود…",
+    "deleting": "در حال حذف…",
+    "relative": {
+      "justNow": "همین الان",
+      "minutesAgo": "{count} دقیقه پیش",
+      "hoursAgo": "{count} ساعت پیش",
+      "daysAgo": "{count} روز پیش"
+    }
   },
   "header": {
     "openMenu": "باز کردن منو",
-    "closeMenu": "بستن منو"
+    "closeMenu": "بستن منو",
+    "selectLanguage": "انتخاب زبان"
   },
   "footer": {
     "copyright": "© {year} {name}. تمامی حقوق محفوظ است.",
-    "support": "پشتیبانی"
+    "support": "پشتیبانی",
+    "poweredBy": "قدرت‌گرفته از سیاواش"
   },
   "breadcrumb": {
     "home": "خانه"
@@ -84,7 +103,10 @@
     "finalizeSuccess": "نهایی‌سازی با موفقیت انجام شد",
     "finalizeFailed": "خطا در نهایی‌سازی",
     "pricesUpdatedBroadcast": "قیمت‌ها به‌روزرسانی و به تلگرام ارسال شدند",
-    "cacheCleared": "آپلودهای موقت و کش پاک شد."
+    "cacheCleared": "آپلودهای موقت و کش پاک شد.",
+    "saveFailed": "ذخیره ناموفق",
+    "linkCopied": "لینک کپی شد",
+    "copyFailed": "کپی انجام نشد"
   },
   "emptyState": {
     "noCategories": "هنوز دسته‌بندی‌ای ایجاد نشده",
@@ -143,13 +165,93 @@
     "templateMediaLibrary": "کتابخانه رسانه",
     "telegramStudio": "استودیو پیام تلگرام",
     "instagramHub": "هاب اینستاگرام",
-    "userCenter": "مدیریت ادمین‌ها"
+    "userCenter": "مدیریت ادمین‌ها",
+    "orders": "صف سفارش‌ها",
+    "webappOrder": "ثبت سفارش"
+  },
+  "webapp": {
+    "orderTitle": "ثبت سفارش سریع",
+    "welcome": "سلام {name}",
+    "tradeType": "نوع معامله",
+    "buy": "خرید",
+    "sell": "فروش",
+    "category": "ارز / دسته",
+    "selectCategory": "انتخاب کنید",
+    "amount": "مبلغ",
+    "note": "توضیحات",
+    "notePlaceholder": "توضیحات اختیاری...",
+    "submitOrder": "ثبت سفارش",
+    "orderSubmitted": "سفارش شما با موفقیت ثبت شد",
+    "orderContactMessage": "کارشناسان ما در اسرع وقت با شماره تماس شما ارتباط خواهند گرفت.",
+    "orderContactMessageBot": "کارشناسان ما در اسرع وقت از طریق تلگرام با شما تماس خواهند گرفت.",
+    "orderPendingReview": "لطفاً پاسخگوی تماس باشید. از صبر شما سپاسگزاریم.",
+    "missingToken": "لینک نامعتبر است. لطفاً از دکمه ربات استفاده کنید.",
+    "authFailed": "احراز هویت ناموفق. لینک منقضی شده است.",
+    "submitFailed": "ثبت سفارش ناموفق بود.",
+    "publicIntro": "نرخ‌های لحظه‌ای را ببینید و سفارش خود را ثبت کنید.",
+    "liveRates": "نرخ‌های لحظه‌ای",
+    "customerName": "نام و نام خانوادگی",
+    "customerPhone": "شماره تماس",
+    "priceType": "نوع نرخ",
+    "selectPriceType": "انتخاب نوع نرخ (اختیاری)",
+    "selectPriceTypeLabel": "نوع نرخ را انتخاب کنید",
+    "ratesUpdated": "بروزرسانی",
+    "noRatesYet": "هنوز نرخی ثبت نشده است.",
+    "selectedRate": "نرخ انتخابی شما",
+    "formSection": "اطلاعات سفارش",
+    "customerNamePlaceholder": "مثال: علی محمدی",
+    "amountPlaceholder": "مبلغ مورد نظر",
+    "phonePlaceholder": "0912..."
+  },
+  "orders": {
+    "queueTitle": "صف سفارش‌های ربات",
+    "customerLinkTitle": "لینک ثبت سفارش مشتری",
+    "customerLinkHint": "این لینک را برای مشتریان ارسال کنید. آن‌ها نرخ‌های لحظه‌ای را می‌بینند و سفارش در همین صف ثبت می‌شود.",
+    "copyLink": "کپی لینک",
+    "copied": "کپی شد",
+    "copyFailed": "کپی لینک ناموفق بود",
+    "openLink": "باز کردن",
+    "pendingBadge": "{count} سفارش در انتظار",
+    "empty": "سفارشی یافت نشد.",
+    "approve": "تأیید",
+    "reject": "رد",
+    "viewDetails": "مشاهده جزئیات",
+    "detailTitle": "جزئیات سفارش",
+    "sectionStatus": "وضعیت",
+    "sectionCustomer": "مخاطب",
+    "sectionOrder": "سفارش",
+    "sectionMetadata": "اطلاعات ثبت‌شده",
+    "platform": "منبع",
+    "platformTelegram": "تلگرام",
+    "platformWhatsapp": "واتساپ",
+    "platformWeb": "وب / لینک عمومی",
+    "telegramChatId": "شناسه چت تلگرام",
+    "telegramUsername": "نام کاربری تلگرام",
+    "customerId": "شناسه مخاطب",
+    "reviewedAt": "زمان بررسی",
+    "adminNote": "یادداشت مدیر",
+    "adminNotePlaceholder": "یادداشت اختیاری...",
+    "metaSource": "منبع ثبت",
+    "metaUserAgent": "مرورگر / دستگاه",
+    "deleteOrder": "حذف سفارش",
+    "deleteConfirm": "سفارش «{name}» از سیستم حذف شود؟ این کار برای آزاد کردن دسته‌بندی لازم است.",
+    "deleteSuccess": "سفارش حذف شد.",
+    "reviewSuccess": "وضعیت سفارش به‌روز شد.",
+    "status": {
+      "pending": "در انتظار",
+      "approved": "تأیید شده",
+      "rejected": "رد شده",
+      "cancelled": "لغو شده",
+      "all": "همه"
+    }
   },
   "instagramHub": {
     "description": "تصاویر پست و استوری را از قیمت‌های نهایی شده بسازید. تم و دسته‌ها را انتخاب کنید و قبل از انتشار در اینستاگرام پیش‌نمایش ببینید.",
     "statusDescription": "اینستاگرام از تنظیمات ست می‌شود. با نهایی‌سازی قیمت‌ها، به‌طور خودکار مثل تلگرام به پیج اینستاگرام ارسال می‌شوند.",
     "connected": "متصل",
     "disconnected": "قطع",
+    "readyForPublish": "آماده — با نهایی‌سازی، خودکار به اینستاگرام پست می‌شود.",
+    "partiallyConfigured": "متصل ولی آماده نیست — توکن و INSTAGRAM_BASE_URL را در تنظیمات بررسی کنید.",
     "configureInSettings": "در تنظیمات App ID و App Secret را وارد کنید، سپس از دکمه زیر اتصال بزنید.",
     "reconnect": "اتصال مجدد",
     "setAppIdFirst": "ابتدا در تنظیمات App ID و App Secret را وارد کنید.",
@@ -252,7 +354,116 @@
       "english_weekday": "نام روز هفته به انگلیسی"
     },
     "arabicShapingLabel": "شکل‌دهی فارسی/عربی (خروجی PNG)",
-    "arabicShapingHelp": "با arabic reshaper و bidi متن RTL در تصویر بدون libraqm درست رسم می‌شود؛ پیش‌نمایش ادیتور با این حالت هم‌خوان است."
+    "arabicShapingHelp": "با arabic reshaper و bidi متن RTL در تصویر بدون libraqm درست رسم می‌شود؛ پیش‌نمایش ادیتور با این حالت هم‌خوان است.",
+    "workspace": {
+      "back": "بازگشت",
+      "untitledTemplate": "قالب",
+      "lastSaveAt": "آخرین ذخیره: {time}",
+      "canvasSize": "بوم {w}×{h}",
+      "fitZoom": "جا دادن",
+      "uploadBackground": "آپلود تصویر پس‌زمینه",
+      "uploadBackgroundHint": "طراحی را با تنظیم تصویر پایه بوم شروع کنید.",
+      "saveStatus": {
+        "error": "ذخیره ناموفق",
+        "saving": "در حال ذخیره",
+        "dirty": "تغییرات ذخیره‌نشده",
+        "saved": "ذخیره شد"
+      },
+      "noCategory": "بدون دسته",
+      "saveSuccess": "قالب ذخیره شد ({category})",
+      "backgroundUploaded": "تصویر پس‌زمینه آپلود شد",
+      "backgroundUploadFailed": "آپلود پس‌زمینه ناموفق",
+      "missingTemplateId": "شناسه قالب موجود نیست",
+      "loadFailed": "بارگذاری قالب ناموفق"
+    },
+    "inspector": {
+      "title": "بازرس",
+      "templateSettings": "تنظیمات قالب",
+      "templateName": "نام قالب",
+      "width": "عرض",
+      "height": "ارتفاع",
+      "canvasBackground": "پس‌زمینه بوم",
+      "selectWidget": "یک ویجت انتخاب کنید تا استایل، تایپوگرافی و اتصال داده را ویرایش کنید.",
+      "tabs": {
+        "appearance": "ظاهر",
+        "typography": "تایپوگرافی",
+        "data": "داده"
+      },
+      "priceTypeBinding": "اتصال نوع قیمت",
+      "selectPriceType": "انتخاب نوع قیمت",
+      "stableKey": "کلید پایدار:",
+      "previewSource": "منبع پیش‌نمایش:",
+      "previewValue": "مقدار:",
+      "fallbackValue": "مقدار جایگزین (وقتی مقدار زنده در دسترس نیست)",
+      "clockUsesServerTime": "از زمان سرور استفاده می‌کند.",
+      "typography": "تایپوگرافی",
+      "fontSize": "اندازه فونت",
+      "textColor": "رنگ متن",
+      "pickColor": "انتخاب رنگ",
+      "fontFile": "فایل فونت (خروجی PNG)",
+      "defaultServerFont": "پیش‌فرض (سرور)",
+      "align": "تراز افقی",
+      "verticalAlign": "تراز عمودی (در جعبه)",
+      "weight": "ضخامت",
+      "lineHeight": "ارتفاع خط (اختیاری)",
+      "lineHeightPlaceholder": "مثلاً 1.2 یا 32",
+      "plainTextExport": "متن ساده در خروجی (بدون حاشیه / سایه)",
+      "dropShadow": "سایه (PNG)",
+      "textOutline": "حاشیه متن (PNG)",
+      "snapToBackground": "چسبیدن به تصویر پس‌زمینه",
+      "snapHelp": "جعبه ویجت را به لبه تصویر قابل‌مشاهده منتقل می‌کند (بدون حاشیه خالی).",
+      "snapLeft": "چپ",
+      "snapHMid": "وسط افقی",
+      "snapRight": "راست",
+      "snapTop": "بالا",
+      "snapVMid": "وسط عمودی",
+      "snapBottom": "پایین",
+      "imageUrl": "آدرس تصویر",
+      "imageUrlPlaceholder": "https://… یا /media/…",
+      "uploadImage": "آپلود تصویر",
+      "openMediaLibrary": "باز کردن کتابخانه رسانه",
+      "opacity": "شفافیت (ویرایشگر + PNG)",
+      "zIndex": "z-index",
+      "rotation": "چرخش",
+      "deleteWidget": "حذف ویجت",
+      "imageUploaded": "تصویر آپلود شد",
+      "alignLeft": "چپ",
+      "alignCenter": "وسط",
+      "alignRight": "راست",
+      "valignMiddle": "وسط",
+      "valignTop": "بالا",
+      "valignBottom": "پایین",
+      "weightNormal": "معمولی",
+      "weightBold": "ضخیم",
+      "uploadBackground": "آپلود تصویر پس‌زمینه"
+    },
+    "widgetLibrary": {
+      "title": "کتابخانه ویجت",
+      "widgetPreview": "پیش‌نمایش {label}",
+      "priceBindings": "اتصال قیمت",
+      "mediaLibrary": "کتابخانه رسانه",
+      "uploadBaseImage": "آپلود تصویر پایه",
+      "setCanvasBackgroundFirst": "ابتدا پس‌زمینه بوم را تنظیم کنید",
+      "noUploads": "هنوز آپلودی نیست.",
+      "mediaLoadFailed": "بارگذاری رسانه ناموفق",
+      "imageWidgetAdded": "ویجت تصویر اضافه شد — برای جابه‌جایی یا تغییر اندازه انتخاب کنید",
+      "sections": {
+        "textTime": "متن و زمان",
+        "media": "رسانه"
+      },
+      "widgets": {
+        "text": "متن",
+        "textHint": "تیتر یا یادداشت",
+        "date": "تاریخ",
+        "dateHint": "تاریخ محلی",
+        "weekday": "روز هفته",
+        "weekdayHint": "نام روز",
+        "clock": "ساعت",
+        "clockHint": "زمان زنده سرور",
+        "image": "تصویر",
+        "imageHint": "لوگو یا عکس ثابت"
+      }
+    }
   },
   "categories": {
     "backToList": "بازگشت به دسته‌بندی‌ها",
@@ -264,7 +475,8 @@
     "openFullForm": "باز کردن فرم کامل",
     "deleteConfirmTitle": "حذف دسته‌بندی؟",
     "deleteConfirmMessage": "آیا از حذف «{name}» اطمینان دارید؟ این عمل قابل بازگشت نیست.",
-    "deleteBlockedByOrders": "این دسته‌بندی به سفارش‌های ثبت‌شده متصل است و قابل حذف نیست. ابتدا سفارش‌ها را بررسی یا حذف کنید.",
+    "deleteBlockedByOrders": "این دسته‌بندی به سفارش‌های ثبت‌شده متصل است و قابل حذف نیست. ابتدا سفارش‌ها را از صف سفارش‌ها حذف کنید.",
+    "deleteBlockedByOrdersCount": "این دسته‌بندی به {count} سفارش متصل است. از منوی «همه» در صف سفارش‌ها آن‌ها را پیدا و حذف کنید.",
     "hubPrices": "قیمت‌ها",
     "hubDesignTemplate": "قالب گرافیکی",
     "hubTelegramContent": "محتوای تلگرام",
@@ -308,7 +520,11 @@
       "RUB": "دسته‌بندی آماده نرخ‌های مرتبط با روبل روسیه.",
       "USDT": "دسته‌بندی آماده نرخ‌های مرتبط با تتر.",
       "XAU": "دسته‌بندی آماده نرخ‌های مرتبط با طلا."
-    }
+    },
+    "addPriceType": "افزودن نوع قیمت",
+    "deletePriceTypeConfirm": "نوع قیمت «{name}» حذف شود؟",
+    "deleteConfirmAria": "تأیید حذف دسته‌بندی",
+    "selectCategory": "انتخاب دسته‌بندی"
   },
   "bulkUpdate": {
     "backToCategories": "بازگشت به دسته‌بندی‌ها",
@@ -419,7 +635,9 @@
     "offline": "آفلاین",
     "connectionStatus": "اتصال",
     "cashPrice": "نقد",
-    "accountPrice": "حساب"
+    "accountPrice": "حساب",
+    "lastPriceUpdateBy": "آخرین بروزرسانی قیمت توسط",
+    "topCategoriesChartTitle": "پُرکارترین دسته‌بندی‌ها بر اساس تعداد نوع قیمت"
   },
   "finalize": {
     "title": "نهایی‌سازی دسته‌بندی",
@@ -532,7 +750,16 @@
       "connected": "حساب اینستاگرام متصل است.",
       "tokenExpires": "انقضای توکن",
       "connectSuccess": "اتصال به اینستاگرام با موفقیت انجام شد.",
-      "connectError": "اتصال به اینستاگرام ناموفق بود."
+      "connectError": "اتصال به اینستاگرام ناموفق بود.",
+      "captionSuffix": "پسوند کپشن (پست فید)",
+      "captionSuffixPlaceholder": "مثلاً خط تماس یا آدرس دفتر",
+      "hashtags": "هشتگ‌ها (پست فید)",
+      "hashtagsPlaceholder": "مثلاً #صرافی #نرخ",
+      "tokenExpired": "توکن اینستاگرام منقضی شده — دوباره اتصال بزنید.",
+      "tokenExpiringSoon": "توکن اینستاگرام تا {days} روز دیگر منقضی می‌شود — زود reconnect کنید.",
+      "missingPublicBaseUrl": "متغیر INSTAGRAM_BASE_URL را روی URL عمومی سایت (بدون /media) تنظیم کنید تا Meta تصاویر را بگیرد.",
+      "oauthRedirectUri": "آدرس بازگشت OAuth (در پورتال Meta Developer)",
+      "oauthRedirectHint": "باید دقیقاً در Facebook Login → Valid OAuth Redirect URIs ثبت شود."
     },
     "fonts": {
       "description": "فایل‌های .ttf یا .otf برای رندر قالب و اختیاری برای ظاهر پنل آپلود کنید. فونت‌ها در کنار دارایی‌های قالب ذخیره می‌شوند.",
@@ -563,6 +790,16 @@
       "copyLink": "کپی لینک",
       "copied": "کپی شد",
       "save": "ذخیرهٔ تنظیمات API"
+    },
+    "confirmClearCacheAria": "تأیید پاک‌سازی کش",
+    "confirmDeleteFontAria": "تأیید حذف فونت",
+    "pwa": {
+      "iosInstallSteps": [
+        "این صفحه را در Safari روی آیفون یا آیپد باز کنید.",
+        "دکمه اشتراک‌گذاری در پایین صفحه را بزنید.",
+        "پایین بروید و «Add to Home Screen» را انتخاب کنید.",
+        "در گوشه بالا روی «Add» بزنید."
+      ]
     }
   },
   "specialPrices": {
@@ -604,7 +841,23 @@
     "showDetails": "نمایش جزئیات",
     "hideDetails": "بستن جزئیات",
     "apply": "اعمال",
-    "clearFilters": "پاک کردن"
+    "clearFilters": "پاک کردن",
+    "levels": {
+      "DEBUG": "اشکال‌زدایی",
+      "INFO": "اطلاعات",
+      "WARNING": "هشدار",
+      "ERROR": "خطا",
+      "CRITICAL": "بحرانی"
+    },
+    "sources": {
+      "telegram": "تلگرام",
+      "finalize": "نهایی‌سازی",
+      "price_publisher": "انتشار قیمت",
+      "instagram": "اینستاگرام",
+      "auth": "احراز هویت",
+      "api": "API",
+      "system": "سیستم"
+    }
   },
   "finalizeDashboard": {
     "allUpToDate": "همه قیمت‌ها به‌روز هستند. موردی برای نهایی‌سازی نیست.",
@@ -811,5 +1064,119 @@
       "unknown": "خطایی رخ داد. لطفا دوباره تلاش کنید."
     },
     "fields": {}
+  },
+  "a11y": {
+    "breadcrumb": "مسیر ناوبری",
+    "toggleSidebar": "باز/بسته کردن نوار کناری",
+    "toggleTheme": "تغییر تم",
+    "dismiss": "بستن",
+    "categoryIcon": "آیکون {name}"
+  },
+  "landing": {
+    "accessPanel": "ورود به پنل"
+  },
+  "priceTypeForm": {
+    "backToCategories": "بازگشت به دسته‌بندی‌ها",
+    "sourceCurrency": "ارز مبدا",
+    "targetCurrency": "ارز مقصد",
+    "tradeType": "نوع معامله (خرید / فروش)",
+    "tradeTypeHelp": "مشخص می‌کند این قیمت در ستون‌های بروزرسانی گروهی و منطق انتشار نهایی چگونه استفاده شود.",
+    "descriptionOptional": "توضیحات (اختیاری)",
+    "loadCurrenciesError": "بارگذاری ارزها انجام نشد",
+    "missingCategoryId": "شناسه دسته‌بندی موجود نیست",
+    "selectBothCurrencies": "لطفاً ارز مبدا و مقصد را انتخاب کنید.",
+    "createSuccess": "نوع قیمت با موفقیت ایجاد شد",
+    "updateSuccess": "نوع قیمت با موفقیت ویرایش شد",
+    "saveError": "ذخیره نوع قیمت انجام نشد",
+    "loadPriceTypeError": "بارگذاری نوع قیمت انجام نشد",
+    "pageTitleCreate": "نوع قیمت جدید",
+    "pageTitleEdit": "ویرایش نوع قیمت"
+  },
+  "userCenter": {
+    "title": "مدیریت ادمین‌ها",
+    "users": "کاربران",
+    "activity": "فعالیت‌ها",
+    "manageUsers": "مدیریت کاربران",
+    "addUser": "افزودن ادمین",
+    "inactive": "غیرفعال",
+    "forceLogout": "خروج اجباری",
+    "noUsers": "کاربری یافت نشد",
+    "allActions": "همه عملیات",
+    "actionType": "نوع عملیات",
+    "user": "کاربر",
+    "details": "جزئیات",
+    "ip": "IP",
+    "noActivity": "فعالیتی ثبت نشده است",
+    "editUser": "ویرایش ادمین",
+    "newPasswordOptional": "رمز عبور جدید (اختیاری)",
+    "leaveBlankToKeepCurrent": "برای حفظ رمز فعلی، خالی بگذارید",
+    "fullName": "نام کامل",
+    "role": "نقش",
+    "active": "فعال",
+    "userUpdated": "کاربر با موفقیت ویرایش شد",
+    "userCreated": "کاربر با موفقیت ایجاد شد",
+    "failedToSave": "ذخیره انجام نشد",
+    "forceLogoutConfirm": "این کاربر از همه دستگاه‌ها خارج شود؟ تمام نشست‌ها نامعتبر می‌شوند.",
+    "userLoggedOutAllDevices": "کاربر از همه دستگاه‌ها خارج شد",
+    "failedToForceLogout": "خروج اجباری انجام نشد",
+    "roles": {
+      "super_admin": "مدیر کل",
+      "management": "مدیریت",
+      "developer": "توسعه‌دهنده",
+      "employee": "کارمند"
+    },
+    "actionTypes": {
+      "login_success": "ورود موفق",
+      "login_failed": "ورود ناموفق",
+      "logout": "خروج",
+      "price_update": "بروزرسانی قیمت",
+      "bulk_price_update": "بروزرسانی گروهی قیمت",
+      "special_price_update": "بروزرسانی قیمت ویژه"
+    }
+  },
+  "templates": {
+    "addTemplate": "افزودن قالب",
+    "openEditor": "ویرایشگر",
+    "templateNumber": "قالب {id}",
+    "unassigned": "بدون دسته",
+    "deleteConfirm": "آیا از حذف این قالب مطمئن هستید؟",
+    "deleteSuccess": "قالب با موفقیت حذف شد.",
+    "createFailed": "ایجاد ناموفق",
+    "nameRequired": "لطفاً نام قالب را وارد کنید.",
+    "categoryRequired": "برای ایجاد قالب، انتخاب دسته‌بندی الزامی است."
+  },
+  "templateMedia": {
+    "formatHint": "JPG، PNG، GIF، WebP — آدرس را در ویجت تصویر کپی کنید یا فایل جدید آپلود کنید.",
+    "uploadImages": "آپلود تصاویر",
+    "uploadSuccess": "آپلود شد: {name}"
+  },
+  "templateRenderer": {
+    "missingToken": "توکن رندر موجود نیست",
+    "loadFailed": "بارگذاری زمینه رندر ناموفق بود"
+  },
+  "prices": {
+    "backToList": "بازگشت به قیمت‌ها",
+    "newPrice": "قیمت جدید",
+    "notesOptional": "یادداشت (اختیاری)",
+    "notesPlaceholder": "یادداشت اختیاری",
+    "columns": {
+      "priceType": "نوع قیمت",
+      "category": "دسته‌بندی",
+      "pair": "جفت ارز",
+      "latestPrice": "آخرین قیمت",
+      "actions": "عملیات"
+    }
+  },
+  "priceHistory": {
+    "columns": {
+      "price": "قیمت",
+      "date": "تاریخ",
+      "notes": "یادداشت"
+    }
+  },
+  "commandPalette": {
+    "navigate": "ناوبری",
+    "select": "انتخاب",
+    "close": "بستن"
   }
 }

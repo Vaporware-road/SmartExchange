@@ -2,7 +2,7 @@
   <div class="w-full min-w-0 overflow-hidden">
     <nav class="mb-6">
       <router-link to="/update" class="text-gray-400 hover:text-gold transition-colors">
-        <i class="fas fa-arrow-left mr-2"></i>{{ $t('priceHub.backToHub') }}
+        <i class="fas fa-arrow-left icon-back me-2"></i>{{ $t('priceHub.backToHub') }}
       </router-link>
     </nav>
     <h1 class="text-2xl font-bold text-gold mb-6">{{ $t('routes.priceHistory') }}</h1>
@@ -16,9 +16,9 @@
         <table class="w-full min-w-[320px]">
         <thead>
           <tr class="border-b border-[var(--border-color)]">
-            <th class="text-left py-4 px-4 text-gold font-semibold">Price</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Date</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Notes</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('priceHistory.columns.price') }}</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('priceHistory.columns.date') }}</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('priceHistory.columns.notes') }}</th>
           </tr>
         </thead>
         <tbody>

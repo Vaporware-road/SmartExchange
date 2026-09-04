@@ -19,11 +19,11 @@
         <table class="w-full text-sm min-w-[400px]">
         <thead>
           <tr class="border-b border-[var(--border-color)]">
-            <th class="text-left py-4 px-4 text-gold font-semibold">Price Type</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Category</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Pair</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Latest Price</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Actions</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('prices.columns.priceType') }}</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('prices.columns.category') }}</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('prices.columns.pair') }}</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('prices.columns.latestPrice') }}</th>
+            <th class="text-start py-4 px-4 text-gold font-semibold">{{ $t('prices.columns.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -71,7 +71,7 @@
           <span class="text-lg font-bold text-[var(--text-primary)]">{{ $t('common.update') }}</span>
           <p class="text-sm text-[var(--text-secondary)]">{{ $t('update.byCategory') }}</p>
         </div>
-        <i class="fas fa-chevron-left text-gold ms-auto"></i>
+        <i class="fas fa-chevron-left icon-back text-gold ms-auto"></i>
       </router-link>
     </div>
   </div>

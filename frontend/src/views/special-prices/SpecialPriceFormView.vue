@@ -5,7 +5,7 @@
         to="/categories"
         class="text-[var(--text-secondary)] hover:text-gold transition-colors inline-flex items-center gap-2"
       >
-        <i class="fas" :class="isRtl ? 'fa-arrow-right' : 'fa-arrow-left'" />
+        <i class="fas fa-arrow-left icon-back me-2" />
         {{ $t('categories.backToList') }}
       </router-link>
     </nav>

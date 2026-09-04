@@ -2,7 +2,7 @@
   <div class="flex flex-col items-center">
     <nav class="mb-6 w-full">
       <router-link to="/finalize" class="text-gray-400 hover:text-gold transition-colors">
-        <i class="fas" :class="isRtl ? 'fa-arrow-right' : 'fa-arrow-left'" />
+        <i class="fas fa-arrow-left icon-back me-2" />
         <span class="ms-2">{{ $t('finalize.backToList') }}</span>
       </router-link>
     </nav>
@@ -114,7 +114,7 @@ import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 import BaseModal from '@/components/ui/BaseModal.vue'
 import { useI18n } from 'vue-i18n'
-import { formatAppDecimal, createAppDateTimeFormat } from '@/utils/localeFormat.js'
+import { formatAppDecimal, createAppDateTimeFormat, resolveFormatLocale } from '@/utils/localeFormat.js'
 
 const { locale } = useI18n()
 const route = useRoute()
@@ -139,7 +139,7 @@ function formatPrice(value) {
   if (value == null || value === '') return '—'
   const num = typeof value === 'string' ? parseFloat(value) : value
   if (Number.isNaN(num)) return String(value)
-  const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+  const appLoc = resolveFormatLocale(locale.value)
   return formatAppDecimal(appLoc, num, 2)
 }
 
@@ -166,7 +166,7 @@ function formatDate(isoString) {
   if (!isoString) return '—'
   try {
     const d = new Date(isoString)
-    const appLoc = locale.value === 'fa' ? 'fa' : 'en'
+    const appLoc = resolveFormatLocale(locale.value)
     return createAppDateTimeFormat(appLoc, { dateStyle: 'short', timeStyle: 'short' }).format(d)
   } catch {
     return isoString

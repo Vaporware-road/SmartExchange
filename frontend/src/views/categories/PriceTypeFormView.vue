@@ -2,10 +2,10 @@
   <div>
     <nav class="mb-6">
       <router-link to="/categories" class="text-gray-400 hover:text-gold transition-colors">
-        <i class="fas fa-arrow-left mr-2"></i>{{ labels.backToCategories }}
+        <i class="fas fa-arrow-left icon-back me-2"></i>{{ $t('priceTypeForm.backToCategories') }}
       </router-link>
     </nav>
-    <h1 class="text-2xl font-bold text-gold mb-6">{{ isEdit ? labels.pageTitleEdit : labels.pageTitleCreate }}</h1>
+    <h1 class="text-2xl font-bold text-gold mb-6">{{ isEdit ? $t('priceTypeForm.pageTitleEdit') : $t('priceTypeForm.pageTitleCreate') }}</h1>
     <form @submit.prevent="handleSubmit" class="card-luxury max-w-md space-y-4">
       <p v-if="formError" class="rounded-lg border border-red-400/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">
         {{ formError }}
@@ -16,12 +16,12 @@
         <p v-if="fieldErrors.name" class="mt-1 text-xs text-red-300">{{ fieldErrors.name }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-400 mb-2">{{ labels.sourceCurrency }}</label>
+        <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('priceTypeForm.sourceCurrency') }}</label>
         <BaseCurrencySelect
           v-model="form.source_currency_id"
           :options="currencies"
           value-key="id"
-          :placeholder="labels.sourceCurrency"
+          :placeholder="$t('priceTypeForm.sourceCurrency')"
           :search-placeholder="$t('common.search')"
           :empty-text="$t('emptyState.noData')"
         />
@@ -30,12 +30,12 @@
         </p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-400 mb-2">{{ labels.targetCurrency }}</label>
+        <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('priceTypeForm.targetCurrency') }}</label>
         <BaseCurrencySelect
           v-model="form.target_currency_id"
           :options="currencies"
           value-key="id"
-          :placeholder="labels.targetCurrency"
+          :placeholder="$t('priceTypeForm.targetCurrency')"
           :search-placeholder="$t('common.search')"
           :empty-text="$t('emptyState.noData')"
         />
@@ -44,9 +44,9 @@
         </p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-400 mb-2">{{ labels.tradeType }}</label>
+        <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('priceTypeForm.tradeType') }}</label>
         <p class="mb-2 text-xs text-[var(--text-secondary)]">
-          {{ labels.tradeTypeHelp }}
+          {{ $t('priceTypeForm.tradeTypeHelp') }}
         </p>
         <div class="grid grid-cols-2 gap-2">
           <button
@@ -57,7 +57,7 @@
               : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'"
             @click="form.trade_type = 'buy'"
           >
-            {{ labels.buy }}
+            {{ $t('priceTypeForm.buy') }}
           </button>
           <button
             type="button"
@@ -67,14 +67,14 @@
               : 'border-[var(--border-color)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]'"
             @click="form.trade_type = 'sell'"
           >
-            {{ labels.sell }}
+            {{ $t('priceTypeForm.sell') }}
           </button>
         </div>
         <input v-model="form.trade_type" type="hidden" required />
         <p v-if="fieldErrors.trade_type" class="mt-1 text-xs text-red-300">{{ fieldErrors.trade_type }}</p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-400 mb-2">{{ labels.descriptionOptional }}</label>
+        <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('priceTypeForm.descriptionOptional') }}</label>
         <input v-model="form.description" type="text" class="input-luxury" />
         <p v-if="fieldErrors.description" class="mt-1 text-xs text-red-300">{{ fieldErrors.description }}</p>
       </div>
@@ -102,7 +102,7 @@ import { useI18n } from 'vue-i18n'
 const route = useRoute()
 const router = useRouter()
 const toast = useToast()
-const { locale, t } = useI18n()
+const { t } = useI18n()
 const currenciesStore = useCurrenciesStore()
 const categoryId = computed(() => route.params.id)
 const priceTypeId = computed(() => route.params.priceTypeId)
@@ -118,48 +118,6 @@ const currencies = ref([])
 const submitting = ref(false)
 const formError = ref('')
 const fieldErrors = ref({})
-const labels = computed(() => {
-  if (locale.value === 'fa') {
-    return {
-      backToCategories: 'بازگشت به دسته‌بندی‌ها',
-      sourceCurrency: 'ارز مبدا',
-      targetCurrency: 'ارز مقصد',
-      tradeType: 'نوع معامله (خرید / فروش)',
-      tradeTypeHelp: 'مشخص می‌کند این قیمت در ستون‌های بروزرسانی گروهی و منطق انتشار نهایی چگونه استفاده شود.',
-      buy: 'خرید',
-      sell: 'فروش',
-      descriptionOptional: 'توضیحات (اختیاری)',
-      loadCurrenciesError: 'بارگذاری ارزها انجام نشد',
-      missingCategoryId: 'شناسه دسته‌بندی موجود نیست',
-      selectBothCurrencies: 'لطفاً ارز مبدا و مقصد را انتخاب کنید.',
-      createSuccess: 'نوع قیمت با موفقیت ایجاد شد',
-      updateSuccess: 'نوع قیمت با موفقیت ویرایش شد',
-      saveError: 'ذخیره نوع قیمت انجام نشد',
-      loadPriceTypeError: 'بارگذاری نوع قیمت انجام نشد',
-      pageTitleCreate: 'نوع قیمت جدید',
-      pageTitleEdit: 'ویرایش نوع قیمت',
-    }
-  }
-  return {
-    backToCategories: 'Back to Categories',
-    sourceCurrency: 'Source Currency',
-    targetCurrency: 'Target Currency',
-    tradeType: 'Trade Type (Buy / Sell)',
-    tradeTypeHelp: 'Choose how this price is used in Bulk Update columns and final publish logic.',
-    buy: 'Buy',
-    sell: 'Sell',
-    descriptionOptional: 'Description (optional)',
-    loadCurrenciesError: 'Could not load currencies',
-    missingCategoryId: 'Missing category id',
-    selectBothCurrencies: 'Please select both source and target currencies.',
-    createSuccess: 'Price type created successfully',
-    updateSuccess: 'Price type updated successfully',
-    saveError: 'Could not save price type',
-    loadPriceTypeError: 'Could not load price type',
-    pageTitleCreate: 'New Price Type',
-    pageTitleEdit: 'Edit Price Type',
-  }
-})
 
 onMounted(async () => {
   try {
@@ -171,7 +129,7 @@ onMounted(async () => {
     }
   } catch (e) {
     currencies.value = []
-    formError.value = getApiErrorDetails(e).message || labels.value.loadCurrenciesError
+    formError.value = getApiErrorDetails(e).message || t('priceTypeForm.loadCurrenciesError')
   }
 
   if (isEdit.value) {
@@ -185,7 +143,7 @@ onMounted(async () => {
         description: data?.description ?? '',
       }
     } catch (e) {
-      const msg = getApiErrorDetails(e).message || labels.value.loadPriceTypeError
+      const msg = getApiErrorDetails(e).message || t('priceTypeForm.loadPriceTypeError')
       formError.value = msg
       toast.error(msg)
     }
@@ -196,11 +154,11 @@ async function handleSubmit() {
   formError.value = ''
   fieldErrors.value = {}
   if (!categoryId.value) {
-    formError.value = labels.value.missingCategoryId
+    formError.value = t('priceTypeForm.missingCategoryId')
     return
   }
   if (!form.value.source_currency_id || !form.value.target_currency_id) {
-    formError.value = labels.value.selectBothCurrencies
+    formError.value = t('priceTypeForm.selectBothCurrencies')
     return
   }
   submitting.value = true
@@ -215,12 +173,12 @@ async function handleSubmit() {
     } else {
       await categoryApi.addPriceType(categoryId.value, payload)
     }
-    toast.success(isEdit.value ? labels.value.updateSuccess : labels.value.createSuccess)
+    toast.success(isEdit.value ? t('priceTypeForm.updateSuccess') : t('priceTypeForm.createSuccess'))
     router.push('/categories')
   } catch (e) {
     const details = getApiErrorDetails(e)
     fieldErrors.value = details.fieldErrors || {}
-    const msg = details.message || labels.value.saveError
+    const msg = details.message || t('priceTypeForm.saveError')
     formError.value = msg
     toast.error(msg)
   } finally {

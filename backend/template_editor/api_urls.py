@@ -52,5 +52,10 @@ urlpatterns = [
         api_views.TemplateCategoryPriceTypesAPIView.as_view(),
         name="api-template-editor-category-price-types",
     ),
+    path(
+        "headless-render/context/",
+        api_views.HeadlessRenderContextAPIView.as_view(),
+        name="api-template-editor-headless-render-context",
+    ),
     path("", include(router.urls)),
 ]

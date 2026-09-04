@@ -44,8 +44,13 @@
                     ]"
                     @click="$emit('close')"
                   >
-                    <i :class="link.icon" class="text-base w-5 text-center" />
-                    <span class="font-medium">{{ $t(link.labelKey) }}</span>
+                    <span class="relative shrink-0 flex items-center justify-center w-5">
+                      <i :class="link.icon" class="text-base w-5 text-center" />
+                    </span>
+                    <span class="font-medium flex items-center gap-2">
+                      {{ $t(link.labelKey) }}
+                      <OrderQueueBadge v-if="link.to === '/orders'" inline />
+                    </span>
                   </router-link>
                 </li>
               </ul>
@@ -63,6 +68,7 @@ import { useRoute } from 'vue-router'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useAuthStore } from '@/stores/auth'
 import AppBrandLogo from '@/components/layout/AppBrandLogo.vue'
+import OrderQueueBadge from '@/components/layout/OrderQueueBadge.vue'
 
 defineProps({
   open: Boolean,
@@ -83,6 +89,7 @@ const allNavLinks = [
   { to: '/finalize', labelKey: 'sidebar.finalize', icon: 'fas fa-check-circle', exact: false, permission: 'finalize', activeColor: 'buy' },
   { to: '/categories', labelKey: 'sidebar.categories', icon: 'fas fa-tags', exact: false, activeColor: 'gold' },
   { to: '/analysis', labelKey: 'sidebar.analysis', icon: 'fas fa-chart-line', exact: false, permission: 'analysis', activeColor: 'info' },
+  { to: '/orders', labelKey: 'sidebar.orders', icon: 'fas fa-shopping-cart', exact: false, permission: 'orders', activeColor: 'buy' },
   { to: '/telegram/send', labelKey: 'sidebar.telegram', icon: 'fab fa-telegram', exact: false, activeColor: 'info' },
   { to: '/instagram', labelKey: 'sidebar.instagramHub', icon: 'fab fa-instagram', exact: false, activeColor: 'gold' },
   { to: '/templates', labelKey: 'sidebar.templates', icon: 'fas fa-file-image', exact: false, activeColor: 'template' },

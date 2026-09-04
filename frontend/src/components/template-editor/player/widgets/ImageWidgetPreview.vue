@@ -11,7 +11,7 @@
       :style="imgStyle"
       draggable="false"
     />
-    <span v-else class="text-xs text-[var(--text-secondary)]">Image URL</span>
+    <span v-else class="text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.inspector.imageUrl') }}</span>
   </div>
 </template>
 

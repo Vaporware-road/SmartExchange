@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'analysis',
     'landing',
     'instagram_hub',
+    'bot_gateway',
+    'orders',
     # third-party apps
     'corsheaders',
     'rest_framework',
@@ -75,8 +77,47 @@ REST_FRAMEWORK = {
         'finalize': '60/hour',
         'settings': '200/hour',
         'public_prices': '2000/hour',
+        'bot_gateway': '3000/hour',
     },
 }
+
+# Redis cache (bot gateway live rates, dedup, rate limits)
+_redis_cache_url = os.environ.get("REDIS_CACHE_URL", "")
+if not _redis_cache_url:
+    _celery_broker = os.environ.get("CELERY_BROKER_URL", "redis://localhost:6379/0")
+    if _celery_broker.rstrip("/").split("/")[-1].isdigit():
+        _redis_cache_url = _celery_broker.rsplit("/", 1)[0] + "/2"
+    else:
+        _redis_cache_url = "redis://localhost:6379/2"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": _redis_cache_url,
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}
+
+# Bot Gateway
+BOT_GATEWAY_RATES_CACHE_TTL = int(os.environ.get("BOT_GATEWAY_RATES_CACHE_TTL", "15"))
+BOT_GATEWAY_FRONTEND_URL = os.environ.get(
+    "BOT_GATEWAY_FRONTEND_URL", "http://localhost:3000"
+).rstrip("/")
+BOT_CUSTOMER_JWT_LIFETIME_MINUTES = int(
+    os.environ.get("BOT_CUSTOMER_JWT_LIFETIME_MINUTES", "60")
+)
+BOT_GATEWAY_RATE_LIMIT = int(os.environ.get("BOT_GATEWAY_RATE_LIMIT", "20"))
+BOT_GATEWAY_RATE_WINDOW = int(os.environ.get("BOT_GATEWAY_RATE_WINDOW", "60"))
+
+# Headless Playwright template screenshots (Vue render route)
+PLAYWRIGHT_FRONTEND_BASE_URL = os.environ.get(
+    "PLAYWRIGHT_FRONTEND_BASE_URL", "http://127.0.0.1:5250"
+).rstrip("/")
+PLAYWRIGHT_SCREENSHOT_TIMEOUT_MS = int(os.environ.get("PLAYWRIGHT_SCREENSHOT_TIMEOUT_MS", "30000"))
+PLAYWRIGHT_MAX_CONCURRENT = int(os.environ.get("PLAYWRIGHT_MAX_CONCURRENT", "2"))
+SCREENSHOT_CACHE_TTL = int(os.environ.get("SCREENSHOT_CACHE_TTL", "300"))
 
 # Finalize: when True, do not persist finalization if Telegram publish fails (rollback semantics).
 # When False, persist with message_sent=False on Telegram failure.
@@ -352,3 +393,14 @@ CELERY_TASK_TIME_LIMIT = int(os.environ.get("CELERY_TASK_TIME_LIMIT", "120"))
 CELERY_TASK_SOFT_TIME_LIMIT = int(os.environ.get("CELERY_TASK_SOFT_TIME_LIMIT", "90"))
 CELERY_RESULT_EXPIRES = int(os.environ.get("CELERY_RESULT_EXPIRES", "3600"))
 FINALIZE_TASK_WAIT_TIMEOUT = int(os.environ.get("FINALIZE_TASK_WAIT_TIMEOUT", "75"))
+
+CELERY_BEAT_SCHEDULE = {
+    "bot-gateway-refresh-rates-cache": {
+        "task": "bot_gateway.refresh_live_rates_cache",
+        "schedule": 30.0,
+    },
+    "instagram-hub-refresh-token": {
+        "task": "instagram_hub.refresh_token_if_needed",
+        "schedule": 86400.0,
+    },
+}

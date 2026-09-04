@@ -1,6 +1,6 @@
 <template>
   <div class="min-h-screen relative" style="background: var(--bg-base);">
-    <div class="absolute top-4 right-4">
+    <div class="absolute top-4 end-4">
         <ThemeToggle />
       </div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -12,7 +12,7 @@
         <p class="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">{{ tagline }}</p>
         <router-link to="/login" class="btn-luxury inline-flex">
           <i class="fas fa-sign-in-alt"></i>
-          <span>Access Panel</span>
+          <span>{{ $t('landing.accessPanel') }}</span>
         </router-link>
       </div>
     </div>
