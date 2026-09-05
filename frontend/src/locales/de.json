@@ -752,7 +752,7 @@
       "channelName": "Kanalname",
       "channelNamePlaceholder": "z.B. Offizielle Kurse",
       "channelId": "Kanal-ID",
-      "channelIdPlaceholder": "z.B. @username oder -1001234567890",
+      "channelIdPlaceholder": "z.B. {'@'}username oder -1001234567890",
       "bot": "Bot",
       "selectBot": "Bot auswählen",
       "active": "Aktiv",

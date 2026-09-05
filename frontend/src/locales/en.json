@@ -129,7 +129,7 @@
     "loggingIn": "Logging in...",
     "signingIn": "Signing in…",
     "email": "Email address",
-    "emailPlaceholder": "you@yourexchange.com",
+    "emailPlaceholder": "you{'@'}yourexchange.com",
     "firstName": "First name",
     "lastName": "Last name",
     "exchangeName": "Exchange name",
@@ -154,7 +154,7 @@
       "sendFailed": "We could not send the email. Try again in a moment."
     },
     "identifier": "Email or username",
-    "identifierPlaceholder": "you@yourexchange.com",
+    "identifierPlaceholder": "you{'@'}yourexchange.com",
     "or": "or",
     "googleUnavailable": "Google sign-in could not load. Use your email and password.",
     "noAccount": "No account yet?",
@@ -1285,7 +1285,7 @@
     },
     "plan": "Plan",
     "saving": "Creating…",
-    "telegramIdHint": "Numeric Telegram ID or @username",
+    "telegramIdHint": "Numeric Telegram ID or {'@'}username",
     "website": "Website",
     "websiteHint": "Optional",
     "subRole": "Delegated Role",
@@ -1354,7 +1354,7 @@
       "services": "Services",
       "package": "Package",
       "contact": "Contact us",
-      "cta": "Get a demo",
+      "cta": "Start free trial",
       "menu": "Menu",
       "language": "Language",
       "tutorials": "Tutorials"
@@ -1692,7 +1692,107 @@
       "readMore": "Read the walkthrough",
       "backToIndex": "All tutorials",
       "steps": "Steps",
-      "notFound": "That tutorial does not exist."
+      "notFound": "That tutorial does not exist.",
+      "minutes": "{count} min read",
+      "more": "More walkthroughs",
+      "posts": {
+        "publish-prices": {
+          "title": "Update your rates and publish them everywhere",
+          "summary": "The morning routine: type the new buy and sell rates, finalize them, and let the panel push the change to every channel you run.",
+          "intro": "This is the one flow every exchange office runs several times a day. Nothing here needs a designer or a developer — you type numbers, confirm them, and the panel takes care of the website, the Telegram channel, the Instagram post and the rate widget.",
+          "steps": {
+            "open": {
+              "title": "Open the price hub",
+              "body": "Every currency you sell sits under a category. Pick the category you are repricing and the panel shows the current buy and sell rate side by side with the last change."
+            },
+            "enter": {
+              "title": "Enter the new rates",
+              "body": "Type a base rate and let the margins do the rest, or enter buy and sell explicitly. The panel keeps the previous value visible so you can see exactly how far you moved."
+            },
+            "finalize": {
+              "title": "Finalize the change",
+              "body": "Nothing reaches your customers until you finalize. That single confirmation is what separates a typo from a published rate, and it is recorded with your name and the time."
+            },
+            "publish": {
+              "title": "Watch it go out",
+              "body": "The moment the change is final, the website page, the Telegram message, the rendered rate image and the widget all update. No second tool, no copy and paste."
+            }
+          },
+          "outro": "That is the whole loop. Start your free trial and run it against your own currencies today."
+        },
+        "template-editor": {
+          "title": "Design a rate image on your own template",
+          "summary": "Drag a widget onto the canvas, bind it to a live price, and preview the image your customers will see.",
+          "intro": "The images you post to Telegram and Instagram are generated from a template you design once. The editor is a canvas: you place widgets, point them at a price, and every future publish renders with the current numbers automatically.",
+          "steps": {
+            "open": {
+              "title": "Start from your background",
+              "body": "Upload your own artwork, or start from one of the packaged templates and swap the colours and fonts for your brand."
+            },
+            "drag": {
+              "title": "Drag a widget onto the canvas",
+              "body": "Rate rows, headings, logos, dates and free text are all widgets. Drop one where you want it and nudge it into place; layers keep the stacking order predictable."
+            },
+            "bind": {
+              "title": "Bind it to a live price",
+              "body": "A rate widget is bound to a price type, not to a number. When the rate changes, the widget changes — you never edit the image again."
+            },
+            "preview": {
+              "title": "Preview with real numbers",
+              "body": "The preview renders the template exactly as the publisher will, using today’s rates, so what you approve is what your channel receives."
+            }
+          },
+          "outro": "One template, every publish. Try the editor on your own branding during the trial."
+        },
+        "telegram-bot": {
+          "title": "Connect your Telegram channel and bot",
+          "summary": "Paste a bot token, add the channel, choose what gets posted, and send a test message before anything goes live.",
+          "intro": "Telegram is where most exchange customers actually read your rates. The panel talks to your own bot, in your own channel, so the audience and the branding stay yours.",
+          "steps": {
+            "token": {
+              "title": "Add your bot token",
+              "body": "Create a bot with {'@'}BotFather and paste the token into the panel. The token is stored encrypted and is never shown again in full."
+            },
+            "channel": {
+              "title": "Add the channel",
+              "body": "Make the bot an administrator of your channel, then register the channel here. The panel verifies the permission before it saves anything."
+            },
+            "settings": {
+              "title": "Choose what gets posted",
+              "body": "Text message, rendered image, or both; pinned or not; on every change or on a schedule. The default message template is editable per channel."
+            },
+            "test": {
+              "title": "Send a test message",
+              "body": "Fire one message at the channel before you go live. If the bot is missing a permission you find out here, not in front of your customers."
+            }
+          },
+          "outro": "Your channel, your bot, your rates — connected in a few minutes."
+        },
+        "signup-tour": {
+          "title": "Sign up and find your way around",
+          "summary": "Email and password or a Google account, a one-time code to confirm it is you, then a guided tour of the panel.",
+          "intro": "There is no shared demo account and no sales call in the way. You sign up, confirm your address, and land in a panel of your own with fourteen days of the complete product.",
+          "steps": {
+            "signup": {
+              "title": "Create your account",
+              "body": "Enter your exchange name, an email address and a password — or sign up with Google and skip the password entirely."
+            },
+            "code": {
+              "title": "Confirm with a one-time code",
+              "body": "A six-digit code arrives by email, or by SMS if that is the only contact you gave us. It is valid for ten minutes and dies after five wrong attempts."
+            },
+            "tour": {
+              "title": "Take the tour",
+              "body": "The first time you sign in, a short guided tour walks you through prices, templates, channels and settings. You can replay it any time from the user menu."
+            },
+            "trial": {
+              "title": "Use the whole product for 14 days",
+              "body": "Nothing is locked and nothing is shared: your rates, templates and channels are yours alone. If you get stuck, the support contacts are one click away in the panel."
+            }
+          },
+          "outro": "Fourteen days, the complete panel, no card required."
+        }
+      }
     }
   },
   "orders": {
@@ -1866,7 +1966,7 @@
     "channelKind": "Kind",
     "channelLabel": "Label",
     "channelValue": "Value",
-    "channelValueHint": "Phone number, @handle, email address or URL.",
+    "channelValueHint": "Phone number, {'@'}handle, email address or URL.",
     "channelOrder": "Order",
     "preview": "What customers see",
     "previewEmpty": "Nothing is active, so no contact is shown anywhere."

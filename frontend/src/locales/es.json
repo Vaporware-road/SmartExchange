@@ -752,7 +752,7 @@
       "channelName": "Nombre del canal",
       "channelNamePlaceholder": "ej. Cotizaciones oficiales",
       "channelId": "ID del canal",
-      "channelIdPlaceholder": "ej. @usuario o -1001234567890",
+      "channelIdPlaceholder": "ej. {'@'}usuario o -1001234567890",
       "bot": "Bot",
       "selectBot": "Seleccionar bot",
       "active": "Activo",

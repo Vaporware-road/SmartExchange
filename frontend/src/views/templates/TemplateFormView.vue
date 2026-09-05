@@ -65,7 +65,9 @@ onMounted(async () => {
   }
   try {
     const { data } = await categoryApi.list()
-    categories.value = Array.isArray(data) ? data : []
+    // The endpoint is paginated: without unwrapping `results` the select renders
+    // empty and a template can never be created.
+    categories.value = Array.isArray(data) ? data : (data?.results ?? [])
   } catch {
     categories.value = []
   }

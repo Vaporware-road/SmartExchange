@@ -13,6 +13,10 @@ design system, one component set and one set of translations.
 | Prices, phone, links | `frontend/src/config/landing.js` |
 | Copy (7 languages) | `landing.*` in `frontend/src/locales/*.json` |
 | Crawler metadata | `landing/templates/landing/seo_head.html` |
+| Tutorial hub | `frontend/src/views/landing/TutorialsView.vue`, `TutorialDetailView.vue` |
+| Tutorial content | `frontend/src/content/tutorials/index.js` + `landing.tutorials.*` in the locales |
+| Tutorial metadata (crawlers) | `landing/tutorials.py` + `landing/templates/landing/tutorial_seo_head.html` |
+| Tutorial GIFs | `static/landing/gifs/`, recorded by `scripts/record_gifs.py` |
 | Video / logo | `static/landing/Demo.mp4`, `static/landing/images/` |
 
 ## How `/` is served
@@ -20,6 +24,14 @@ design system, one component set and one set of translations.
 `landing.views.landing_page` reads the built SPA shell — the same file `SPAView`
 serves — strips its generic `<title>`, injects `seo_head.html` into `<head>`, and
 returns it. The Vue router then renders `LandingView` for `/`.
+
+`/tutorials` and `/tutorials/<slug>` work the same way through
+`tutorial_index` / `tutorial_detail`, which build their `<head>` from
+`landing/tutorials.py` — a post's title and description are duplicated there
+because a crawler reads them before the bundle runs. **Keep `landing/tutorials.py`
+in step with `frontend/src/content/tutorials/index.js` and the `landing.tutorials`
+copy.** An unknown slug falls back to the index rather than 404ing, because the
+SPA owns the "no such tutorial" message.
 
 Only the crawler-facing metadata is server-rendered: title, description, OG and
 Twitter cards, and the `SoftwareApplication` / `Organization` / `FAQPage`

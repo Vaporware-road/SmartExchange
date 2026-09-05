@@ -16,8 +16,11 @@ Usage:
 """
 from decimal import Decimal
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
+
+from accounts.models import Account, CustomUser
+from accounts.scoping import act_as_account
 
 from category.models import Category, Currency, PriceType
 from change_price.models import PriceHistory
@@ -284,9 +287,49 @@ class Command(BaseCommand):
             action="store_true",
             help="Seed only when no categories exist yet, so container start-up can run this every boot.",
         )
+        parser.add_argument(
+            "--account",
+            help=(
+                "Username or account slug to seed into. Every seeded row belongs to one "
+                "desk, so without this there is nobody to own the fixtures."
+            ),
+        )
 
     @transaction.atomic
     def handle(self, *args, **options):
+        account = self._resolve_account(options.get("account"))
+        with act_as_account(account):
+            self._seed(**options)
+
+    def _resolve_account(self, identifier):
+        """The desk these fixtures belong to.
+
+        Rows are owned per account now, so seeding needs a target. Given no
+        `--account`, fall back to the oldest desk on the install, which on a
+        dev box is the default admin's.
+        """
+        if identifier:
+            user = CustomUser.objects.filter(username=identifier).first()
+            if user is not None and user.account_id:
+                return user.account_id
+            account = Account.objects.filter(slug=identifier).first()
+            if account is None:
+                raise CommandError(f"No user or account matches {identifier!r}.")
+            return account.pk
+
+        user = (
+            CustomUser.objects.filter(account__isnull=False)
+            .order_by("date_joined")
+            .first()
+        )
+        if user is None:
+            raise CommandError(
+                "No account exists yet. Sign up a customer first, or pass --account."
+            )
+        self.stdout.write(self.style.NOTICE(f"Seeding into {user.username}'s desk."))
+        return user.account_id
+
+    def _seed(self, **options):
         if options.get("if_empty") and Category.objects.exists():
             self.stdout.write(
                 self.style.NOTICE("Panel already has categories; --if-empty made this a no-op.")

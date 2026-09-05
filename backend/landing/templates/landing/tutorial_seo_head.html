@@ -1,0 +1,24 @@
+<title>{{ page_title }}</title>
+<meta name="description" content="{{ page_description }}">
+<meta name="robots" content="index, follow">
+<meta name="author" content="MrExchange">
+<link rel="canonical" href="{{ page_url }}">
+
+<meta property="og:type" content="{% if post %}article{% else %}website{% endif %}">
+<meta property="og:locale" content="en_GB">
+<meta property="og:site_name" content="MrExchange">
+<meta property="og:url" content="{{ page_url }}">
+<meta property="og:title" content="{{ page_title }}">
+<meta property="og:description" content="{{ page_description }}">
+<meta property="og:image" content="{{ page_image }}">
+<meta property="og:image:alt" content="{{ page_title }}">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="{{ page_url }}">
+<meta name="twitter:title" content="{{ page_title }}">
+<meta name="twitter:description" content="{{ page_description }}">
+<meta name="twitter:image" content="{{ page_image }}">
+
+<script type="application/ld+json">
+{{ structured_data|safe }}
+</script>

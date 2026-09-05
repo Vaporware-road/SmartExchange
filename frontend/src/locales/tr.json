@@ -752,7 +752,7 @@
       "channelName": "Kanal adı",
       "channelNamePlaceholder": "örn. Resmi Kurlar",
       "channelId": "Kanal Kimliği",
-      "channelIdPlaceholder": "örn. @kullaniciadi veya -1001234567890",
+      "channelIdPlaceholder": "örn. {'@'}kullaniciadi veya -1001234567890",
       "bot": "Bot",
       "selectBot": "Bot seçin",
       "active": "Aktif",

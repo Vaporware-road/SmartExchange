@@ -752,7 +752,7 @@
       "channelName": "اسم القناة",
       "channelNamePlaceholder": "مثال: الأسعار الرسمية",
       "channelId": "معرف القناة",
-      "channelIdPlaceholder": "مثال: @username أو -1001234567890",
+      "channelIdPlaceholder": "مثال: {'@'}username أو -1001234567890",
       "bot": "البوت",
       "selectBot": "اختر بوت",
       "active": "نشط",

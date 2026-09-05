@@ -84,7 +84,7 @@ const { t } = useI18n()
 const route = useRoute()
 
 /**
- * Four destinations, deliberately. The old nav carried seven links plus a phone
+ * Five destinations, deliberately. The old nav carried seven links plus a phone
  * number and a language button, which is what made it read as clutter; the
  * phone moved to the contact page and the mobile drawer.
  *
@@ -96,6 +96,7 @@ const LINKS = [
   { to: { name: 'landing', hash: '#product' }, labelKey: 'landing.nav.product' },
   { to: { name: 'landing', hash: '#services' }, labelKey: 'landing.nav.services' },
   { to: { name: 'landing', hash: '#package' }, labelKey: 'landing.nav.package' },
+  { to: { name: 'tutorials' }, labelKey: 'landing.nav.tutorials' },
   { to: { name: 'contact' }, labelKey: 'landing.nav.contact' },
 ]
 

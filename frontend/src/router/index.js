@@ -21,6 +21,20 @@ const routes = [
     meta: { public: true },
   },
   {
+    // The "show me before I sign up" path that replaced the shared demo. Both
+    // routes are server-rendered for their <head>, so crawlers see real titles.
+    path: '/tutorials',
+    name: 'tutorials',
+    component: () => import('@/views/landing/TutorialsView.vue'),
+    meta: { public: true, titleKey: 'landing.tutorials.title' },
+  },
+  {
+    path: '/tutorials/:slug',
+    name: 'tutorial',
+    component: () => import('@/views/landing/TutorialDetailView.vue'),
+    meta: { public: true, titleKey: 'landing.tutorials.title' },
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('@/views/auth/LoginView.vue'),
