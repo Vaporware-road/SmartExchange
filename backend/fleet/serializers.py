@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from accounts.plans import PLAN_CHOICES
 
-from .models import CustomerDeployment
+from .models import CustomerDeployment, Sale
 from .services import days_remaining, trial_grace_ends_at
 
 
@@ -111,3 +111,94 @@ class CheckinSerializer(serializers.Serializer):
                 {"non_field_errors": f"Unsupported fields: {', '.join(sorted(extra))}"}
             )
         return attrs
+
+
+class SaleSerializer(serializers.ModelSerializer):
+    customer_display = serializers.SerializerMethodField()
+    account_name = serializers.CharField(source="account.name", read_only=True, default="")
+    recorded_by_display = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Sale
+        fields = (
+            "id",
+            "customer",
+            "customer_display",
+            "customer_email",
+            "account",
+            "account_name",
+            "amount",
+            "currency",
+            "sale_plan",
+            "sold_at",
+            "reference",
+            "note",
+            "recorded_by",
+            "recorded_by_display",
+            "created_at",
+        )
+        read_only_fields = (
+            "id",
+            "customer_display",
+            "account",
+            "account_name",
+            "recorded_by",
+            "recorded_by_display",
+            "created_at",
+        )
+
+    def get_customer_display(self, sale):
+        if sale.customer is None:
+            return sale.customer_email
+        return sale.customer.get_full_name() or sale.customer.username
+
+    def get_recorded_by_display(self, sale):
+        if sale.recorded_by is None:
+            return ""
+        return sale.recorded_by.get_full_name() or sale.recorded_by.username
+
+    def validate_customer(self, value):
+        if value is None:
+            raise serializers.ValidationError("Pick the customer this sale belongs to.")
+        return value
+
+    def create(self, validated_data):
+        customer = validated_data["customer"]
+        validated_data.setdefault("customer_email", customer.email or "")
+        validated_data["account"] = customer.account
+        validated_data["recorded_by"] = self.context["request"].user
+        return super().create(validated_data)
+
+
+class AccountOverviewSerializer(serializers.Serializer):
+    """One signed-up desk as the owner console lists it."""
+
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    slug = serializers.CharField(read_only=True)
+    created_at = serializers.DateTimeField(read_only=True)
+    is_paid = serializers.BooleanField(read_only=True)
+    owner = serializers.SerializerMethodField()
+    user_count = serializers.IntegerField(read_only=True)
+    sales_total = serializers.SerializerMethodField()
+
+    def get_owner(self, account):
+        owner = getattr(account, "owner_user", None)
+        if owner is None:
+            return None
+        return {
+            "id": owner.id,
+            "username": owner.username,
+            "email": owner.email,
+            "full_name": owner.get_full_name(),
+            "is_active": owner.is_active,
+            "role": owner.role,
+            "email_verified_at": owner.email_verified_at,
+            "last_login": owner.last_login,
+            "trial_started_at": owner.trial_started_at,
+            "trial_expires_at": owner.trial_expires_at,
+            "days_remaining": days_remaining(owner),
+        }
+
+    def get_sales_total(self, account):
+        return str(getattr(account, "sales_total", None) or 0)

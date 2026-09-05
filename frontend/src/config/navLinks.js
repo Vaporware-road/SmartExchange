@@ -21,6 +21,7 @@ export const developerNavLinks = [
   { to: '/programmer/register', labelKey: 'sidebar.registerUser', icon: 'fas fa-user-plus', exact: true, permission: 'programmerHub', activeColor: 'gold' },
   { to: '/programmer/templates', labelKey: 'sidebar.plans', icon: 'fas fa-medal', exact: false, permission: 'programmerHub', activeColor: 'gold' },
   { to: '/programmer/fleet', labelKey: 'sidebar.fleet', icon: 'fas fa-server', exact: false, permission: 'programmerHub', activeColor: 'gold' },
+  { to: '/programmer/console', labelKey: 'sidebar.ownerConsole', icon: 'fas fa-shield-halved', exact: false, permission: 'programmerHub', activeColor: 'gold' },
   { to: '/analysis', labelKey: 'sidebar.analysis', icon: 'fas fa-chart-line', exact: false, permission: 'analysis', activeColor: 'info' },
   { to: '/telegram/send', labelKey: 'sidebar.telegram', icon: 'fab fa-telegram', exact: false, activeColor: 'info' },
   { to: '/orders', labelKey: 'sidebar.orders', icon: 'fas fa-inbox', exact: false, permission: 'orders', activeColor: 'buy' },

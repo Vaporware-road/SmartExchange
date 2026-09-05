@@ -18,12 +18,13 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
-from accounts.permissions import IsSuperAdmin, IsSuperAdminOrManagement
+from accounts.permissions import IsProgrammer, IsSuperAdmin, IsSuperAdminOrManagement
 from telegram_app.models import TelegramBot, TelegramChannel
 
-from .models import SiteSettings, Log
+from .models import SiteSettings, Log, SupportChannel
 from .serializers import (
     SiteSettingsSerializer,
+    SupportChannelSerializer,
     TelegramBotSerializer,
     TelegramChannelSerializer,
     LogSerializer,
@@ -77,6 +78,9 @@ def _public_site_settings_fallback():
         "ui_font_filename_ltr": "",
         "prices_webhook_url": "",
         "telegram_webhook_base_url": "",
+        "support_channels": [],
+        "google_client_id": "",
+        "signup_enabled": True,
     }
 
 
@@ -122,6 +126,23 @@ class SiteSettingsAPIView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+
+class SupportChannelViewSet(ModelViewSet):
+    """CRUD for the contacts every "need help?" surface renders.
+
+    Owner-only: these are the program owner's own numbers and handles, shared
+    by every desk on the install, not per-customer settings.
+    """
+
+    permission_classes = [IsAuthenticated, IsProgrammer]
+    throttle_scope = "settings"
+    throttle_classes = [ScopedRateThrottle]
+    serializer_class = SupportChannelSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        return SupportChannel.objects.all()
 
 
 class TelegramBotViewSet(ModelViewSet):

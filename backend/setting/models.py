@@ -199,6 +199,13 @@ class SiteSettings(AccountScopedModel):
         else:
             account_id = getattr(account, "pk", account)
 
+        if account_id is None:
+            # No desk in context — the owner console, a management command, a
+            # public page on an install with several customers. There is no row
+            # to own these settings, so hand back an unsaved default rather than
+            # inventing an account-less one that every scoped query would hide.
+            return cls()
+
         # Do not cache ORM instances: pickled/stale cache entries break after schema
         # changes (e.g. new fields) and can cause 500s on endpoints that read flags
         # like auto_post_on_update. Fresh DB read is cheap for a single row.

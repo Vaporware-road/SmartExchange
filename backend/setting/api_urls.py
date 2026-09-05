@@ -4,6 +4,7 @@ from rest_framework.routers import DefaultRouter
 from . import api_views
 
 router = DefaultRouter()
+router.register(r"support-channels", api_views.SupportChannelViewSet, basename="api-support-channel")
 router.register(r"bots", api_views.TelegramBotViewSet, basename="api-setting-bot")
 router.register(r"channels", api_views.TelegramChannelViewSet, basename="api-setting-channel")
 

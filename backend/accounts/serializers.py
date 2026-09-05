@@ -452,15 +452,27 @@ class ProgrammerUserUpdateSerializer(serializers.ModelSerializer):
 
 class UserActivityLogSerializer(serializers.ModelSerializer):
     user_display = serializers.SerializerMethodField()
+    email = serializers.SerializerMethodField()
+    account = serializers.SerializerMethodField()
 
     class Meta:
         model = UserActivityLog
-        fields = ["id", "user", "user_display", "action_type", "ip_address", "user_agent", "details", "created_at"]
+        fields = [
+            "id", "user", "user_display", "email", "account", "action_type",
+            "ip_address", "user_agent", "details", "created_at",
+        ]
 
     def get_user_display(self, obj):
         if obj.user:
             return obj.user.get_full_name() or obj.user.username
         return None
+
+    def get_email(self, obj):
+        return getattr(obj.user, "email", "") or ""
+
+    def get_account(self, obj):
+        account = getattr(obj.user, "account", None)
+        return account.name if account else ""
 
 
 class TokenRefreshWithVersionSerializer(TokenRefreshSerializer):

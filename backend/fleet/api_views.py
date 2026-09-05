@@ -17,25 +17,36 @@ from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import (
+    ListAPIView,
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+)
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.throttling import AnonRateThrottle
 from rest_framework.views import APIView
 
-from accounts.models import CustomUser
+from accounts.models import Account, CustomUser
 from accounts.permissions import IsProgrammer
 
 from .licensing import normalize_license_key
-from .models import CustomerDeployment
+from .models import CustomerDeployment, Sale
 from .serializers import (
+    AccountOverviewSerializer,
     CheckinSerializer,
     ConvertTrialSerializer,
     CustomerDeploymentSerializer,
     ExtendTrialSerializer,
+    SaleSerializer,
     TrialCustomerSerializer,
 )
-from .services import convert_to_licensed, ensure_trial_deployment, extend_trial
+from .services import (
+    convert_to_licensed,
+    ensure_trial_deployment,
+    extend_trial,
+    mark_account_paid,
+)
 from .tasks import archive_trial_stack_task, provision_trial_task
 
 logger = logging.getLogger(__name__)
@@ -195,6 +206,102 @@ class LicenseReissueAPIView(APIView):
         deployment.issue_license(renews_at=renews_at)
         deployment.save(update_fields=["license_key", "renews_at"])
         return Response(CustomerDeploymentSerializer(deployment).data)
+
+
+class AccountOverviewListAPIView(ListAPIView):
+    """Every signed-up desk, newest first, with its owner and trial state.
+
+    Runs unscoped by construction: the owner console's role already resolves to
+    ``UNSCOPED``, so the plain managers here see every customer.
+    """
+
+    permission_classes = [IsProgrammer]
+    serializer_class = AccountOverviewSerializer
+
+    def get_queryset(self):
+        from django.db.models import Count, Sum
+
+        return (
+            Account.objects.annotate(
+                user_count=Count("users", distinct=True),
+                sales_total=Sum("sales__amount"),
+            )
+            .prefetch_related("users")
+            .order_by("-created_at")
+        )
+
+    def list(self, request, *args, **kwargs):
+        accounts = list(self.filter_queryset(self.get_queryset()))
+        _attach_account_owners(accounts)
+        page = self.paginate_queryset(accounts)
+        rows = page if page is not None else accounts
+        data = self.get_serializer(rows, many=True).data
+        return self.get_paginated_response(data) if page is not None else Response(data)
+
+
+def _attach_account_owners(accounts):
+    """The desk's own operator: the account's oldest management user."""
+    owners = {}
+    for user in CustomUser.objects.filter(
+        account__in=accounts, role=CustomUser.ROLE_MANAGEMENT
+    ).order_by("account_id", "date_joined"):
+        owners.setdefault(user.account_id, user)
+    for account in accounts:
+        account.owner_user = owners.get(account.pk)
+    return accounts
+
+
+class AccountSuspendAPIView(APIView):
+    """POST: deactivate or reactivate a desk's owner, locking every session."""
+
+    permission_classes = [IsProgrammer]
+
+    def post(self, request, pk):
+        active = bool(request.data.get("is_active", False))
+        users = CustomUser.objects.filter(account_id=pk)
+        if not users.exists():
+            return Response(
+                {"detail": "Account not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+        for user in users:
+            user.is_active = active
+            # Bumping the version invalidates tokens already issued, so a
+            # suspension takes effect now rather than at the next expiry.
+            user.token_version = (user.token_version or 0) + 1
+            user.save(update_fields=["is_active", "token_version"])
+        return Response({"account": pk, "is_active": active, "users": users.count()})
+
+
+class SaleListCreateAPIView(ListCreateAPIView):
+    """GET: every recorded sale. POST: record one, which lifts the trial wall."""
+
+    permission_classes = [IsProgrammer]
+    serializer_class = SaleSerializer
+
+    def get_queryset(self):
+        qs = Sale.objects.select_related("customer", "account", "recorded_by")
+        customer = self.request.query_params.get("customer")
+        if customer:
+            qs = qs.filter(customer_id=customer)
+        return qs
+
+    def perform_create(self, serializer):
+        sale = serializer.save()
+        # The sale is the record; lifting the wall is the effect. A customer
+        # moving to their own server goes through convert_to_licensed instead,
+        # because that needs a domain this form deliberately does not collect.
+        if sale.customer is not None:
+            deployment = mark_account_paid(
+                sale.customer,
+                notes=f"Paid: {sale.amount} {sale.currency} ({sale.get_sale_plan_display()})",
+            )
+            serializer.instance.license_key = deployment.license_key
+
+
+class SaleDetailAPIView(RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsProgrammer]
+    serializer_class = SaleSerializer
+    queryset = Sale.objects.select_related("customer", "account", "recorded_by")
 
 
 class FleetCheckinThrottle(AnonRateThrottle):

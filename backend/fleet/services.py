@@ -72,6 +72,45 @@ def ensure_trial_deployment(user):
 
 
 @transaction.atomic
+def mark_account_paid(user, *, plan=None, notes=""):
+    """Lift the trial wall for a customer who stays on our shared panel.
+
+    :func:`convert_to_licensed` is the other half of "they paid", but it is
+    built for the handoff to the customer's own server and demands a domain.
+    Most sales are not that: the customer keeps using this panel, so all that
+    has to change is the trial clock and a licence key to identify them.
+
+    Returns the deployment record carrying the key.
+    """
+    deployment, _ = ensure_trial_deployment(user)
+    deployment.deployment_type = CustomerDeployment.TYPE_TRIAL
+    deployment.plan = normalize_plan(plan or getattr(user, "plan", None))
+    deployment.status = CustomerDeployment.STATUS_ACTIVE
+    if notes:
+        deployment.notes = notes
+    if not deployment.license_key:
+        deployment.issue_license()
+    deployment.renews_at = None
+    deployment.save()
+
+    # These two fields are the whole of TrialAccessMiddleware's input; clearing
+    # them is what turns the read-only panel back into a working one.
+    user.trial_expires_at = None
+    user.trial_expiry_notified_at = None
+    user.is_active = True
+    user.save(
+        update_fields=["trial_expires_at", "trial_expiry_notified_at", "is_active"]
+    )
+
+    account = getattr(user, "account", None)
+    if account is not None and not account.is_paid:
+        account.is_paid = True
+        account.save(update_fields=["is_paid"])
+
+    return deployment
+
+
+@transaction.atomic
 def convert_to_licensed(
     trial_deployment,
     *,

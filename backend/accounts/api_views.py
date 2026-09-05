@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.http import JsonResponse
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -652,13 +653,31 @@ class ForceLogoutAPIView(APIView):
 
 
 class ActivityLogListAPIView(ListAPIView):
-    """GET: list user activity logs with filters. Super Admin only."""
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    """GET: every login and action, with the IP it came from. Owner console.
+
+    ``IsProgrammer`` rather than ``IsSuperAdmin``: this is the program owner's
+    audit trail across every customer, so it sits with the rest of
+    ``/programmer`` and a developer account can read it.
+    """
+
+    permission_classes = [IsAuthenticated, IsProgrammer]
     serializer_class = UserActivityLogSerializer
-    queryset = UserActivityLog.objects.select_related('user').all()
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        qs = UserActivityLog.objects.select_related("user", "user__account").all()
+        ip = self.request.query_params.get("ip")
+        if ip:
+            qs = qs.filter(ip_address__icontains=ip.strip())
+        search = (self.request.query_params.get("q") or "").strip()
+        if search:
+            qs = qs.filter(
+                Q(user__email__icontains=search)
+                | Q(user__username__icontains=search)
+                | Q(user__first_name__icontains=search)
+                | Q(user__last_name__icontains=search)
+                | Q(details__icontains=search)
+                | Q(ip_address__icontains=search)
+            )
         user_id = self.request.query_params.get('user')
         if user_id:
             qs = qs.filter(user_id=user_id)

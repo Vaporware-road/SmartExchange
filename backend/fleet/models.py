@@ -117,3 +117,71 @@ class CustomerDeployment(models.Model):
             self.status = self.STATUS_ACTIVE
             update_fields.append("status")
         self.save(update_fields=update_fields)
+
+
+class Sale(models.Model):
+    """A payment the owner took, recorded by hand.
+
+    There is no gateway: sales are agreed over WhatsApp or in person and
+    entered here afterwards, which is why nothing about this model tries to
+    reconcile itself with anything. Recording one is what lifts the customer's
+    trial wall — see :func:`fleet.services.mark_account_paid`.
+    """
+
+    PLAN_ONE_TIME = "one_time"
+    PLAN_LIFETIME = "lifetime"
+    PLAN_RENEWAL = "renewal"
+    PLAN_ADDON = "addon"
+
+    SALE_PLAN_CHOICES = (
+        (PLAN_ONE_TIME, "One-time"),
+        (PLAN_LIFETIME, "Lifetime"),
+        (PLAN_RENEWAL, "Renewal"),
+        (PLAN_ADDON, "Add-on"),
+    )
+
+    account = models.ForeignKey(
+        "accounts.Account",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="sales",
+    )
+    customer = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="sales",
+    )
+    # Kept alongside the FK, not derived from it: the receipt has to keep saying
+    # who paid even if the account is later deleted.
+    customer_email = models.EmailField(blank=True, default="")
+    amount = models.DecimalField(max_digits=12, decimal_places=2)
+    currency = models.CharField(max_length=8, default="USD")
+    sale_plan = models.CharField(max_length=16, choices=SALE_PLAN_CHOICES, default=PLAN_ONE_TIME)
+    sold_at = models.DateTimeField(default=timezone.now)
+    reference = models.CharField(
+        max_length=120,
+        blank=True,
+        default="",
+        help_text="Invoice number, transfer reference or whatever the owner files it under",
+    )
+    note = models.TextField(blank=True, default="")
+    recorded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="recorded_sales",
+    )
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ["-sold_at", "-id"]
+        verbose_name = "Sale"
+        verbose_name_plural = "Sales"
+        indexes = [models.Index(fields=["-sold_at"])]
+
+    def __str__(self):
+        return f"{self.amount} {self.currency} — {self.customer_email or self.customer_id}"

@@ -18,7 +18,8 @@
     "registerUser": "Register User",
     "plans": "Plans & Templates",
     "fleet": "Fleet",
-    "orders": "Orders Queue"
+    "orders": "Orders Queue",
+    "ownerConsole": "Owner console"
   },
   "common": {
     "save": "Save",
@@ -50,7 +51,10 @@
     "login": "Login",
     "history": "History",
     "all": "All",
-    "aboutPage": "About"
+    "aboutPage": "About",
+    "active": "Active",
+    "inactive": "Inactive",
+    "saved": "Saved"
   },
   "header": {
     "openMenu": "Open menu",
@@ -201,7 +205,8 @@
     "programmerFleet": "Fleet",
     "userCenter": "Admin Management",
     "orders": "Orders Queue",
-    "webappOrder": "Place Order"
+    "webappOrder": "Place Order",
+    "programmerConsole": "Owner console"
   },
   "instagramHub": {
     "description": "Generate post and story images from your finalized prices. Choose a theme and categories, then preview before publishing to Instagram.",
@@ -1774,6 +1779,96 @@
   },
   "support": {
     "title": "Need a hand?",
-    "text": "Message our admins — a person answers."
+    "text": "Message our admins — a person answers.",
+    "kinds": {
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "email": "Email",
+      "instagram": "Instagram",
+      "custom": "Other"
+    }
+  },
+  "ownerConsole": {
+    "title": "Owner console",
+    "tabs": {
+      "activity": "Logins & IPs",
+      "accounts": "Accounts & trials",
+      "sales": "Sales",
+      "support": "Support channels"
+    },
+    "search": "Search",
+    "searchHint": "Email, name, IP or details",
+    "apply": "Apply",
+    "exportCsv": "Export CSV",
+    "allActions": "All actions",
+    "from": "From",
+    "to": "To",
+    "user": "User",
+    "account": "Account",
+    "action": "Action",
+    "ip": "IP address",
+    "device": "Device",
+    "when": "When",
+    "unknownUser": "Unknown",
+    "unknownDevice": "Unknown",
+    "noActivity": "No activity matches these filters.",
+    "actions": {
+      "signup": "Signup",
+      "login_success": "Login",
+      "login_failed": "Failed login",
+      "logout": "Logout",
+      "price_update": "Price update",
+      "bulk_price_update": "Bulk price update",
+      "special_price_update": "Special price update",
+      "template_change": "Template change",
+      "finalize": "Finalize",
+      "impersonate_start": "Impersonation",
+      "other": "Other"
+    },
+    "noAccounts": "Nobody has signed up yet.",
+    "signedUp": "Signed up",
+    "lastLogin": "Last login",
+    "seats": "Users",
+    "revenue": "Revenue",
+    "verified": "Email verified",
+    "paid": "Paid",
+    "suspend": "Suspend",
+    "suspended": "Suspended",
+    "reinstate": "Reinstate",
+    "reinstated": "Account reinstated",
+    "forceLogout": "Force logout",
+    "forcedLogout": "Every session for this account was ended.",
+    "recordSale": "Record a sale",
+    "saleHint": "Recording a sale lifts the trial wall and issues a licence key.",
+    "pickCustomer": "Pick a customer",
+    "customer": "Customer",
+    "amount": "Amount",
+    "currency": "Currency",
+    "salePlan": "Plan",
+    "salePlans": {
+      "one_time": "One-time",
+      "lifetime": "Lifetime",
+      "renewal": "Renewal",
+      "addon": "Add-on"
+    },
+    "soldAt": "Sold",
+    "reference": "Reference",
+    "note": "Note",
+    "recordedBy": "Recorded by",
+    "noSales": "No sales recorded yet.",
+    "salesTotal": "Total: {total}",
+    "saleRecorded": "Sale recorded — the trial wall is lifted.",
+    "saleDeleted": "Sale removed.",
+    "addChannel": "Add a channel",
+    "noChannels": "No support channels yet. Customers will see nothing when they need help.",
+    "channelTitle": "Support channel",
+    "channelKind": "Kind",
+    "channelLabel": "Label",
+    "channelValue": "Value",
+    "channelValueHint": "Phone number, @handle, email address or URL.",
+    "channelOrder": "Order",
+    "preview": "What customers see",
+    "previewEmpty": "Nothing is active, so no contact is shown anywhere."
   }
 }

@@ -20,13 +20,15 @@
 import { computed } from 'vue'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 
-defineProps({
+const props = defineProps({
   /* Row of chips instead of a stacked list — for footers and banners. */
   inline: { type: Boolean, default: false },
+  /* Render these instead of the saved ones — the owner console previews edits. */
+  items: { type: Array, default: null },
 })
 
 const siteSettings = useSiteSettingsStore()
-const channels = computed(() => siteSettings.supportChannels)
+const channels = computed(() => props.items ?? siteSettings.supportChannels)
 </script>
 
 <style scoped>

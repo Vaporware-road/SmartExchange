@@ -312,6 +312,13 @@ export const fleetApi = {
   provisionTrial: (id) => api.post(`/fleet/trials/${id}/provision/`),
   deployments: () => api.get('/fleet/deployments/'),
   reissueLicense: (id) => api.post(`/fleet/deployments/${id}/reissue-license/`),
+  accounts: (params) => api.get('/fleet/accounts/', { params }),
+  suspendAccount: (id, isActive) =>
+    api.post(`/fleet/accounts/${id}/suspend/`, { is_active: isActive }),
+  sales: (params) => api.get('/fleet/sales/', { params }),
+  createSale: (data) => api.post('/fleet/sales/', data),
+  updateSale: (id, data) => api.patch(`/fleet/sales/${id}/`, data),
+  deleteSale: (id) => api.delete(`/fleet/sales/${id}/`),
 }
 
 export const dashboardApi = {
@@ -386,6 +393,12 @@ export const settingsApi = {
   uploads: () => api.get('/settings/uploads/'),
   updateUploads: (data) => api.put('/settings/uploads/', data),
   clearTempUploads: () => api.post('/settings/uploads/clear-temp/'),
+  supportChannels: {
+    list: () => api.get('/settings/support-channels/'),
+    create: (data) => api.post('/settings/support-channels/', data),
+    update: (id, data) => api.patch(`/settings/support-channels/${id}/`, data),
+    delete: (id) => api.delete(`/settings/support-channels/${id}/`),
+  },
 }
 
 export const analysisApi = {
