@@ -1411,6 +1411,7 @@ class AlertCheckerMathTests(TestCase):
         service_cls.return_value.send_message.return_value = (True, "ok", None)
         alert = PriceAlert.objects.create(
             customer=self.customer,
+            bot=self.bot,
             direction=PriceAlert.Direction.INCREASE,
             source_currency="USD",
             target_currency="EUR",

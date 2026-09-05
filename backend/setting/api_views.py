@@ -130,8 +130,10 @@ class TelegramBotViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
     throttle_scope = "settings"
     throttle_classes = [ScopedRateThrottle]
-    queryset = TelegramBot.objects.all().order_by("-created_at")
     serializer_class = TelegramBotSerializer
+
+    def get_queryset(self):
+        return TelegramBot.objects.all().order_by("-created_at")
 
 
 class TelegramChannelViewSet(ModelViewSet):
@@ -140,8 +142,10 @@ class TelegramChannelViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated, IsSuperAdmin]
     throttle_scope = "settings"
     throttle_classes = [ScopedRateThrottle]
-    queryset = TelegramChannel.objects.select_related("bot").all().order_by("-created_at")
     serializer_class = TelegramChannelSerializer
+
+    def get_queryset(self):
+        return TelegramChannel.objects.select_related("bot").all().order_by("-created_at")
 
 
 class LogListAPIView(APIView):

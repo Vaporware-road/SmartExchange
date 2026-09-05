@@ -3,14 +3,16 @@ from django.core.validators import MinValueValidator
 from django.utils.text import slugify
 from category.models import Currency
 
+from accounts.scoping import AccountScopedModel, RelatedScopedManager
 
-class SpecialPriceType(models.Model):
+
+class SpecialPriceType(AccountScopedModel):
     """
     Special Price Type model - no category required.
     Example: "Special Price: Pound"
     """
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=120, blank=True, unique=True)
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120, blank=True)
     # Currency pair and trade direction
     source_currency = models.ForeignKey(Currency, on_delete=models.PROTECT, related_name='special_price_types_source')
     target_currency = models.ForeignKey(Currency, on_delete=models.PROTECT, related_name='special_price_types_target')
@@ -37,6 +39,10 @@ class SpecialPriceType(models.Model):
         verbose_name = "Special Price Type"
         verbose_name_plural = "Special Price Types"
         ordering = ['name']
+        constraints = [
+            models.UniqueConstraint(fields=["account", "name"], name="uniq_spt_name_per_account"),
+            models.UniqueConstraint(fields=["account", "slug"], name="uniq_spt_slug_per_account"),
+        ]
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -79,6 +85,9 @@ class SpecialPricePair(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    objects = RelatedScopedManager("special_price_type__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = "Special Price Pair"
         verbose_name_plural = "Special Price Pairs"
@@ -110,6 +119,9 @@ class SpecialPriceHistory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     notes = models.TextField(blank=True, null=True)
+
+    objects = RelatedScopedManager("special_price_type__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Special Price History"

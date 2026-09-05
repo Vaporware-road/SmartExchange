@@ -1,5 +1,7 @@
 from celery import shared_task
 
+from accounts.scoping import act_as_account
+
 from .models import TelegramBot
 from .services.alert_checker import check_price_alerts
 from .services.analytics_service import (
@@ -28,8 +30,8 @@ def snapshot_daily_bot_usage_task():
     """Nightly: persist daily active user counts per bot."""
     results = {}
     for bot in TelegramBot.objects.filter(is_active=True):
-        count = snapshot_daily_usage_for_bot(bot)
-        results[bot.id] = count
+        with act_as_account(bot.account_id):
+            results[bot.id] = snapshot_daily_usage_for_bot(bot)
     return results
 
 
@@ -38,8 +40,8 @@ def snapshot_customer_growth_task():
     """Nightly: persist new bot DM user counts per bot."""
     results = {}
     for bot in TelegramBot.objects.filter(is_active=True):
-        count = snapshot_customer_growth_for_bot(bot)
-        results[bot.id] = count
+        with act_as_account(bot.account_id):
+            results[bot.id] = snapshot_customer_growth_for_bot(bot)
     return results
 
 
@@ -48,7 +50,8 @@ def snapshot_channel_members_task():
     """Nightly: sample channel subscriber counts where bot is admin."""
     results = {}
     for bot in TelegramBot.objects.filter(is_active=True):
-        results[bot.id] = snapshot_channel_members_for_bot(bot)
+        with act_as_account(bot.account_id):
+            results[bot.id] = snapshot_channel_members_for_bot(bot)
     return results
 
 

@@ -8,6 +8,8 @@ from datetime import timedelta
 
 from django.utils import timezone
 
+from accounts.scoping import act_as_account
+
 from ..models import (
     BotSession,
     CampaignDeliveryLog,
@@ -149,19 +151,22 @@ def run_due_campaigns(*, now=None) -> dict:
     summary = {"campaigns_run": 0, "total_sent": 0, "total_failed": 0}
 
     for campaign in due.select_related("bot"):
-        result = send_to_audience(
-            campaign.bot,
-            campaign.audience,
-            campaign.message,
-        )
-        CampaignDeliveryLog.objects.create(
-            bot=campaign.bot,
-            campaign=campaign,
-            sent=result.get("sent", 0),
-            failed=result.get("failed", 0),
-            skipped=result.get("skipped", 0),
-        )
-        schedule_next_run(campaign, from_time=now)
+        # Beat has no account; the campaign's bot names the desk whose audience
+        # and delivery log this run touches.
+        with act_as_account(campaign.bot.account_id):
+            result = send_to_audience(
+                campaign.bot,
+                campaign.audience,
+                campaign.message,
+            )
+            CampaignDeliveryLog.objects.create(
+                bot=campaign.bot,
+                campaign=campaign,
+                sent=result.get("sent", 0),
+                failed=result.get("failed", 0),
+                skipped=result.get("skipped", 0),
+            )
+            schedule_next_run(campaign, from_time=now)
         summary["campaigns_run"] += 1
         summary["total_sent"] += result.get("sent", 0)
         summary["total_failed"] += result.get("failed", 0)

@@ -4,6 +4,9 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.plans import PLAN_BRONZE, PLAN_CHOICES
 
+from accounts.scoping import AccountScopedModel, RelatedScopedManager
+from accounts.storage import AccountUploadPath
+
 
 class Layer(models.Model):
     """Editor layer (PixelCast-style); default layer holds synced widgets."""
@@ -17,6 +20,9 @@ class Layer(models.Model):
     order = models.PositiveSmallIntegerField(default=0)
     width = models.PositiveIntegerField(null=True, blank=True)
     height = models.PositiveIntegerField(null=True, blank=True)
+
+    objects = RelatedScopedManager("template__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         ordering = ["template_id", "order", "id"]
@@ -68,6 +74,9 @@ class Widget(models.Model):
     rotation = models.FloatField(default=0)
     is_active = models.BooleanField(default=True)
 
+    objects = RelatedScopedManager("layer__template__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         ordering = ["layer_id", "z_index", "id"]
 
@@ -75,13 +84,12 @@ class Widget(models.Model):
         return f"{self.widget_uuid}:{self.type}"
 
 
-class Template(models.Model):
+class Template(AccountScopedModel):
     """Template model with JSONField for storing text field configurations."""
     
     name = models.CharField(
         max_length=100,
-        unique=True,
-        help_text="Unique name for this template"
+        help_text="Name for this template, unique within the account"
     )
     category = models.ForeignKey(
         'category.Category',
@@ -89,7 +97,7 @@ class Template(models.Model):
         help_text="Category this template belongs to."
     )
     image = models.ImageField(
-        upload_to="templates/",
+        upload_to=AccountUploadPath("templates"),
         null=True,
         blank=True,
         help_text="Background image for the template (optional; editor can use solid color only)",
@@ -145,6 +153,9 @@ class Template(models.Model):
         verbose_name = "Template"
         verbose_name_plural = "Templates"
         ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(fields=["account", "name"], name="uniq_template_name_per_account"),
+        ]
 
     def __str__(self) -> str:
         return self.name
@@ -199,6 +210,9 @@ class TemplateWidgetBinding(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = RelatedScopedManager("template__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         ordering = ["template_id", "id"]

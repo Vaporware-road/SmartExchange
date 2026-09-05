@@ -18,6 +18,11 @@ def trial_expires_at(started_at):
 def trial_is_expired(user, now=None):
     if getattr(user, "is_superuser", False) or getattr(user, "role", "") == "super_admin":
         return False
+    # A recorded sale flips the account to paid; the trial dates stay on the
+    # user as history but stop gating anything.
+    account = getattr(user, "account", None)
+    if account is not None and getattr(account, "is_paid", False):
+        return False
     expires_at = getattr(user, "trial_expires_at", None)
     return expires_at is not None and expires_at <= (now or timezone.now())
 

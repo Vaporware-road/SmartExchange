@@ -21,6 +21,25 @@ def get_active_config() -> Optional[WhatsAppConfig]:
     return WhatsAppConfig.objects.filter(is_active=True).first()
 
 
+def config_for_phone_number_id(phone_number_id: str) -> Optional[WhatsAppConfig]:
+    """The desk that owns a WhatsApp number, searched across every account.
+
+    Meta posts every desk's messages to the same webhook URL and authenticates
+    no user, so the ``phone_number_id`` in the payload is the only tenant key
+    there is. Looked up unscoped by necessity; the caller then narrows to the
+    account it resolves to.
+    """
+    from accounts.scoping import unscoped
+
+    phone_number_id = (phone_number_id or "").strip()
+    if not phone_number_id:
+        return None
+    with unscoped():
+        return WhatsAppConfig.objects.filter(
+            is_active=True, phone_number_id=phone_number_id
+        ).first()
+
+
 def send_text_message(
     phone: str,
     text: str,

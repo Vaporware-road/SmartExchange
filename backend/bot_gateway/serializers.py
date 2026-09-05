@@ -2,6 +2,7 @@ import re
 
 from rest_framework import serializers
 
+from accounts.relations import ScopedPrimaryKeyRelatedField
 from bot_gateway.models import BotCustomer, Platform
 from category.models import Category, PriceType
 from orders.models import OrderIntake
@@ -16,9 +17,13 @@ class PublicOrderIntakeCreateSerializer(serializers.Serializer):
     customer_name = serializers.CharField(max_length=255)
     customer_phone = serializers.CharField(max_length=32)
     trade_type = serializers.ChoiceField(choices=OrderIntake.TradeType.choices)
-    category = serializers.PrimaryKeyRelatedField(queryset=Category.objects.all())
-    price_type = serializers.PrimaryKeyRelatedField(
-        queryset=PriceType.objects.filter(is_active=True),
+    category = ScopedPrimaryKeyRelatedField(queryset=lambda: Category.objects.all())
+    price_type = ScopedPrimaryKeyRelatedField(
+        # PriceType has no account column of its own; it scopes through the
+        # category, whose manager is the one that knows the current account.
+        queryset=lambda: PriceType.objects.filter(
+            is_active=True, category__in=Category.objects.all()
+        ),
         required=False,
         allow_null=True,
     )

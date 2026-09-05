@@ -1,5 +1,7 @@
 from rest_framework import serializers
 
+from accounts.relations import ScopedPrimaryKeyRelatedField
+
 from .models import (
     AutoPostConfig,
     CustomerProfile,
@@ -98,11 +100,14 @@ class TelegramChannelSerializer(serializers.ModelSerializer):
 
 
 class SendMessageSerializer(serializers.Serializer):
-    bot_id = serializers.PrimaryKeyRelatedField(
-        queryset=TelegramBot.objects.filter(is_active=True), write_only=True
+    bot_id = ScopedPrimaryKeyRelatedField(
+        queryset=lambda: TelegramBot.objects.filter(is_active=True), write_only=True
     )
-    channel_id = serializers.PrimaryKeyRelatedField(
-        queryset=TelegramChannel.objects.filter(is_active=True, bot__is_active=True),
+    channel_id = ScopedPrimaryKeyRelatedField(
+        # Channels scope through their bot, which is the account-owning root.
+        queryset=lambda: TelegramChannel.objects.filter(
+            is_active=True, bot__is_active=True, bot__in=TelegramBot.objects.all()
+        ),
         write_only=True,
     )
     message = serializers.CharField(

@@ -167,6 +167,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     # Enforce login for all views (allows exceptions in middleware)
     'accounts.middleware.LoginRequiredMiddleware',
+    'accounts.middleware.AccountScopeMiddleware',
     'accounts.middleware.TrialAccessMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -382,6 +383,22 @@ PLAYWRIGHT_SCREENSHOT_TIMEOUT_MS = int(
 )
 # Chromium is memory-hungry; two at a time is what a small VPS survives.
 PLAYWRIGHT_MAX_CONCURRENT = int(os.environ.get('PLAYWRIGHT_MAX_CONCURRENT', '2'))
+# Every cache key is namespaced by the account in context. Cached price
+# snapshots, formatted captions and settings are customer data, and a shared key
+# would serve whichever desk warmed the cache first to all the others — the leak
+# the scoped managers close at the database, reopened one layer up. Doing it in
+# KEY_FUNCTION rather than at each call site means a cache added later is
+# namespaced without anyone remembering to.
+CACHES = {
+    'default': {
+        'BACKEND': os.environ.get(
+            'CACHE_BACKEND', 'django.core.cache.backends.locmem.LocMemCache'
+        ),
+        'LOCATION': os.environ.get('CACHE_LOCATION', ''),
+        'KEY_FUNCTION': 'accounts.cache.account_scoped_key',
+    }
+}
+
 SCREENSHOT_CACHE_TTL = int(os.environ.get('SCREENSHOT_CACHE_TTL', '300'))
 
 # -----------------------------

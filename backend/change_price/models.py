@@ -1,5 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
+
+from accounts.scoping import RelatedScopedManager
 from category.models import PriceType
 
 
@@ -11,6 +13,9 @@ class PriceHistory(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     notes = models.TextField(blank=True, null=True)
+
+    objects = RelatedScopedManager("price_type__category__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Price History"

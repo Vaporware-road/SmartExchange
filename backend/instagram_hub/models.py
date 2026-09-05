@@ -5,8 +5,10 @@ from django.utils import timezone
 
 from instagram_hub.encryption import decrypt_token, encrypt_token
 
+from accounts.scoping import AccountScopedModel
 
-class InstagramConfig(models.Model):
+
+class InstagramConfig(AccountScopedModel):
     """
     Instagram (Meta Graph API) credentials. Token and app secret encrypted at rest.
     Single active config used for posting; OAuth flow populates token and ig_user_id.

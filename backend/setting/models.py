@@ -2,6 +2,9 @@ from django.db import models
 from django.core.cache import cache
 from django.utils import timezone
 
+from accounts.scoping import AccountScopedModel
+from accounts.storage import AccountUploadPath
+
 
 class PriceThemeState(models.Model):
     """
@@ -24,7 +27,7 @@ class PriceThemeState(models.Model):
         return cls.objects.get_or_create(key="price_theme", defaults={"last_index": 0})
 
 
-class Log(models.Model):
+class Log(AccountScopedModel):
     """
     Stores application logs from various sources (Telegram, Finalize, etc.)
     """
@@ -75,16 +78,20 @@ class Log(models.Model):
         return f"[{self.level}] {self.source} - {self.created_at.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
-class SiteSettings(models.Model):
-    """
-    Singleton model for dynamic branding and contact information.
-    Only one row should exist; use ``SiteSettings.load()`` to retrieve it.
+class SiteSettings(AccountScopedModel):
+    """Branding and contact information, one row per customer account.
+
+    Was a strict singleton pinned to ``pk=1``. With several customers sharing
+    one deployment each needs its own branding, so the row is now per account
+    and ``load()`` resolves the right one from the request context. The
+    ``account=None`` row survives as the install-wide default, which is what
+    the landing page and the login screen render before anyone signs in.
     """
 
     site_name = models.CharField(max_length=100, default="MrExchange")
     tagline = models.CharField(max_length=200, default="Premium Exchange Panel")
-    logo = models.ImageField(upload_to="branding/", null=True, blank=True)
-    favicon = models.ImageField(upload_to="branding/", null=True, blank=True)
+    logo = models.ImageField(upload_to=AccountUploadPath("branding"), null=True, blank=True)
+    favicon = models.ImageField(upload_to=AccountUploadPath("branding"), null=True, blank=True)
     support_phone = models.CharField(max_length=30, blank=True)
     support_email = models.EmailField(blank=True)
     address = models.TextField(blank=True)
@@ -171,15 +178,122 @@ class SiteSettings(models.Model):
         return self.site_name
 
     def save(self, *args, **kwargs):
-        self.pk = 1
         super().save(*args, **kwargs)
         cache.delete("site_settings")
 
     @classmethod
-    def load(cls):
+    def load(cls, account=None):
+        """The settings row for ``account``, or for the account in context.
+
+        Pass ``account`` explicitly from anywhere without a request — Celery
+        tasks, the publish pipeline, management commands — since the context
+        variable is empty there and would otherwise resolve to the install
+        default rather than the customer's own branding.
+        """
+        from accounts.scoping import UNSCOPED, get_current_account_id
+
+        if account is None:
+            account_id = get_current_account_id()
+            if account_id in (None, UNSCOPED):
+                account_id = None
+        else:
+            account_id = getattr(account, "pk", account)
+
         # Do not cache ORM instances: pickled/stale cache entries break after schema
         # changes (e.g. new fields) and can cause 500s on endpoints that read flags
-        # like auto_post_on_update. Fresh DB read is cheap for a singleton row.
-        obj, _ = cls.objects.get_or_create(pk=1)
+        # like auto_post_on_update. Fresh DB read is cheap for a single row.
+        obj, _ = cls.all_objects.get_or_create(account_id=account_id)
         return obj
 
+
+
+class SupportChannel(models.Model):
+    """A way for customers to reach the people who run this install.
+
+    Deliberately a table rather than more columns on ``SiteSettings``: the
+    owner adds and removes numbers, handles and inboxes over time, and every
+    surface that offers help — the panel footer, the expired-trial wall, the
+    onboarding tour, the error pages, the marketing site — renders whatever is
+    active right now without a redeploy.
+    """
+
+    KIND_PHONE = "phone"
+    KIND_WHATSAPP = "whatsapp"
+    KIND_TELEGRAM = "telegram"
+    KIND_EMAIL = "email"
+    KIND_INSTAGRAM = "instagram"
+    KIND_CUSTOM = "custom"
+
+    KIND_CHOICES = (
+        (KIND_PHONE, "Phone"),
+        (KIND_WHATSAPP, "WhatsApp"),
+        (KIND_TELEGRAM, "Telegram"),
+        (KIND_EMAIL, "Email"),
+        (KIND_INSTAGRAM, "Instagram"),
+        (KIND_CUSTOM, "Custom"),
+    )
+
+    # Font Awesome class per kind, so the panel and the landing page show the
+    # same icon without either hardcoding a mapping.
+    DEFAULT_ICONS = {
+        KIND_PHONE: "fas fa-phone",
+        KIND_WHATSAPP: "fab fa-whatsapp",
+        KIND_TELEGRAM: "fab fa-telegram",
+        KIND_EMAIL: "fas fa-envelope",
+        KIND_INSTAGRAM: "fab fa-instagram",
+        KIND_CUSTOM: "fas fa-headset",
+    }
+
+    kind = models.CharField(max_length=20, choices=KIND_CHOICES, default=KIND_PHONE)
+    label = models.CharField(
+        max_length=120,
+        help_text="Shown to the customer, e.g. 'Sales' or 'Technical support'",
+    )
+    value = models.CharField(
+        max_length=255,
+        help_text="Phone number, @handle, email address or URL",
+    )
+    icon = models.CharField(
+        max_length=64,
+        blank=True,
+        help_text="Font Awesome class; falls back to the icon for this kind",
+    )
+    is_active = models.BooleanField(default=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(default=timezone.now)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["sort_order", "id"]
+        verbose_name = "Support Channel"
+        verbose_name_plural = "Support Channels"
+
+    def __str__(self):
+        return f"{self.get_kind_display()}: {self.label}"
+
+    @property
+    def display_icon(self):
+        return self.icon or self.DEFAULT_ICONS.get(self.kind, "fas fa-headset")
+
+    @property
+    def href(self):
+        """A clickable target, or empty when the value is not linkable."""
+        value = (self.value or "").strip()
+        if not value:
+            return ""
+        if self.kind == self.KIND_PHONE:
+            return f"tel:{value.replace(' ', '')}"
+        if self.kind == self.KIND_EMAIL:
+            return f"mailto:{value}"
+        if self.kind == self.KIND_WHATSAPP:
+            digits = "".join(ch for ch in value if ch.isdigit())
+            return f"https://wa.me/{digits}" if digits else ""
+        if self.kind == self.KIND_TELEGRAM:
+            if value.startswith("http"):
+                return value
+            return f"https://t.me/{value.lstrip('@')}"
+        if self.kind == self.KIND_INSTAGRAM:
+            if value.startswith("http"):
+                return value
+            return f"https://instagram.com/{value.lstrip('@')}"
+        return value if value.startswith("http") else ""

@@ -11,8 +11,10 @@ from category.models import Category
 from special_price.models import SpecialPriceType
 from instagram_hub.encryption import decrypt_token, encrypt_token
 
+from accounts.scoping import AccountScopedModel, RelatedScopedManager
 
-class TelegramBot(models.Model):
+
+class TelegramBot(AccountScopedModel):
     """Model representing a Telegram bot."""
 
     name = models.CharField(
@@ -82,6 +84,14 @@ class TelegramBot(models.Model):
     def __str__(self):
         return self.name
 
+    def _scope_account_id(self):
+        # Stamp the owning desk's account so a bot created from a request-less
+        # path (registration task, webhook, test) still lands on the right desk.
+        owner = self.owner
+        if owner is not None:
+            return owner.account_id
+        return None
+
     def get_plain_token(self):
         decrypted = decrypt_token(self.token)
         return decrypted or self.token
@@ -142,6 +152,9 @@ class TelegramChannel(models.Model):
         verbose_name="Updated At",
     )
 
+    objects = RelatedScopedManager("bot__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = "Telegram Channel"
         verbose_name_plural = "Telegram Channels"
@@ -180,6 +193,9 @@ class DefaultMessageSettings(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
+
+    objects = RelatedScopedManager("bot__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Default Message Setting"
@@ -279,6 +295,9 @@ class AutoPostConfig(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
+
+    objects = RelatedScopedManager("channel__bot__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Auto Post Config"
@@ -498,6 +517,9 @@ class ExchangeRequest(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
 
+    objects = RelatedScopedManager("bot__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = "Exchange Request"
         verbose_name_plural = "Exchange Requests"
@@ -541,6 +563,17 @@ class PriceAlert(models.Model):
         on_delete=models.CASCADE,
         related_name="price_alerts",
         verbose_name="Customer",
+    )
+    # The bot the customer subscribed through. A CustomerProfile is keyed on a
+    # global Telegram user id and can talk to several desks' bots, so the bot is
+    # what says whose board this alert is watching and who sends the DM.
+    bot = models.ForeignKey(
+        "telegram_app.TelegramBot",
+        on_delete=models.CASCADE,
+        related_name="price_alerts",
+        null=True,
+        blank=True,
+        verbose_name="Bot",
     )
     direction = models.CharField(
         max_length=16,
@@ -600,6 +633,9 @@ class BotDailyUsageSnapshot(models.Model):
     active_users = models.PositiveIntegerField(default=0, verbose_name="Active Users")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
 
+    objects = RelatedScopedManager("bot__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = "Bot Daily Usage Snapshot"
         verbose_name_plural = "Bot Daily Usage Snapshots"
@@ -628,6 +664,9 @@ class ChannelMemberSnapshot(models.Model):
     bot_is_admin = models.BooleanField(default=False, verbose_name="Bot Is Admin")
     sampled_at = models.DateTimeField(auto_now_add=True, verbose_name="Sampled At", db_index=True)
 
+    objects = RelatedScopedManager("channel__bot__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = "Channel Member Snapshot"
         verbose_name_plural = "Channel Member Snapshots"
@@ -649,6 +688,9 @@ class BotCustomerGrowthSnapshot(models.Model):
     date = models.DateField(verbose_name="Date", db_index=True)
     new_customers = models.PositiveIntegerField(default=0, verbose_name="New Customers")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
+
+    objects = RelatedScopedManager("bot__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Bot Customer Growth Snapshot"
@@ -710,6 +752,9 @@ class ReengageCampaign(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
 
+    objects = RelatedScopedManager("bot__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = "Re-engage Campaign"
         verbose_name_plural = "Re-engage Campaigns"
@@ -759,6 +804,9 @@ class ReengageOffer(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Created At")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Updated At")
 
+    objects = RelatedScopedManager("bot__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = "Re-engage Offer"
         verbose_name_plural = "Re-engage Offers"
@@ -798,6 +846,9 @@ class CampaignDeliveryLog(models.Model):
     skipped = models.PositiveIntegerField(default=0, verbose_name="Skipped")
     run_at = models.DateTimeField(auto_now_add=True, verbose_name="Run At", db_index=True)
 
+    objects = RelatedScopedManager("bot__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = "Campaign Delivery Log"
         verbose_name_plural = "Campaign Delivery Logs"
@@ -828,6 +879,9 @@ class BotAdmin(models.Model):
         verbose_name="User",
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = RelatedScopedManager("bot__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Bot Admin"

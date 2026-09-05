@@ -7,8 +7,10 @@ from django.utils import timezone
 from bot_gateway.models import BotCustomer, Platform
 from category.models import Category, PriceType
 
+from accounts.scoping import AccountScopedModel
 
-class OrderIntake(models.Model):
+
+class OrderIntake(AccountScopedModel):
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
         APPROVED = "approved", "Approved"

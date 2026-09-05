@@ -20,13 +20,17 @@ from .serializers import (
 
 
 class SpecialPriceTypeViewSet(viewsets.ModelViewSet):
-    queryset = SpecialPriceType.objects.prefetch_related(
-        "special_price_histories",
-        "pairs__histories",
-        "pairs__source_currency",
-        "pairs__target_currency",
-    ).select_related("source_currency", "target_currency").all()
     serializer_class = SpecialPriceTypeSerializer
+
+    # Built per request: the scoped manager reads the account from context, and a
+    # class attribute would freeze an import-time (account-less) queryset.
+    def get_queryset(self):
+        return SpecialPriceType.objects.prefetch_related(
+            "special_price_histories",
+            "pairs__histories",
+            "pairs__source_currency",
+            "pairs__target_currency",
+        ).select_related("source_currency", "target_currency").all()
 
 
 class SpecialPriceUpdateAPIView(APIView):

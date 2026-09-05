@@ -1121,6 +1121,7 @@ class ConversationEngine:
         try:
             PriceAlert.objects.create(
                 customer=customer,
+                bot=session.bot,
                 direction=str(draft["direction"]),
                 source_currency=str(draft["source_currency"]),
                 target_currency=str(draft["target_currency"]),

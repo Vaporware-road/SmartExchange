@@ -269,7 +269,6 @@ class TelegramBotViewSet(ModelViewSet):
     List/retrieve operations hide the token; create/update use the detail serializer.
     """
 
-    queryset = TelegramBot.objects.all().order_by("-created_at")
     permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
 
     def get_queryset(self):
@@ -454,10 +453,16 @@ class TelegramCustomerWebhookAPIView(APIView):
     throttle_classes = []
 
     def post(self, request, bot_id: int):
+        from accounts.scoping import act_as_account, unscoped
+
         from .services.dispatcher import process_update_payload
 
+        # Telegram authenticates nobody, so the bot id in the URL *is* the
+        # tenant key: look it up across every desk, then run the rest of the
+        # handler as the desk that owns it.
         try:
-            bot = TelegramBot.objects.get(pk=bot_id, is_active=True)
+            with unscoped():
+                bot = TelegramBot.objects.get(pk=bot_id, is_active=True)
         except TelegramBot.DoesNotExist:
             return Response({"ok": False, "detail": "bot not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -466,7 +471,8 @@ class TelegramCustomerWebhookAPIView(APIView):
             return Response({"ok": False, "detail": "invalid json"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            process_update_payload(bot, payload)
+            with act_as_account(bot.account_id):
+                process_update_payload(bot, payload)
         except Exception:
             # Still 200 — Telegram retries on non-2xx and can amplify outages.
             try:

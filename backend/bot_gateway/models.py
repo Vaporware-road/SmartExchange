@@ -6,6 +6,8 @@ from django.utils import timezone
 from category.models import Category
 from instagram_hub.encryption import decrypt_token, encrypt_token
 
+from accounts.scoping import AccountScopedModel
+
 
 class Platform(models.TextChoices):
     TELEGRAM = "telegram", "Telegram"
@@ -30,7 +32,7 @@ class Direction(models.TextChoices):
     OUTBOUND = "outbound", "Outbound"
 
 
-class BotCustomer(models.Model):
+class BotCustomer(AccountScopedModel):
     uuid = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     platform = models.CharField(max_length=16, choices=Platform.choices)
     telegram_chat_id = models.BigIntegerField(null=True, blank=True, db_index=True)
@@ -104,7 +106,7 @@ class BotInteractionLog(models.Model):
         return f"{self.platform} {self.direction} @ {self.created_at:%Y-%m-%d %H:%M}"
 
 
-class WhatsAppConfig(models.Model):
+class WhatsAppConfig(AccountScopedModel):
     """Meta Cloud API credentials for WhatsApp Business messaging."""
 
     name = models.CharField(max_length=128, default="Default")

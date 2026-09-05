@@ -114,9 +114,12 @@ class PriceTypeViewSet(viewsets.ModelViewSet):
     serializer_class = PriceTypeSerializer
 
     def get_queryset(self):
+        # PriceType owns no account column; it is reachable only through a
+        # category the caller's own account owns, which is what the scoped
+        # ``Category.objects`` subquery enforces.
         qs = PriceType.objects.select_related(
             "category", "source_currency", "target_currency"
-        )
+        ).filter(category__in=Category.objects.all())
         category_id = self.kwargs.get("category_pk")
         if category_id:
             qs = qs.filter(category_id=category_id)

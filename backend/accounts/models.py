@@ -5,6 +5,28 @@ from .managers import CustomUserManager
 from .plans import PLAN_BRONZE, PLAN_CHOICES
 
 
+class Account(models.Model):
+    """One customer desk: the isolation boundary for all customer data.
+
+    Created for every self-serve signup and owned by the user who signed up.
+    Staff and ``super_admin`` belong to no account, which is how they see
+    across all of them. See ``accounts.scoping`` for how rows are narrowed.
+    """
+
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=120, unique=True)
+    created_at = models.DateTimeField(default=timezone.now)
+    # Set when a sale converts the account; a paid account is never walled by
+    # TrialAccessMiddleware even after its trial dates lapse.
+    is_paid = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROLE_SUPER_ADMIN = 'super_admin'
     ROLE_MANAGEMENT = 'management'
@@ -53,6 +75,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         related_name='sub_users',
         help_text='Panel user this delegated operator reports to'
     )
+    # The customer desk this user's data belongs to. Null for staff and
+    # super_admins, who work across every account.
+    account = models.ForeignKey(
+        'accounts.Account', on_delete=models.CASCADE, null=True, blank=True,
+        related_name='users',
+        help_text='Customer account whose data this user works on'
+    )
     sub_role = models.CharField(max_length=24, choices=SUB_ROLE_CHOICES, default=SUB_ROLE_ADMIN)
     telegram_username = models.CharField(max_length=128, blank=True, default='')
     plan = models.CharField(max_length=16, choices=PLAN_CHOICES, default=PLAN_BRONZE)
@@ -84,7 +113,56 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
             self.full_name = composed
         if self.email == "":
             self.email = None
+        # Every customer desk owns an Account; each row of their data lives
+        # under it. Staff and owners of no desk stay account-less (UNSCOPED).
+        self._ensure_account()
         super().save(*args, **kwargs)
+
+    def _ensure_account(self):
+        """Assign this user an Account unless they are staff or already have one.
+
+        The isolation model is one desk per Account: a standalone operator
+        (management) owns its own; a delegated operator (employee) inherits the
+        desk it reports to via ``owner``. Staff, ``super_admin`` and
+        ``developer`` see every account and belong to none. Runs on every save,
+        but only ever *creates* an Account for a brand-new user, so re-saving an
+        existing user is a no-op.
+        """
+        if self.account_id is not None:
+            return
+        if getattr(self, "is_staff", False) or getattr(self, "is_superuser", False):
+            return
+        if self.role in (CustomUser.ROLE_SUPER_ADMIN, CustomUser.ROLE_DEVELOPER):
+            return
+        owner = self.owner
+        if owner is not None and owner.account_id is not None:
+            self.account = owner.account
+            return
+        if not self._state.adding:
+            return
+        # A user created from inside a desk's own session joins that desk; only
+        # a signup (unauthenticated) or a staff-initiated registration
+        # (UNSCOPED) reaches the branch below that opens a new one.
+        from .scoping import UNSCOPED, get_current_account_id
+
+        scoped_account_id = get_current_account_id()
+        if scoped_account_id not in (None, UNSCOPED):
+            self.account_id = scoped_account_id
+            return
+        account = Account.objects.create(
+            name=self.exchange_name or self.full_name or self.username,
+            slug=self._account_slug(),
+        )
+        self.account = account
+
+    def _account_slug(self):
+        base = (self.username or self.email or "account")
+        slug = base.lower().strip().replace(" ", "-")[:120]
+        candidate, n = slug, 1
+        while Account.objects.filter(slug=candidate).exists():
+            candidate = f"{slug}-{n}"
+            n += 1
+        return candidate
 
     def get_full_name(self):
         composed = f"{self.first_name} {self.last_name}".strip()

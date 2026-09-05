@@ -12,6 +12,7 @@ from core.prices_snapshot import build_prices_public_snapshot
 
 logger = logging.getLogger(__name__)
 
+# Partitioned per account by the cache KEY_FUNCTION, not by these names.
 CACHE_KEY = "bot_gateway:live_rates:v1"
 CAPTIONS_KEY = "bot_gateway:formatted_captions:v1"
 

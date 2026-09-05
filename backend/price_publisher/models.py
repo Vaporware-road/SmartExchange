@@ -5,8 +5,11 @@ from django.db import models
 
 from accounts.plans import PLAN_BRONZE, PLAN_CHOICES
 
+from accounts.scoping import AccountScopedModel
+from accounts.storage import AccountUploadPath
 
-class PriceTemplate(models.Model):
+
+class PriceTemplate(AccountScopedModel):
     """Configurable assets used when rendering Telegram price images."""
 
     class TemplateType(models.TextChoices):
@@ -37,17 +40,17 @@ class PriceTemplate(models.Model):
     )
 
     background_image = models.ImageField(
-        upload_to="price_templates/backgrounds/",
+        upload_to=AccountUploadPath("price_templates/backgrounds"),
         help_text="Background used for the rendered price image.",
     )
     logo_image = models.ImageField(
-        upload_to="price_templates/logos/",
+        upload_to=AccountUploadPath("price_templates/logos"),
         null=True,
         blank=True,
         help_text="Logo positioned on the rendered image (optional).",
     )
     watermark_image = models.ImageField(
-        upload_to="price_templates/watermarks/",
+        upload_to=AccountUploadPath("price_templates/watermarks"),
         null=True,
         blank=True,
         help_text="Watermark placed near the bottom of the rendered image (optional).",

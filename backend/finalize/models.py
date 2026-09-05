@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils import timezone
+
+from accounts.scoping import RelatedScopedManager
 from category.models import Category
 from change_price.models import PriceHistory
 from special_price.models import SpecialPriceHistory
@@ -59,6 +61,9 @@ class Finalization(models.Model):
         verbose_name="Notes"
     )
 
+    objects = RelatedScopedManager("category__account_id")
+    all_objects = models.Manager()
+
     class Meta:
         verbose_name = "Finalization"
         verbose_name_plural = "Finalizations"
@@ -87,6 +92,9 @@ class FinalizedPriceHistory(models.Model):
         related_name='finalizations',
         verbose_name="Price History"
     )
+
+    objects = RelatedScopedManager("price_history__price_type__category__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Finalized Price History"
@@ -153,6 +161,9 @@ class SpecialPriceFinalization(models.Model):
         null=True,
         verbose_name="Notes"
     )
+
+    objects = RelatedScopedManager("special_price_history__special_price_type__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "Special Price Finalization"

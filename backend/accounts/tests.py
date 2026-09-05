@@ -78,7 +78,9 @@ class ProgrammerHubApiTests(APITestCase):
         self.assertTrue(data.get("generated_password"))
         self.assertIn("…", data.get("telegram_bot_token_masked") or "")
         user = CustomUser.objects.get(email="ada@example.com")
-        bot = TelegramBot.objects.get(owner=user)
+        # Registration puts the new customer on their own account, so this bot
+        # lives outside the account the test itself runs under.
+        bot = TelegramBot.all_objects.get(owner=user)
         self.assertNotEqual(bot.token, "111:bot-token-plain")
         self.assertEqual(bot.get_plain_token(), "111:bot-token-plain")
 

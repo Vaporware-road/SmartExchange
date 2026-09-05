@@ -6,6 +6,7 @@ from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from accounts.permissions import IsSuperAdminOrManagement, IsSuperAdminOrManagementOrEmployee
+from accounts.scoping import act_as_account, resolve_public_account_id, unscoped
 from bot_gateway.auth import BotCustomerAuthentication
 from bot_gateway.permissions import IsBotCustomer
 from bot_gateway.serializers import PublicOrderIntakeCreateSerializer
@@ -56,6 +57,16 @@ class BotGatewayOrderSubmitView(APIView):
         )
 
 
+def _public_account_id(request):
+    """The desk a public, user-less request is for.
+
+    Named by ``?account=<slug>``; a single-account deployment may leave it off.
+    Unresolvable means no desk, and no desk reads and writes nothing.
+    """
+    with unscoped():
+        return resolve_public_account_id(request.query_params.get("account"))
+
+
 class PublicOrderIntakeContextView(APIView):
     """Public order form bootstrap: live cached rates and categories."""
 
@@ -65,14 +76,15 @@ class PublicOrderIntakeContextView(APIView):
     throttle_classes = [ScopedRateThrottle]
 
     def get(self, request):
-        rates = get_cached_live_rates()
-        return Response(
-            {
-                "rates": rates,
-                "price_catalog": build_price_catalog(rates),
-                "order_url": _customer_order_url(),
-            }
-        )
+        with act_as_account(_public_account_id(request)):
+            rates = get_cached_live_rates()
+            return Response(
+                {
+                    "rates": rates,
+                    "price_catalog": build_price_catalog(rates),
+                    "order_url": _customer_order_url(),
+                }
+            )
 
 
 class PublicOrderSubmitView(APIView):
@@ -84,13 +96,14 @@ class PublicOrderSubmitView(APIView):
     throttle_classes = [ScopedRateThrottle]
 
     def post(self, request):
-        serializer = PublicOrderIntakeCreateSerializer(
-            data=request.data,
-            context={"request": request},
-        )
-        serializer.is_valid(raise_exception=True)
-        order = serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        with act_as_account(_public_account_id(request)):
+            serializer = PublicOrderIntakeCreateSerializer(
+                data=request.data,
+                context={"request": request},
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 def _customer_order_url() -> str:

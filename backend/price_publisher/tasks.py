@@ -3,6 +3,8 @@ from typing import Optional
 
 from celery import shared_task
 
+from accounts.scoping import act_as_account
+
 from category.models import Category
 from change_price.models import PriceHistory
 from finalize.models import Finalization, SpecialPriceFinalization
@@ -63,6 +65,13 @@ def publish_category_prices_task(
 
     category = Category.objects.get(id=category_id)
     channel = TelegramChannel.objects.select_related("bot").get(id=channel_id, is_active=True)
+
+    with act_as_account(category.account_id):
+        return _publish_category(category, channel, price_history_ids, notes, user_id)
+
+
+def _publish_category(category, channel, price_history_ids, notes, user_id):
+    category_id = category.pk
 
     histories = (
         PriceHistory.objects.filter(id__in=price_history_ids, price_type__category_id=category_id)
@@ -147,6 +156,12 @@ def publish_special_price_task(
         "special_price_type__target_currency",
     ).get(id=special_price_history_id)
     channel = TelegramChannel.objects.select_related("bot").get(id=channel_id, is_active=True)
+
+    with act_as_account(special_price_history.special_price_type.account_id):
+        return _publish_special(special_price_history, channel, notes, user_id)
+
+
+def _publish_special(special_price_history, channel, notes, user_id):
 
     acting_user = None
     if user_id:

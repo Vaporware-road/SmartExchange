@@ -28,6 +28,15 @@ class IsolatedMediaTestRunner(DiscoverRunner):
         self._media_override = override_settings(MEDIA_ROOT=str(self._tmp_media_root))
         self._media_override.enable()
 
+    def setup_databases(self, **kwargs):
+        result = super().setup_databases(**kwargs)
+        # Scoping fails closed, so the suite needs a default account in context
+        # before the first fixture is built. See accounts.testing.
+        from accounts.testing import create_and_pin_test_account
+
+        create_and_pin_test_account()
+        return result
+
     def teardown_test_environment(self, **kwargs):
         self._media_override.disable()
         shutil.rmtree(self._tmp_media_root, ignore_errors=True)

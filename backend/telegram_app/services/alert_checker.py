@@ -11,11 +11,14 @@ import logging
 from datetime import timedelta
 from decimal import Decimal
 
+from django.db.models import Q
 from django.utils import timezone
 
 from category.models import PriceType
 from change_price.models import PriceHistory
-from ..models import PriceAlert, TelegramBot
+from accounts.scoping import act_as_account, unscoped
+
+from ..models import BotSession, PriceAlert, TelegramBot
 from .telegram_client import TelegramService
 
 logger = logging.getLogger(__name__)
@@ -92,9 +95,36 @@ def _dm_customer(alert: PriceAlert, current: Decimal, bot: TelegramBot) -> bool:
 
 
 def check_price_alerts(*, cooldown: timedelta = DEFAULT_COOLDOWN) -> dict:
+    """Scan every desk's active alerts once. Returns counters for tests.
+
+    Beat calls this with no account, so it walks the desks itself: an alert is
+    priced against its own desk's board and delivered by its own desk's bot. A
+    single global pass would DM one customer another exchange's rates.
     """
-    Scan active alerts once. Returns counters for observability/tests.
-    """
+    totals = {
+        "checked": 0,
+        "skipped_no_price": 0,
+        "skipped_cooldown": 0,
+        "skipped_threshold": 0,
+        "triggered": 0,
+        "dm_failed": 0,
+        "no_bot": 0,
+    }
+    with unscoped():
+        account_ids = list(
+            TelegramBot.objects.filter(is_active=True)
+            .order_by("account_id")
+            .values_list("account_id", flat=True)
+            .distinct()
+        )
+    for account_id in account_ids:
+        with act_as_account(account_id):
+            for key, value in _check_account_alerts(cooldown=cooldown).items():
+                totals[key] += value
+    return totals
+
+
+def _check_account_alerts(*, cooldown: timedelta) -> dict:
     now = timezone.now()
     bot = _pick_send_bot()
     stats = {
@@ -109,9 +139,20 @@ def check_price_alerts(*, cooldown: timedelta = DEFAULT_COOLDOWN) -> dict:
     if bot is None:
         stats["no_bot"] = 1
         logger.warning("alert_checker: no active TelegramBot; skipping DMs")
+        return stats
 
+    # Alerts subscribed through one of this desk's bots. Rows predating the bot
+    # column fall back to the session join — the same one the staff customer
+    # list uses to decide which customers a desk may see.
+    customer_ids = BotSession.objects.filter(bot__account_id=bot.account_id).values(
+        "telegram_user_id"
+    )
     alerts = (
         PriceAlert.objects.filter(is_active=True)
+        .filter(
+            Q(bot__account_id=bot.account_id)
+            | Q(bot__isnull=True, customer__telegram_user_id__in=customer_ids)
+        )
         .select_related("customer")
         .order_by("id")
     )

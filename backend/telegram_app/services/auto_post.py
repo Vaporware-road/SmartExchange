@@ -33,6 +33,8 @@ from special_price.models import SpecialPriceHistory
 
 from ..models import AutoPostConfig
 
+from accounts.scoping import act_as_account
+
 logger = logging.getLogger(__name__)
 
 # How long to wait for a publish task result before giving up (same as finalize).
@@ -253,7 +255,10 @@ def run_due_auto_posts(now=None) -> dict:
     results = []
     for config in configs:
         logger.info("auto_post dispatching config_id=%s channel_id=%s", config.id, config.channel_id)
-        results.append(dispatch_config(config))
+        # Beat runs across every desk; each dispatch renders that desk's prices
+        # with that desk's template, so it has to run as that desk.
+        with act_as_account(config.channel.bot.account_id):
+            results.append(dispatch_config(config))
     summary = {
         "checked": AutoPostConfig.objects.filter(enabled=True).count(),
         "dispatched": sum(1 for r in results if r.get("dispatched")),

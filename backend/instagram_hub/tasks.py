@@ -64,11 +64,20 @@ def schedule_instagram_post_finalize(
     special_price_history_ids: List[int],
     theme: str = "dark",
 ) -> None:
-    """Queue Celery task to render and publish finalize snapshot to Instagram."""
+    """Queue Celery task to render and publish finalize snapshot to Instagram.
+
+    The account is captured here, in the request that finalized, and travels as
+    a task kwarg: the worker has no request to infer it from, and the ids alone
+    would not say whose Instagram config to publish with.
+    """
+    from accounts.scoping import UNSCOPED, get_current_account_id
+
+    account_id = get_current_account_id()
     post_finalize_to_instagram_task.delay(
         category_ids=list(category_ids),
         special_price_history_ids=list(special_price_history_ids),
         theme=theme,
+        account_id=None if account_id == UNSCOPED else account_id,
     )
 
 
@@ -342,12 +351,16 @@ def post_finalize_to_instagram_task(
     category_ids: List[int],
     special_price_history_ids: List[int],
     theme: str = "dark",
+    account_id: int = None,
 ) -> None:
-    run_post_finalize_to_instagram(
-        category_ids=category_ids,
-        special_price_history_ids=special_price_history_ids,
-        theme=theme,
-    )
+    from accounts.scoping import act_as_account
+
+    with act_as_account(account_id):
+        run_post_finalize_to_instagram(
+            category_ids=category_ids,
+            special_price_history_ids=special_price_history_ids,
+            theme=theme,
+        )
 
 
 def enqueue_post_finalize_to_instagram(
@@ -371,15 +384,39 @@ def refresh_instagram_token_if_needed() -> dict:
     Refresh long-lived Meta token when within 30 days of expiry.
     Logs warnings when expired or refresh fails.
     """
+    from accounts.scoping import unscoped
+    from instagram_hub.models import InstagramConfig
+
+    with unscoped():
+        config_ids = list(
+            InstagramConfig.objects.filter(is_active=True)
+            .order_by("pk")
+            .values_list("pk", "account_id")
+        )
+    if not config_ids:
+        return {"action": "skip", "reason": "no_config"}
+    # One desk per pass: every step below writes back to that desk's config and
+    # its own log, so they cannot share a context.
+    results = [
+        _refresh_one_instagram_token(config_pk, account_id)
+        for config_pk, account_id in config_ids
+    ]
+    return results[0] if len(results) == 1 else {"action": "batch", "results": results}
+
+
+def _refresh_one_instagram_token(config_pk: int, account_id) -> dict:
+    from accounts.scoping import act_as_account
+    from instagram_hub.models import InstagramConfig
+
+    with act_as_account(account_id):
+        return _refresh_instagram_token_body(InstagramConfig.objects.get(pk=config_pk))
+
+
+def _refresh_instagram_token_body(config) -> dict:
     from datetime import timedelta
 
-    from instagram_hub.models import InstagramConfig
     from instagram_hub.services.instagram_config import get_token_status
     from instagram_hub.services.instagram_oauth import exchange_for_long_lived_token
-
-    config = InstagramConfig.objects.filter(is_active=True).order_by("pk").first()
-    if not config:
-        return {"action": "skip", "reason": "no_config"}
 
     token = config.get_decrypted_token()
     if not token:

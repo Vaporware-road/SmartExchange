@@ -6,6 +6,22 @@ from bot_gateway.adapters.base import InboundMessage
 from bot_gateway.models import Platform
 
 
+def webhook_phone_number_ids(payload: Dict[str, Any]) -> List[str]:
+    """Every WhatsApp number a webhook body carries messages for.
+
+    Meta batches by number, so in practice this is one id; the webhook uses it
+    to decide which desk the batch belongs to.
+    """
+    ids: List[str] = []
+    for entry in payload.get("entry") or []:
+        for change in entry.get("changes") or []:
+            value = change.get("value") or {}
+            phone_number_id = (value.get("metadata") or {}).get("phone_number_id")
+            if phone_number_id and phone_number_id not in ids:
+                ids.append(str(phone_number_id))
+    return ids
+
+
 def parse_whatsapp_webhook(payload: Dict[str, Any]) -> List[InboundMessage]:
     """Parse Meta WhatsApp Cloud API webhook payload into inbound messages."""
     results: List[InboundMessage] = []

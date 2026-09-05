@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils.text import slugify
 
+from accounts.scoping import AccountScopedModel, RelatedScopedManager
+
 
 class Currency(models.Model):
     code = models.CharField(max_length=10, unique=True)
@@ -15,9 +17,9 @@ class Currency(models.Model):
         return f"{self.code} ({self.symbol})" if self.symbol else self.code
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    slug = models.SlugField(max_length=120, unique=True, blank=True)
+class Category(AccountScopedModel):
+    name = models.CharField(max_length=100)
+    slug = models.SlugField(max_length=120, blank=True)
     description = models.TextField(blank=True, null=True)
     # Telegram message content for this category
     telegram_message_description = models.TextField(blank=True, null=True)
@@ -38,6 +40,10 @@ class Category(models.Model):
         verbose_name = "Category"
         verbose_name_plural = "Categories"
         ordering = ['name']
+        constraints = [
+            models.UniqueConstraint(fields=["account", "name"], name="uniq_category_name_per_account"),
+            models.UniqueConstraint(fields=["account", "slug"], name="uniq_category_slug_per_account"),
+        ]
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -76,6 +82,9 @@ class PriceType(models.Model):
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = RelatedScopedManager("category__account_id")
+    all_objects = models.Manager()
 
     class Meta:
         verbose_name = "PriceType"
