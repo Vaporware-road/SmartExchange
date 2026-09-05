@@ -92,6 +92,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Self-serve signups reach their panel immediately; this only records that
     # the address was later proven, so the panel can nag and staff can filter.
     email_verified_at = models.DateTimeField(null=True, blank=True)
+    # Server-side rather than a browser flag: the guided tour should not reopen
+    # because someone signed in from a second machine or cleared their storage.
+    onboarding_completed_at = models.DateTimeField(null=True, blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)

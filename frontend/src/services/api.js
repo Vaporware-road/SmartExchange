@@ -82,7 +82,7 @@ api.interceptors.response.use(
       const url = error.config?.url ?? ''
       const original = error.config ?? {}
       const isRefreshCall = url.includes('/auth/token/refresh')
-      const isLoginCall = url.includes('/auth/login') || url.includes('/auth/demo-login')
+      const isLoginCall = url.includes('/auth/login')
 
       // ACCESS_TOKEN_LIFETIME is 12h but REFRESH_TOKEN_LIFETIME is 7 days. Without this
       // the refresh token was stored and never used, so every session died at the 12h
@@ -277,10 +277,11 @@ export function formatDrfError(data) {
 export const authApi = {
   login: (username, password) =>
     api.post('/auth/login/', { username, password }),
-  demoLogin: () => api.post('/auth/demo-login/'),
   signup: (data) => api.post('/auth/signup/', data),
   verifyEmail: (token) => api.post('/auth/verify-email/', { token }),
   resendVerification: () => api.post('/auth/verify-email/resend/'),
+  completeOnboarding: (replay = false) =>
+    api.post('/auth/onboarding/complete/', { replay }),
   logout: (refresh) => api.post('/auth/logout/', { refresh }),
   me: () => api.get('/auth/me/'),
   users: {

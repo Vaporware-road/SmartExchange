@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.http import JsonResponse
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -243,59 +244,21 @@ class ResendVerificationAPIView(APIView):
         return Response({"sent": bool(sent), "already_verified": False})
 
 
-class DemoLoginAPIView(APIView):
-    """POST: instant demo access — logs in the configured demo account (no password).
+class CompleteOnboardingAPIView(APIView):
+    """POST: mark the guided tour done for the signed-in user.
 
-    Backs the "demo" autologin buttons on the marketing page. The demo account is
-    role=management (created via ``manage.py ensure_demo_user``), so it can explore the
-    panel but cannot manage users or site settings.
+    Recorded on the row, not in the browser, so the tour does not reappear on a
+    second device. ``replay=true`` clears it again for the "show me the tour"
+    entry in the user menu.
     """
 
-    permission_classes = [AllowAny]
-    authentication_classes = []
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        if not settings.DEMO_LOGIN_ENABLED:
-            return error_response(
-                "Demo login is disabled.",
-                code="demo_login_disabled",
-                status_code=status.HTTP_403_FORBIDDEN,
-            )
-
-        username = settings.DEMO_USERNAME
-        try:
-            user = CustomUser.objects.get(username=username, is_active=True)
-        except CustomUser.DoesNotExist:
-            log_activity(
-                None,
-                UserActivityLog.ACTION_LOGIN_FAILED,
-                request,
-                details="demo_login_no_demo_user",
-            )
-            return error_response(
-                "Demo user not configured. Run `python manage.py ensure_demo_user`.",
-                code="demo_user_not_found",
-                status_code=status.HTTP_404_NOT_FOUND,
-            )
-
-        ensure_trial_started(user)
-        if trial_is_expired(user):
-            return error_response(
-                "The demo trial has expired. Please contact an administrator.",
-                code="trial_expired",
-                status_code=status.HTTP_403_FORBIDDEN,
-            )
-        login(request, user)
-
-        refresh = issue_tokens_for_user(user)
-
-        log_activity(user, UserActivityLog.ACTION_LOGIN_SUCCESS, request, details="demo_login")
-
-        return Response({
-            'user': UserSerializer(user).data,
-            'access': str(refresh.access_token),
-            'refresh': str(refresh),
-        })
+        replay = str(request.data.get("replay", "")).lower() in ("1", "true", "yes")
+        request.user.onboarding_completed_at = None if replay else timezone.now()
+        request.user.save(update_fields=["onboarding_completed_at"])
+        return Response({"onboarding_completed_at": request.user.onboarding_completed_at})
 
 
 class LogoutAPIView(APIView):

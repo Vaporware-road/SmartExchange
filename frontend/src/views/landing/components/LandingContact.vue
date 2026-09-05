@@ -26,7 +26,7 @@
             ✈️ {{ t('landing.contact.telegram') }}
           </a>
 
-          <a :href="DEMO_URL" class="lp-btn lp-btn--primary">{{ t('landing.hero.ctaDemo') }}</a>
+          <a :href="TRIAL_URL" class="lp-btn lp-btn--primary">{{ t('landing.hero.ctaTrial') }}</a>
         </div>
       </div>
     </div>
@@ -36,7 +36,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { CONTACT_PHONE, DEMO_URL, TELEGRAM_URL, TEL_HREF, whatsappHref } from '@/config/landing.js'
+import { CONTACT_PHONE, TRIAL_URL, TELEGRAM_URL, TEL_HREF, whatsappHref } from '@/config/landing.js'
 
 const { t } = useI18n()
 

@@ -6,8 +6,8 @@
           <h2 class="text-2xl font-bold leading-snug">{{ t('landing.demo.title') }}</h2>
           <p class="mt-4 text-sm leading-8" style="color: var(--text-secondary)">{{ t('landing.demo.text') }}</p>
           <div class="mt-6 flex flex-wrap gap-3">
-            <a :href="DEMO_URL" class="lp-btn lp-btn--primary">{{ t('landing.demo.cta') }}</a>
-            <a :href="TRIAL_URL" class="lp-btn lp-btn--ghost">{{ t('landing.hero.ctaTrial') }}</a>
+            <a :href="TRIAL_URL" class="lp-btn lp-btn--primary">{{ t('landing.hero.ctaTrial') }}</a>
+            <a :href="TUTORIALS_URL" class="lp-btn lp-btn--ghost">{{ t('landing.hero.ctaTutorials') }}</a>
           </div>
           <p class="mt-4 text-xs" style="color: var(--text-secondary)">{{ t('landing.demo.note') }}</p>
         </div>
@@ -35,7 +35,7 @@
 
 <script setup>
 import { useI18n } from 'vue-i18n'
-import { DEMO_URL, TRIAL_URL } from '@/config/landing.js'
+import { TRIAL_URL, TUTORIALS_URL } from '@/config/landing.js'
 
 const { t } = useI18n()
 

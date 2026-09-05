@@ -66,9 +66,9 @@ export const useAuthStore = defineStore('auth', {
     isImpersonating() {
       return Boolean(this.user?.impersonated_by)
     },
-    /** Shared public demo account — the panel labels the session and offers the tour. */
-    isDemo() {
-      return Boolean(this.user?.is_demo)
+    /** First sign-in: the guided tour opens itself once, then never again. */
+    needsOnboarding() {
+      return Boolean(this.user) && !this.user?.onboarding_completed_at
     },
     /** Signup grants access before the address is proven; the banner asks for it. */
     needsEmailVerification() {
@@ -145,20 +145,9 @@ export const useAuthStore = defineStore('auth', {
       return data
     },
 
-    async demoLogin() {
-      this.loading = true
-      try {
-        const { data } = await authApi.demoLogin()
-        if (data.access) localStorage.setItem('access_token', data.access)
-        if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
-        sessionStorage.removeItem('programmer_access_token')
-        sessionStorage.removeItem('programmer_refresh_token')
-        this.user = data.user ?? data
-        useTelegramHubStore().clearSession()
-        return this.user
-      } finally {
-        this.loading = false
-      }
+    async completeOnboarding({ replay = false } = {}) {
+      const { data } = await authApi.completeOnboarding(replay)
+      if (this.user) this.user.onboarding_completed_at = data.onboarding_completed_at
     },
 
     async logout() {

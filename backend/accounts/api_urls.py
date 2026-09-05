@@ -13,7 +13,11 @@ urlpatterns = [
         api_views.ResendVerificationAPIView.as_view(),
         name="api-verify-email-resend",
     ),
-    path("demo-login/", api_views.DemoLoginAPIView.as_view(), name="api-demo-login"),
+    path(
+        "onboarding/complete/",
+        api_views.CompleteOnboardingAPIView.as_view(),
+        name="api-onboarding-complete",
+    ),
     path("logout/", api_views.LogoutAPIView.as_view(), name="api-logout"),
     path("me/", api_views.MeAPIView.as_view(), name="api-me"),
     path("token/refresh/", TokenRefreshView.as_view(serializer_class=TokenRefreshWithVersionSerializer), name="api-token-refresh"),

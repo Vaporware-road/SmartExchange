@@ -13,18 +13,7 @@
         <p class="text-gray-400 text-sm">{{ $t('auth.loginTitle') }}</p>
       </div>
 
-      <!--
-        Demo autologin: the visitor clicked "Get a demo" on the marketing page and
-        never asked for a login form. Show what is happening instead of a form
-        they would have to ignore.
-      -->
-      <div v-if="openingDemo" class="card-luxury text-center">
-        <LoadingSpinner class="mx-auto h-8 w-8" />
-        <p class="mt-4 font-semibold">{{ $t('demo.opening.title') }}</p>
-        <p class="mt-2 text-sm text-[var(--text-secondary)]">{{ $t('demo.opening.text') }}</p>
-      </div>
-
-      <div v-else class="card-luxury">
+      <div class="card-luxury">
         <form @submit.prevent="handleSubmit" class="space-y-4">
           <AlertMessage v-if="error" type="error" :show="true" @dismiss="error = ''">
             {{ error }}
@@ -101,32 +90,9 @@ const loading = ref(false)
 
 const siteName = computed(() => siteSettings.siteName)
 
-const isDemoRequest = computed(() => route.query.demo === '1' || route.query.demo === 'true')
-/* Fall back to the form if the demo login fails, so the visitor is never stuck. */
-const openingDemo = computed(() => isDemoRequest.value && loading.value && !error.value)
-
 onMounted(() => {
   siteSettings.fetch()
-  if (isDemoRequest.value) {
-    startDemoLogin()
-  }
 })
-
-async function startDemoLogin() {
-  if (auth.isAuthenticated) {
-    router.push(route.query.redirect || '/panel')
-    return
-  }
-  loading.value = true
-  try {
-    await auth.demoLogin()
-    router.push(route.query.redirect || '/panel')
-  } catch (err) {
-    error.value = getApiErrorDetails(err).message
-  } finally {
-    loading.value = false
-  }
-}
 
 async function handleSubmit() {
   error.value = ''

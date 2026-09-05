@@ -39,10 +39,10 @@ import { RouterLink } from 'vue-router'
 import LandingLogo from './LandingLogo.vue'
 import {
   CONTACT_PHONE,
-  DEMO_URL,
   TELEGRAM_URL,
   TEL_HREF,
   TRIAL_URL,
+  TUTORIALS_URL,
   whatsappHref,
 } from '@/config/landing.js'
 
@@ -63,8 +63,8 @@ const COLUMNS = computed(() => [
   {
     titleKey: 'landing.footer.startTitle',
     links: [
-      { href: DEMO_URL, labelKey: 'landing.hero.ctaDemo' },
       { href: TRIAL_URL, labelKey: 'landing.hero.ctaTrial' },
+      { href: TUTORIALS_URL, labelKey: 'landing.nav.tutorials' },
       { href: '/login', labelKey: 'landing.footer.login' },
     ],
   },

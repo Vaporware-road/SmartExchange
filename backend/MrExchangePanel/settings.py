@@ -316,10 +316,6 @@ LOGIN_REDIRECT_URL = '/'
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
-# Demo account for the public demo-login endpoint (autologin from the marketing page).
-# The account is created with `python manage.py ensure_demo_user` (role=management, unusable password).
-DEMO_LOGIN_ENABLED = os.environ.get('DEMO_LOGIN_ENABLED', 'True').lower() in ('true', '1', 'yes')
-DEMO_USERNAME = (os.environ.get('DEMO_USERNAME', 'demo') or 'demo').strip()
 
 # -----------------------------
 # Trial tier — one isolated stack per signup, hosted on our own VPS

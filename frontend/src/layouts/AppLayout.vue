@@ -17,7 +17,6 @@
           {{ $t('programmerHub.exit') }}
         </button>
       </div>
-      <DemoBanner v-if="auth.isDemo" @open-tour="tourOpen = true" />
       <VerifyEmailBanner v-if="auth.needsEmailVerification" />
       <AppHeader @toggle-drawer="drawerOpen = !drawerOpen" />
       <main
@@ -47,7 +46,7 @@
       <AppFooter v-if="!isTemplateEditorLayout" />
     </div>
     <AppBottomNav />
-    <DemoTour v-if="auth.isDemo" :open="tourOpen" @close="tourOpen = false" />
+    <OnboardingTour :open="tourOpen" @close="closeTour" />
   </div>
 </template>
 
@@ -55,14 +54,12 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { AppSidebar, AppHeader, AppDrawer, AppFooter, AppBreadcrumb, AppBottomNav } from '@/components/layout'
-import DemoBanner from '@/components/demo/DemoBanner.vue'
 import VerifyEmailBanner from '@/components/layout/VerifyEmailBanner.vue'
-import DemoTour from '@/components/demo/DemoTour.vue'
+import OnboardingTour from '@/components/onboarding/OnboardingTour.vue'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useSidebarStore } from '@/stores/sidebar'
 import { useAuthStore } from '@/stores/auth'
 import { useOrdersQueueStore } from '@/stores/ordersQueue'
-import { STORAGE_DEMO_TOUR_SEEN, storageGet, storageSet } from '@/constants/branding'
 
 const route = useRoute()
 const router = useRouter()
@@ -84,6 +81,18 @@ async function exitImpersonation() {
 /* Only poll for someone who can actually open the queue, and stop the moment
    they cannot — an impersonation exit or a logout must not leave a timer
    hitting an endpoint that will 403. */
+/* Closing the tour is what marks onboarding done — a failed call just means it
+   offers itself again next time, which is better than losing it silently. */
+async function closeTour() {
+  tourOpen.value = false
+  if (!auth.needsOnboarding) return
+  try {
+    await auth.completeOnboarding()
+  } catch {
+    /* ignore */
+  }
+}
+
 function syncOrdersPolling() {
   if (auth.isAuthenticated && auth.can('orders')) {
     ordersQueue.startPolling()
@@ -97,10 +106,7 @@ watch(() => [auth.isAuthenticated, auth.role], syncOrdersPolling)
 onMounted(() => {
   siteSettings.fetch()
   syncOrdersPolling()
-  if (auth.isDemo && !storageGet(STORAGE_DEMO_TOUR_SEEN)) {
-    tourOpen.value = true
-    storageSet(STORAGE_DEMO_TOUR_SEEN, null, '1')
-  }
+  if (auth.needsOnboarding) tourOpen.value = true
 })
 
 onUnmounted(() => {

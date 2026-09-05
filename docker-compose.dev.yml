@@ -22,7 +22,6 @@ services:
         cd /app/backend &&
         python manage.py migrate --noinput &&
         python manage.py ensure_default_admin --username admin --password admin &&
-        python manage.py ensure_demo_user &&
         echo '✅ Django + Vite starting...' &&
         exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
       "

@@ -232,16 +232,64 @@
     "direct": "Direct"
   },
   "onboarding": {
-    "backToList": "Back to Developer Hub",
-    "subtitle": "Create a new client account with access to the exchange panel.",
-    "basicInfo": "Basic Info",
-    "basicInfoDesc": "Personal and contact details of the client.",
-    "businessDetails": "Business Details",
-    "businessDetailsDesc": "Company information and partnership model.",
-    "systemAccess": "System Access",
-    "systemAccessDesc": "Telegram bot credentials and access level.",
-    "registeredBy": "Registered by",
-    "registeredByHint": "Automatically recorded as the logged-in admin."
+    "badge": "Getting started",
+    "tour": {
+      "title": "What this panel does",
+      "intro": "{count} stops, in the order a rate desk uses them. Each one opens the real page — this is your own panel, so anything you set up here stays.",
+      "progress": "Step {current} of {total}",
+      "prev": "Back",
+      "next": "Next",
+      "finish": "Start using the panel",
+      "steps": {
+        "dashboard": {
+          "title": "The morning screen",
+          "body": "Every rate, bot and channel in one view: what changed, what is waiting to be published, and whether your Telegram and Instagram connections are alive.",
+          "look": "Bot status, recent rate changes and channel numbers — all live, no spreadsheet."
+        },
+        "prices": {
+          "title": "Set your rates",
+          "body": "Buy and sell for every currency you deal in. Type one number, or set a base rate and let the panel work out the spread for each pair.",
+          "look": "Open a currency and change a rate — the panel keeps the history and the percentage move."
+        },
+        "finalize": {
+          "title": "Approve, then publish",
+          "body": "Nothing reaches your customers until someone approves it. A manager reviews the new rates, sees the generated image, and releases them.",
+          "look": "The rendered rate image is built here from your own template before it goes out."
+        },
+        "categories": {
+          "title": "Your currencies, your rules",
+          "body": "Define the currencies, pairs and price types you actually quote — cash, transfer, VIP — each with its own rounding and formatting.",
+          "look": "Add a price type and it appears on the panel, the channel post and the image."
+        },
+        "templates": {
+          "title": "Your brand on every post",
+          "body": "The rate images are drawn on your template: your logo, colours, fonts and background. The editor is right here, no designer needed.",
+          "look": "Open a template and move a field — that is exactly what your customers will receive."
+        },
+        "telegram": {
+          "title": "Telegram, automatically",
+          "body": "Formatted rate messages and images go to your channel the moment rates are approved, and a bot answers price questions for your customers.",
+          "look": "Channels, bots and the message that gets sent — all configured from this page."
+        },
+        "instagram": {
+          "title": "Instagram without the phone",
+          "body": "The same branded rate graphic is published straight to your page through the Instagram API, on your schedule.",
+          "look": "The post queue and the account connection live here."
+        },
+        "analytics": {
+          "title": "Proof it is working",
+          "body": "Rate history, publishing activity and channel reach, so you can see how often you move and how many people saw it.",
+          "look": "Pick a range and compare — the same numbers your manager will ask for."
+        },
+        "support": {
+          "title": "Stuck? Talk to us",
+          "body": "Anything the panel will not do, or a rate that looks wrong — message our admins directly and a person answers.",
+          "look": "These are live contacts; the same ones appear in the panel footer and on the site."
+        }
+      },
+      "skip": "Skip for now",
+      "replay": "Replay the tour"
+    }
   },
   "templateEditor": {
     "back": "Back",
@@ -1289,20 +1337,21 @@
       "contact": "Contact us",
       "cta": "Get a demo",
       "menu": "Menu",
-      "language": "Language"
+      "language": "Language",
+      "tutorials": "Tutorials"
     },
     "hero": {
       "badge": "Rate publishing, fully automated",
       "title": "One rate panel for",
       "titleAccent": "every channel you publish to",
       "subtitle": "Enter your buy and sell rates once. MrExchange pushes them to your website, Telegram channel, Instagram page and rate widget the moment you save.",
-      "ctaDemo": "Get a demo",
       "ctaTrial": "Start 14-day free trial",
       "note": "The demo is a quick look with ready-made data. The trial is your own panel on your own subdomain.",
       "panelTitle": "Rate management",
       "live": "Live updates",
       "buy": "Buy",
-      "sell": "Sell"
+      "sell": "Sell",
+      "ctaTutorials": "See how it works"
     },
     "stats": {
       "saved": "Saved every day on publishing rates",
@@ -1377,9 +1426,8 @@
     },
     "demo": {
       "title": "See it running",
-      "text": "The video shows a single rate change travelling to the website, the Telegram channel and the Instagram page at the same time. Or skip it and open the real panel — no signup, no password.",
-      "cta": "Open the demo panel",
-      "note": "The demo account has a manager role: it sees every operational screen, but user management and site settings stay disabled."
+      "text": "The video shows a single rate change travelling to the website, the Telegram channel and the Instagram page at the same time. Then start your own 14 days and do it with your rates.",
+      "note": "Fourteen days of the whole panel. No card, and nothing is published until you say so."
     },
     "pricing": {
       "eyebrow": "Pricing",
@@ -1618,70 +1666,14 @@
       "faq": "FAQ",
       "login": "Sign in",
       "bottom": "mrexchange.co.uk. All rights reserved."
-    }
-  },
-  "demo": {
-    "badge": "Live demo",
-    "banner": {
-      "title": "You are inside a live MrExchange panel.",
-      "text": "Sample rates, sample channels. Nothing here is published anywhere, and it resets for the next visitor.",
-      "tour": "Show me around",
-      "talk": "Talk to us",
-      "site": "Back to site"
     },
-    "tour": {
-      "title": "What this panel does",
-      "intro": "Eight stops, in the order a rate desk uses them. Each one opens the real page — look around, change things, nothing breaks.",
-      "progress": "Step {current} of {total}",
-      "prev": "Back",
-      "next": "Next",
-      "finish": "Get this for my exchange",
-      "steps": {
-        "dashboard": {
-          "title": "The morning screen",
-          "body": "Every rate, bot and channel in one view: what changed, what is waiting to be published, and whether your Telegram and Instagram connections are alive.",
-          "look": "Bot status, recent rate changes and channel numbers — all live, no spreadsheet."
-        },
-        "prices": {
-          "title": "Set your rates",
-          "body": "Buy and sell for every currency you deal in. Type one number, or set a base rate and let the panel work out the spread for each pair.",
-          "look": "Open a currency and change a rate — the panel keeps the history and the percentage move."
-        },
-        "finalize": {
-          "title": "Approve, then publish",
-          "body": "Nothing reaches your customers until someone approves it. A manager reviews the new rates, sees the generated image, and releases them.",
-          "look": "The rendered rate image is built here from your own template before it goes out."
-        },
-        "categories": {
-          "title": "Your currencies, your rules",
-          "body": "Define the currencies, pairs and price types you actually quote — cash, transfer, VIP — each with its own rounding and formatting.",
-          "look": "Add a price type and it appears on the panel, the channel post and the image."
-        },
-        "templates": {
-          "title": "Your brand on every post",
-          "body": "The rate images are drawn on your template: your logo, colours, fonts and background. The editor is right here, no designer needed.",
-          "look": "Open a template and move a field — that is exactly what your customers will receive."
-        },
-        "telegram": {
-          "title": "Telegram, automatically",
-          "body": "Formatted rate messages and images go to your channel the moment rates are approved, and a bot answers price questions for your customers.",
-          "look": "Channels, bots and the message that gets sent — all configured from this page."
-        },
-        "instagram": {
-          "title": "Instagram without the phone",
-          "body": "The same branded rate graphic is published straight to your page through the Instagram API, on your schedule.",
-          "look": "The post queue and the account connection live here."
-        },
-        "analytics": {
-          "title": "Proof it is working",
-          "body": "Rate history, publishing activity and channel reach, so you can see how often you move and how many people saw it.",
-          "look": "Pick a range and compare — the same numbers your manager will ask for."
-        }
-      }
-    },
-    "opening": {
-      "title": "Opening the live demo…",
-      "text": "Signing you into a demo panel filled with sample rates. No account needed."
+    "tutorials": {
+      "title": "Tutorials",
+      "subtitle": "Short, recorded walkthroughs of the things you will do every morning.",
+      "readMore": "Read the walkthrough",
+      "backToIndex": "All tutorials",
+      "steps": "Steps",
+      "notFound": "That tutorial does not exist."
     }
   },
   "orders": {

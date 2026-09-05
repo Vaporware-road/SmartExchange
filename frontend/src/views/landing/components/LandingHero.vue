@@ -21,8 +21,8 @@
         </p>
 
         <div class="mt-8 flex flex-wrap gap-3">
-          <a :href="DEMO_URL" class="lp-btn lp-btn--primary">{{ t('landing.hero.ctaDemo') }}</a>
-          <a :href="TRIAL_URL" class="lp-btn lp-btn--ghost">{{ t('landing.hero.ctaTrial') }}</a>
+          <a :href="TRIAL_URL" class="lp-btn lp-btn--primary">{{ t('landing.hero.ctaTrial') }}</a>
+          <a :href="TUTORIALS_URL" class="lp-btn lp-btn--ghost">{{ t('landing.hero.ctaTutorials') }}</a>
         </div>
 
         <p class="mt-4 text-xs" style="color: var(--text-secondary)">{{ t('landing.hero.note') }}</p>
@@ -83,7 +83,7 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useHeroCanvas } from '../composables/useHeroCanvas.js'
 import { formatRate, useLivePrices } from '../composables/useLivePrices.js'
-import { DEMO_URL, HERO_RATES, TRIAL_URL } from '@/config/landing.js'
+import { HERO_RATES, TRIAL_URL, TUTORIALS_URL } from '@/config/landing.js'
 
 const { t } = useI18n()
 

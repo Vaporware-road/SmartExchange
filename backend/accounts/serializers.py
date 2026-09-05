@@ -35,7 +35,6 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     telegram_bot_token_masked = serializers.SerializerMethodField()
     trial_days_remaining = serializers.SerializerMethodField()
-    is_demo = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
@@ -66,10 +65,10 @@ class UserSerializer(serializers.ModelSerializer):
             "trial_expiry_notified_at",
             "trial_days_remaining",
             "email_verified_at",
+            "onboarding_completed_at",
             "is_active",
             "date_joined",
             "telegram_bot_token_masked",
-            "is_demo",
         ]
         read_only_fields = fields
 
@@ -102,14 +101,6 @@ class UserSerializer(serializers.ModelSerializer):
             return None
         return max(0, (obj.trial_expires_at - timezone.now()).days)
 
-    def get_is_demo(self, obj):
-        """True for the shared public demo account, so the panel can say so.
-
-        Derived from settings rather than a flag on the row: the demo account is
-        whichever username ``DEMO_USERNAME`` points at, and a customer install
-        with demo login off has none.
-        """
-        return bool(settings.DEMO_LOGIN_ENABLED) and obj.username == settings.DEMO_USERNAME
 
     def get_telegram_bot_token_masked(self, obj):
         bot = obj.telegram_bots.order_by("-created_at").first()

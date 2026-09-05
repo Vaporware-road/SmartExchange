@@ -4,7 +4,7 @@ from rest_framework import serializers
 from accounts.permissions import IsSuperAdmin
 from core.utils import validate_uploaded_image, MAX_IMAGE_SIZE
 from template_editor.utils import get_available_fonts
-from .models import SiteSettings, Log
+from .models import SiteSettings, Log, SupportChannel
 
 
 class SafeImageField(serializers.ImageField):
@@ -46,9 +46,21 @@ CANONICAL_BASE_CURRENCIES = {
 UPLOAD_FORMAT_CHOICES = {"PNG", "JPG", "SVG", "GIF", "WEBP", "JPEG"}
 
 
+class SupportChannelSerializer(serializers.ModelSerializer):
+    icon = serializers.CharField(source="display_icon", read_only=True)
+    href = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = SupportChannel
+        fields = ["id", "kind", "label", "value", "icon", "href", "is_active", "sort_order"]
+
+
 class SiteSettingsSerializer(serializers.ModelSerializer):
     logo = SafeImageField(allow_null=True, required=False)
     favicon = SafeImageField(allow_null=True, required=False)
+    # Read-only here: the owner console is the only place they are edited, but
+    # every public surface reads them from this one endpoint.
+    support_channels = serializers.SerializerMethodField()
 
     class Meta:
         model = SiteSettings
@@ -76,7 +88,13 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "ui_font_filename_ltr",
             "prices_webhook_url",
             "telegram_webhook_base_url",
+            "support_channels",
         ]
+
+    def get_support_channels(self, obj):
+        from .support import support_channel_payload
+
+        return support_channel_payload()
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

@@ -93,7 +93,7 @@
             </p>
 
             <div class="mt-8 flex flex-wrap justify-center gap-3">
-              <a :href="DEMO_URL" class="lp-btn lp-btn--primary">{{ t('landing.hero.ctaDemo') }}</a>
+              <a :href="TRIAL_URL" class="lp-btn lp-btn--primary">{{ t('landing.hero.ctaTrial') }}</a>
               <RouterLink :to="{ name: 'landing', hash: '#package' }" class="lp-btn lp-btn--ghost">
                 {{ t('landing.nav.package') }}
               </RouterLink>
@@ -117,7 +117,7 @@ import LandingNav from './components/LandingNav.vue'
 import { useReveal } from './composables/useReveal.js'
 import {
   CONTACT_PHONE,
-  DEMO_URL,
+  TRIAL_URL,
   TELEGRAM_CHANNEL,
   TELEGRAM_URL,
   TEL_HREF,

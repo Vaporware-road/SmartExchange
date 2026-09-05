@@ -26,7 +26,7 @@
              `hidden` on specificity. The breakpoint toggle therefore lives on a
              wrapper with no display rule of its own, where `hidden` wins. -->
         <span class="hidden sm:block">
-          <a :href="DEMO_URL" class="lp-btn lp-btn--primary !px-4 !py-2 !text-[0.82rem]">
+          <a :href="TRIAL_URL" class="lp-btn lp-btn--primary !px-4 !py-2 !text-[0.82rem]">
             {{ t('landing.nav.cta') }}
           </a>
         </span>
@@ -78,7 +78,7 @@ import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
 import LandingLangMenu from './LandingLangMenu.vue'
 import LandingLogo from './LandingLogo.vue'
-import { CONTACT_PHONE, DEMO_URL, TEL_HREF } from '@/config/landing.js'
+import { CONTACT_PHONE, TRIAL_URL, TEL_HREF } from '@/config/landing.js'
 
 const { t } = useI18n()
 const route = useRoute()

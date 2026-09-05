@@ -26,8 +26,6 @@ export function whatsappHref(message) {
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`
 }
 
-/** Instant demo: `?demo=1` autologs into the shared demo account (LoginView). */
-export const DEMO_URL = '/login?demo=1'
 /**
  * Trials are self-serve: the visitor signs up with an email address and lands
  * in their own panel with the clock already running. Kept in sync with the
@@ -35,6 +33,9 @@ export const DEMO_URL = '/login?demo=1'
  */
 export const TRIAL_URL = '/signup'
 export const TRIAL_DAYS = 14
+
+/** Tutorial hub — the "show me before I sign up" path that replaced the demo. */
+export const TUTORIALS_URL = '/tutorials'
 
 /** Bundle price. One-off — the only recurring line is the optional support add-on. */
 export const BUNDLE_PRICE = 399

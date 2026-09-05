@@ -31,6 +31,7 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
       ui_font_filename_rtl: '',
       ui_font_filename_ltr: '',
       prices_webhook_url: '',
+      support_channels: [],
     },
     loading: false,
   }),
@@ -38,6 +39,9 @@ export const useSiteSettingsStore = defineStore('siteSettings', {
   getters: {
     siteName: (state) => state.settings.site_name ?? DEFAULT_SITE_NAME,
     tagline: (state) => state.settings.tagline ?? 'Premium Exchange Panel',
+    /** Live contacts the owner console manages; every "need help?" surface reads these. */
+    supportChannels: (state) =>
+      Array.isArray(state.settings.support_channels) ? state.settings.support_channels : [],
   },
 
   actions: {
