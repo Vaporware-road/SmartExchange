@@ -16,9 +16,9 @@
         <table class="w-full min-w-[320px]">
         <thead>
           <tr class="border-b border-[var(--border-color)]">
-            <th class="text-left py-4 px-4 text-gold font-semibold">Price</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Date</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Notes</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('common.price') }}</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('common.date') }}</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('common.notes') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -34,7 +34,7 @@
         </tbody>
       </table>
       </div>
-      <p v-if="!loading && (!history || !history.length)" class="text-center text-gray-500 py-8">No history found.</p>
+      <p v-if="!loading && (!history || !history.length)" class="text-center text-gray-500 py-8">{{ $t('common.noHistory') }}</p>
     </div>
   </div>
 </template>

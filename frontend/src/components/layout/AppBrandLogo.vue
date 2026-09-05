@@ -7,7 +7,7 @@
     <img
       v-if="hasUsableLogo"
       :src="logoSrc"
-      alt="Brand logo"
+      :alt="$t('common.brandLogo')"
       class="w-full h-full object-contain"
       @error="onImageError"
     >

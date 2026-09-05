@@ -798,7 +798,7 @@ onMounted(async () => {
     hasLoadedOnce.value = true
     saveState.value = 'saved'
   } catch (e) {
-    loadError.value = e?.response?.data?.detail || 'Failed to load template'
+    loadError.value = e?.response?.data?.detail || t('templateEditor.failedToLoadTemplate')
   } finally {
     loading.value = false
   }

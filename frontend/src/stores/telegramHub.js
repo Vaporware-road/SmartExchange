@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { telegramApi } from '@/services/api'
+import i18n from '@/i18n'
 
 export const TELEGRAM_HUB_SESSION_KEY = 'telegramHubSession'
 export const TELEGRAM_HUB_VERIFY_TTL_MS = 8 * 60 * 60 * 1000
@@ -146,7 +147,7 @@ export const useTelegramHubStore = defineStore('telegramHub', {
         const { data } = await telegramApi.admin.verifyBot(payload)
         if (!data?.ok || !data?.bot) {
           this.clearSession()
-          const err = new Error(data?.message || 'Bot verification failed')
+          const err = new Error(data?.message || i18n.global.t('telegram.bots.verificationFailed'))
           err.response = { data }
           throw err
         }

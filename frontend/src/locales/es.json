@@ -799,12 +799,9 @@
       },
       "customerAnalysis": {
         "title": "Análisis clientes",
-        "userid": "ID usuario",
-        "search": "Buscar",
-        "noData": "Sin datos"
+        "userid": "ID usuario"
       },
       "stubs": {
-        "title": "Stubs",
         "messagePlaceholder": "Mensaje campaña",
         "offerPlaceholder": "Título oferta"
       },
@@ -813,7 +810,6 @@
         "message": "Texto oferta"
       },
       "offers": {
-        "title": "Ofertas",
         "validUntil": "Válido hasta"
       }
     }
@@ -1044,18 +1040,6 @@
     "agency": "Agencia",
     "direct": "Directo"
   },
-  "onboarding": {
-    "backToList": "Volver al hub de desarrollador",
-    "subtitle": "Crea una cuenta de cliente con acceso al panel.",
-    "basicInfo": "Información básica",
-    "basicInfoDesc": "Datos personales y de contacto.",
-    "businessDetails": "Detalles de negocio",
-    "businessDetailsDesc": "Información de la empresa y modelo de colaboración.",
-    "systemAccess": "Acceso al sistema",
-    "systemAccessDesc": "Credenciales del bot de Telegram y nivel de acceso.",
-    "registeredBy": "Registrado por",
-    "registeredByHint": "Se registra automáticamente como el admin conectado."
-  },
   "landing": {
     "meta": {
       "title": "MrExchange — Panel de automatización de tipos de cambio"
@@ -1075,7 +1059,6 @@
       "title": "Un único panel de tipos para",
       "titleAccent": "todos los canales en los que publicas",
       "subtitle": "Introduce tus tipos de compra y venta una sola vez. MrExchange los envía al instante a tu web, tu canal de Telegram, tu página de Instagram y tu widget de tipos.",
-      "ctaDemo": "Solicitar demo",
       "ctaTrial": "Empezar prueba gratuita de 14 días",
       "note": "La demo es un vistazo rápido con datos preparados. La prueba es tu propio panel en tu propio subdominio.",
       "panelTitle": "Gestión de tipos",
@@ -1157,7 +1140,6 @@
     "demo": {
       "title": "Míralo en marcha",
       "text": "El vídeo muestra un solo cambio de tipo llegando a la vez a la web, al canal de Telegram y a la página de Instagram. O sáltatelo y abre el panel real — sin registro y sin contraseña.",
-      "cta": "Abrir el panel de demo",
       "note": "La cuenta de demo tiene rol de dirección: ve todas las pantallas operativas, pero la gestión de usuarios y los ajustes del sitio quedan desactivados."
     },
     "pricing": {
@@ -1388,5 +1370,17 @@
       "login": "Iniciar sesión",
       "bottom": "mrexchange.co.uk. Todos los derechos reservados."
     }
+  },
+  "registerClient": {
+    "backToList": "Volver al hub de desarrollador",
+    "subtitle": "Crea una cuenta de cliente con acceso al panel.",
+    "basicInfo": "Información básica",
+    "basicInfoDesc": "Datos personales y de contacto.",
+    "businessDetails": "Detalles de negocio",
+    "businessDetailsDesc": "Información de la empresa y modelo de colaboración.",
+    "systemAccess": "Acceso al sistema",
+    "systemAccessDesc": "Credenciales del bot de Telegram y nivel de acceso.",
+    "registeredBy": "Registrado por",
+    "registeredByHint": "Se registra automáticamente como el admin conectado."
   }
 }

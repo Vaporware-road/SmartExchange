@@ -17,8 +17,8 @@
         <table class="w-full min-w-[280px]">
         <thead>
           <tr class="border-b border-[var(--border-color)]">
-            <th class="text-left py-4 px-4 text-gold font-semibold">Price</th>
-            <th class="text-left py-4 px-4 text-gold font-semibold">Date</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('common.price') }}</th>
+            <th class="text-left py-4 px-4 text-gold font-semibold">{{ $t('common.date') }}</th>
           </tr>
         </thead>
         <tbody>

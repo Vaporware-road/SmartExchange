@@ -799,12 +799,9 @@
       },
       "customerAnalysis": {
         "title": "Müşteri Analizi",
-        "userid": "Kullanıcı kimliği",
-        "search": "Ara",
-        "noData": "Veri yok"
+        "userid": "Kullanıcı kimliği"
       },
       "stubs": {
-        "title": "Veri Taslakları",
         "messagePlaceholder": "Kampanya mesajı",
         "offerPlaceholder": "Teklif başlığı"
       },
@@ -813,7 +810,6 @@
         "message": "Teklif metni"
       },
       "offers": {
-        "title": "Teklifler",
         "validUntil": "Son geçerlilik"
       }
     }
@@ -1044,18 +1040,6 @@
     "agency": "Ajans",
     "direct": "Doğrudan"
   },
-  "onboarding": {
-    "backToList": "Geliştirici Merkezine Dön",
-    "subtitle": "Borsa paneline erişimi olan yeni bir müşteri hesabı oluşturun.",
-    "basicInfo": "Temel Bilgiler",
-    "basicInfoDesc": "Müşterinin kişisel ve iletişim bilgileri.",
-    "businessDetails": "İş Bilgileri",
-    "businessDetailsDesc": "Şirket bilgileri ve ortaklık modeli.",
-    "systemAccess": "Sistem Erişimi",
-    "systemAccessDesc": "Telegram bot kimlik bilgileri ve erişim seviyesi.",
-    "registeredBy": "Kaydeden",
-    "registeredByHint": "Otomatik olarak giriş yapan yönetici olarak kaydedilir."
-  },
   "landing": {
     "meta": {
       "title": "MrExchange — Döviz Kuru Otomasyon Paneli"
@@ -1075,7 +1059,6 @@
       "title": "Tek bir kur paneli,",
       "titleAccent": "yayın yaptığınız her kanal için",
       "subtitle": "Alış ve satış kurlarınızı bir kez girin. MrExchange kaydettiğiniz anda bunları web sitenize, Telegram kanalınıza, Instagram sayfanıza ve kur bileşeninize gönderir.",
-      "ctaDemo": "Demo alın",
       "ctaTrial": "14 günlük ücretsiz denemeyi başlatın",
       "note": "Demo, hazır verilerle hızlı bir bakıştır. Deneme ise kendi alt alan adınızda kendi panelinizdir.",
       "panelTitle": "Kur yönetimi",
@@ -1157,7 +1140,6 @@
     "demo": {
       "title": "Çalışırken görün",
       "text": "Videoda tek bir kur değişikliğinin aynı anda web sitesine, Telegram kanalına ve Instagram sayfasına ulaştığını görürsünüz. Ya da atlayın ve gerçek paneli açın — kayıt yok, parola yok.",
-      "cta": "Demo panelini aç",
       "note": "Demo hesabı yönetici rolündedir: tüm operasyonel ekranları görür, ancak kullanıcı yönetimi ve site ayarları kapalıdır."
     },
     "pricing": {
@@ -1388,5 +1370,17 @@
       "login": "Giriş yap",
       "bottom": "mrexchange.co.uk. Tüm hakları saklıdır."
     }
+  },
+  "registerClient": {
+    "backToList": "Geliştirici Merkezine Dön",
+    "subtitle": "Borsa paneline erişimi olan yeni bir müşteri hesabı oluşturun.",
+    "basicInfo": "Temel Bilgiler",
+    "basicInfoDesc": "Müşterinin kişisel ve iletişim bilgileri.",
+    "businessDetails": "İş Bilgileri",
+    "businessDetailsDesc": "Şirket bilgileri ve ortaklık modeli.",
+    "systemAccess": "Sistem Erişimi",
+    "systemAccessDesc": "Telegram bot kimlik bilgileri ve erişim seviyesi.",
+    "registeredBy": "Kaydeden",
+    "registeredByHint": "Otomatik olarak giriş yapan yönetici olarak kaydedilir."
   }
 }

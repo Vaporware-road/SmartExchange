@@ -799,12 +799,9 @@
       },
       "customerAnalysis": {
         "title": "Analyse clients",
-        "userid": "ID utilisateur",
-        "search": "Rechercher",
-        "noData": "Aucune donnée"
+        "userid": "ID utilisateur"
       },
       "stubs": {
-        "title": "Stubs",
         "messagePlaceholder": "Message campagne",
         "offerPlaceholder": "Titre offre"
       },
@@ -813,7 +810,6 @@
         "message": "Texte de l'offre"
       },
       "offers": {
-        "title": "Offres",
         "validUntil": "Valide jusqu'au"
       }
     }
@@ -1044,18 +1040,6 @@
     "agency": "Agence",
     "direct": "Direct"
   },
-  "onboarding": {
-    "backToList": "Retour au hub développeur",
-    "subtitle": "Créer un compte client avec accès au panneau.",
-    "basicInfo": "Informations de base",
-    "basicInfoDesc": "Détails personnels et coordonnées.",
-    "businessDetails": "Détails entreprise",
-    "businessDetailsDesc": "Informations société et modèle de partenariat.",
-    "systemAccess": "Accès système",
-    "systemAccessDesc": "Identifiants du bot Telegram et niveau d'accès.",
-    "registeredBy": "Enregistré par",
-    "registeredByHint": "Enregistré automatiquement comme admin connecté."
-  },
   "landing": {
     "meta": {
       "title": "MrExchange — Panneau d'automatisation des taux de change"
@@ -1075,7 +1059,6 @@
       "title": "Un seul panneau de taux pour",
       "titleAccent": "tous les canaux où vous publiez",
       "subtitle": "Saisissez vos taux d'achat et de vente une seule fois. MrExchange les envoie aussitôt vers votre site, votre canal Telegram, votre page Instagram et votre widget de taux.",
-      "ctaDemo": "Demander une démo",
       "ctaTrial": "Démarrer l'essai gratuit de 14 jours",
       "note": "La démo est un aperçu rapide avec des données prêtes. L'essai, c'est votre propre panneau sur votre propre sous-domaine.",
       "panelTitle": "Gestion des taux",
@@ -1157,7 +1140,6 @@
     "demo": {
       "title": "Voyez-le fonctionner",
       "text": "La vidéo montre un seul changement de taux atteignant en même temps le site, le canal Telegram et la page Instagram. Ou passez la vidéo et ouvrez directement le vrai panneau — sans inscription, sans mot de passe.",
-      "cta": "Ouvrir le panneau de démo",
       "note": "Le compte de démo a le rôle « direction » : il voit tous les écrans opérationnels, mais la gestion des utilisateurs et les réglages du site restent désactivés."
     },
     "pricing": {
@@ -1388,5 +1370,17 @@
       "login": "Se connecter",
       "bottom": "mrexchange.co.uk. Tous droits réservés."
     }
+  },
+  "registerClient": {
+    "backToList": "Retour au hub développeur",
+    "subtitle": "Créer un compte client avec accès au panneau.",
+    "basicInfo": "Informations de base",
+    "basicInfoDesc": "Détails personnels et coordonnées.",
+    "businessDetails": "Détails entreprise",
+    "businessDetailsDesc": "Informations société et modèle de partenariat.",
+    "systemAccess": "Accès système",
+    "systemAccessDesc": "Identifiants du bot Telegram et niveau d'accès.",
+    "registeredBy": "Enregistré par",
+    "registeredByHint": "Enregistré automatiquement comme admin connecté."
   }
 }

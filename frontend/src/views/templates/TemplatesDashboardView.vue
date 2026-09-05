@@ -14,8 +14,7 @@
           to="/templates/new"
           class="btn-luxury inline-flex w-full items-center justify-center gap-2 sm:w-auto"
         >
-          <i class="fas fa-plus"></i> Add Template
-        </router-link>
+          <i class="fas fa-plus"></i>{{ $t('templates.addTemplate') }}</router-link>
       </div>
     </div>
 
@@ -41,8 +40,7 @@
     >
       <p class="text-[var(--text-secondary)] mb-4">{{ $t('emptyState.noTemplates') || 'No templates yet.' }}</p>
       <router-link to="/templates/new" class="btn-luxury">
-        <i class="fas fa-plus"></i> Add Template
-      </router-link>
+        <i class="fas fa-plus"></i>{{ $t('templates.addTemplate') }}</router-link>
     </div>
 
     <!-- Template cards: vertical layout with preview + details -->
@@ -109,8 +107,7 @@
             :to="`/templates/${t.id}/editor`"
             class="btn-luxury-outline text-sm py-2 w-full sm:w-auto"
           >
-            <i class="fas fa-edit"></i> Editor
-          </router-link>
+            <i class="fas fa-edit"></i>{{ $t('templates.editor') }}</router-link>
           <button
             type="button"
             class="btn-luxury-outline text-sm py-2 w-full sm:w-auto !border-rose-500/50 !text-rose-400 hover:!bg-rose-500/10"
@@ -128,6 +125,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { getApiErrorDetails, templateEditorApi } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
@@ -135,6 +133,7 @@ import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 const loading = ref(true)
 const templates = ref([])
 const deletingId = ref(null)
+const { t } = useI18n()
 const toast = useToast()
 
 /** Extract up to 5 variable_key values from config (themes or legacy fields) for preview. */
@@ -190,7 +189,7 @@ async function deleteTemplate(template) {
   try {
     await templateEditorApi.delete(template.id)
     templates.value = templates.value.filter((t) => t.id !== template.id)
-    toast.success('Template deleted successfully.')
+    toast.success(t('templates.deleted'))
   } catch (error) {
     toast.error(getApiErrorDetails(error).message)
   } finally {

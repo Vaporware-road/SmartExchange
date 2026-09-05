@@ -54,7 +54,19 @@
     "aboutPage": "About",
     "active": "Active",
     "inactive": "Inactive",
-    "saved": "Saved"
+    "saved": "Saved",
+    "brandLogo": "Brand logo",
+    "breadcrumb": "Breadcrumb",
+    "toggleSidebar": "Toggle sidebar",
+    "dismiss": "Dismiss",
+    "poweredBy": "Powered by",
+    "price": "Price",
+    "notes": "Notes",
+    "noHistory": "No history found.",
+    "category": "Category",
+    "copyLink": "Copy link",
+    "linkCopied": "Link copied",
+    "copyFailed": "Could not copy"
   },
   "header": {
     "openMenu": "Open menu",
@@ -417,7 +429,59 @@
       "english_weekday": "English weekday name"
     },
     "arabicShapingLabel": "Persian/Arabic shaping (export)",
-    "arabicShapingHelp": "Uses arabic reshaper + bidi so RTL text draws correctly in PNG when Pillow has no libraqm. Editor preview follows the same shaping when ON."
+    "arabicShapingHelp": "Uses arabic reshaper + bidi so RTL text draws correctly in PNG when Pillow has no libraqm. Editor preview follows the same shaping when ON.",
+    "inspector": "Inspector",
+    "templateSettings": "Template settings",
+    "templateName": "Template name",
+    "width": "Width",
+    "height": "Height",
+    "canvasBackground": "Canvas background",
+    "selectWidgetHint": "Select a widget to edit style, typography and data bindings.",
+    "name": "Name",
+    "type": "Type",
+    "priceTypeBinding": "PriceType binding",
+    "selectPriceType": "Select PriceType",
+    "stableKey": "Stable key:",
+    "previewSource": "Preview source:",
+    "fallbackValue": "Fallback value (used when live value is unavailable)",
+    "typography": "Typography",
+    "fontSize": "Font size",
+    "textColor": "Text color",
+    "fontFile": "Font file (PNG export)",
+    "fontDefault": "Default (server)",
+    "alignLabel": "Align",
+    "verticalAlign": "Vertical (in box)",
+    "alignMiddle": "Middle",
+    "weight": "Weight",
+    "weightNormal": "Normal",
+    "weightBold": "Bold",
+    "lineHeight": "Line height (optional)",
+    "plainOnExport": "Plain text on export (no outline / shadow)",
+    "dropShadow": "Drop shadow (PNG)",
+    "textOutline": "Text outline (PNG)",
+    "snapToBackground": "Snap to background image",
+    "imageUrl": "Image URL",
+    "openMediaLibrary": "Open media library",
+    "opacityLabel": "Opacity (editor + PNG)",
+    "rotation": "Rotation",
+    "deleteWidget": "Delete widget",
+    "alignLeft": "Left",
+    "alignCenter": "Center",
+    "alignRight": "Right",
+    "alignBottom": "Bottom",
+    "widgetLibrary": "Widget library",
+    "priceBindings": "Price bindings",
+    "mediaLibrary": "Media library",
+    "uploadBaseImage": "Upload base image",
+    "setBackgroundFirst": "Set canvas background first",
+    "loadingEllipsis": "Loading…",
+    "noUploads": "No uploads yet.",
+    "clockSource": "Uses the server's time value.",
+    "previewValue": "Value:",
+    "pickColor": "Pick color",
+    "imageUploaded": "Image uploaded",
+    "imageWidgetAdded": "Image widget added — select it to move or resize",
+    "mediaLoadFailed": "Could not load media"
   },
   "categories": {
     "backToList": "Back to Categories",
@@ -797,7 +861,9 @@
       "copyLink": "Copy link",
       "copied": "Copied",
       "save": "Save API settings"
-    }
+    },
+    "confirmClearCache": "Confirm clear cache",
+    "confirmDeleteFont": "Confirm delete font"
   },
   "specialPrices": {
     "backToList": "Back to Special Prices",
@@ -1104,6 +1170,9 @@
       "loadError": "Could not load customers",
       "tagError": "Could not update tag",
       "tagUpdated": "Tag updated"
+    },
+    "bots": {
+      "verificationFailed": "Bot verification failed"
     }
   },
   "telegramStudio": {
@@ -1970,5 +2039,28 @@
     "channelOrder": "Order",
     "preview": "What customers see",
     "previewEmpty": "Nothing is active, so no contact is shown anywhere."
+  },
+  "registerClient": {
+    "backToList": "Back to Developer Hub",
+    "subtitle": "Create a new client account with access to the exchange panel.",
+    "basicInfo": "Basic Info",
+    "basicInfoDesc": "Personal and contact details of the client.",
+    "businessDetails": "Business Details",
+    "businessDetailsDesc": "Company information and partnership model.",
+    "systemAccess": "System Access",
+    "systemAccessDesc": "Telegram bot credentials and access level.",
+    "registeredBy": "Registered by",
+    "registeredByHint": "Automatically recorded as the logged-in admin."
+  },
+  "about": {
+    "motto": "Every product is an opportunity to leave a lasting mark."
+  },
+  "templates": {
+    "selectCategory": "Select category",
+    "addTemplate": "Add Template",
+    "editor": "Editor",
+    "nameRequired": "Please enter a template name.",
+    "categoryRequired": "Pick a category before creating the template.",
+    "deleted": "Template deleted."
   }
 }

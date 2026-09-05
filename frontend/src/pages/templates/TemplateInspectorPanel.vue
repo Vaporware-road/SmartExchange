@@ -1,27 +1,27 @@
 <template>
   <aside class="flex w-72 shrink-0 flex-col gap-3 overflow-y-auto rounded-xl border border-[var(--border-card)] bg-[var(--bg-card)] p-3 text-sm">
-    <h2 class="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">Inspector</h2>
+    <h2 class="text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">{{ $t('templateEditor.inspector') }}</h2>
 
     <template v-if="!w">
       <div class="space-y-2 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/45 p-3">
-        <p class="text-xs font-semibold text-[var(--text-primary)]">Template settings</p>
+        <p class="text-xs font-semibold text-[var(--text-primary)]">{{ $t('templateEditor.templateSettings') }}</p>
         <div class="space-y-1.5">
-          <label class="block text-xs text-[var(--text-secondary)]">Template name</label>
+          <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.templateName') }}</label>
           <input v-model="templateName" type="text" class="input-luxury w-full text-sm" />
         </div>
         <div class="grid grid-cols-2 gap-2">
           <div class="space-y-1.5">
-            <label class="block text-xs text-[var(--text-secondary)]">Width</label>
+            <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.width') }}</label>
             <input v-model.number="canvasWidthValue" type="number" min="320" max="4096" class="input-luxury w-full text-sm" />
           </div>
           <div class="space-y-1.5">
-            <label class="block text-xs text-[var(--text-secondary)]">Height</label>
+            <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.height') }}</label>
             <input v-model.number="canvasHeightValue" type="number" min="320" max="4096" class="input-luxury w-full text-sm" />
           </div>
         </div>
         <div class="grid grid-cols-[1fr_auto] gap-2">
           <div class="space-y-1.5">
-            <label class="block text-xs text-[var(--text-secondary)]">Canvas background</label>
+            <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.canvasBackground') }}</label>
             <input v-model="canvasBgColor" type="text" class="input-luxury w-full text-sm font-mono" placeholder="#ffffff" />
           </div>
           <div class="space-y-1.5">
@@ -35,10 +35,10 @@
           @click="te.openBackgroundPicker?.()"
         >
           <i class="fas fa-image" />
-          Upload background image
+          {{ $t('templateEditor.uploadBackgroundImage') }}
         </button>
       </div>
-      <p class="text-xs text-[var(--text-secondary)]">Select a widget to edit style, typography and data bindings.</p>
+      <p class="text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.selectWidgetHint') }}</p>
     </template>
 
     <template v-else>
@@ -56,25 +56,24 @@
       </div>
 
       <div class="space-y-2">
-        <label class="block text-xs text-[var(--text-secondary)]">Name</label>
+        <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.name') }}</label>
         <input v-model="w.name" type="text" class="input-luxury w-full text-sm" />
       </div>
 
       <div class="space-y-2">
-        <label class="block text-xs text-[var(--text-secondary)]">Type</label>
+        <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.type') }}</label>
         <input :value="w.type" type="text" class="input-luxury w-full text-sm opacity-70" disabled />
       </div>
 
       <div v-if="activeTab === 'data' && w.type === 'text'" class="space-y-2">
-        <label class="block text-xs text-[var(--text-secondary)]">PriceType binding</label>
+        <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.priceTypeBinding') }}</label>
         <select v-model="selectedPriceTypeId" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
-          <option :value="''">Select PriceType</option>
+          <option :value="''">{{ $t('templateEditor.selectPriceType') }}</option>
           <option v-for="pt in categoryPriceTypeOptions" :key="pt.id" :value="String(pt.id)">
             {{ pt.name }}
           </option>
         </select>
-        <p v-if="linkedPriceTypeId != null" class="text-[10px] text-[var(--text-secondary)]">
-          Stable key: <span class="font-mono text-[var(--text-primary)]">price_type__{{ linkedPriceTypeId }}</span>
+        <p v-if="linkedPriceTypeId != null" class="text-[10px] text-[var(--text-secondary)]">{{ $t('templateEditor.stableKey') }}<span class="font-mono text-[var(--text-primary)]">price_type__{{ linkedPriceTypeId }}</span>
         </p>
         <div
           v-if="showPriceDigitLocale"
@@ -108,12 +107,13 @@
         <div
           v-if="bindingPreviewInfo"
           class="rounded border border-[var(--border-card)] bg-[var(--bg-input)]/40 px-2 py-1.5 text-[10px] text-[var(--text-secondary)]"
-        >
-          Preview source:
-          <span class="font-semibold text-[var(--text-primary)]">{{ bindingPreviewInfo.sourceLabel }}</span>
-          <span v-if="bindingPreviewDisplayValue"> | Value: <span class="font-mono text-[var(--text-primary)]">{{ bindingPreviewDisplayValue }}</span></span>
+        >{{ $t('templateEditor.previewSource') }}<span class="font-semibold text-[var(--text-primary)]">{{ bindingPreviewInfo.sourceLabel }}</span>
+          <span v-if="bindingPreviewDisplayValue">
+            {{ $t('templateEditor.previewValue') }}
+            <span class="font-mono text-[var(--text-primary)]">{{ bindingPreviewDisplayValue }}</span>
+          </span>
         </div>
-        <label class="block text-xs text-[var(--text-secondary)]">Fallback value (used when live value is unavailable)</label>
+        <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.fallbackValue') }}</label>
         <textarea v-model="w.content" rows="3" class="input-luxury w-full text-sm font-mono" @blur="refitSelectedAfterTick" />
       </div>
 
@@ -132,59 +132,59 @@
       </div>
 
       <div v-if="activeTab === 'data' && w.type === 'clock'" class="space-y-2">
-        <p class="text-xs text-[var(--text-secondary)]">Uses <code class="font-mono">time</code> from server data.</p>
+        <p class="text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.clockSource') }}</p>
       </div>
 
       <div v-if="activeTab === 'typography' && isTextLikeWidget" class="space-y-3 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/40 p-2">
-        <p class="text-xs font-semibold text-[var(--text-primary)]">Typography</p>
+        <p class="text-xs font-semibold text-[var(--text-primary)]">{{ $t('templateEditor.typography') }}</p>
         <div class="space-y-2">
-          <label class="block text-xs text-[var(--text-secondary)]">Font size</label>
+          <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.fontSize') }}</label>
           <input v-model.number="styleFontSize" type="number" min="1" max="200" step="1" class="input-luxury w-full text-sm" />
         </div>
         <div class="grid grid-cols-[1fr_auto] gap-2">
           <div class="space-y-2">
-            <label class="block text-xs text-[var(--text-secondary)]">Text color</label>
+            <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.textColor') }}</label>
             <input v-model="styleColorHex" type="text" class="input-luxury w-full text-sm font-mono" placeholder="#ffffff" />
           </div>
           <div class="space-y-2">
             <label class="block text-xs text-transparent">.</label>
-            <input v-model="styleColorHex" type="color" class="h-10 w-full min-w-[2.75rem] cursor-pointer rounded border border-[var(--border-card)] bg-transparent p-0" title="Pick color" />
+            <input v-model="styleColorHex" type="color" class="h-10 w-full min-w-[2.75rem] cursor-pointer rounded border border-[var(--border-card)] bg-transparent p-0" :title="$t('templateEditor.pickColor')" />
           </div>
         </div>
         <div class="space-y-2">
-          <label class="block text-xs text-[var(--text-secondary)]">Font file (PNG export)</label>
+          <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.fontFile') }}</label>
           <select v-model="styleFontFile" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
-            <option value="">Default (server)</option>
+            <option value="">{{ $t('templateEditor.fontDefault') }}</option>
             <option v-for="f in fontsList" :key="f.filename" :value="f.filename">
               {{ f.display_name || f.filename }}
             </option>
           </select>
         </div>
         <div class="space-y-2">
-          <label class="block text-xs text-[var(--text-secondary)]">Align</label>
+          <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.alignLabel') }}</label>
           <select v-model="styleAlign" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
-            <option value="left">Left</option>
-            <option value="center">Center</option>
-            <option value="right">Right</option>
+            <option value="left">{{ $t('templateEditor.alignLeft') }}</option>
+            <option value="center">{{ $t('templateEditor.alignCenter') }}</option>
+            <option value="right">{{ $t('templateEditor.alignRight') }}</option>
           </select>
         </div>
         <div class="space-y-2">
-          <label class="block text-xs text-[var(--text-secondary)]">Vertical (in box)</label>
+          <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.verticalAlign') }}</label>
           <select v-model="styleVerticalAlign" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
-            <option value="middle">Middle</option>
+            <option value="middle">{{ $t('templateEditor.alignMiddle') }}</option>
             <option value="top">Top</option>
-            <option value="bottom">Bottom</option>
+            <option value="bottom">{{ $t('templateEditor.alignBottom') }}</option>
           </select>
         </div>
         <div class="space-y-2">
-          <label class="block text-xs text-[var(--text-secondary)]">Weight</label>
+          <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.weight') }}</label>
           <select v-model="styleFontWeight" class="input-luxury w-full text-sm" @change="refitSelectedAfterTick">
-            <option value="normal">Normal</option>
-            <option value="bold">Bold</option>
+            <option value="normal">{{ $t('templateEditor.weightNormal') }}</option>
+            <option value="bold">{{ $t('templateEditor.weightBold') }}</option>
           </select>
         </div>
         <div class="space-y-2">
-          <label class="block text-xs text-[var(--text-secondary)]">Line height (optional)</label>
+          <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.lineHeight') }}</label>
           <input
             v-model="styleLineHeight"
             type="text"
@@ -193,10 +193,10 @@
             @blur="refitSelectedAfterTick"
           />
         </div>
-        <BaseCheckbox v-model="stylePlainText">Plain text on export (no outline / shadow)</BaseCheckbox>
+        <BaseCheckbox v-model="stylePlainText">{{ $t('templateEditor.plainOnExport') }}</BaseCheckbox>
         <template v-if="!stylePlainText">
-          <BaseCheckbox v-model="styleShadowEnabled">Drop shadow (PNG)</BaseCheckbox>
-          <BaseCheckbox v-model="styleOutlineEnabled">Text outline (PNG)</BaseCheckbox>
+          <BaseCheckbox v-model="styleShadowEnabled">{{ $t('templateEditor.dropShadow') }}</BaseCheckbox>
+          <BaseCheckbox v-model="styleOutlineEnabled">{{ $t('templateEditor.textOutline') }}</BaseCheckbox>
         </template>
       </div>
 
@@ -204,22 +204,22 @@
         v-if="activeTab === 'appearance' && canAlignWidgetToBackground"
         class="space-y-2 rounded-lg border border-[var(--border-card)] bg-[var(--bg-input)]/40 p-2"
       >
-        <p class="text-xs font-semibold text-[var(--text-primary)]">Snap to background image</p>
+        <p class="text-xs font-semibold text-[var(--text-primary)]">{{ $t('templateEditor.snapToBackground') }}</p>
         <p class="text-[10px] leading-snug text-[var(--text-secondary)]">
           Moves the widget box to the edges of the visible image (letterboxing excluded).
         </p>
         <div class="grid grid-cols-3 gap-1">
-          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('left')">Left</button>
+          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('left')">{{ $t('templateEditor.alignLeft') }}</button>
           <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('center-h')">H mid</button>
-          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('right')">Right</button>
+          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('right')">{{ $t('templateEditor.alignRight') }}</button>
           <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('top')">Top</button>
           <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('center-v')">V mid</button>
-          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('bottom')">Bottom</button>
+          <button type="button" class="btn-luxury-outline py-1.5 text-[10px]" @click="alignWidgetToBackground('bottom')">{{ $t('templateEditor.alignBottom') }}</button>
         </div>
       </div>
 
       <div v-if="activeTab === 'appearance' && w.type === 'image'" class="space-y-2">
-        <label class="block text-xs text-[var(--text-secondary)]">Image URL</label>
+        <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.imageUrl') }}</label>
         <input v-model="w.content" type="url" class="input-luxury w-full text-sm" placeholder="https://… or /media/…" />
         <input ref="imageFileInput" type="file" accept="image/jpeg,image/png,image/gif,image/webp" class="hidden" @change="onImageFile" />
         <button
@@ -236,13 +236,11 @@
           target="_blank"
           rel="noopener noreferrer"
           class="block text-center text-[10px] text-[var(--primary)] underline-offset-2 hover:underline"
-        >
-          Open media library
-        </router-link>
+        >{{ $t('templateEditor.openMediaLibrary') }}</router-link>
       </div>
 
       <div v-if="activeTab === 'appearance'" class="space-y-2">
-        <label class="block text-xs text-[var(--text-secondary)]">Opacity (editor + PNG)</label>
+        <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.opacityLabel') }}</label>
         <input v-model.number="styleOpacity" type="range" min="0" max="1" step="0.01" class="w-full accent-[var(--primary)]" />
         <div class="text-right text-[10px] tabular-nums text-[var(--text-secondary)]">{{ Math.round(styleOpacity * 100) }}%</div>
       </div>
@@ -263,7 +261,7 @@
           <input v-model.number="w.zIndex" type="number" class="input-luxury w-full text-sm" />
         </div>
         <div>
-          <label class="block text-xs text-[var(--text-secondary)]">Rotation</label>
+          <label class="block text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.rotation') }}</label>
           <input v-model.number="w.rotation" type="number" class="input-luxury w-full text-sm" />
         </div>
       </div>
@@ -272,9 +270,7 @@
         type="button"
         class="btn-luxury-outline w-full py-2 text-xs text-red-600 dark:text-red-300"
         @click="te.deleteWidget(w.id)"
-      >
-        Delete widget
-      </button>
+      >{{ $t('templateEditor.deleteWidget') }}</button>
     </template>
   </aside>
 </template>
@@ -401,7 +397,7 @@ async function onImageFile(ev) {
     const { data } = await templateEditorApi.uploadMedia(fd)
     const url = data?.url
     if (url) sw.content = typeof url === 'string' ? url : ''
-    toast.success('Image uploaded')
+    toast.success(t('templateEditor.imageUploaded'))
   } catch (e) {
     toast.error(formatDrfError(e.response?.data))
   } finally {

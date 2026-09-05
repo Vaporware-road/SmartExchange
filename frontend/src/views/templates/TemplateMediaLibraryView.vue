@@ -67,9 +67,7 @@
             class="btn-luxury-outline flex w-full items-center justify-center gap-1 py-1.5 text-xs"
             @click="copyLink(row.url)"
           >
-            <i class="fas fa-link" />
-            Copy link
-          </button>
+            <i class="fas fa-link" />{{ $t('common.copyLink') }}</button>
         </div>
       </article>
     </div>
@@ -78,10 +76,12 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { formatDrfError, templateEditorApi } from '@/services/api'
 import BaseSkeleton from '@/components/ui/BaseSkeleton.vue'
 
+const { t } = useI18n()
 const toast = useToast()
 const loading = ref(true)
 const uploading = ref(false)
@@ -99,7 +99,7 @@ async function copyLink(url) {
       : `${window.location.origin}${url.startsWith('/') ? '' : '/'}${url}`
   try {
     await navigator.clipboard.writeText(text)
-    toast.success('Link copied')
+    toast.success(t('common.linkCopied'))
   } catch {
     const ta = document.createElement('textarea')
     ta.value = text
@@ -110,10 +110,10 @@ async function copyLink(url) {
     ta.select()
     try {
       const ok = document.execCommand('copy')
-      if (ok) toast.success('Link copied')
-      else toast.error('Could not copy')
+      if (ok) toast.success(t('common.linkCopied'))
+      else toast.error(t('common.copyFailed'))
     } catch {
-      toast.error('Could not copy')
+      toast.error(t('common.copyFailed'))
     }
     document.body.removeChild(ta)
   }

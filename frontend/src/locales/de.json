@@ -799,12 +799,9 @@
       },
       "customerAnalysis": {
         "title": "Kundenanalyse",
-        "userid": "Benutzer-ID",
-        "search": "Suchen",
-        "noData": "Keine Daten"
+        "userid": "Benutzer-ID"
       },
       "stubs": {
-        "title": "Daten-Stubs",
         "messagePlaceholder": "Kampagnennachricht",
         "offerPlaceholder": "Angebotstitel"
       },
@@ -813,7 +810,6 @@
         "message": "Angebotstext"
       },
       "offers": {
-        "title": "Angebote",
         "validUntil": "Gültig bis"
       }
     }
@@ -1044,18 +1040,6 @@
     "agency": "Agentur",
     "direct": "Direkt"
   },
-  "onboarding": {
-    "backToList": "Zurück zum Entwickler-Hub",
-    "subtitle": "Neues Kundenkonto mit Zugriff auf das Börsenpanel erstellen.",
-    "basicInfo": "Basisdaten",
-    "basicInfoDesc": "Persönliche und Kontaktdaten des Kunden.",
-    "businessDetails": "Geschäftsdaten",
-    "businessDetailsDesc": "Firmeninformationen und Partnerschaftsmodell.",
-    "systemAccess": "Systemzugang",
-    "systemAccessDesc": "Telegram-Bot-Zugangsdaten und Zugriffsstufe.",
-    "registeredBy": "Registriert von",
-    "registeredByHint": "Wird automatisch als angemeldeter Admin erfasst."
-  },
   "landing": {
     "meta": {
       "title": "MrExchange — Panel zur Automatisierung von Wechselkursen"
@@ -1075,7 +1059,6 @@
       "title": "Ein Kurs-Panel für",
       "titleAccent": "jeden Kanal, auf dem Sie publizieren",
       "subtitle": "Geben Sie An- und Verkaufskurse einmal ein. MrExchange spielt sie beim Speichern sofort auf Ihre Website, Ihren Telegram-Kanal, Ihre Instagram-Seite und Ihr Kurs-Widget aus.",
-      "ctaDemo": "Demo anfordern",
       "ctaTrial": "14 Tage kostenlos testen",
       "note": "Die Demo ist ein schneller Blick mit vorbereiteten Daten. Der Test ist Ihr eigenes Panel auf Ihrer eigenen Subdomain.",
       "panelTitle": "Kursverwaltung",
@@ -1157,7 +1140,6 @@
     "demo": {
       "title": "Im Betrieb ansehen",
       "text": "Das Video zeigt, wie eine einzige Kursänderung gleichzeitig auf Website, Telegram-Kanal und Instagram-Seite ankommt. Oder überspringen Sie es und öffnen Sie direkt das echte Panel — ohne Anmeldung, ohne Passwort.",
-      "cta": "Demo-Panel öffnen",
       "note": "Das Demokonto hat die Rolle „Leitung“: Es sieht alle operativen Bereiche, Benutzerverwaltung und Website-Einstellungen bleiben jedoch gesperrt."
     },
     "pricing": {
@@ -1388,5 +1370,17 @@
       "login": "Anmelden",
       "bottom": "mrexchange.co.uk. Alle Rechte vorbehalten."
     }
+  },
+  "registerClient": {
+    "backToList": "Zurück zum Entwickler-Hub",
+    "subtitle": "Neues Kundenkonto mit Zugriff auf das Börsenpanel erstellen.",
+    "basicInfo": "Basisdaten",
+    "basicInfoDesc": "Persönliche und Kontaktdaten des Kunden.",
+    "businessDetails": "Geschäftsdaten",
+    "businessDetailsDesc": "Firmeninformationen und Partnerschaftsmodell.",
+    "systemAccess": "Systemzugang",
+    "systemAccessDesc": "Telegram-Bot-Zugangsdaten und Zugriffsstufe.",
+    "registeredBy": "Registriert von",
+    "registeredByHint": "Wird automatisch als angemeldeter Admin erfasst."
   }
 }

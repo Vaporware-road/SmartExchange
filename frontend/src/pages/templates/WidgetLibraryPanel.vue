@@ -1,8 +1,6 @@
 <template>
   <aside class="flex w-64 shrink-0 flex-col gap-2 overflow-hidden rounded-xl border border-[var(--border-card)] bg-[var(--bg-card)] text-sm sm:w-64">
-    <h2 class="shrink-0 px-2 pt-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">
-      Widget library
-    </h2>
+    <h2 class="shrink-0 px-2 pt-2 text-xs font-semibold uppercase tracking-wide text-[var(--text-secondary)]">{{ $t('templateEditor.widgetLibrary') }}</h2>
 
     <div class="min-h-0 flex-1 space-y-2 overflow-y-auto px-2 pb-2">
       <section
@@ -58,7 +56,7 @@
         >
           <span class="flex min-w-0 items-center gap-2">
             <i class="fas fa-coins shrink-0 text-[var(--primary)]" />
-            <span class="truncate">Price bindings</span>
+            <span class="truncate">{{ $t('templateEditor.priceBindings') }}</span>
           </span>
           <i
             class="fas fa-chevron-down shrink-0 text-xs text-[var(--text-secondary)] transition-transform"
@@ -87,7 +85,7 @@
         >
           <span class="flex min-w-0 items-center gap-2">
             <i class="fas fa-folder-open shrink-0 text-[var(--primary)]" />
-            <span class="truncate">Media library</span>
+            <span class="truncate">{{ $t('templateEditor.mediaLibrary') }}</span>
           </span>
           <i
             class="fas fa-chevron-down shrink-0 text-xs text-[var(--text-secondary)] transition-transform"
@@ -104,12 +102,12 @@
               <i class="fas fa-image" />
             </span>
             <span>
-              <span class="block text-xs font-semibold text-[var(--text-primary)]">Upload base image</span>
-              <span class="block text-[10px] text-[var(--text-secondary)]">Set canvas background first</span>
+              <span class="block text-xs font-semibold text-[var(--text-primary)]">{{ $t('templateEditor.uploadBaseImage') }}</span>
+              <span class="block text-[10px] text-[var(--text-secondary)]">{{ $t('templateEditor.setBackgroundFirst') }}</span>
             </span>
           </button>
-          <p v-if="mediaLoading" class="px-1 py-2 text-xs text-[var(--text-secondary)]">Loading…</p>
-          <p v-else-if="!mediaItems.length" class="px-1 py-2 text-xs text-[var(--text-secondary)]">No uploads yet.</p>
+          <p v-if="mediaLoading" class="px-1 py-2 text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.loadingEllipsis') }}</p>
+          <p v-else-if="!mediaItems.length" class="px-1 py-2 text-xs text-[var(--text-secondary)]">{{ $t('templateEditor.noUploads') }}</p>
           <div v-else class="grid max-h-40 grid-cols-3 gap-1 overflow-y-auto">
             <button
               v-for="m in mediaItems"
@@ -130,6 +128,7 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { templateEditorApi, formatDrfError } from '@/services/api'
 import { useTemplateEditorInjected } from './templateEditorInjectionKey.js'
@@ -139,6 +138,7 @@ const props = defineProps({
 })
 
 const te = useTemplateEditorInjected()
+const { t } = useI18n()
 const toast = useToast()
 
 const sections = [
@@ -212,7 +212,7 @@ async function loadMedia() {
     mediaItems.value = Array.isArray(data?.results) ? data.results : []
   } catch (e) {
     mediaItems.value = []
-    toast.error(formatDrfError(e.response?.data) || 'Could not load media')
+    toast.error(formatDrfError(e.response?.data) || t('templateEditor.mediaLoadFailed'))
   } finally {
     mediaLoading.value = false
   }
@@ -256,7 +256,7 @@ function insertMediaUrl(url) {
     content: url,
     name: 'Image',
   })
-  toast.success('Image widget added — select it to move or resize')
+  toast.success(t('templateEditor.imageWidgetAdded'))
 }
 
 watch(

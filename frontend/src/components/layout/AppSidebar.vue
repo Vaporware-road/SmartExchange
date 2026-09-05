@@ -65,7 +65,7 @@
       <button
         type="button"
         class="w-full flex items-center justify-center py-2.5 rounded-xl transition-all duration-300 ease-in-out border border-[var(--border-color)] bg-[var(--bg-navbar)] hover:bg-[var(--bg-hover)] hover:border-[var(--border-card-hover)] text-[var(--text-secondary)] hover:text-[var(--primary)]"
-        aria-label="Toggle sidebar"
+        :aria-label="$t('common.toggleSidebar')"
         @click="toggleSidebar"
       >
         <i

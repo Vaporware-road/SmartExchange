@@ -8,9 +8,7 @@
     <div class="vapor-about__scan" aria-hidden="true" />
 
     <div class="vapor-about__frame">
-      <p class="vapor-about__tag">
-        Every product is an opportunity to leave a lasting mark.
-      </p>
+      <p class="vapor-about__tag">{{ $t('about.motto') }}</p>
 
       <GlitchTitle text="Vaporware-Road" />
 

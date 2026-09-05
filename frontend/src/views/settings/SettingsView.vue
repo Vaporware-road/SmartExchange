@@ -478,7 +478,7 @@
     <BaseModal
       v-model="showClearCacheModal"
       :title="$t('common.confirm')"
-      aria-label="Confirm clear cache"
+      :aria-label="$t('settings.confirmClearCache')"
     >
       <p class="text-[var(--text-secondary)] mb-6">{{ $t('settings.uploads.clearCacheConfirm') }}</p>
       <div class="flex gap-3 justify-end">
@@ -499,7 +499,7 @@
     <BaseModal
       v-model="showDeleteFontModal"
       :title="$t('common.confirm')"
-      aria-label="Confirm delete font"
+      :aria-label="$t('settings.confirmDeleteFont')"
     >
       <p class="text-[var(--text-secondary)] mb-6">{{ $t('settings.fonts.deleteConfirm', { name: fontPendingDelete || '' }) }}</p>
       <div class="flex gap-3 justify-end">

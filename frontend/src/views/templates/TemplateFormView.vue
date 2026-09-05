@@ -15,9 +15,9 @@
         <input v-model="name" type="text" class="input-luxury" required />
       </div>
       <div>
-        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">Category</label>
+        <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ $t('common.category') }}</label>
         <select v-model.number="selectedCategoryId" class="input-luxury" required>
-          <option :value="null" disabled>Select category</option>
+          <option :value="null" disabled>{{ $t('templates.selectCategory') }}</option>
           <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
         </select>
       </div>
@@ -32,12 +32,14 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useToast } from 'vue-toastification'
 import { templateEditorApi, categoryApi } from '@/services/api'
 import LoadingSpinner from '@/components/ui/LoadingSpinner.vue'
 
 const router = useRouter()
 const route = useRoute()
+const { t } = useI18n()
 const toast = useToast()
 const name = ref('')
 const submitting = ref(false)
@@ -88,14 +90,14 @@ function formatCreateError(data) {
 async function handleSubmit() {
   const trimmed = name.value.trim()
   if (!trimmed) {
-    toast.error('Please enter a template name.')
+    toast.error(t('templates.nameRequired'))
     return
   }
   submitting.value = true
   try {
     const cid = selectedCategoryId.value ?? categoryIdFromQuery.value
     if (cid == null || !Number.isFinite(Number(cid))) {
-      toast.error('A category is required to create template.')
+      toast.error(t('templates.categoryRequired'))
       return
     }
     const payload = { name: trimmed }

@@ -8,11 +8,11 @@
           class="mb-2 inline-flex items-center gap-1.5 text-sm text-[var(--text-secondary)] transition-colors hover:text-[var(--primary)]"
         >
           <i class="fas fa-arrow-left text-xs rtl:rotate-180" />
-          {{ $t('onboarding.backToList') }}
+          {{ $t('registerClient.backToList') }}
         </router-link>
         <h1 class="text-2xl font-bold text-gold">{{ $t('programmerHub.register') }}</h1>
         <p class="mt-1 text-sm text-[var(--text-secondary)]">
-          {{ $t('onboarding.subtitle') }}
+          {{ $t('registerClient.subtitle') }}
         </p>
       </div>
       <div
@@ -27,8 +27,8 @@
       <!-- Section 1: Basic Info -->
       <FormSection
         icon="fas fa-user"
-        :title="$t('onboarding.basicInfo')"
-        :description="$t('onboarding.basicInfoDesc')"
+        :title="$t('registerClient.basicInfo')"
+        :description="$t('registerClient.basicInfoDesc')"
       >
         <TextField
           v-model="form.first_name"
@@ -81,8 +81,8 @@
       <!-- Section 2: Business Details -->
       <FormSection
         icon="fas fa-briefcase"
-        :title="$t('onboarding.businessDetails')"
-        :description="$t('onboarding.businessDetailsDesc')"
+        :title="$t('registerClient.businessDetails')"
+        :description="$t('registerClient.businessDetailsDesc')"
       >
         <TextField
           v-model="form.exchange_name"
@@ -117,8 +117,8 @@
       <!-- Section 3: System Access -->
       <FormSection
         icon="fas fa-key"
-        :title="$t('onboarding.systemAccess')"
-        :description="$t('onboarding.systemAccessDesc')"
+        :title="$t('registerClient.systemAccess')"
+        :description="$t('registerClient.systemAccessDesc')"
       >
         <TextField
           v-model="form.telegram_id"
@@ -184,7 +184,7 @@
         <!-- Audit trail: auto-filled, read-only -->
         <div class="min-w-0 w-full">
           <span class="mb-1.5 block text-sm font-medium text-[var(--text-primary)]">
-            {{ $t('onboarding.registeredBy') }}
+            {{ $t('registerClient.registeredBy') }}
           </span>
           <div
             class="flex items-center gap-2.5 rounded-xl border border-[var(--border-card)] bg-[var(--bg-input)]/70 px-4 py-3"
@@ -197,7 +197,7 @@
                 {{ registeredByName }}
               </p>
               <p class="text-xs text-[var(--text-secondary)]">
-                {{ $t('onboarding.registeredByHint') }}
+                {{ $t('registerClient.registeredByHint') }}
               </p>
             </div>
           </div>
