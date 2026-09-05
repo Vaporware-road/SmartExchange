@@ -123,7 +123,6 @@
     "password": "Password",
     "loginButton": "Login",
     "loggingIn": "Logging in...",
-    "exploreDemo": "Explore Demo",
     "signingIn": "Signing in…",
     "email": "Email address",
     "emailPlaceholder": "you@yourexchange.com",
@@ -149,7 +148,22 @@
       "resend": "Send it again",
       "sent": "Confirmation email sent.",
       "sendFailed": "We could not send the email. Try again in a moment."
-    }
+    },
+    "identifier": "Email or username",
+    "identifierPlaceholder": "you@yourexchange.com",
+    "or": "or",
+    "googleUnavailable": "Google sign-in could not load. Use your email and password.",
+    "noAccount": "No account yet?",
+    "signupLink": "Start your free trial",
+    "confirmTitle": "Confirm it is you",
+    "confirmSentEmail": "We sent a six-digit code to {to}.",
+    "confirmSentSms": "We texted a six-digit code to {to}.",
+    "confirmCode": "Confirmation code",
+    "confirmButton": "Confirm",
+    "confirmResend": "Send a new code",
+    "confirmResent": "A new code is on its way.",
+    "confirmSkip": "Do this later",
+    "confirmSendFailed": "We could not send the code. Try again in a moment."
   },
   "routes": {
     "dashboard": "Dashboard",
@@ -1751,5 +1765,15 @@
     "customerNamePlaceholder": "e.g. John Smith",
     "amountPlaceholder": "Enter amount",
     "phonePlaceholder": "0912..."
+  },
+  "trial": {
+    "expiredTitle": "Your free trial has ended.",
+    "expiredText": "Your data is safe and still visible, but changes are paused until you upgrade.",
+    "talkToUs": "Talk to us",
+    "daysLeft": "{days} days left in your trial"
+  },
+  "support": {
+    "title": "Need a hand?",
+    "text": "Message our admins — a person answers."
   }
 }

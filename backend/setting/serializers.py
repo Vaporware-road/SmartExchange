@@ -61,6 +61,11 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
     # Read-only here: the owner console is the only place they are edited, but
     # every public surface reads them from this one endpoint.
     support_channels = serializers.SerializerMethodField()
+    # Public by design — it identifies the app to Google, it is not a secret —
+    # and empty when the install has no client id, which is how the login page
+    # knows whether to render the button at all.
+    google_client_id = serializers.SerializerMethodField()
+    signup_enabled = serializers.SerializerMethodField()
 
     class Meta:
         model = SiteSettings
@@ -89,12 +94,24 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "prices_webhook_url",
             "telegram_webhook_base_url",
             "support_channels",
+            "google_client_id",
+            "signup_enabled",
         ]
 
     def get_support_channels(self, obj):
         from .support import support_channel_payload
 
         return support_channel_payload()
+
+    def get_google_client_id(self, obj):
+        from django.conf import settings as django_settings
+
+        return getattr(django_settings, "GOOGLE_OAUTH_CLIENT_ID", "")
+
+    def get_signup_enabled(self, obj):
+        from django.conf import settings as django_settings
+
+        return bool(getattr(django_settings, "SIGNUP_ENABLED", True))
 
     def to_representation(self, instance):
         data = super().to_representation(instance)

@@ -120,7 +120,6 @@
     "password": "Mot de passe",
     "loginButton": "Connexion",
     "loggingIn": "Connexion en cours…",
-    "exploreDemo": "Explorer la démo",
     "signingIn": "Connexion en cours…"
   },
   "routes": {

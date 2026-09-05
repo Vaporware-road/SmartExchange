@@ -37,6 +37,15 @@
         <BaseButton
           variant="outline"
           size="sm"
+          :title="$t('onboarding.tour.replay')"
+          :aria-label="$t('onboarding.tour.replay')"
+          @click="replayTour"
+        >
+          <i class="fas fa-route" />
+        </BaseButton>
+        <BaseButton
+          variant="outline"
+          size="sm"
           class="!border-red-500/50 !text-red-400 hover:!bg-red-500/10"
           @click="handleLogout"
         >
@@ -72,6 +81,16 @@ const router = useRouter()
 const auth = useAuthStore()
 const siteSettings = useSiteSettingsStore()
 const siteName = computed(() => siteSettings.siteName)
+
+/* Clearing the flag is what reopens the tour: AppLayout watches the same
+   `needsOnboarding` getter the first sign-in uses. */
+async function replayTour() {
+  try {
+    await auth.completeOnboarding({ replay: true })
+  } catch {
+    /* ignore */
+  }
+}
 
 function handleLogout() {
   auth.logout()

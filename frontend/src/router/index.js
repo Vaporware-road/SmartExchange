@@ -42,6 +42,14 @@ const routes = [
     meta: { public: true },
   },
   {
+    // The six-digit code path. Signed-in only: signup hands out tokens before
+    // the address is proven, so there is always a session by the time this
+    // opens, and an anonymous version would leak which addresses exist.
+    path: '/confirm',
+    name: 'confirm-code',
+    component: () => import('@/views/auth/ConfirmCodeView.vue'),
+  },
+  {
     // Opened from the confirmation email, often in a browser with no session,
     // so it must stay public: the signed token in the path is the proof.
     path: '/verify-email/:token',

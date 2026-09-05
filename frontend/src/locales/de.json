@@ -120,7 +120,6 @@
     "password": "Passwort",
     "loginButton": "Anmelden",
     "loggingIn": "Anmeldung läuft…",
-    "exploreDemo": "Demo erkunden",
     "signingIn": "Anmeldung läuft…"
   },
   "routes": {

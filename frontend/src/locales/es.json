@@ -120,7 +120,6 @@
     "password": "Contraseña",
     "loginButton": "Iniciar sesión",
     "loggingIn": "Iniciando sesión…",
-    "exploreDemo": "Explorar demo",
     "signingIn": "Iniciando sesión…"
   },
   "routes": {

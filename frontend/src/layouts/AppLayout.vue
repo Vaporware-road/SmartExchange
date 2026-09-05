@@ -17,6 +17,7 @@
           {{ $t('programmerHub.exit') }}
         </button>
       </div>
+      <TrialExpiredBanner v-if="auth.isReadOnly" />
       <VerifyEmailBanner v-if="auth.needsEmailVerification" />
       <AppHeader @toggle-drawer="drawerOpen = !drawerOpen" />
       <main
@@ -55,6 +56,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { AppSidebar, AppHeader, AppDrawer, AppFooter, AppBreadcrumb, AppBottomNav } from '@/components/layout'
 import VerifyEmailBanner from '@/components/layout/VerifyEmailBanner.vue'
+import TrialExpiredBanner from '@/components/layout/TrialExpiredBanner.vue'
 import OnboardingTour from '@/components/onboarding/OnboardingTour.vue'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import { useSidebarStore } from '@/stores/sidebar'
@@ -102,6 +104,12 @@ function syncOrdersPolling() {
 }
 
 watch(() => [auth.isAuthenticated, auth.role], syncOrdersPolling)
+watch(
+  () => auth.needsOnboarding,
+  (needed) => {
+    if (needed) tourOpen.value = true
+  },
+)
 
 onMounted(() => {
   siteSettings.fetch()

@@ -12,6 +12,7 @@
           class="font-medium text-slate-400/90 hover:text-slate-200 dark:text-slate-500/90 dark:hover:text-slate-300 transition-colors"
         >Vaporware-road</a>
       </p>
+      <SupportChannelList v-if="hasSupport" inline class="min-w-0" />
       <div class="flex items-center gap-1.5 min-w-0">
         <span class="font-semibold text-[11px] md:text-xs text-[var(--primary)] truncate max-w-[120px]">{{ siteName }}</span>
         <AppBrandLogo size="sm" rounded="lg" />
@@ -24,7 +25,9 @@
 import { computed } from 'vue'
 import { useSiteSettingsStore } from '@/stores/siteSettings'
 import AppBrandLogo from '@/components/layout/AppBrandLogo.vue'
+import SupportChannelList from '@/components/support/SupportChannelList.vue'
 
 const siteSettings = useSiteSettingsStore()
 const siteName = computed(() => siteSettings.siteName)
+const hasSupport = computed(() => siteSettings.supportChannels.length > 0)
 </script>

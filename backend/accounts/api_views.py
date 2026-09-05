@@ -12,12 +12,16 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
 from core.exceptions import error_response
-from .models import CustomUser, UserActivityLog
+from .models import CustomUser, OtpCode, UserActivityLog
 from .plans import allowed_plans_for, is_impersonating, user_plan
 from .trial import ensure_trial_started, trial_is_expired
+from .google import google_enabled, verify_id_token
+from .otp import issue_code, verify_code
+from .scoping import unscoped
 from .tokens import issue_tokens_for_user
 from .emails import mark_email_verified, read_verification_token, send_verification_email
 from .serializers import (
+    GoogleSignupSerializer,
     LoginSerializer,
     SignupSerializer,
     UserSerializer,
@@ -123,9 +127,11 @@ def _telegram_analytics_for_user(user):
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = []
+    throttle_scope = "login"
+    throttle_classes = [ScopedRateThrottle]
 
     def post(self, request):
-        username = request.data.get('username', '')
+        username = request.data.get("identifier") or request.data.get("username") or ""
         try:
             serializer = LoginSerializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -140,14 +146,10 @@ class LoginAPIView(APIView):
             )
             raise
 
+        # An expired trial does not block sign-in any more: the wall is
+        # read-only, so the customer gets in, sees their data and reads the
+        # upgrade message instead of a locked door.
         ensure_trial_started(user)
-        if trial_is_expired(user):
-            return error_response(
-                "Your 14-day free trial has expired. Please contact an administrator to upgrade your plan.",
-                code="trial_expired",
-                status_code=status.HTTP_403_FORBIDDEN,
-            )
-
         login(request, user)
 
         refresh = issue_tokens_for_user(user)
@@ -190,7 +192,7 @@ class SignupAPIView(APIView):
         send_verification_email(user)
         log_activity(
             user,
-            UserActivityLog.ACTION_LOGIN_SUCCESS,
+            UserActivityLog.ACTION_SIGNUP,
             request,
             details="self_serve_signup",
         )
@@ -242,6 +244,163 @@ class ResendVerificationAPIView(APIView):
             return Response({"sent": False, "already_verified": True})
         sent = send_verification_email(user)
         return Response({"sent": bool(sent), "already_verified": False})
+
+
+class GoogleAuthAPIView(APIView):
+    """POST: sign in or sign up with a Google id-token.
+
+    Links to an existing account by *verified* email when there is one, so a
+    customer who signed up with a password can later use the Google button
+    without ending up with two accounts. Otherwise it opens a new desk with the
+    address already proven — Google has verified it, so there is nothing for an
+    OTP to add.
+    """
+
+    permission_classes = [AllowAny]
+    authentication_classes = []
+    throttle_scope = "login"
+    throttle_classes = [ScopedRateThrottle]
+
+    def post(self, request):
+        if not google_enabled():
+            return error_response(
+                "Google sign-in is not configured on this install.",
+                code="google_auth_disabled",
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
+
+        claims = verify_id_token(request.data.get("credential") or request.data.get("id_token"))
+        if claims is None:
+            log_activity(None, UserActivityLog.ACTION_LOGIN_FAILED, request, details="google_token_rejected")
+            return error_response(
+                "That Google sign-in could not be verified.",
+                code="google_token_invalid",
+                status_code=status.HTTP_401_UNAUTHORIZED,
+            )
+
+        email = claims["email"].strip().lower()
+        with unscoped():
+            user = (
+                CustomUser.objects.filter(google_sub=claims["sub"]).first()
+                or CustomUser.objects.filter(email__iexact=email).first()
+            )
+            created = user is None
+            if created:
+                if not settings.SIGNUP_ENABLED:
+                    return error_response(
+                        "Self-serve signup is disabled on this install.",
+                        code="signup_disabled",
+                        status_code=status.HTTP_403_FORBIDDEN,
+                    )
+                user = GoogleSignupSerializer().create_from_claims(claims)
+            else:
+                _link_google_account(user, claims)
+
+        if not user.is_active:
+            return error_response(
+                "This account is disabled.",
+                code="account_disabled",
+                status_code=status.HTTP_403_FORBIDDEN,
+            )
+
+        ensure_trial_started(user)
+        login(request, user)
+        log_activity(
+            user,
+            UserActivityLog.ACTION_SIGNUP if created else UserActivityLog.ACTION_LOGIN_SUCCESS,
+            request,
+            details="google",
+        )
+        refresh = issue_tokens_for_user(user)
+        return Response(
+            {
+                "user": UserSerializer(user).data,
+                "access": str(refresh.access_token),
+                "refresh": str(refresh),
+                "created": created,
+            },
+            status=status.HTTP_201_CREATED if created else status.HTTP_200_OK,
+        )
+
+
+def _link_google_account(user, claims):
+    """Attach the Google subject to an account that matched by verified email."""
+    updates = []
+    if not user.google_sub:
+        user.google_sub = claims["sub"]
+        updates.append("google_sub")
+    if user.email_verified_at is None:
+        user.email_verified_at = timezone.now()
+        updates.append("email_verified_at")
+    if updates:
+        user.save(update_fields=updates)
+
+
+class OtpRequestAPIView(APIView):
+    """POST: send the signed-in user a fresh one-time code.
+
+    Authenticated rather than anonymous: signup already hands out tokens, so
+    the customer is always signed in by the time they confirm, and an
+    anonymous version would be an address-enumeration oracle.
+    """
+
+    permission_classes = [IsAuthenticated]
+    throttle_scope = "otp"
+    throttle_classes = [ScopedRateThrottle]
+
+    def post(self, request):
+        user = request.user
+        if user.email_verified_at is not None:
+            return Response({"sent": False, "already_verified": True})
+
+        otp, delivered = issue_code(user, purpose=OtpCode.PURPOSE_VERIFY_EMAIL)
+        if otp is None:
+            return error_response(
+                "Add an email address or a phone number before requesting a code.",
+                code="otp_no_destination",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        return Response(
+            {
+                "sent": bool(delivered),
+                "channel": otp.channel,
+                "expires_at": otp.expires_at,
+                "already_verified": False,
+            }
+        )
+
+
+class OtpVerifyAPIView(APIView):
+    """POST: exchange a one-time code for a verified address."""
+
+    permission_classes = [IsAuthenticated]
+    throttle_scope = "otp"
+    throttle_classes = [ScopedRateThrottle]
+
+    def post(self, request):
+        user = request.user
+        if user.email_verified_at is not None:
+            return Response({"verified": True, "already_verified": True})
+
+        ok, reason = verify_code(
+            user, request.data.get("code"), purpose=OtpCode.PURPOSE_VERIFY_EMAIL
+        )
+        if not ok:
+            return error_response(
+                _OTP_MESSAGES.get(reason, "That code is not valid."),
+                code=reason,
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+        mark_email_verified(user)
+        return Response({"verified": True, "already_verified": False})
+
+
+_OTP_MESSAGES = {
+    "otp_not_requested": "Request a code before entering one.",
+    "otp_expired": "That code has expired. Request a new one.",
+    "otp_too_many_attempts": "Too many wrong attempts. Request a new code.",
+    "otp_invalid": "That code is not correct.",
+}
 
 
 class CompleteOnboardingAPIView(APIView):

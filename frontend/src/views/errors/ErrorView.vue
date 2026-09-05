@@ -85,7 +85,11 @@ const resolvedErrorId = computed(() => {
 
 const showLogId = computed(() => props.code === 500 && !!resolvedErrorId.value)
 
+/* An owner-managed channel first — that is the one someone actually answers —
+   then the site's Telegram link, then the built-in support handle. */
 const supportLink = computed(() => {
+  const channel = siteSettings.supportChannels.find((item) => item.href)
+  if (channel) return channel.href
   const link = siteSettings.settings?.telegram_link?.trim()
   if (link) return link.startsWith('http') ? link : `https://t.me/${link.replace(/^@/, '')}`
   return 'https://t.me/mrexchange_support'

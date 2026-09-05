@@ -76,6 +76,8 @@
 
           <p class="text-xs text-center text-[var(--text-secondary)]">{{ $t('auth.signupNoCard') }}</p>
         </form>
+
+        <GoogleSignInButton @credential="handleGoogle" />
       </div>
 
       <div class="text-center mt-6 space-y-2">
@@ -100,6 +102,7 @@ import ThemeToggle from '@/components/ui/ThemeToggle.vue'
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue'
 import AlertMessage from '@/components/ui/AlertMessage.vue'
 import AppBrandLogo from '@/components/layout/AppBrandLogo.vue'
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton.vue'
 
 const router = useRouter()
 const route = useRoute()
@@ -129,13 +132,28 @@ function fieldError(name) {
   return Array.isArray(value) ? value[0] : value || ''
 }
 
+/* Google has already verified the address, so these signups skip the code. */
+async function handleGoogle(credential) {
+  error.value = ''
+  loading.value = true
+  try {
+    await auth.loginWithGoogle(credential)
+    router.push('/panel')
+  } catch (err) {
+    error.value = getApiErrorDetails(err).message
+  } finally {
+    loading.value = false
+  }
+}
+
 async function handleSubmit() {
   error.value = ''
   fieldErrors.value = {}
   loading.value = true
   try {
     await auth.signup({ ...form })
-    router.push('/panel')
+    /* Straight to the code: the panel already works, this just proves the address. */
+    router.push('/confirm')
   } catch (err) {
     const details = getApiErrorDetails(err)
     error.value = details.message

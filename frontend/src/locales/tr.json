@@ -120,7 +120,6 @@
     "password": "Şifre",
     "loginButton": "Giriş Yap",
     "loggingIn": "Giriş yapılıyor…",
-    "exploreDemo": "Demoyu Keşfet",
     "signingIn": "Giriş yapılıyor…"
   },
   "routes": {

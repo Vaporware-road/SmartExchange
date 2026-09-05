@@ -20,12 +20,13 @@
           </AlertMessage>
 
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('auth.username') }}</label>
+            <label class="block text-sm font-medium text-gray-400 mb-2">{{ $t('auth.identifier') }}</label>
             <input
-              v-model="username"
+              v-model="identifier"
               type="text"
               class="input-luxury"
-              :placeholder="$t('auth.username')"
+              :placeholder="$t('auth.identifierPlaceholder')"
+              autocomplete="username"
               required
               autofocus
             />
@@ -52,7 +53,16 @@
             <span>{{ loading ? $t('auth.loggingIn') : $t('auth.loginButton') }}</span>
           </button>
         </form>
+
+        <GoogleSignInButton @credential="handleGoogle" />
       </div>
+
+      <p class="mt-5 text-center text-sm text-[var(--text-secondary)]">
+        {{ $t('auth.noAccount') }}
+        <router-link to="/signup" class="text-gold hover:underline">
+          {{ $t('auth.signupLink') }}
+        </router-link>
+      </p>
 
       <div class="text-center mt-6">
         <router-link
@@ -77,13 +87,14 @@ import ThemeToggle from '@/components/ui/ThemeToggle.vue'
 import LanguageSwitcher from '@/components/ui/LanguageSwitcher.vue'
 import AlertMessage from '@/components/ui/AlertMessage.vue'
 import AppBrandLogo from '@/components/layout/AppBrandLogo.vue'
+import GoogleSignInButton from '@/components/auth/GoogleSignInButton.vue'
 
 const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 const siteSettings = useSiteSettingsStore()
 
-const username = ref('')
+const identifier = ref('')
 const password = ref('')
 const error = ref('')
 const loading = ref(false)
@@ -94,11 +105,24 @@ onMounted(() => {
   siteSettings.fetch()
 })
 
+async function handleGoogle(credential) {
+  error.value = ''
+  loading.value = true
+  try {
+    await auth.loginWithGoogle(credential)
+    router.push(route.query.redirect || '/panel')
+  } catch (err) {
+    error.value = getApiErrorDetails(err).message
+  } finally {
+    loading.value = false
+  }
+}
+
 async function handleSubmit() {
   error.value = ''
   loading.value = true
   try {
-    await auth.login(username.value, password.value)
+    await auth.login(identifier.value, password.value)
     const redirect = route.query.redirect
     router.push(redirect || (auth.shouldOpenProgrammerHub ? '/programmer' : '/panel'))
   } catch (err) {

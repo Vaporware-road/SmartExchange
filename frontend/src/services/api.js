@@ -275,8 +275,11 @@ export function formatDrfError(data) {
 }
 
 export const authApi = {
-  login: (username, password) =>
-    api.post('/auth/login/', { username, password }),
+  login: (identifier, password) =>
+    api.post('/auth/login/', { identifier, password }),
+  google: (credential) => api.post('/auth/google/', { credential }),
+  requestOtp: () => api.post('/auth/otp/request/', {}),
+  verifyOtp: (code) => api.post('/auth/otp/verify/', { code }),
   signup: (data) => api.post('/auth/signup/', data),
   verifyEmail: (token) => api.post('/auth/verify-email/', { token }),
   resendVerification: () => api.post('/auth/verify-email/resend/'),

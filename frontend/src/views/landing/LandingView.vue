@@ -24,6 +24,9 @@
 </template>
 
 <script setup>
+import { onMounted as onLandingMounted } from 'vue'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
+
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import LandingChannels from './components/LandingChannels.vue'
@@ -62,4 +65,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => window.removeEventListener('scroll', onScroll))
+
+/* Support contacts are owner-managed, so the marketing page reads them live. */
+onLandingMounted(() => useSiteSettingsStore().fetch())
 </script>

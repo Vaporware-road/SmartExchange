@@ -108,6 +108,9 @@
 </template>
 
 <script setup>
+import { onMounted as onLandingMounted } from 'vue'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
+
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { RouterLink, useRoute } from 'vue-router'
@@ -176,4 +179,7 @@ const channels = computed(() => [
 onMounted(() => {
   document.title = t('landing.contactPage.metaTitle')
 })
+
+/* Support contacts are owner-managed, so the marketing page reads them live. */
+onLandingMounted(() => useSiteSettingsStore().fetch())
 </script>

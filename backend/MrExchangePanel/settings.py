@@ -104,6 +104,12 @@ REST_FRAMEWORK = {
         # Registration is anonymous and creates rows; keep it well under the
         # generic anon rate so a script cannot fill the user table.
         'signup': '10/hour',
+        # Password guessing is the reason this exists; the generic anon rate
+        # is far too generous for an endpoint that hands out tokens.
+        'login': '30/hour',
+        # One-time codes: cheap to request, expensive to spam, so the request
+        # and the verify side share one tight ceiling.
+        'otp': '15/hour',
         # Anonymous customers submitting orders from WhatsApp or the Telegram
         # Mini App; generous enough for a real conversation, tight enough that
         # a leaked webapp link cannot flood the queue.
@@ -434,6 +440,16 @@ EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', 'True').lower() in ('true', '1',
 EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', 'False').lower() in ('true', '1', 'yes')
 EMAIL_TIMEOUT = int(os.environ.get('EMAIL_TIMEOUT', '10'))
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'MrExchange <no-reply@mrexchange.co.uk>')
+
+# One-time codes fall back to SMS for accounts that gave a phone and no email.
+# 'mock' logs the message; 'disabled' refuses, so a missing provider is visible
+# rather than a code that silently never arrives.
+SMS_PROVIDER = os.environ.get('SMS_PROVIDER', 'mock' if DEBUG else 'disabled').strip()
+
+# "Sign in with Google". Unset means the feature is off end to end: the endpoint
+# refuses and the frontend hides the button, so the install ships dormant until
+# a client id exists.
+GOOGLE_OAUTH_CLIENT_ID = os.environ.get('GOOGLE_OAUTH_CLIENT_ID', '').strip()
 
 # -----------------------------
 # Fleet — how this install reports to the owner panel

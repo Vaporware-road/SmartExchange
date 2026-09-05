@@ -7,7 +7,26 @@
           {{ t('landing.contact.subtitle') }}
         </p>
 
-        <div class="mt-8 flex flex-wrap justify-center gap-3">
+        <div v-if="channels.length" class="mt-8 flex flex-wrap justify-center gap-3">
+          <a
+            v-for="channel in channels"
+            :key="`${channel.kind}-${channel.value}`"
+            :href="channel.href || undefined"
+            :target="channel.href?.startsWith('http') ? '_blank' : undefined"
+            :rel="channel.href?.startsWith('http') ? 'noopener' : undefined"
+            dir="ltr"
+            class="lp-btn lp-btn--ghost"
+          >
+            <i :class="channel.icon" aria-hidden="true" />
+            {{ channel.value }}
+          </a>
+          <a :href="TRIAL_URL" class="lp-btn lp-btn--primary" dir="auto">{{ t('landing.hero.ctaTrial') }}</a>
+        </div>
+
+        <!-- Fallback for an install whose owner has not added any channel yet:
+             a marketing page with no way to reach anyone is worse than one
+             showing the built-in sales line. -->
+        <div v-else class="mt-8 flex flex-wrap justify-center gap-3">
           <a :href="TEL_HREF" dir="ltr" class="lp-btn lp-btn--ghost">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.46.57 3.6a1 1 0 0 1-.25 1z" />
@@ -37,8 +56,11 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { CONTACT_PHONE, TRIAL_URL, TELEGRAM_URL, TEL_HREF, whatsappHref } from '@/config/landing.js'
+import { useSiteSettingsStore } from '@/stores/siteSettings'
 
 const { t } = useI18n()
+const siteSettings = useSiteSettingsStore()
+const channels = computed(() => siteSettings.supportChannels)
 
 /** The greeting follows the visitor's language, so the chat opens in it too. */
 const whatsappLink = computed(() => whatsappHref(t('landing.contact.whatsappMessage')))

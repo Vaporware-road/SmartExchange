@@ -77,6 +77,10 @@ export const useAuthStore = defineStore('auth', {
     trialDaysRemaining() {
       return this.user?.trial_days_remaining ?? null
     },
+    /** Trial over: the panel still reads, the server refuses every write. */
+    isReadOnly() {
+      return Boolean(this.user?.trial_expired)
+    },
     shouldOpenProgrammerHub() {
       return this.canAccessProgrammerHub && !this.isImpersonating
     },
@@ -107,10 +111,11 @@ export const useAuthStore = defineStore('auth', {
       }
     },
 
-    async login(username, password) {
+    /** `identifier` is an email address or a username — the server resolves it. */
+    async login(identifier, password) {
       this.loading = true
       try {
-        const { data } = await authApi.login(username, password)
+        const { data } = await authApi.login(identifier, password)
         if (data.access) localStorage.setItem('access_token', data.access)
         if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
         sessionStorage.removeItem('programmer_access_token')
@@ -138,6 +143,34 @@ export const useAuthStore = defineStore('auth', {
       } finally {
         this.loading = false
       }
+    },
+
+    /** Exchange a Google id-token for a session, signing up on first use. */
+    async loginWithGoogle(credential) {
+      this.loading = true
+      try {
+        const { data } = await authApi.google(credential)
+        if (data.access) localStorage.setItem('access_token', data.access)
+        if (data.refresh) localStorage.setItem('refresh_token', data.refresh)
+        sessionStorage.removeItem('programmer_access_token')
+        sessionStorage.removeItem('programmer_refresh_token')
+        this.user = data.user ?? data
+        useTelegramHubStore().clearSession()
+        return this.user
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async requestOtp() {
+      const { data } = await authApi.requestOtp()
+      return data
+    },
+
+    async verifyOtp(code) {
+      const { data } = await authApi.verifyOtp(code)
+      if (this.user) this.user.email_verified_at = new Date().toISOString()
+      return data
     },
 
     async resendVerification() {

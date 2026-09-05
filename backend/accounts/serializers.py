@@ -13,16 +13,38 @@ from .trial import trial_expires_at
 
 
 class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
+    """Sign in with an email address or a username.
+
+    Customers only ever know their email — the username is generated for them
+    at signup — while staff and delegated operators still have real usernames,
+    so both resolve to the same ``authenticate`` call. ``email`` is unique on
+    the model, which is what makes the lookup unambiguous.
+    """
+
+    identifier = serializers.CharField(required=False, allow_blank=True)
+    username = serializers.CharField(required=False, allow_blank=True)
     password = serializers.CharField(write_only=True)
 
     def validate(self, attrs):
-        username = (attrs.get("username") or "").strip()
+        identifier = (attrs.get("identifier") or attrs.get("username") or "").strip()
+        if not identifier:
+            raise serializers.ValidationError(
+                {"identifier": "Enter your email address or username."}
+            )
         password = attrs.get("password") or ""
-        attrs["username"] = username
-        request = self.context.get("request")
+        attrs["identifier"] = identifier
+
+        username = identifier
+        if "@" in identifier:
+            username = (
+                CustomUser.objects.filter(email__iexact=identifier)
+                .values_list("username", flat=True)
+                .first()
+                or identifier
+            )
+
         user = authenticate(
-            request,
+            self.context.get("request"),
             username=username,
             password=password,
         )
@@ -35,6 +57,7 @@ class LoginSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     telegram_bot_token_masked = serializers.SerializerMethodField()
     trial_days_remaining = serializers.SerializerMethodField()
+    trial_expired = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
@@ -66,6 +89,7 @@ class UserSerializer(serializers.ModelSerializer):
             "trial_days_remaining",
             "email_verified_at",
             "onboarding_completed_at",
+            "trial_expired",
             "is_active",
             "date_joined",
             "telegram_bot_token_masked",
@@ -93,6 +117,12 @@ class UserSerializer(serializers.ModelSerializer):
         if owner is None:
             return ""
         return owner.username
+
+    def get_trial_expired(self, obj):
+        """Explicit, because zero days remaining also means "the last day"."""
+        from .trial import trial_is_expired
+
+        return trial_is_expired(obj)
 
     def get_trial_days_remaining(self, obj):
         from django.utils import timezone
@@ -205,6 +235,38 @@ class SignupSerializer(serializers.Serializer):
             trial_started_at=started_at,
             trial_expires_at=trial_expires_at(started_at),
         )
+        return user
+
+
+class GoogleSignupSerializer(serializers.Serializer):
+    """Opens a desk from a verified Google profile.
+
+    Shares :class:`SignupSerializer`'s shape — role, plan and trial clock — but
+    takes its fields from Google's claims and sets no usable password: the only
+    way into a Google-created account is the Google button, until the customer
+    sets a password themselves.
+    """
+
+    def create_from_claims(self, claims):
+        started_at = timezone.now()
+        email = claims["email"].strip().lower()
+        user = CustomUser.objects.create_user(
+            unique_username_from_email(email),
+            password=None,
+            email=email,
+            first_name=(claims.get("given_name") or "").strip()[:150],
+            last_name=(claims.get("family_name") or "").strip()[:150],
+            plan=PLAN_BRONZE,
+            role=CustomUser.ROLE_MANAGEMENT,
+            sub_role=CustomUser.SUB_ROLE_ADMIN,
+            is_active=True,
+            google_sub=claims["sub"],
+            email_verified_at=started_at,
+            trial_started_at=started_at,
+            trial_expires_at=trial_expires_at(started_at),
+        )
+        user.set_unusable_password()
+        user.save(update_fields=["password"])
         return user
 
 

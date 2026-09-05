@@ -95,6 +95,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     # Server-side rather than a browser flag: the guided tour should not reopen
     # because someone signed in from a second machine or cleared their storage.
     onboarding_completed_at = models.DateTimeField(null=True, blank=True)
+    # Google's stable subject id, not the email: an address can be reassigned
+    # inside a Workspace domain, the sub cannot.
+    google_sub = models.CharField(max_length=64, blank=True, default="", db_index=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -178,9 +181,69 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.get_full_name()
 
 
+class OtpCode(models.Model):
+    """A short-lived one-time code sent to a customer's email or phone.
+
+    Only the hash is stored: a leaked database must not hand anyone a working
+    code, and nothing in the product ever needs to read one back. A code is
+    single-use — ``consumed_at`` closes it — and dies after
+    :attr:`MAX_ATTEMPTS` wrong guesses so the six digits cannot be walked.
+    """
+
+    PURPOSE_VERIFY_EMAIL = "verify_email"
+    PURPOSE_LOGIN = "login"
+    PURPOSE_CHOICES = (
+        (PURPOSE_VERIFY_EMAIL, "Verify email"),
+        (PURPOSE_LOGIN, "Login"),
+    )
+
+    CHANNEL_EMAIL = "email"
+    CHANNEL_SMS = "sms"
+    CHANNEL_CHOICES = (
+        (CHANNEL_EMAIL, "Email"),
+        (CHANNEL_SMS, "SMS"),
+    )
+
+    CODE_LENGTH = 6
+    MAX_ATTEMPTS = 5
+    TTL_SECONDS = 600
+
+    user = models.ForeignKey(
+        "accounts.CustomUser", on_delete=models.CASCADE, related_name="otp_codes"
+    )
+    purpose = models.CharField(max_length=32, choices=PURPOSE_CHOICES)
+    code_hash = models.CharField(max_length=128)
+    # The address or number the code actually went to, recorded because the
+    # user may change either before they get round to typing it in.
+    sent_to = models.CharField(max_length=255)
+    channel = models.CharField(max_length=16, choices=CHANNEL_CHOICES)
+    expires_at = models.DateTimeField()
+    attempts = models.PositiveSmallIntegerField(default=0)
+    consumed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = "OTP Code"
+        verbose_name_plural = "OTP Codes"
+        ordering = ["-created_at"]
+        indexes = [models.Index(fields=["user", "purpose", "-created_at"])]
+
+    def __str__(self):
+        return f"{self.get_purpose_display()} for {self.user_id}"
+
+    @property
+    def is_usable(self):
+        return (
+            self.consumed_at is None
+            and self.attempts < self.MAX_ATTEMPTS
+            and self.expires_at > timezone.now()
+        )
+
+
 class UserActivityLog(models.Model):
     """Audit log for logins, logouts, and sensitive actions."""
 
+    ACTION_SIGNUP = 'signup'
     ACTION_LOGIN_SUCCESS = 'login_success'
     ACTION_LOGIN_FAILED = 'login_failed'
     ACTION_LOGOUT = 'logout'
@@ -193,6 +256,7 @@ class UserActivityLog(models.Model):
     ACTION_OTHER = 'other'
 
     ACTION_CHOICES = (
+        (ACTION_SIGNUP, 'Signup'),
         (ACTION_LOGIN_SUCCESS, 'Login success'),
         (ACTION_LOGIN_FAILED, 'Login failed'),
         (ACTION_LOGOUT, 'Logout'),
