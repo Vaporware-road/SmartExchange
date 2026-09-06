@@ -255,6 +255,7 @@
                 <th class="p-3 text-start">{{ $t('ownerConsole.salePlan') }}</th>
                 <th class="p-3 text-start">{{ $t('ownerConsole.soldAt') }}</th>
                 <th class="p-3 text-start">{{ $t('ownerConsole.reference') }}</th>
+                <th class="p-3 text-start">{{ $t('fleet.license') }}</th>
                 <th class="p-3 text-start">{{ $t('ownerConsole.recordedBy') }}</th>
                 <th class="p-3 text-end">{{ $t('common.actions') }}</th>
               </tr>
@@ -272,6 +273,9 @@
                 <td class="p-3 text-[var(--text-secondary)]">{{ $t(`ownerConsole.salePlans.${row.sale_plan}`) }}</td>
                 <td class="p-3 text-[var(--text-secondary)] whitespace-nowrap">{{ formatDate(row.sold_at) }}</td>
                 <td class="p-3 text-[var(--text-secondary)]">{{ row.reference || '—' }}</td>
+                <td class="p-3 font-mono text-xs text-[var(--text-secondary)] whitespace-nowrap">
+                  {{ row.license_key || '—' }}
+                </td>
                 <td class="p-3 text-[var(--text-secondary)]">{{ row.recorded_by_display || '—' }}</td>
                 <td class="p-3 text-end whitespace-nowrap">
                   <button

@@ -117,6 +117,7 @@ class SaleSerializer(serializers.ModelSerializer):
     customer_display = serializers.SerializerMethodField()
     account_name = serializers.CharField(source="account.name", read_only=True, default="")
     recorded_by_display = serializers.SerializerMethodField()
+    license_key = serializers.SerializerMethodField()
 
     class Meta:
         model = Sale
@@ -135,6 +136,7 @@ class SaleSerializer(serializers.ModelSerializer):
             "note",
             "recorded_by",
             "recorded_by_display",
+            "license_key",
             "created_at",
         )
         read_only_fields = (
@@ -156,6 +158,24 @@ class SaleSerializer(serializers.ModelSerializer):
         if sale.recorded_by is None:
             return ""
         return sale.recorded_by.get_full_name() or sale.recorded_by.username
+
+    def get_license_key(self, sale):
+        """The key this sale put the customer on.
+
+        Recording the sale issues it and hangs it on the instance; reading an
+        older sale finds it on the customer's live deployment instead.
+        """
+        issued = getattr(sale, "license_key", "")
+        if issued:
+            return issued
+        if sale.customer_id is None:
+            return ""
+        deployment = (
+            sale.customer.deployments.exclude(license_key="")
+            .order_by("-created_at")
+            .first()
+        )
+        return getattr(deployment, "license_key", "")
 
     def validate_customer(self, value):
         if value is None:
