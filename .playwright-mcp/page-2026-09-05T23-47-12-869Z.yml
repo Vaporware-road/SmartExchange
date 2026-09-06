@@ -1,0 +1,10 @@
+- generic [ref=f19e3]:
+  - generic [ref=f19e4]: 
+  - generic [ref=f19e6]:
+    - heading "Install App" [level=3] [ref=f19e7]
+    - paragraph [ref=f19e8]: Install this app on your device
+    - generic [ref=f19e9]:
+      - button " Install" [ref=f19e10] [cursor=pointer]:
+        - generic [ref=f19e11]: 
+        - text: Install
+      - button "Later" [ref=f19e12] [cursor=pointer]
