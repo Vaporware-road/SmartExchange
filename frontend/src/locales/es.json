@@ -17,7 +17,9 @@
     "userManagement": "Gestión usuarios",
     "registerUser": "Registrar usuario",
     "plans": "Planes y plantillas",
-    "fleet": "Flota"
+    "fleet": "Flota",
+    "orders": "Cola de pedidos",
+    "ownerConsole": "Consola del propietario"
   },
   "common": {
     "save": "Guardar",
@@ -47,7 +49,24 @@
     "date": "Fecha",
     "logout": "Cerrar sesión",
     "login": "Iniciar sesión",
-    "history": "Historial"
+    "history": "Historial",
+    "all": "Todos",
+    "aboutPage": "Acerca de",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "saved": "Guardado",
+    "brandLogo": "Logotipo de la marca",
+    "breadcrumb": "Ruta de navegación",
+    "toggleSidebar": "Mostrar/ocultar barra lateral",
+    "dismiss": "Descartar",
+    "poweredBy": "Desarrollado por",
+    "price": "Precio",
+    "notes": "Notas",
+    "noHistory": "No se encontró historial.",
+    "category": "Categoría",
+    "copyLink": "Copiar enlace",
+    "linkCopied": "Enlace copiado",
+    "copyFailed": "No se pudo copiar"
   },
   "header": {
     "openMenu": "Abrir menú",
@@ -120,7 +139,47 @@
     "password": "Contraseña",
     "loginButton": "Iniciar sesión",
     "loggingIn": "Iniciando sesión…",
-    "signingIn": "Iniciando sesión…"
+    "signingIn": "Iniciando sesión…",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu{'@'}tucasadecambio.com",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "exchangeName": "Nombre de la casa de cambio",
+    "exchangeNamePlaceholder": "El nombre que conocen sus clientes",
+    "passwordHint": "Al menos 8 caracteres.",
+    "signupTitle": "Comience su prueba gratuita de {days} días",
+    "signupButton": "Comenzar mis {days} días gratis",
+    "signingUp": "Creando su panel…",
+    "signupNoCard": "No se necesita tarjeta. Su panel se abre de inmediato.",
+    "haveAccount": "¿Ya tiene una cuenta?",
+    "verifying": "Confirmando su correo electrónico…",
+    "verifiedTitle": "Correo electrónico confirmado",
+    "verifiedText": "Gracias, ahora podemos contactarlo. Su prueba no se ve afectada.",
+    "verifyFailedTitle": "Ese enlace no funcionó",
+    "verifyFailedText": "Puede haber caducado. Solicite uno nuevo desde el aviso en su panel.",
+    "goToPanel": "Ir a mi panel",
+    "verifyBanner": {
+      "title": "Confirme su correo electrónico",
+      "text": "Enviamos un enlace a {email}. Su panel funciona de todos modos.",
+      "resend": "Enviar de nuevo",
+      "sent": "Correo de confirmación enviado.",
+      "sendFailed": "No pudimos enviar el correo. Inténtelo de nuevo en un momento."
+    },
+    "identifier": "Correo electrónico o nombre de usuario",
+    "identifierPlaceholder": "tu{'@'}tucasadecambio.com",
+    "or": "o",
+    "googleUnavailable": "No se pudo cargar el inicio de sesión de Google. Use su correo y contraseña.",
+    "noAccount": "¿Aún no tiene una cuenta?",
+    "signupLink": "Comience su prueba gratuita",
+    "confirmTitle": "Confirme que es usted",
+    "confirmSentEmail": "Enviamos un código de seis dígitos a {to}.",
+    "confirmSentSms": "Enviamos por SMS un código de seis dígitos a {to}.",
+    "confirmCode": "Código de confirmación",
+    "confirmButton": "Confirmar",
+    "confirmResend": "Enviar un nuevo código",
+    "confirmResent": "Un nuevo código está en camino.",
+    "confirmSkip": "Hacer esto más tarde",
+    "confirmSendFailed": "No pudimos enviar el código. Inténtelo de nuevo en un momento."
   },
   "routes": {
     "dashboard": "Panel",
@@ -154,9 +213,29 @@
     "templateMediaLibrary": "Biblioteca multimedia",
     "telegramStudio": "Estudio de mensajes Telegram",
     "instagramHub": "Hub Instagram",
-    "userCenter": "Gestión de admins",
     "programmerHub": "Hub Desarrollador",
-    "programmerFleet": "Flota"
+    "programmerFleet": "Flota",
+    "userCenter": "Gestión de admins",
+    "orders": "Cola de pedidos",
+    "webappOrder": "Realizar pedido",
+    "programmerConsole": "Consola del propietario"
+  },
+  "instagramHub": {
+    "description": "Genere imágenes de publicaciones e historias a partir de sus precios finalizados. Elija un tema y categorías, y previsualice antes de publicar en Instagram.",
+    "statusDescription": "Instagram se configura en Ajustes. Al finalizar los precios, se publican automáticamente en su cuenta de Instagram conectada (igual que Telegram).",
+    "connected": "Conectado",
+    "disconnected": "No conectado",
+    "configureInSettings": "Configure el App ID y el Secret en Ajustes y luego conecte a continuación.",
+    "reconnect": "Reconectar",
+    "setAppIdFirst": "Configure primero el App ID y el App Secret en Ajustes.",
+    "theme": "Tema",
+    "themeDark": "Oscuro (Dorado)",
+    "themeLight": "Claro (Azul)",
+    "categoriesForPreview": "Categorías para la vista previa",
+    "noPendingCategories": "No hay categorías con precios pendientes. El panel de finalización las mostrará.",
+    "generatePreview": "Generar vista previa",
+    "previewPost": "Publicación",
+    "previewStory": "Historia"
   },
   "lang": {
     "fa": "فارسی",
@@ -174,16 +253,74 @@
     "urlInvalid": "Introduce una URL válida (ej. https://example.com)",
     "requiredMarkHint": "Los campos marcados con * son obligatorios"
   },
-  "prices": {
-    "backToPrices": "Volver a precios",
-    "newPrice": "Nuevo precio",
-    "notesOptional": "Notas (opcional)",
-    "optionalNotes": "Notas opcionales",
-    "priceType": "Tipo de precio",
-    "category": "Categoría",
-    "pair": "Par",
-    "latestPrice": "Último precio",
-    "history": "Historial"
+  "collaboration": {
+    "title": "Cómo trabajar con nosotros",
+    "hint": "Selecciona el modelo de colaboración",
+    "placeholder": "Seleccionar tipo de colaboración",
+    "reseller": "Revendedor",
+    "white_label": "Marca blanca",
+    "agency": "Agencia",
+    "direct": "Directo"
+  },
+  "onboarding": {
+    "badge": "Primeros pasos",
+    "tour": {
+      "title": "Qué hace este panel",
+      "intro": "{count} paradas, en el orden en que las usa una mesa de cambio. Cada una abre la página real; este es su propio panel, así que todo lo que configure aquí se mantiene.",
+      "progress": "Paso {current} de {total}",
+      "prev": "Atrás",
+      "next": "Siguiente",
+      "finish": "Empezar a usar el panel",
+      "steps": {
+        "dashboard": {
+          "title": "La pantalla de la mañana",
+          "body": "Cada tarifa, bot y canal en una sola vista: qué cambió, qué está pendiente de publicar y si sus conexiones de Telegram e Instagram están activas.",
+          "look": "Estado del bot, cambios recientes de tarifas y números de canal, todo en vivo, sin hojas de cálculo."
+        },
+        "prices": {
+          "title": "Configure sus tarifas",
+          "body": "Compra y venta para cada moneda que maneja. Escriba un número o defina una tarifa base y deje que el panel calcule el margen de cada par.",
+          "look": "Abra una moneda y cambie una tarifa; el panel guarda el historial y el movimiento porcentual."
+        },
+        "finalize": {
+          "title": "Apruebe y luego publique",
+          "body": "Nada llega a sus clientes hasta que alguien lo aprueba. Un gerente revisa las nuevas tarifas, ve la imagen generada y las publica.",
+          "look": "La imagen de tarifas se genera aquí a partir de su propia plantilla antes de salir."
+        },
+        "categories": {
+          "title": "Sus monedas, sus reglas",
+          "body": "Defina las monedas, pares y tipos de precio que realmente cotiza: efectivo, transferencia, VIP, cada uno con su propio redondeo y formato.",
+          "look": "Agregue un tipo de precio y aparecerá en el panel, en la publicación del canal y en la imagen."
+        },
+        "templates": {
+          "title": "Su marca en cada publicación",
+          "body": "Las imágenes de tarifas se dibujan sobre su plantilla: su logo, colores, fuentes y fondo. El editor está aquí mismo, sin necesidad de diseñador.",
+          "look": "Abra una plantilla y mueva un campo; eso es exactamente lo que recibirán sus clientes."
+        },
+        "telegram": {
+          "title": "Telegram, automáticamente",
+          "body": "Los mensajes e imágenes de tarifas con formato se envían a su canal en cuanto se aprueban, y un bot responde las preguntas de precios de sus clientes.",
+          "look": "Canales, bots y el mensaje que se envía, todo configurado desde esta página."
+        },
+        "instagram": {
+          "title": "Instagram sin usar el teléfono",
+          "body": "El mismo gráfico de tarifas con su marca se publica directamente en su página a través de la API de Instagram, según su horario.",
+          "look": "La cola de publicaciones y la conexión de la cuenta están aquí."
+        },
+        "analytics": {
+          "title": "Prueba de que funciona",
+          "body": "Historial de tarifas, actividad de publicación y alcance del canal, para que vea con qué frecuencia cambia y cuántas personas lo vieron.",
+          "look": "Elija un período y compare: los mismos números que le pedirá su gerente."
+        },
+        "support": {
+          "title": "¿Atascado? Hable con nosotros",
+          "body": "Cualquier cosa que el panel no haga, o una tarifa que parezca incorrecta: escriba directamente a nuestros administradores y una persona responde.",
+          "look": "Estos son contactos en vivo; los mismos que aparecen en el pie del panel y en el sitio."
+        }
+      },
+      "skip": "Omitir por ahora",
+      "replay": "Repetir el recorrido"
+    }
   },
   "templateEditor": {
     "back": "Volver",
@@ -254,6 +391,10 @@
     "libraryBrandingHint": "Logos e insignias",
     "snapToGrid": "Ajustar a cuadrícula",
     "inspectorTypography": "Tipografía",
+    "priceDigitLocale": "Dígitos de precio",
+    "priceDigitsEnglish": "Inglés (0–9)",
+    "priceDigitsPersian": "Persa (۰–۹)",
+    "priceDigitLocaleHint": "Aplica a vista previa y PNG exportado.",
     "inspectorAppearance": "Apariencia",
     "inspectorPosition": "Posición",
     "fontWeight": "Peso",
@@ -267,12 +408,6 @@
     "dateSource": "Origen de fecha",
     "dateSourceHelp": "Usa valores reales al publicar.",
     "weekdaySource": "Origen del día",
-    "priceDigitLocale": "Dígitos de precio",
-    "priceDigitsEnglish": "Inglés (0–9)",
-    "priceDigitsPersian": "Persa (۰–۹)",
-    "priceDigitLocaleHint": "Aplica a vista previa y PNG exportado.",
-    "arabicShapingLabel": "Formato persa/árabe (exportación)",
-    "arabicShapingHelp": "Usa arabic reshaper + bidi para texto RTL en PNG.",
     "dateFormats": {
       "date_fa": "Persa — día, nombre mes, año",
       "farsi_date": "Persa — como fecha persa completa",
@@ -292,7 +427,61 @@
     "weekdayFormats": {
       "farsi_weekday": "Nombre del día en persa",
       "english_weekday": "Nombre del día en inglés"
-    }
+    },
+    "arabicShapingLabel": "Formato persa/árabe (exportación)",
+    "arabicShapingHelp": "Usa arabic reshaper + bidi para texto RTL en PNG.",
+    "inspector": "Inspector",
+    "templateSettings": "Ajustes de la plantilla",
+    "templateName": "Nombre de la plantilla",
+    "width": "Ancho",
+    "height": "Alto",
+    "canvasBackground": "Fondo del lienzo",
+    "selectWidgetHint": "Seleccione un widget para editar estilo, tipografía y vínculos de datos.",
+    "name": "Nombre",
+    "type": "Tipo",
+    "priceTypeBinding": "Vínculo de PriceType",
+    "selectPriceType": "Seleccionar PriceType",
+    "stableKey": "Clave estable:",
+    "previewSource": "Fuente de vista previa:",
+    "fallbackValue": "Valor de reserva (se usa cuando el valor en vivo no está disponible)",
+    "typography": "Tipografía",
+    "fontSize": "Tamaño de fuente",
+    "textColor": "Color de texto",
+    "fontFile": "Archivo de fuente (exportación PNG)",
+    "fontDefault": "Predeterminado (servidor)",
+    "alignLabel": "Alinear",
+    "verticalAlign": "Vertical (en el cuadro)",
+    "alignMiddle": "Centro",
+    "weight": "Grosor",
+    "weightNormal": "Normal",
+    "weightBold": "Negrita",
+    "lineHeight": "Interlineado (opcional)",
+    "plainOnExport": "Texto plano al exportar (sin contorno / sombra)",
+    "dropShadow": "Sombra paralela (PNG)",
+    "textOutline": "Contorno de texto (PNG)",
+    "snapToBackground": "Ajustar a la imagen de fondo",
+    "imageUrl": "URL de la imagen",
+    "openMediaLibrary": "Abrir biblioteca multimedia",
+    "opacityLabel": "Opacidad (editor + PNG)",
+    "rotation": "Rotación",
+    "deleteWidget": "Eliminar widget",
+    "alignLeft": "Izquierda",
+    "alignCenter": "Centro",
+    "alignRight": "Derecha",
+    "alignBottom": "Abajo",
+    "widgetLibrary": "Biblioteca de widgets",
+    "priceBindings": "Vínculos de precios",
+    "mediaLibrary": "Biblioteca multimedia",
+    "uploadBaseImage": "Subir imagen base",
+    "setBackgroundFirst": "Defina primero el fondo del lienzo",
+    "loadingEllipsis": "Cargando…",
+    "noUploads": "Aún no hay archivos subidos.",
+    "clockSource": "Usa el valor de hora del servidor.",
+    "previewValue": "Valor:",
+    "pickColor": "Elegir color",
+    "imageUploaded": "Imagen subida",
+    "imageWidgetAdded": "Widget de imagen agregado; selecciónelo para moverlo o cambiar su tamaño",
+    "mediaLoadFailed": "No se pudo cargar el contenido multimedia"
   },
   "categories": {
     "backToList": "Volver a categorías",
@@ -300,6 +489,7 @@
     "specialOffers": "Ofertas especiales",
     "editTitle": "Editar categoría",
     "newTitle": "Nueva categoría",
+    "modalPlaceholder": "Cree una nueva categoría desde el formulario completo, o integre el formulario aquí más adelante.",
     "openFullForm": "Abrir formulario completo",
     "deleteConfirmTitle": "¿Eliminar categoría?",
     "deleteConfirmAria": "Confirmar eliminación",
@@ -349,7 +539,9 @@
       "RUB": "Categoría para cotizaciones del rublo.",
       "USDT": "Categoría para cotizaciones de Tether.",
       "XAU": "Categoría para cotizaciones del oro."
-    }
+    },
+    "deletePriceTypeConfirm": "¿Eliminar el tipo de precio '{name}'?",
+    "deleteBlockedByOrdersCount": "No se puede eliminar: {count} pedidos activos usan esta categoría"
   },
   "bulkUpdate": {
     "backToCategories": "Volver a categorías",
@@ -460,7 +652,42 @@
     "offline": "Desconectado",
     "connectionStatus": "Conexión",
     "cashPrice": "Efectivo",
-    "accountPrice": "Cuenta"
+    "accountPrice": "Cuenta",
+    "exchangeRequests": "Solicitudes de cambio",
+    "last30Days": "Últimos 30 días",
+    "viewAll": "Ver todo",
+    "customer": "Cliente",
+    "exchange": "Cambio",
+    "amount": "Monto",
+    "ttl": "TTL",
+    "noPendingRequests": "No hay solicitudes de cambio pendientes",
+    "botStatus": "Estado del bot",
+    "activeBot": "Activo",
+    "inactiveBot": "Inactivo",
+    "telegramAnalytics": "Estadísticas de Telegram",
+    "dailyActiveUsers": "Usuarios activos diarios",
+    "usersYesterday": "vs. ayer",
+    "channelMembers": "Miembros del canal",
+    "totalMembers": "Total",
+    "channelViews": "Vistas del canal",
+    "viewsNotAvailable": "El recuento de vistas no está disponible. Conecte un bot con acceso a estadísticas del canal para habilitar esta métrica.",
+    "recentPriceUpdates": "Actualizaciones de precios recientes",
+    "noRecentUpdates": "No hay actualizaciones de precios recientes.",
+    "quickActions": "Acciones rápidas",
+    "channels": "Canales",
+    "goToAnalysis": "Estadísticas",
+    "goToFinalize": "Finalizar",
+    "goToTelegram": "Telegram",
+    "statusNew": "Nuevo",
+    "statusCancelled": "Cancelado",
+    "statusSuccessful": "Completado",
+    "relative": {
+      "justNow": "ahora mismo",
+      "minutes": "hace {count} min",
+      "hours": "hace {count} h",
+      "days": "hace {count} d"
+    },
+    "topCategories": "Categorías con más tipos de precio"
   },
   "finalize": {
     "title": "Finalizar categoría",
@@ -501,7 +728,31 @@
     "completed": "Finalización completada",
     "completedNoTelegram": "Precios finalizados, pero publicación no enviada",
     "telegramNotSent": "Telegram no aceptó la publicación.",
-    "failed": "Finalización fallida"
+    "failed": "Finalización fallida",
+    "addChannelLink": "Agregar un canal →",
+    "noChannelsHint": "Cree canales en los ajustes de Telegram para habilitar la finalización.",
+    "wizard": {
+      "backToCategories": "Volver a Categorías",
+      "chooseCategory": "Elegir categoría",
+      "confirmContent": "Confirmar contenido",
+      "confirmed": "Confirmado",
+      "details": "Detalles",
+      "editContent": "Editar contenido",
+      "noChannelHint": "Agregue un canal de Telegram antes de publicar.",
+      "noChannelTitle": "No hay canales disponibles",
+      "publish": "Publicar",
+      "publishTitle": "Publicar en Telegram",
+      "publishingHint": "El mensaje se enviará a su canal de Telegram.",
+      "select": "Seleccionar",
+      "telegramContentHint": "Edite el mensaje que se enviará a su canal de Telegram.",
+      "telegramContentTitle": "Contenido de Telegram",
+      "updatePricesHint": "Actualice los precios antes de continuar con la finalización.",
+      "publishedSuccessfully": "¡Publicado correctamente!",
+      "publishTelegramFailed": "Error al publicar en Telegram",
+      "stepChoose": "Elegir",
+      "stepPublish": "Publicar",
+      "stepReview": "Revisar"
+    }
   },
   "search": {
     "placeholder": "Buscar precios, categorías, configuración...",
@@ -514,6 +765,17 @@
     "settings": "Configuración",
     "pages": "Páginas",
     "clearRecent": "Limpiar"
+  },
+  "prices": {
+    "backToPrices": "Volver a precios",
+    "newPrice": "Nuevo precio",
+    "notesOptional": "Notas (opcional)",
+    "optionalNotes": "Notas opcionales",
+    "priceType": "Tipo de precio",
+    "category": "Categoría",
+    "pair": "Par",
+    "latestPrice": "Último precio",
+    "history": "Historial"
   },
   "pwa": {
     "installTitle": "Instalar app",
@@ -606,6 +868,14 @@
       "copyLink": "Copiar enlace",
       "copied": "Copiado",
       "save": "Guardar config API"
+    },
+    "confirmClearCache": "Confirmar borrado de caché",
+    "confirmDeleteFont": "Confirmar eliminación de fuente",
+    "iosInstall": {
+      "step1": "Use Safari en iPhone/iPad (la opción de instalar no está disponible en Chrome).",
+      "step2": "Toque Compartir y elija Añadir a pantalla de inicio.",
+      "step3": "Toque Añadir en la siguiente pantalla para colocar el icono de la app.",
+      "step4": "Ábrala desde la pantalla de inicio para una experiencia completa de app."
     }
   },
   "specialPrices": {
@@ -693,11 +963,116 @@
     "hubTitle": "Hub de gestión Telegram",
     "timezonePlaceholder": "Europe/Madrid",
     "timezoneDefault": "Asia/Tehran",
+    "admin": {
+      "analytics": {
+        "title": "Estadísticas",
+        "channelMembers": "Miembros del canal",
+        "channelViews": "Vistas del canal",
+        "channelViewsStub": "Los datos de vistas estarán disponibles tras conectar las estadísticas",
+        "dailyUsage": "Uso diario",
+        "publishActivity": "Actividad de publicación"
+      },
+      "botSettings": {
+        "title": "Ajustes del bot",
+        "hint": "Configure el TTL de cambio predeterminado y el comportamiento."
+      },
+      "campaigns": {
+        "daily": "Diaria",
+        "weekly": "Semanal",
+        "monthly": "Mensual",
+        "save": "Guardar campaña"
+      },
+      "customerAnalysis": {
+        "title": "Análisis clientes",
+        "hint": "Busque ID de usuario y revise las estadísticas de interacción.",
+        "userid": "ID usuario",
+        "prompt": "Ingrese un ID de usuario de Telegram para analizar.",
+        "inactive": "Usuarios inactivos",
+        "returned": "Usuarios que regresaron",
+        "requests": "Solicitudes",
+        "vipRatio": "Proporción VIP",
+        "peakHours": "Horas pico",
+        "setTag": "Establecer etiqueta"
+      },
+      "customersStatus": {
+        "title": "Estado de los clientes",
+        "hint": "Resumen de etiquetas y actividad de los clientes.",
+        "manageTags": "Administrar etiquetas",
+        "total": "Total de clientes"
+      },
+      "exchangeRequests": {
+        "title": "Solicitudes de cambio",
+        "hint": "Gestione y revise las solicitudes de cambio entrantes.",
+        "new": "Nueva",
+        "hold": "En espera",
+        "successful": "Exitosa",
+        "canceled": "Cancelada",
+        "changeState": "Cambiar estado",
+        "customer": "Cliente",
+        "amount": "Monto",
+        "pair": "Par",
+        "ttl": "TTL",
+        "mostRequested": "Más solicitados",
+        "newMembers": "Nuevos miembros",
+        "holdOk": "Solicitud puesta en espera ({ttl} minutos)",
+        "loadError": "No se pudieron cargar las solicitudes de cambio",
+        "stateUpdated": "Estado actualizado"
+      },
+      "notifications": {
+        "title": "Notificaciones",
+        "total": "{n} en total",
+        "active": "{n} activas",
+        "customer": "Cliente",
+        "pair": "Par",
+        "direction": "Dirección"
+      },
+      "offers": {
+        "validUntil": "Válido hasta",
+        "saveAndSend": "Guardar y enviar"
+      },
+      "reengage": {
+        "title": "Reactivación",
+        "hint": "Envíe ofertas dirigidas a usuarios inactivos.",
+        "message": "Texto oferta",
+        "inactive": "Usuarios inactivos",
+        "audience": "Audiencia",
+        "send": "Enviar",
+        "result": "Resultado",
+        "sentOk": "Mensaje enviado"
+      },
+      "reports": {
+        "title": "Informes",
+        "hint": "Consulte datos agregados y exportaciones.",
+        "pending": "Informes pendientes",
+        "cancelled": "Cancelado",
+        "new": "Nuevo",
+        "running": "En curso",
+        "successful": "Completado"
+      },
+      "stubs": {
+        "messagePlaceholder": "Mensaje campaña",
+        "offerPlaceholder": "Título oferta",
+        "offerTitle": "Título de la oferta",
+        "periodicTitle": "Oferta periódica",
+        "schedulePlaceholder": "Programación (cron u hora)"
+      },
+      "navLabel": "Sección admin",
+      "gate": {
+        "verifying": "Verificando...",
+        "verifyingHint": "Confirmando permisos...",
+        "failedTitle": "Acceso denegado",
+        "failedHint": "Sin permisos admin.",
+        "retry": "Reintentar",
+        "scopedTo": "Limitado a {name}",
+        "dashboardError": "No se pudo cargar el panel"
+      }
+    },
     "tabs": {
       "messenger": "Mensajería",
       "botSetup": "Configurar bot",
       "channels": "Canales",
-      "automation": "Automatización"
+      "automation": "Automatización",
+      "customers": "Clientes"
     },
     "messenger": {
       "channelLabel": "Canal",
@@ -743,7 +1118,9 @@
       "newBotTitle": "Nuevo bot",
       "editBot": "Editar bot",
       "deleteBotConfirm": "¿Eliminar {name}?",
-      "tokenRequired": "Token requerido"
+      "tokenRequired": "Token requerido",
+      "defaultExchangeTtl": "TTL de cambio predeterminado (minutos)",
+      "defaultExchangeTtlHint": "Se aplica automáticamente a las solicitudes de cambio. Déjelo vacío para mantener el TTL por solicitud."
     },
     "channels": {
       "title": "Canales",
@@ -759,7 +1136,8 @@
       "inactive": "Inactivo",
       "add": "Añadir",
       "editChannel": "Editar canal",
-      "noChannels": "Sin canales."
+      "noChannels": "Sin canales.",
+      "deleteConfirm": "¿Eliminar el canal '{name}'?"
     },
     "automation": {
       "title": "Automatización",
@@ -781,37 +1159,33 @@
       "add": "Añadir",
       "schedules": "Horarios",
       "noSchedules": "Sin horarios.",
-      "hint": "Solo configuración."
+      "hint": "Solo configuración.",
+      "deleteScheduleConfirm": "¿Eliminar esta programación?"
     },
     "settings": {
       "description": "Configurar bots y canales.",
       "openHub": "Abrir hub"
     },
-    "admin": {
-      "navLabel": "Sección admin",
-      "gate": {
-        "verifying": "Verificando...",
-        "verifyingHint": "Confirmando permisos...",
-        "failedTitle": "Acceso denegado",
-        "failedHint": "Sin permisos admin.",
-        "retry": "Reintentar",
-        "scopedTo": "Limitado a {name}"
+    "customers": {
+      "description": "Etiquetas de clientes y perfiles de Telegram.",
+      "empty": "No se encontraron clientes.",
+      "name": "Nombre",
+      "tag": "Etiqueta",
+      "staffTelegramHint": "ID de Telegram del personal (opcional)",
+      "telegramId": "ID de Telegram",
+      "username": "Nombre de usuario",
+      "tags": {
+        "admin": "Administrador",
+        "global": "Global",
+        "special": "Especial",
+        "vip": "VIP"
       },
-      "customerAnalysis": {
-        "title": "Análisis clientes",
-        "userid": "ID usuario"
-      },
-      "stubs": {
-        "messagePlaceholder": "Mensaje campaña",
-        "offerPlaceholder": "Título oferta"
-      },
-      "reengage": {
-        "title": "Reactivación",
-        "message": "Texto oferta"
-      },
-      "offers": {
-        "validUntil": "Válido hasta"
-      }
+      "loadError": "No se pudieron cargar los clientes",
+      "tagError": "No se pudo actualizar la etiqueta",
+      "tagUpdated": "Etiqueta actualizada"
+    },
+    "bots": {
+      "verificationFailed": "Falló la verificación del bot"
     }
   },
   "telegramStudio": {
@@ -837,7 +1211,8 @@
     "categoryNotFound": "Categoría no encontrada.",
     "previewImageError": "Imagen",
     "incompleteMessage": "Medio o descripción faltante.",
-    "templateMediaHint": "ID plantilla:"
+    "templateMediaHint": "ID plantilla:",
+    "commonVariables": "Variables comunes"
   },
   "apiErrors": {
     "codes": {
@@ -863,6 +1238,8 @@
       "invalid_json": "JSON inválido.",
       "template_config_empty_payload": "Sin configuración.",
       "template_config_invalid_type": "Config debe ser objeto JSON.",
+      "template_config_json_invalid_type": "El config_json de la plantilla debe ser un objeto JSON.",
+      "template_config_json_invalid": "El JSON de configuración de la plantilla no es válido.",
       "template_canvas_width_invalid": "Ancho inválido.",
       "template_canvas_height_invalid": "Alto inválido.",
       "template_orientation_invalid": "Orientación inválida.",
@@ -916,14 +1293,20 @@
       "update": "Actualizar",
       "delete": "Eliminar",
       "force_logout": "Cierre forzado",
-      "other": "Otro"
+      "other": "Otro",
+      "bulk_price_update": "Actualización masiva de precios",
+      "login_failed": "Inicio de sesión fallido",
+      "login_success": "Inicio de sesión exitoso",
+      "price_update": "Actualización de precio",
+      "special_price_update": "Actualización de precio especial"
     },
     "roles": {
       "super_admin": "Super Admin",
       "management": "Gerencia",
       "operator": "Operador",
       "viewer": "Observador",
-      "developer": "Desarrollador"
+      "developer": "Desarrollador",
+      "employee": "Empleado"
     }
   },
   "programmerHub": {
@@ -982,11 +1365,23 @@
       "templates": "Plantillas",
       "audit": "Registro de auditoría"
     },
+    "plan": "Plan",
+    "saving": "Creando…",
+    "telegramIdHint": "ID de Telegram numérico o nombre de usuario",
     "website": "Dirección web",
     "websiteHint": "Opcional",
-    "telegramIdHint": "ID de Telegram numérico o nombre de usuario",
-    "plan": "Plan",
-    "saving": "Creando…"
+    "subRole": "Rol delegado",
+    "subRoleHint": "Los operadores delegados gestionan el panel de administración dentro del bot de otro usuario",
+    "operator": "Operador",
+    "ownerUsername": "Nombre de usuario del propietario",
+    "ownerUsernameHint": "Nombre de usuario de la cuenta de gestión cuyo bot administra este operador",
+    "telegramUsername": "Nombre de usuario de Telegram",
+    "ownerUsernameRequired": "El nombre de usuario del propietario es obligatorio para operadores delegados",
+    "delegatedNoBotHint": "Los operadores delegados usan el bot del propietario; no se necesita token de bot.",
+    "delegationTitle": "Operador delegado",
+    "delegationDesc": "Otorgue a este usuario acceso al panel de administración dentro del bot de la cuenta de otro usuario.",
+    "admin": "Administrador",
+    "head_operator": "Operador principal"
   },
   "fleet": {
     "title": "Flota de clientes",
@@ -1031,15 +1426,6 @@
       "failed": "Fallido"
     }
   },
-  "collaboration": {
-    "title": "Cómo trabajar con nosotros",
-    "hint": "Selecciona el modelo de colaboración",
-    "placeholder": "Seleccionar tipo de colaboración",
-    "reseller": "Revendedor",
-    "white_label": "Marca blanca",
-    "agency": "Agencia",
-    "direct": "Directo"
-  },
   "landing": {
     "meta": {
       "title": "MrExchange — Panel de automatización de tipos de cambio"
@@ -1052,7 +1438,8 @@
       "contact": "Contacto",
       "cta": "Solicitar demo",
       "menu": "Menú",
-      "language": "Idioma"
+      "language": "Idioma",
+      "tutorials": "Tutoriales"
     },
     "hero": {
       "badge": "Publicación de tipos, totalmente automática",
@@ -1064,7 +1451,8 @@
       "panelTitle": "Gestión de tipos",
       "live": "Actualización en vivo",
       "buy": "Compra",
-      "sell": "Venta"
+      "sell": "Venta",
+      "ctaTutorials": "Vea cómo funciona"
     },
     "stats": {
       "saved": "Ahorro diario al publicar los tipos",
@@ -1176,11 +1564,13 @@
         },
         "api": {
           "title": "Integración de API a medida",
-          "desc": "Trae tipos automáticamente de una fuente global, o expón tus tipos a otro sistema."
+          "desc": "Trae tipos automáticamente de una fuente global, o expón tus tipos a otro sistema.",
+          "note": "Gratis al comprar el paquete."
         },
         "accounting": {
           "title": "Integración contable",
-          "desc": "Conecta el panel con tu software contable o de back-office para que tipos y registros vayan a la par."
+          "desc": "Conecta el panel con tu software contable o de back-office para que tipos y registros vayan a la par.",
+          "note": "Gratis con la compra de un paquete, hasta 5 conexiones; $50 por cada cambio posterior."
         },
         "brandTemplate": {
           "title": "Plantilla de marca a medida",
@@ -1200,7 +1590,8 @@
         },
         "branch": {
           "title": "Sucursal adicional",
-          "desc": "Otra sucursal con sus accesos, sus cuentas de personal y sus ajustes de tipos."
+          "desc": "Otra sucursal con sus accesos, sus cuentas de personal y sus ajustes de tipos.",
+          "note": "Hasta 2 sucursales gratis; $130 por cada sucursal adicional."
         },
         "migration": {
           "title": "Migración de datos",
@@ -1208,11 +1599,13 @@
         },
         "training": {
           "title": "Formación del equipo",
-          "desc": "Una sesión de puesta en marcha en directo para tu equipo, más una guía escrita en tu idioma."
+          "desc": "Una sesión de puesta en marcha en directo para tu equipo, más una guía escrita en tu idioma.",
+          "note": "Incluido gratis con el paquete."
         },
         "domain": {
           "title": "Configuración de dominio y SSL",
-          "desc": "Dominio, DNS, certificados y registros de correo configurados por nosotros."
+          "desc": "Dominio, DNS, certificados y registros de correo configurados por nosotros.",
+          "note": "Gratis con la compra de un paquete."
         },
         "support": {
           "title": "Soporte y mantenimiento",
@@ -1359,7 +1752,12 @@
         }
       },
       "ctaTitle": "¿Prefieres echar un vistazo primero?",
-      "ctaText": "Abre el panel de demo ahora, o lee qué incluye exactamente el paquete antes de escribirnos."
+      "ctaText": "Abre el panel de demo ahora, o lee qué incluye exactamente el paquete antes de escribirnos.",
+      "trial": {
+        "eyebrow": "Prueba gratuita",
+        "title": "Su propio panel, en su propio subdominio",
+        "text": "Las pruebas las configuramos nosotros, no un formulario de registro, así que su panel llega con sus monedas, su plantilla y su canal de Telegram ya conectados. Escríbanos por cualquiera de los canales anteriores y suele estar funcionando ese mismo día. Catorce días, sin tarjeta, sin compromiso."
+      }
     },
     "footer": {
       "about": "Un panel de publicación de tipos para casas de cambio: una entrada, todos los canales.",
@@ -1369,7 +1767,291 @@
       "faq": "Preguntas frecuentes",
       "login": "Iniciar sesión",
       "bottom": "mrexchange.co.uk. Todos los derechos reservados."
+    },
+    "tutorials": {
+      "title": "Tutoriales",
+      "subtitle": "Recorridos cortos y grabados de las cosas que hará cada mañana.",
+      "readMore": "Leer el tutorial",
+      "backToIndex": "Todos los tutoriales",
+      "steps": "Pasos",
+      "notFound": "Ese tutorial no existe.",
+      "minutes": "{count} min de lectura",
+      "more": "Más tutoriales",
+      "posts": {
+        "publish-prices": {
+          "title": "Actualice sus tarifas y publíquelas en todas partes",
+          "summary": "La rutina de la mañana: escriba las nuevas tarifas de compra y venta, finalícelas y deje que el panel publique el cambio en todos los canales que usa.",
+          "intro": "Este es el flujo que toda casa de cambio ejecuta varias veces al día. Nada de esto necesita un diseñador o un desarrollador: usted escribe números, los confirma, y el panel se encarga del sitio web, el canal de Telegram, la publicación de Instagram y el widget de tarifas.",
+          "steps": {
+            "open": {
+              "title": "Abra el centro de precios",
+              "body": "Cada moneda que vende está bajo una categoría. Elija la categoría cuyo precio va a cambiar y el panel muestra la tarifa de compra y venta actual junto con el último cambio."
+            },
+            "enter": {
+              "title": "Ingrese las nuevas tarifas",
+              "body": "Escriba una tarifa base y deje que los márgenes hagan el resto, o ingrese la compra y la venta explícitamente. El panel mantiene visible el valor anterior para que vea exactamente cuánto cambió."
+            },
+            "finalize": {
+              "title": "Finalice el cambio",
+              "body": "Nada llega a sus clientes hasta que finaliza. Esa única confirmación es lo que separa un error de tipeo de una tarifa publicada, y queda registrada con su nombre y la hora."
+            },
+            "publish": {
+              "title": "Véalo publicarse",
+              "body": "En el momento en que el cambio se finaliza, la página del sitio web, el mensaje de Telegram, la imagen de tarifas generada y el widget se actualizan todos. Sin una segunda herramienta, sin copiar y pegar."
+            }
+          },
+          "outro": "Eso es todo el ciclo. Comience su prueba gratuita y ejecútelo con sus propias monedas hoy mismo."
+        },
+        "template-editor": {
+          "title": "Diseñe una imagen de tarifas con su propia plantilla",
+          "summary": "Arrastre un widget al lienzo, vincúlelo a un precio en vivo y previsualice la imagen que verán sus clientes.",
+          "intro": "Las imágenes que publica en Telegram e Instagram se generan a partir de una plantilla que diseña una sola vez. El editor es un lienzo: usted coloca widgets, los apunta a un precio, y cada publicación futura se renderiza con los números actuales automáticamente.",
+          "steps": {
+            "open": {
+              "title": "Empiece desde su fondo",
+              "body": "Suba su propio diseño, o empiece con una de las plantillas incluidas y cambie los colores y fuentes por los de su marca."
+            },
+            "drag": {
+              "title": "Arrastre un widget al lienzo",
+              "body": "Filas de tarifas, encabezados, logotipos, fechas y texto libre son todos widgets. Suelte uno donde lo quiera y ajústelo; las capas mantienen el orden de apilamiento predecible."
+            },
+            "bind": {
+              "title": "Vincúlelo a un precio en vivo",
+              "body": "Un widget de tarifa está vinculado a un tipo de precio, no a un número. Cuando la tarifa cambia, el widget cambia; nunca vuelve a editar la imagen."
+            },
+            "preview": {
+              "title": "Previsualice con números reales",
+              "body": "La vista previa renderiza la plantilla exactamente como lo hará el publicador, usando las tarifas de hoy, así que lo que aprueba es lo que recibirá su canal."
+            }
+          },
+          "outro": "Una plantilla, cada publicación. Pruebe el editor con su propia marca durante la prueba gratuita."
+        },
+        "telegram-bot": {
+          "title": "Conecte su canal y bot de Telegram",
+          "summary": "Pegue un token de bot, agregue el canal, elija qué se publica y envíe un mensaje de prueba antes de que nada se active.",
+          "intro": "Telegram es donde la mayoría de los clientes de casas de cambio realmente leen sus tarifas. El panel se comunica con su propio bot, en su propio canal, así que la audiencia y la marca siguen siendo suyas.",
+          "steps": {
+            "token": {
+              "title": "Agregue el token de su bot",
+              "body": "Cree un bot con {'@'}BotFather y pegue el token en el panel. El token se almacena cifrado y nunca se vuelve a mostrar completo."
+            },
+            "channel": {
+              "title": "Agregue el canal",
+              "body": "Haga que el bot sea administrador de su canal y luego regístrelo aquí. El panel verifica el permiso antes de guardar nada."
+            },
+            "settings": {
+              "title": "Elija qué se publica",
+              "body": "Mensaje de texto, imagen renderizada, o ambos; fijado o no; con cada cambio o según un horario. La plantilla de mensaje predeterminada se puede editar por canal."
+            },
+            "test": {
+              "title": "Envíe un mensaje de prueba",
+              "body": "Envíe un mensaje al canal antes de activarlo. Si al bot le falta un permiso, lo descubre aquí, no frente a sus clientes."
+            }
+          },
+          "outro": "Su canal, su bot, sus tarifas, conectados en pocos minutos."
+        },
+        "signup-tour": {
+          "title": "Regístrese y conozca el panel",
+          "summary": "Correo electrónico y contraseña o una cuenta de Google, un código de un solo uso para confirmar que es usted, y luego un recorrido guiado por el panel.",
+          "intro": "No hay cuenta de demostración compartida ni llamada de ventas de por medio. Se registra, confirma su dirección y llega a un panel propio con catorce días del producto completo.",
+          "steps": {
+            "signup": {
+              "title": "Cree su cuenta",
+              "body": "Ingrese el nombre de su casa de cambio, un correo electrónico y una contraseña, o regístrese con Google y omita la contraseña por completo."
+            },
+            "code": {
+              "title": "Confirme con un código de un solo uso",
+              "body": "Llega un código de seis dígitos por correo electrónico, o por SMS si ese es el único contacto que nos dio. Es válido durante diez minutos y caduca tras cinco intentos fallidos."
+            },
+            "tour": {
+              "title": "Haga el recorrido",
+              "body": "La primera vez que inicia sesión, un breve recorrido guiado le muestra precios, plantillas, canales y ajustes. Puede repetirlo en cualquier momento desde el menú de usuario."
+            },
+            "trial": {
+              "title": "Use el producto completo durante 14 días",
+              "body": "Nada está bloqueado y nada es compartido: sus tarifas, plantillas y canales son solo suyos. Si se atasca, los contactos de soporte están a un clic en el panel."
+            }
+          },
+          "outro": "Catorce días, el panel completo, sin necesidad de tarjeta."
+        }
+      }
     }
+  },
+  "orders": {
+    "queueTitle": "Cola de pedidos del bot",
+    "customerLinkTitle": "Enlace de pedido para clientes",
+    "customerLinkHint": "Comparta este enlace con los clientes. Ven las tarifas en vivo y los pedidos aparecen en esta cola.",
+    "copyLink": "Copiar enlace",
+    "copied": "Copiado",
+    "copyFailed": "No se pudo copiar el enlace",
+    "openLink": "Abrir",
+    "pendingBadge": "{count} pedidos pendientes",
+    "empty": "No se encontraron pedidos.",
+    "approve": "Aprobar",
+    "reject": "Rechazar",
+    "viewDetails": "Ver detalles",
+    "detailTitle": "Detalles del pedido",
+    "sectionStatus": "Estado",
+    "sectionCustomer": "Cliente",
+    "sectionOrder": "Pedido",
+    "sectionMetadata": "Datos capturados",
+    "platform": "Origen",
+    "platformTelegram": "Telegram",
+    "platformWhatsapp": "WhatsApp",
+    "platformWeb": "Web / enlace público",
+    "telegramChatId": "ID de chat de Telegram",
+    "telegramUsername": "Nombre de usuario de Telegram",
+    "customerId": "ID de cliente",
+    "reviewedAt": "Revisado el",
+    "adminNote": "Nota del administrador",
+    "adminNotePlaceholder": "Nota opcional...",
+    "metaSource": "Origen del envío",
+    "metaUserAgent": "Navegador / dispositivo",
+    "deleteOrder": "Eliminar pedido",
+    "deleteConfirm": "¿Eliminar permanentemente el pedido \"{name}\"? Es necesario antes de eliminar su categoría.",
+    "deleteSuccess": "Pedido eliminado.",
+    "reviewSuccess": "Estado del pedido actualizado.",
+    "status": {
+      "pending": "Pendiente",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "cancelled": "Cancelado",
+      "all": "Todos"
+    }
+  },
+  "webapp": {
+    "orderTitle": "Pedido rápido",
+    "welcome": "Hola {name}",
+    "tradeType": "Tipo de operación",
+    "buy": "Comprar",
+    "sell": "Vender",
+    "category": "Moneda / categoría",
+    "selectCategory": "Seleccionar",
+    "amount": "Monto",
+    "note": "Notas",
+    "notePlaceholder": "Notas opcionales...",
+    "submitOrder": "Enviar pedido",
+    "orderSubmitted": "Su pedido se envió correctamente",
+    "orderContactMessage": "Nuestro equipo lo contactará en breve al número de teléfono que proporcionó.",
+    "orderContactMessageBot": "Nuestro equipo lo contactará en breve por Telegram.",
+    "orderPendingReview": "Por favor mantenga su teléfono disponible. Gracias por su paciencia.",
+    "missingToken": "Enlace no válido. Use el botón del bot.",
+    "authFailed": "Error de autenticación. El enlace pudo haber caducado.",
+    "submitFailed": "No se pudo enviar el pedido.",
+    "publicIntro": "Vea las tarifas en vivo y envíe su pedido.",
+    "liveRates": "Tarifas en vivo",
+    "customerName": "Nombre completo",
+    "customerPhone": "Número de teléfono",
+    "priceType": "Tipo de tarifa",
+    "selectPriceType": "Seleccionar tipo de tarifa (opcional)",
+    "selectPriceTypeLabel": "Seleccione una tarifa",
+    "ratesUpdated": "Actualizado",
+    "noRatesYet": "Aún no hay tarifas disponibles.",
+    "selectedRate": "Su tarifa seleccionada",
+    "formSection": "Detalles del pedido",
+    "customerNamePlaceholder": "p. ej. Juan Pérez",
+    "amountPlaceholder": "Ingrese el monto",
+    "phonePlaceholder": "0912..."
+  },
+  "trial": {
+    "expiredTitle": "Su prueba gratuita ha finalizado.",
+    "expiredText": "Sus datos están seguros y siguen siendo visibles, pero los cambios están pausados hasta que actualice.",
+    "talkToUs": "Hable con nosotros",
+    "daysLeft": "Le quedan {days} días de prueba"
+  },
+  "support": {
+    "title": "¿Necesita ayuda?",
+    "text": "Escriba a nuestros administradores: una persona responde.",
+    "kinds": {
+      "phone": "Teléfono",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "email": "Correo electrónico",
+      "instagram": "Instagram",
+      "custom": "Otro"
+    }
+  },
+  "ownerConsole": {
+    "title": "Consola del propietario",
+    "tabs": {
+      "activity": "Inicios de sesión e IPs",
+      "accounts": "Cuentas y pruebas",
+      "sales": "Ventas",
+      "support": "Canales de soporte"
+    },
+    "search": "Buscar",
+    "searchHint": "Correo, nombre, IP o detalles",
+    "apply": "Aplicar",
+    "exportCsv": "Exportar CSV",
+    "allActions": "Todas las acciones",
+    "from": "Desde",
+    "to": "Hasta",
+    "user": "Usuario",
+    "account": "Cuenta",
+    "action": "Acción",
+    "ip": "Dirección IP",
+    "device": "Dispositivo",
+    "when": "Cuándo",
+    "unknownUser": "Desconocido",
+    "unknownDevice": "Desconocido",
+    "noActivity": "Ninguna actividad coincide con estos filtros.",
+    "actions": {
+      "signup": "Registro",
+      "login_success": "Inicio de sesión",
+      "login_failed": "Inicio de sesión fallido",
+      "logout": "Cierre de sesión",
+      "price_update": "Actualización de precio",
+      "bulk_price_update": "Actualización masiva de precios",
+      "special_price_update": "Actualización de precio especial",
+      "template_change": "Cambio de plantilla",
+      "finalize": "Finalización",
+      "impersonate_start": "Suplantación",
+      "other": "Otro"
+    },
+    "noAccounts": "Nadie se ha registrado todavía.",
+    "signedUp": "Registrado",
+    "lastLogin": "Último inicio de sesión",
+    "seats": "Usuarios",
+    "revenue": "Ingresos",
+    "verified": "Correo verificado",
+    "paid": "Pagado",
+    "suspend": "Suspender",
+    "suspended": "Suspendido",
+    "reinstate": "Reactivar",
+    "reinstated": "Cuenta reactivada",
+    "forceLogout": "Forzar cierre de sesión",
+    "forcedLogout": "Se cerraron todas las sesiones de esta cuenta.",
+    "recordSale": "Registrar una venta",
+    "saleHint": "Registrar una venta levanta el muro de prueba y emite una clave de licencia.",
+    "pickCustomer": "Elegir un cliente",
+    "customer": "Cliente",
+    "amount": "Monto",
+    "currency": "Moneda",
+    "salePlan": "Plan",
+    "salePlans": {
+      "one_time": "Pago único",
+      "lifetime": "De por vida",
+      "renewal": "Renovación",
+      "addon": "Complemento"
+    },
+    "soldAt": "Vendido",
+    "reference": "Referencia",
+    "note": "Nota",
+    "recordedBy": "Registrado por",
+    "noSales": "Aún no hay ventas registradas.",
+    "salesTotal": "Total: {total}",
+    "saleRecorded": "Venta registrada: se levantó el muro de prueba.",
+    "saleDeleted": "Venta eliminada.",
+    "addChannel": "Agregar un canal",
+    "noChannels": "Aún no hay canales de soporte. Los clientes no verán nada cuando necesiten ayuda.",
+    "channelTitle": "Canal de soporte",
+    "channelKind": "Tipo",
+    "channelLabel": "Etiqueta",
+    "channelValue": "Valor",
+    "channelValueHint": "Número de teléfono, {'@'}usuario, correo electrónico o URL.",
+    "channelOrder": "Orden",
+    "preview": "Lo que ven los clientes",
+    "previewEmpty": "Nada está activo, así que no se muestra ningún contacto en ninguna parte."
   },
   "registerClient": {
     "backToList": "Volver al hub de desarrollador",
@@ -1382,5 +2064,35 @@
     "systemAccessDesc": "Credenciales del bot de Telegram y nivel de acceso.",
     "registeredBy": "Registrado por",
     "registeredByHint": "Se registra automáticamente como el admin conectado."
+  },
+  "about": {
+    "motto": "Cada producto es una oportunidad para dejar una huella duradera."
+  },
+  "templates": {
+    "selectCategory": "Seleccionar categoría",
+    "addTemplate": "Agregar plantilla",
+    "editor": "Editor",
+    "nameRequired": "Ingrese un nombre para la plantilla.",
+    "categoryRequired": "Elija una categoría antes de crear la plantilla.",
+    "deleted": "Plantilla eliminada."
+  },
+  "priceTypeForm": {
+    "backToCategories": "Volver a categorías",
+    "pageTitleCreate": "Nuevo tipo de precio",
+    "pageTitleEdit": "Editar tipo de precio",
+    "sourceCurrency": "Moneda de origen",
+    "targetCurrency": "Moneda de destino",
+    "tradeType": "Tipo de operación (compra / venta)",
+    "tradeTypeHelp": "Define cómo se usa este precio en las columnas de actualización masiva y en la lógica de publicación final.",
+    "buy": "Compra",
+    "sell": "Venta",
+    "descriptionOptional": "Descripción (opcional)",
+    "loadCurrenciesError": "No se pudieron cargar las monedas",
+    "missingCategoryId": "Falta el ID de la categoría",
+    "selectBothCurrencies": "Seleccione la moneda de origen y la de destino.",
+    "createSuccess": "Tipo de precio creado correctamente",
+    "updateSuccess": "Tipo de precio actualizado correctamente",
+    "saveError": "No se pudo guardar el tipo de precio",
+    "loadPriceTypeError": "No se pudo cargar el tipo de precio"
   }
 }

@@ -19,7 +19,6 @@ except ImportError:
     OrderIntake = None
 from .serializers import (
     CategorySerializer,
-    CategoryListSerializer,
     CategoryExplorerSerializer,
     PriceTypeSerializer,
 )

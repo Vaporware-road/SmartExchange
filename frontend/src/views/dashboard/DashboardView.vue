@@ -523,12 +523,12 @@ function formatRelative(iso: string | null | undefined): string {
     const d = new Date(iso)
     const diff = Date.now() - d.getTime()
     const mins = Math.floor(diff / 60000)
-    if (mins < 1) return locale.value === 'fa' ? 'همین الان' : 'just now'
-    if (mins < 60) return locale.value === 'fa' ? `${mins} دقیقه پیش` : `${mins}m ago`
+    if (mins < 1) return t('dashboard.relative.justNow')
+    if (mins < 60) return t('dashboard.relative.minutes', { count: mins })
     const hrs = Math.floor(mins / 60)
-    if (hrs < 24) return locale.value === 'fa' ? `${hrs} ساعت پیش` : `${hrs}h ago`
+    if (hrs < 24) return t('dashboard.relative.hours', { count: hrs })
     const days = Math.floor(hrs / 24)
-    return locale.value === 'fa' ? `${days} روز پیش` : `${days}d ago`
+    return t('dashboard.relative.days', { count: days })
   } catch {
     return '—'
   }
@@ -695,9 +695,7 @@ const lineChartOptions = computed(() => {
   }
 })
 
-const topCategoriesTitle = computed(() =>
-  locale.value === 'fa' ? 'پُرکارترین دسته‌بندی‌ها' : 'Top Categories by Price Types'
-)
+const topCategoriesTitle = computed(() => t('dashboard.topCategories'))
 
 const topCategoriesData = computed(() => {
   if (!categories.value?.length) return { labels: [], datasets: [{ data: [] }] }

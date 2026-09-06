@@ -187,35 +187,6 @@ class CategorySerializer(serializers.ModelSerializer):
             return ""
 
 
-class CategoryListSerializer(serializers.ModelSerializer):
-    price_type_count = serializers.IntegerField(read_only=True)
-    last_used_template = serializers.SerializerMethodField()
-    template_media_url = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Category
-        fields = [
-            "id", "name", "slug", "description",
-            "telegram_message_description", "telegram_media_url", "inline_buttons",
-            "last_used_template", "template_media_url",
-            "created_at", "updated_at", "price_type_count",
-        ]
-        read_only_fields = fields
-
-    def get_last_used_template(self, obj):
-        template = _resolve_preview_template(obj)
-        return getattr(template, "id", None)
-
-    def get_template_media_url(self, obj):
-        template = _resolve_preview_template(obj)
-        if not template or not getattr(template, "image", None):
-            return ""
-        try:
-            return template.image.url
-        except Exception:
-            return ""
-
-
 class CategoryExplorerSerializer(serializers.ModelSerializer):
     """List with nested price_types and latest_price for Explorer UI."""
     price_types = PriceTypeExplorerSerializer(many=True, read_only=True)
@@ -234,10 +205,9 @@ class CategoryExplorerSerializer(serializers.ModelSerializer):
         read_only_fields = fields
 
     def get_price_type_count(self, obj):
-        pts = getattr(obj, "price_types", None)
-        if pts is not None and hasattr(pts, "__len__"):
-            return len(pts)
-        return getattr(obj, "price_type_count", 0)
+        # The list action prefetches price_types, so .all() reads the cache and
+        # costs no extra query; the manager itself has no length.
+        return len(obj.price_types.all())
 
     def get_last_used_template(self, obj):
         template = _resolve_preview_template(obj)

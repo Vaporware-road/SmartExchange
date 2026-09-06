@@ -17,7 +17,9 @@
     "userManagement": "Gestion utilisateurs",
     "registerUser": "Enregistrer",
     "plans": "Plans & modèles",
-    "fleet": "Parc"
+    "fleet": "Parc",
+    "orders": "File des commandes",
+    "ownerConsole": "Console propriétaire"
   },
   "common": {
     "save": "Enregistrer",
@@ -47,7 +49,24 @@
     "date": "Date",
     "logout": "Déconnexion",
     "login": "Connexion",
-    "history": "Historique"
+    "history": "Historique",
+    "aboutPage": "À propos",
+    "active": "Actif",
+    "all": "Tous",
+    "brandLogo": "Logo de la marque",
+    "breadcrumb": "Fil d'Ariane",
+    "category": "Catégorie",
+    "copyFailed": "Copie impossible",
+    "copyLink": "Copier le lien",
+    "dismiss": "Ignorer",
+    "inactive": "Inactif",
+    "linkCopied": "Lien copié",
+    "noHistory": "Aucun historique trouvé.",
+    "notes": "Notes",
+    "poweredBy": "Propulsé par",
+    "price": "Prix",
+    "saved": "Enregistré",
+    "toggleSidebar": "Afficher/masquer la barre latérale"
   },
   "header": {
     "openMenu": "Ouvrir le menu",
@@ -120,7 +139,47 @@
     "password": "Mot de passe",
     "loginButton": "Connexion",
     "loggingIn": "Connexion en cours…",
-    "signingIn": "Connexion en cours…"
+    "signingIn": "Connexion en cours…",
+    "confirmButton": "Confirmer",
+    "confirmCode": "Code de confirmation",
+    "confirmResend": "Envoyer un nouveau code",
+    "confirmResent": "Un nouveau code est en route.",
+    "confirmSendFailed": "Nous n'avons pas pu envoyer le code. Réessayez dans un instant.",
+    "confirmSentEmail": "Nous avons envoyé un code à six chiffres à {to}.",
+    "confirmSentSms": "Nous avons envoyé par SMS un code à six chiffres à {to}.",
+    "confirmSkip": "Le faire plus tard",
+    "confirmTitle": "Confirmez que c'est bien vous",
+    "email": "Adresse e-mail",
+    "emailPlaceholder": "vous{'@'}votrebureau.com",
+    "exchangeName": "Nom du bureau de change",
+    "exchangeNamePlaceholder": "Le nom connu de vos clients",
+    "firstName": "Prénom",
+    "goToPanel": "Accéder à mon panneau",
+    "googleUnavailable": "La connexion Google n'a pas pu se charger. Utilisez votre e-mail et votre mot de passe.",
+    "haveAccount": "Vous avez déjà un compte ?",
+    "identifier": "E-mail ou nom d'utilisateur",
+    "identifierPlaceholder": "vous{'@'}votrebureau.com",
+    "lastName": "Nom",
+    "noAccount": "Pas encore de compte ?",
+    "or": "ou",
+    "passwordHint": "Au moins 8 caractères.",
+    "signingUp": "Création de votre panneau…",
+    "signupButton": "Commencer mes {days} jours gratuits",
+    "signupLink": "Démarrer votre essai gratuit",
+    "signupNoCard": "Aucune carte requise. Votre panneau s'ouvre immédiatement.",
+    "signupTitle": "Démarrez votre essai gratuit de {days} jours",
+    "verifiedText": "Merci — nous pouvons désormais vous joindre. Votre essai n'est pas affecté.",
+    "verifiedTitle": "E-mail confirmé",
+    "verifyBanner": {
+      "resend": "Renvoyer",
+      "sendFailed": "Nous n'avons pas pu envoyer l'e-mail. Réessayez dans un instant.",
+      "sent": "E-mail de confirmation envoyé.",
+      "text": "Nous avons envoyé un lien à {email}. Votre panneau fonctionne dans tous les cas.",
+      "title": "Confirmez votre e-mail"
+    },
+    "verifyFailedText": "Il a peut-être expiré. Demandez-en un nouveau depuis la bannière de votre panneau.",
+    "verifyFailedTitle": "Ce lien n'a pas fonctionné",
+    "verifying": "Confirmation de votre adresse e-mail…"
   },
   "routes": {
     "dashboard": "Tableau de bord",
@@ -156,7 +215,10 @@
     "instagramHub": "Hub Instagram",
     "userCenter": "Gestion des admins",
     "programmerHub": "Hub Développeur",
-    "programmerFleet": "Parc"
+    "programmerFleet": "Parc",
+    "orders": "File des commandes",
+    "programmerConsole": "Console propriétaire",
+    "webappOrder": "Passer commande"
   },
   "lang": {
     "fa": "فارسی",
@@ -292,7 +354,59 @@
     "weekdayFormats": {
       "farsi_weekday": "Nom du jour en persan",
       "english_weekday": "Nom du jour en anglais"
-    }
+    },
+    "alignBottom": "Bas",
+    "alignCenter": "Centre",
+    "alignLabel": "Alignement",
+    "alignLeft": "Gauche",
+    "alignMiddle": "Milieu",
+    "alignRight": "Droite",
+    "canvasBackground": "Arrière-plan du canevas",
+    "clockSource": "Utilise la valeur horaire du serveur.",
+    "deleteWidget": "Supprimer le widget",
+    "dropShadow": "Ombre portée (PNG)",
+    "fallbackValue": "Valeur de repli (utilisée quand la valeur en direct est indisponible)",
+    "fontDefault": "Par défaut (serveur)",
+    "fontFile": "Fichier de police (export PNG)",
+    "fontSize": "Taille de la police",
+    "height": "Hauteur",
+    "imageUploaded": "Image téléversée",
+    "imageUrl": "URL de l'image",
+    "imageWidgetAdded": "Widget image ajouté — sélectionnez-le pour le déplacer ou le redimensionner",
+    "inspector": "Inspecteur",
+    "lineHeight": "Hauteur de ligne (facultatif)",
+    "loadingEllipsis": "Chargement…",
+    "mediaLibrary": "Bibliothèque de médias",
+    "mediaLoadFailed": "Impossible de charger les médias",
+    "name": "Nom",
+    "noUploads": "Aucun fichier téléversé pour l'instant.",
+    "opacityLabel": "Opacité (éditeur + PNG)",
+    "openMediaLibrary": "Ouvrir la bibliothèque de médias",
+    "pickColor": "Choisir une couleur",
+    "plainOnExport": "Texte simple à l'export (sans contour / ombre)",
+    "previewSource": "Source de l'aperçu :",
+    "previewValue": "Valeur :",
+    "priceBindings": "Liaisons de prix",
+    "priceTypeBinding": "Liaison au type de prix",
+    "rotation": "Rotation",
+    "selectPriceType": "Sélectionner un type de prix",
+    "selectWidgetHint": "Sélectionnez un widget pour modifier le style, la typographie et les liaisons de données.",
+    "setBackgroundFirst": "Définissez d'abord l'arrière-plan du canevas",
+    "snapToBackground": "Aligner sur l'image d'arrière-plan",
+    "stableKey": "Clé stable :",
+    "templateName": "Nom du modèle",
+    "templateSettings": "Paramètres du modèle",
+    "textColor": "Couleur du texte",
+    "textOutline": "Contour du texte (PNG)",
+    "type": "Type",
+    "typography": "Typographie",
+    "uploadBaseImage": "Téléverser l'image de base",
+    "verticalAlign": "Vertical (dans le cadre)",
+    "weight": "Graisse",
+    "weightBold": "Gras",
+    "weightNormal": "Normal",
+    "widgetLibrary": "Bibliothèque de widgets",
+    "width": "Largeur"
   },
   "categories": {
     "backToList": "Retour aux catégories",
@@ -349,7 +463,10 @@
       "RUB": "Catégorie prédéfinie pour les cours du rouble.",
       "USDT": "Catégorie prédéfinie pour les cours du Tether.",
       "XAU": "Catégorie prédéfinie pour les cours de l'or."
-    }
+    },
+    "deleteBlockedByOrdersCount": "Suppression impossible : {count} commandes actives utilisent cette catégorie",
+    "deletePriceTypeConfirm": "Supprimer le type de prix « {name} » ?",
+    "modalPlaceholder": "Créez une nouvelle catégorie depuis le formulaire complet, ou intégrez le formulaire ici plus tard."
   },
   "bulkUpdate": {
     "backToCategories": "Retour aux catégories",
@@ -460,7 +577,42 @@
     "offline": "Hors ligne",
     "connectionStatus": "Connexion",
     "cashPrice": "Espèces",
-    "accountPrice": "Compte"
+    "accountPrice": "Compte",
+    "activeBot": "Actif",
+    "amount": "Montant",
+    "botStatus": "État du bot",
+    "channelMembers": "Membres du canal",
+    "channelViews": "Vues du canal",
+    "channels": "Canaux",
+    "customer": "Client",
+    "dailyActiveUsers": "Utilisateurs actifs par jour",
+    "exchange": "Change",
+    "exchangeRequests": "Demandes de change",
+    "goToAnalysis": "Statistiques",
+    "goToFinalize": "Finaliser",
+    "goToTelegram": "Telegram",
+    "inactiveBot": "Inactif",
+    "last30Days": "30 derniers jours",
+    "noPendingRequests": "Aucune demande de change en attente",
+    "noRecentUpdates": "Aucune mise à jour de prix récente.",
+    "quickActions": "Actions rapides",
+    "recentPriceUpdates": "Mises à jour de prix récentes",
+    "statusCancelled": "Annulé",
+    "statusNew": "Nouveau",
+    "statusSuccessful": "Terminé",
+    "telegramAnalytics": "Statistiques Telegram",
+    "totalMembers": "Total",
+    "ttl": "TTL",
+    "usersYesterday": "vs hier",
+    "viewAll": "Tout afficher",
+    "viewsNotAvailable": "Le nombre de vues n'est pas disponible. Connectez un bot avec accès aux statistiques du canal pour activer cette mesure.",
+    "relative": {
+      "justNow": "à l'instant",
+      "minutes": "il y a {count} min",
+      "hours": "il y a {count} h",
+      "days": "il y a {count} j"
+    },
+    "topCategories": "Catégories avec le plus de types de prix"
   },
   "finalize": {
     "title": "Finaliser la catégorie",
@@ -501,7 +653,31 @@
     "completed": "Finalisation réussie",
     "completedNoTelegram": "Prix finalisés, mais publication Telegram non envoyée",
     "telegramNotSent": "Telegram n'a pas accepté la publication.",
-    "failed": "Échec de la finalisation"
+    "failed": "Échec de la finalisation",
+    "addChannelLink": "Ajouter un canal →",
+    "noChannelsHint": "Créez des canaux dans les paramètres Telegram pour activer la finalisation.",
+    "wizard": {
+      "backToCategories": "Retour aux catégories",
+      "chooseCategory": "Choisir une catégorie",
+      "confirmContent": "Confirmer le contenu",
+      "confirmed": "Confirmé",
+      "details": "Détails",
+      "editContent": "Modifier le contenu",
+      "noChannelHint": "Ajoutez d'abord un canal Telegram avant de publier.",
+      "noChannelTitle": "Aucun canal disponible",
+      "publish": "Publier",
+      "publishTelegramFailed": "Échec de la publication sur Telegram",
+      "publishTitle": "Publier sur Telegram",
+      "publishedSuccessfully": "Publié avec succès !",
+      "publishingHint": "Le message sera envoyé à votre canal Telegram.",
+      "select": "Sélectionner",
+      "stepChoose": "Choisir",
+      "stepPublish": "Publier",
+      "stepReview": "Vérifier",
+      "telegramContentHint": "Modifiez le message qui sera envoyé à votre canal Telegram.",
+      "telegramContentTitle": "Contenu Telegram",
+      "updatePricesHint": "Mettez à jour les prix avant de passer à la finalisation."
+    }
   },
   "search": {
     "placeholder": "Rechercher prix, catégories, paramètres...",
@@ -606,6 +782,14 @@
       "copyLink": "Copier le lien",
       "copied": "Copié",
       "save": "Enregistrer paramètres API"
+    },
+    "confirmClearCache": "Confirmer le vidage du cache",
+    "confirmDeleteFont": "Confirmer la suppression de la police",
+    "iosInstall": {
+      "step1": "Utilisez Safari sur iPhone/iPad (l'option d'installation n'existe pas dans Chrome).",
+      "step2": "Touchez Partager, puis choisissez Sur l'écran d'accueil.",
+      "step3": "Touchez Ajouter à l'écran suivant pour placer l'icône de l'application.",
+      "step4": "Ouvrez-la depuis l'écran d'accueil pour une expérience d'application complète."
     }
   },
   "specialPrices": {
@@ -697,7 +881,8 @@
       "messenger": "Messagerie",
       "botSetup": "Configuration bot",
       "channels": "Canaux",
-      "automation": "Automatisation"
+      "automation": "Automatisation",
+      "customers": "Clients"
     },
     "messenger": {
       "channelLabel": "Canal",
@@ -743,7 +928,9 @@
       "newBotTitle": "Nouveau bot",
       "editBot": "Modifier le bot",
       "deleteBotConfirm": "Voulez-vous vraiment supprimer {name} ?",
-      "tokenRequired": "Token requis"
+      "tokenRequired": "Token requis",
+      "defaultExchangeTtl": "TTL de change par défaut (minutes)",
+      "defaultExchangeTtlHint": "Appliqué automatiquement aux demandes de change. Laissez vide pour conserver le TTL par demande."
     },
     "channels": {
       "title": "Canaux",
@@ -759,7 +946,8 @@
       "inactive": "Inactif",
       "add": "Ajouter",
       "editChannel": "Modifier le canal",
-      "noChannels": "Aucun canal."
+      "noChannels": "Aucun canal.",
+      "deleteConfirm": "Supprimer le canal « {name} » ?"
     },
     "automation": {
       "title": "Automatisation",
@@ -781,7 +969,8 @@
       "add": "Ajouter",
       "schedules": "Plannings",
       "noSchedules": "Aucun planning.",
-      "hint": "Configuration uniquement."
+      "hint": "Configuration uniquement.",
+      "deleteScheduleConfirm": "Supprimer ce planning ?"
     },
     "settings": {
       "description": "Configurer bots et canaux Telegram.",
@@ -795,23 +984,122 @@
         "failedTitle": "Accès refusé",
         "failedHint": "Permissions admin insuffisantes.",
         "retry": "Réessayer",
-        "scopedTo": "Limité à {name}"
+        "scopedTo": "Limité à {name}",
+        "dashboardError": "Impossible de charger le tableau de bord"
       },
       "customerAnalysis": {
         "title": "Analyse clients",
-        "userid": "ID utilisateur"
+        "userid": "ID utilisateur",
+        "hint": "Recherchez des ID utilisateur et examinez les statistiques d'interaction.",
+        "inactive": "Utilisateurs inactifs",
+        "peakHours": "Heures de pointe",
+        "prompt": "Entrez un ID utilisateur Telegram à analyser.",
+        "requests": "Demandes",
+        "returned": "Utilisateurs revenus",
+        "setTag": "Définir l'étiquette",
+        "vipRatio": "Ratio VIP"
       },
       "stubs": {
         "messagePlaceholder": "Message campagne",
-        "offerPlaceholder": "Titre offre"
+        "offerPlaceholder": "Titre offre",
+        "offerTitle": "Titre de l'offre",
+        "periodicTitle": "Offre périodique",
+        "schedulePlaceholder": "Planning (cron ou heure)"
       },
       "reengage": {
         "title": "Réengagement",
-        "message": "Texte de l'offre"
+        "message": "Texte de l'offre",
+        "audience": "Audience",
+        "hint": "Envoyez des offres ciblées aux utilisateurs inactifs.",
+        "inactive": "Utilisateurs inactifs",
+        "result": "Résultat",
+        "send": "Envoyer",
+        "sentOk": "Message envoyé"
       },
       "offers": {
-        "validUntil": "Valide jusqu'au"
+        "validUntil": "Valide jusqu'au",
+        "saveAndSend": "Enregistrer et envoyer"
+      },
+      "analytics": {
+        "channelMembers": "Membres du canal",
+        "channelViews": "Vues du canal",
+        "channelViewsStub": "Les données de vues sont disponibles après connexion des statistiques",
+        "dailyUsage": "Utilisation quotidienne",
+        "publishActivity": "Activité de publication",
+        "title": "Statistiques"
+      },
+      "botSettings": {
+        "hint": "Configurez le TTL de change par défaut et le comportement.",
+        "title": "Paramètres du bot"
+      },
+      "campaigns": {
+        "daily": "Quotidien",
+        "monthly": "Mensuel",
+        "save": "Enregistrer la campagne",
+        "weekly": "Hebdomadaire"
+      },
+      "customersStatus": {
+        "hint": "Aperçu des étiquettes et de l'activité des clients.",
+        "manageTags": "Gérer les étiquettes",
+        "title": "Statut des clients",
+        "total": "Total des clients"
+      },
+      "exchangeRequests": {
+        "amount": "Montant",
+        "canceled": "Annulée",
+        "changeState": "Changer l'état",
+        "customer": "Client",
+        "hint": "Gérez et examinez les demandes de change entrantes.",
+        "hold": "En attente",
+        "holdOk": "Demande mise en attente ({ttl} minutes)",
+        "loadError": "Impossible de charger les demandes de change",
+        "mostRequested": "Les plus demandées",
+        "new": "Nouvelle",
+        "newMembers": "Nouveaux membres",
+        "pair": "Paire",
+        "stateUpdated": "Statut mis à jour",
+        "successful": "Réussie",
+        "title": "Demandes de change",
+        "ttl": "TTL"
+      },
+      "notifications": {
+        "active": "{n} actives",
+        "customer": "Client",
+        "direction": "Sens",
+        "pair": "Paire",
+        "title": "Notifications",
+        "total": "{n} au total"
+      },
+      "reports": {
+        "cancelled": "Annulé",
+        "hint": "Consultez les données agrégées et les exports.",
+        "new": "Nouveau",
+        "pending": "Rapports en attente",
+        "running": "En cours",
+        "successful": "Terminé",
+        "title": "Rapports"
       }
+    },
+    "bots": {
+      "verificationFailed": "Échec de la vérification du bot"
+    },
+    "customers": {
+      "description": "Étiquettes des clients et profils Telegram.",
+      "empty": "Aucun client trouvé.",
+      "loadError": "Impossible de charger les clients",
+      "name": "Nom",
+      "staffTelegramHint": "ID Telegram du personnel (facultatif)",
+      "tag": "Étiquette",
+      "tagError": "Impossible de mettre à jour l'étiquette",
+      "tagUpdated": "Étiquette mise à jour",
+      "tags": {
+        "admin": "Admin",
+        "global": "Global",
+        "special": "Spécial",
+        "vip": "VIP"
+      },
+      "telegramId": "ID Telegram",
+      "username": "Nom d'utilisateur"
     }
   },
   "telegramStudio": {
@@ -837,7 +1125,8 @@
     "categoryNotFound": "Catégorie introuvable.",
     "previewImageError": "Image",
     "incompleteMessage": "Média ou description manquant.",
-    "templateMediaHint": "ID du modèle :"
+    "templateMediaHint": "ID du modèle :",
+    "commonVariables": "Variables communes"
   },
   "apiErrors": {
     "codes": {
@@ -868,7 +1157,9 @@
       "template_orientation_invalid": "Orientation invalide.",
       "template_publish_order_invalid": "Ordre de publication invalide.",
       "template_telegram_buttons_invalid": "Boutons Telegram doivent être un tableau.",
-      "template_widget_sync_failed": "Échec synchro widgets."
+      "template_widget_sync_failed": "Échec synchro widgets.",
+      "template_config_json_invalid": "Le JSON de configuration du modèle est invalide.",
+      "template_config_json_invalid_type": "config_json du modèle doit être un objet JSON."
     },
     "fallback": {
       "badRequest": "Requête non traitée.",
@@ -916,14 +1207,20 @@
       "update": "Mettre à jour",
       "delete": "Supprimer",
       "force_logout": "Déconnexion forcée",
-      "other": "Autre"
+      "other": "Autre",
+      "bulk_price_update": "Mise à jour groupée des prix",
+      "login_failed": "Échec de connexion",
+      "login_success": "Connexion réussie",
+      "price_update": "Mise à jour de prix",
+      "special_price_update": "Mise à jour de prix spécial"
     },
     "roles": {
       "super_admin": "Super Admin",
       "management": "Direction",
       "operator": "Opérateur",
       "viewer": "Observateur",
-      "developer": "Développeur"
+      "developer": "Développeur",
+      "employee": "Employé"
     }
   },
   "programmerHub": {
@@ -986,7 +1283,19 @@
     "websiteHint": "Facultatif",
     "telegramIdHint": "ID Telegram numérique ou nom d'utilisateur",
     "plan": "Forfait",
-    "saving": "Création…"
+    "saving": "Création…",
+    "admin": "Administrateur",
+    "delegatedNoBotHint": "Les opérateurs délégués utilisent le bot du propriétaire — aucun jeton de bot requis.",
+    "delegationDesc": "Accordez à cet utilisateur l'accès au panneau d'administration intégré au bot d'un autre compte.",
+    "delegationTitle": "Opérateur délégué",
+    "head_operator": "Opérateur principal",
+    "operator": "Opérateur",
+    "ownerUsername": "Nom d'utilisateur du propriétaire",
+    "ownerUsernameHint": "Nom d'utilisateur du compte de gestion dont cet opérateur gère le bot",
+    "ownerUsernameRequired": "Le nom d'utilisateur du propriétaire est requis pour les opérateurs délégués",
+    "subRole": "Rôle délégué",
+    "subRoleHint": "Les opérateurs délégués gèrent le panneau d'administration intégré au bot d'un autre utilisateur",
+    "telegramUsername": "Nom d'utilisateur Telegram"
   },
   "fleet": {
     "title": "Parc clients",
@@ -1052,7 +1361,8 @@
       "contact": "Contact",
       "cta": "Demander une démo",
       "menu": "Menu",
-      "language": "Langue"
+      "language": "Langue",
+      "tutorials": "Tutoriels"
     },
     "hero": {
       "badge": "Publication des taux, entièrement automatisée",
@@ -1064,7 +1374,8 @@
       "panelTitle": "Gestion des taux",
       "live": "Mise à jour en direct",
       "buy": "Achat",
-      "sell": "Vente"
+      "sell": "Vente",
+      "ctaTutorials": "Voir comment ça marche"
     },
     "stats": {
       "saved": "Économisé chaque jour sur la publication des taux",
@@ -1176,11 +1487,13 @@
         },
         "api": {
           "title": "Intégration d'API sur mesure",
-          "desc": "Récupérez automatiquement les taux d'une source mondiale, ou exposez vos taux à un autre système."
+          "desc": "Récupérez automatiquement les taux d'une source mondiale, ou exposez vos taux à un autre système.",
+          "note": "Gratuit avec l'achat du forfait."
         },
         "accounting": {
           "title": "Intégration comptable",
-          "desc": "Reliez le panneau à votre logiciel comptable ou à votre back-office pour garder taux et écritures alignés."
+          "desc": "Reliez le panneau à votre logiciel comptable ou à votre back-office pour garder taux et écritures alignés.",
+          "note": "Gratuit avec l'achat d'un forfait — jusqu'à 5 connexions ; 50 $ par changement ultérieur."
         },
         "brandTemplate": {
           "title": "Gabarit de marque sur mesure",
@@ -1200,7 +1513,8 @@
         },
         "branch": {
           "title": "Agence supplémentaire",
-          "desc": "Une agence de plus, avec ses accès, ses comptes et ses ajustements de taux."
+          "desc": "Une agence de plus, avec ses accès, ses comptes et ses ajustements de taux.",
+          "note": "Jusqu'à 2 agences gratuites ; 130 $ par agence supplémentaire."
         },
         "migration": {
           "title": "Migration des données",
@@ -1208,11 +1522,13 @@
         },
         "training": {
           "title": "Formation de l'équipe",
-          "desc": "Une session de prise en main en direct pour votre équipe, plus un guide écrit dans votre langue."
+          "desc": "Une session de prise en main en direct pour votre équipe, plus un guide écrit dans votre langue.",
+          "note": "Inclus gratuitement avec le forfait."
         },
         "domain": {
           "title": "Configuration domaine et SSL",
-          "desc": "Domaine, DNS, certificats et enregistrements e-mail configurés pour vous."
+          "desc": "Domaine, DNS, certificats et enregistrements e-mail configurés pour vous.",
+          "note": "Gratuit avec l'achat d'un forfait."
         },
         "support": {
           "title": "Support et maintenance",
@@ -1359,7 +1675,12 @@
         }
       },
       "ctaTitle": "Vous préférez d'abord regarder ?",
-      "ctaText": "Ouvrez le panneau de démo maintenant, ou lisez ce que contient exactement la formule avant de nous écrire."
+      "ctaText": "Ouvrez le panneau de démo maintenant, ou lisez ce que contient exactement la formule avant de nous écrire.",
+      "trial": {
+        "eyebrow": "Essai gratuit",
+        "text": "Les essais sont mis en place par nous, pas par un formulaire d'inscription — votre panneau arrive donc déjà avec vos devises, votre modèle et votre canal Telegram connectés. Contactez-nous sur l'un des canaux ci-dessus et il est généralement opérationnel le jour même. Quatorze jours, sans carte, sans engagement.",
+        "title": "Votre propre panneau, sur votre propre sous-domaine"
+      }
     },
     "footer": {
       "about": "Un panneau de publication des taux pour bureaux de change : une saisie, tous les canaux.",
@@ -1369,6 +1690,114 @@
       "faq": "FAQ",
       "login": "Se connecter",
       "bottom": "mrexchange.co.uk. Tous droits réservés."
+    },
+    "tutorials": {
+      "backToIndex": "Tous les tutoriels",
+      "minutes": "{count} min de lecture",
+      "more": "Plus de tutoriels",
+      "notFound": "Ce tutoriel n'existe pas.",
+      "posts": {
+        "publish-prices": {
+          "intro": "C'est le flux que chaque bureau de change exécute plusieurs fois par jour. Rien ici ne nécessite un designer ou un développeur — vous saisissez des chiffres, vous les confirmez, et le panneau se charge du site web, du canal Telegram, de la publication Instagram et du widget de taux.",
+          "outro": "Voilà toute la boucle. Démarrez votre essai gratuit et testez-la avec vos propres devises dès aujourd'hui.",
+          "steps": {
+            "enter": {
+              "body": "Saisissez un taux de base et laissez les marges faire le reste, ou entrez explicitement l'achat et la vente. Le panneau garde la valeur précédente visible pour que vous voyiez exactement l'écart.",
+              "title": "Saisissez les nouveaux taux"
+            },
+            "finalize": {
+              "body": "Rien n'atteint vos clients tant que vous n'avez pas finalisé. Cette confirmation unique est ce qui distingue une faute de frappe d'un taux publié, et elle est enregistrée avec votre nom et l'heure.",
+              "title": "Finalisez le changement"
+            },
+            "open": {
+              "body": "Chaque devise que vous vendez se trouve dans une catégorie. Choisissez la catégorie à repricer et le panneau affiche le taux d'achat et de vente actuel côte à côte avec le dernier changement.",
+              "title": "Ouvrez le centre des prix"
+            },
+            "publish": {
+              "body": "Dès que le changement est finalisé, la page du site, le message Telegram, l'image de taux générée et le widget se mettent tous à jour. Pas de second outil, pas de copier-coller.",
+              "title": "Regardez la publication se propager"
+            }
+          },
+          "summary": "La routine du matin : saisissez les nouveaux taux d'achat et de vente, finalisez-les, et laissez le panneau diffuser le changement sur tous vos canaux.",
+          "title": "Mettez à jour vos taux et publiez-les partout"
+        },
+        "signup-tour": {
+          "intro": "Il n'y a ni compte de démonstration partagé ni appel commercial sur votre chemin. Vous vous inscrivez, confirmez votre adresse, et arrivez dans votre propre panneau avec quatorze jours du produit complet.",
+          "outro": "Quatorze jours, le panneau complet, sans carte requise.",
+          "steps": {
+            "code": {
+              "body": "Un code à six chiffres arrive par e-mail, ou par SMS si c'est le seul contact que vous nous avez donné. Il est valable dix minutes et expire après cinq tentatives erronées.",
+              "title": "Confirmez avec un code à usage unique"
+            },
+            "signup": {
+              "body": "Saisissez le nom de votre bureau de change, une adresse e-mail et un mot de passe — ou inscrivez-vous avec Google et évitez complètement le mot de passe.",
+              "title": "Créez votre compte"
+            },
+            "tour": {
+              "body": "À la première connexion, une courte visite guidée vous fait découvrir les prix, les modèles, les canaux et les paramètres. Vous pouvez la relancer à tout moment depuis le menu utilisateur.",
+              "title": "Suivez la visite guidée"
+            },
+            "trial": {
+              "body": "Rien n'est verrouillé et rien n'est partagé : vos taux, modèles et canaux vous appartiennent en propre. Si vous êtes bloqué, les contacts d'assistance sont à un clic dans le panneau.",
+              "title": "Utilisez le produit complet pendant 14 jours"
+            }
+          },
+          "summary": "E-mail et mot de passe ou compte Google, un code à usage unique pour confirmer que c'est bien vous, puis une visite guidée du panneau.",
+          "title": "Inscrivez-vous et repérez-vous"
+        },
+        "telegram-bot": {
+          "intro": "Telegram est l'endroit où la plupart des clients d'un bureau de change lisent réellement vos taux. Le panneau parle à votre propre bot, dans votre propre canal, pour que l'audience et la marque restent les vôtres.",
+          "outro": "Votre canal, votre bot, vos taux — connectés en quelques minutes.",
+          "steps": {
+            "channel": {
+              "body": "Faites du bot un administrateur de votre canal, puis enregistrez le canal ici. Le panneau vérifie l'autorisation avant d'enregistrer quoi que ce soit.",
+              "title": "Ajoutez le canal"
+            },
+            "settings": {
+              "body": "Message texte, image générée, ou les deux ; épinglé ou non ; à chaque changement ou selon un planning. Le modèle de message par défaut est modifiable par canal.",
+              "title": "Choisissez ce qui est publié"
+            },
+            "test": {
+              "body": "Envoyez un message test au canal avant la mise en ligne. Si le bot manque d'une autorisation, vous le découvrez ici, pas devant vos clients.",
+              "title": "Envoyez un message test"
+            },
+            "token": {
+              "body": "Créez un bot avec {'@'}BotFather et collez le jeton dans le panneau. Le jeton est stocké chiffré et n'est plus jamais affiché en entier.",
+              "title": "Ajoutez le jeton de votre bot"
+            }
+          },
+          "summary": "Collez un jeton de bot, ajoutez le canal, choisissez ce qui est publié, et envoyez un message test avant la mise en ligne.",
+          "title": "Connectez votre canal et votre bot Telegram"
+        },
+        "template-editor": {
+          "intro": "Les images que vous publiez sur Telegram et Instagram sont générées à partir d'un modèle que vous concevez une seule fois. L'éditeur est un canevas : vous placez des widgets, vous les liez à un prix, et chaque future publication s'affiche automatiquement avec les chiffres actuels.",
+          "outro": "Un seul modèle, chaque publication. Essayez l'éditeur avec votre propre marque pendant l'essai.",
+          "steps": {
+            "bind": {
+              "body": "Un widget de taux est lié à un type de prix, pas à un chiffre. Quand le taux change, le widget change — vous ne modifiez plus jamais l'image.",
+              "title": "Liez-le à un prix en direct"
+            },
+            "drag": {
+              "body": "Lignes de taux, titres, logos, dates et texte libre sont tous des widgets. Déposez-en un où vous le souhaitez et ajustez sa position ; les calques gardent l'ordre d'empilement prévisible.",
+              "title": "Glissez un widget sur le canevas"
+            },
+            "open": {
+              "body": "Téléversez votre propre visuel, ou partez de l'un des modèles fournis et remplacez les couleurs et les polices par ceux de votre marque.",
+              "title": "Partez de votre arrière-plan"
+            },
+            "preview": {
+              "body": "L'aperçu affiche le modèle exactement comme le publieur le fera, avec les taux du jour, afin que ce que vous validez soit ce que votre canal recevra.",
+              "title": "Prévisualisez avec de vrais chiffres"
+            }
+          },
+          "summary": "Glissez un widget sur le canevas, liez-le à un prix en direct, et prévisualisez l'image que vos clients verront.",
+          "title": "Concevez une image de taux sur votre propre modèle"
+        }
+      },
+      "readMore": "Lire le tutoriel",
+      "steps": "Étapes",
+      "subtitle": "De courts tutoriels enregistrés sur les tâches que vous ferez chaque matin.",
+      "title": "Tutoriels"
     }
   },
   "registerClient": {
@@ -1382,5 +1811,288 @@
     "systemAccessDesc": "Identifiants du bot Telegram et niveau d'accès.",
     "registeredBy": "Enregistré par",
     "registeredByHint": "Enregistré automatiquement comme admin connecté."
+  },
+  "about": {
+    "motto": "Chaque produit est une occasion de laisser une empreinte durable."
+  },
+  "instagramHub": {
+    "categoriesForPreview": "Catégories pour l'aperçu",
+    "configureInSettings": "Configurez l'ID et le secret de l'application dans les paramètres, puis connectez-vous ci-dessous.",
+    "connected": "Connecté",
+    "description": "Générez des images de publication et de story à partir de vos prix finalisés. Choisissez un thème et des catégories, puis prévisualisez avant de publier sur Instagram.",
+    "disconnected": "Non connecté",
+    "generatePreview": "Générer l'aperçu",
+    "noPendingCategories": "Aucune catégorie avec des prix en attente. Le tableau de bord de finalisation les listera.",
+    "previewPost": "Publication",
+    "previewStory": "Story",
+    "reconnect": "Reconnecter",
+    "setAppIdFirst": "Définissez d'abord l'ID et le secret de l'application dans les paramètres.",
+    "statusDescription": "Instagram est configuré dans les paramètres. Lorsque vous finalisez les prix, ils sont automatiquement publiés sur votre compte Instagram connecté (comme pour Telegram).",
+    "theme": "Thème",
+    "themeDark": "Sombre (Or)",
+    "themeLight": "Clair (Bleu)"
+  },
+  "onboarding": {
+    "badge": "Prise en main",
+    "tour": {
+      "finish": "Commencer à utiliser le panneau",
+      "intro": "{count} étapes, dans l'ordre où un bureau de change les utilise. Chacune ouvre la page réelle — c'est votre propre panneau, donc tout ce que vous configurez ici est conservé.",
+      "next": "Suivant",
+      "prev": "Retour",
+      "progress": "Étape {current} sur {total}",
+      "replay": "Relancer la visite",
+      "skip": "Passer pour l'instant",
+      "steps": {
+        "analytics": {
+          "body": "Historique des taux, activité de publication et portée des canaux, pour voir à quelle fréquence vous changez les prix et combien de personnes les ont vus.",
+          "look": "Choisissez une période et comparez — les mêmes chiffres que votre responsable vous demandera.",
+          "title": "La preuve que ça fonctionne"
+        },
+        "categories": {
+          "body": "Définissez les devises, paires et types de prix que vous cotez réellement — espèces, virement, VIP — chacun avec son propre arrondi et format.",
+          "look": "Ajoutez un type de prix et il apparaît sur le panneau, la publication du canal et l'image.",
+          "title": "Vos devises, vos règles"
+        },
+        "dashboard": {
+          "body": "Chaque taux, bot et canal en une seule vue : ce qui a changé, ce qui attend d'être publié, et si vos connexions Telegram et Instagram sont actives.",
+          "look": "État du bot, changements de taux récents et chiffres des canaux — tout en direct, sans tableur.",
+          "title": "L'écran du matin"
+        },
+        "finalize": {
+          "body": "Rien n'atteint vos clients tant que quelqu'un ne l'a pas approuvé. Un responsable examine les nouveaux taux, voit l'image générée, et les publie.",
+          "look": "L'image de taux générée est construite ici à partir de votre propre modèle avant d'être diffusée.",
+          "title": "Approuvez, puis publiez"
+        },
+        "instagram": {
+          "body": "Le même graphique de taux à votre marque est publié directement sur votre page via l'API Instagram, selon votre planning.",
+          "look": "La file d'attente des publications et la connexion du compte se trouvent ici.",
+          "title": "Instagram sans le téléphone"
+        },
+        "prices": {
+          "body": "Achat et vente pour chaque devise que vous traitez. Saisissez un seul chiffre, ou définissez un taux de base et laissez le panneau calculer l'écart pour chaque paire.",
+          "look": "Ouvrez une devise et modifiez un taux — le panneau conserve l'historique et le pourcentage de variation.",
+          "title": "Définissez vos taux"
+        },
+        "support": {
+          "body": "Tout ce que le panneau ne fait pas, ou un taux qui semble incorrect — écrivez directement à nos administrateurs et une personne vous répond.",
+          "look": "Ce sont des contacts en direct ; les mêmes apparaissent dans le pied de page du panneau et sur le site.",
+          "title": "Bloqué ? Parlez-nous"
+        },
+        "telegram": {
+          "body": "Des messages et images de taux formatés partent vers votre canal dès que les taux sont approuvés, et un bot répond aux questions de prix de vos clients.",
+          "look": "Canaux, bots et le message envoyé — tout est configuré depuis cette page.",
+          "title": "Telegram, automatiquement"
+        },
+        "templates": {
+          "body": "Les images de taux sont dessinées sur votre modèle : votre logo, vos couleurs, vos polices et votre arrière-plan. L'éditeur est juste ici, sans designer nécessaire.",
+          "look": "Ouvrez un modèle et déplacez un champ — c'est exactement ce que vos clients recevront.",
+          "title": "Votre marque sur chaque publication"
+        }
+      },
+      "title": "Ce que fait ce panneau"
+    }
+  },
+  "orders": {
+    "adminNote": "Note de l'administrateur",
+    "adminNotePlaceholder": "Note facultative...",
+    "approve": "Approuver",
+    "copied": "Copié",
+    "copyFailed": "Impossible de copier le lien",
+    "copyLink": "Copier le lien",
+    "customerId": "ID client",
+    "customerLinkHint": "Partagez ce lien avec vos clients. Ils voient les taux en direct et les commandes apparaissent dans cette file.",
+    "customerLinkTitle": "Lien de commande client",
+    "deleteConfirm": "Supprimer définitivement la commande « {name} » ? Requis avant de supprimer sa catégorie.",
+    "deleteOrder": "Supprimer la commande",
+    "deleteSuccess": "Commande supprimée.",
+    "detailTitle": "Détails de la commande",
+    "empty": "Aucune commande trouvée.",
+    "metaSource": "Source de soumission",
+    "metaUserAgent": "Navigateur / appareil",
+    "openLink": "Ouvrir",
+    "pendingBadge": "{count} commandes en attente",
+    "platform": "Source",
+    "platformTelegram": "Telegram",
+    "platformWeb": "Web / lien public",
+    "platformWhatsapp": "WhatsApp",
+    "queueTitle": "File des commandes du bot",
+    "reject": "Rejeter",
+    "reviewSuccess": "Statut de la commande mis à jour.",
+    "reviewedAt": "Examinée le",
+    "sectionCustomer": "Client",
+    "sectionMetadata": "Données capturées",
+    "sectionOrder": "Commande",
+    "sectionStatus": "Statut",
+    "status": {
+      "all": "Tous",
+      "approved": "Approuvée",
+      "cancelled": "Annulée",
+      "pending": "En attente",
+      "rejected": "Rejetée"
+    },
+    "telegramChatId": "ID du chat Telegram",
+    "telegramUsername": "Nom d'utilisateur Telegram",
+    "viewDetails": "Voir les détails"
+  },
+  "ownerConsole": {
+    "account": "Compte",
+    "action": "Action",
+    "actions": {
+      "bulk_price_update": "Mise à jour groupée des prix",
+      "finalize": "Finalisation",
+      "impersonate_start": "Emprunt d'identité",
+      "login_failed": "Échec de connexion",
+      "login_success": "Connexion",
+      "logout": "Déconnexion",
+      "other": "Autre",
+      "price_update": "Mise à jour de prix",
+      "signup": "Inscription",
+      "special_price_update": "Mise à jour de prix spécial",
+      "template_change": "Modification de modèle"
+    },
+    "addChannel": "Ajouter un canal",
+    "allActions": "Toutes les actions",
+    "amount": "Montant",
+    "apply": "Appliquer",
+    "channelKind": "Type",
+    "channelLabel": "Libellé",
+    "channelOrder": "Ordre",
+    "channelTitle": "Canal d'assistance",
+    "channelValue": "Valeur",
+    "channelValueHint": "Numéro de téléphone, {'@'}identifiant, adresse e-mail ou URL.",
+    "currency": "Devise",
+    "customer": "Client",
+    "device": "Appareil",
+    "exportCsv": "Exporter en CSV",
+    "forceLogout": "Forcer la déconnexion",
+    "forcedLogout": "Toutes les sessions de ce compte ont été terminées.",
+    "from": "Du",
+    "ip": "Adresse IP",
+    "lastLogin": "Dernière connexion",
+    "noAccounts": "Personne ne s'est encore inscrit.",
+    "noActivity": "Aucune activité ne correspond à ces filtres.",
+    "noChannels": "Aucun canal d'assistance pour l'instant. Les clients ne verront aucun contact en cas de besoin.",
+    "noSales": "Aucune vente enregistrée pour l'instant.",
+    "note": "Note",
+    "paid": "Payé",
+    "pickCustomer": "Choisir un client",
+    "preview": "Ce que voient les clients",
+    "previewEmpty": "Rien n'est actif, donc aucun contact n'est affiché nulle part.",
+    "recordSale": "Enregistrer une vente",
+    "recordedBy": "Enregistrée par",
+    "reference": "Référence",
+    "reinstate": "Réactiver",
+    "reinstated": "Compte réactivé",
+    "revenue": "Revenu",
+    "saleDeleted": "Vente supprimée.",
+    "saleHint": "Enregistrer une vente lève le mur d'essai et délivre une clé de licence.",
+    "salePlan": "Forfait",
+    "salePlans": {
+      "addon": "Complément",
+      "lifetime": "À vie",
+      "one_time": "Ponctuel",
+      "renewal": "Renouvellement"
+    },
+    "saleRecorded": "Vente enregistrée — le mur d'essai est levé.",
+    "salesTotal": "Total : {total}",
+    "search": "Rechercher",
+    "searchHint": "E-mail, nom, IP ou détails",
+    "seats": "Utilisateurs",
+    "signedUp": "Inscrit le",
+    "soldAt": "Vendu le",
+    "suspend": "Suspendre",
+    "suspended": "Suspendu",
+    "tabs": {
+      "accounts": "Comptes et essais",
+      "activity": "Connexions et IP",
+      "sales": "Ventes",
+      "support": "Canaux d'assistance"
+    },
+    "title": "Console propriétaire",
+    "to": "Au",
+    "unknownDevice": "Inconnu",
+    "unknownUser": "Inconnu",
+    "user": "Utilisateur",
+    "verified": "E-mail vérifié",
+    "when": "Quand"
+  },
+  "support": {
+    "kinds": {
+      "custom": "Autre",
+      "email": "E-mail",
+      "instagram": "Instagram",
+      "phone": "Téléphone",
+      "telegram": "Telegram",
+      "whatsapp": "WhatsApp"
+    },
+    "text": "Écrivez à nos administrateurs — une personne vous répond.",
+    "title": "Besoin d'aide ?"
+  },
+  "templates": {
+    "addTemplate": "Ajouter un modèle",
+    "categoryRequired": "Choisissez une catégorie avant de créer le modèle.",
+    "deleted": "Modèle supprimé.",
+    "editor": "Éditeur",
+    "nameRequired": "Veuillez saisir un nom de modèle.",
+    "selectCategory": "Sélectionner une catégorie"
+  },
+  "trial": {
+    "daysLeft": "{days} jours restants dans votre essai",
+    "expiredText": "Vos données sont sûres et toujours visibles, mais les modifications sont suspendues jusqu'à votre mise à niveau.",
+    "expiredTitle": "Votre essai gratuit est terminé.",
+    "talkToUs": "Contactez-nous"
+  },
+  "webapp": {
+    "amount": "Montant",
+    "amountPlaceholder": "Saisir le montant",
+    "authFailed": "Échec de l'authentification. Le lien a peut-être expiré.",
+    "buy": "Achat",
+    "category": "Devise / catégorie",
+    "customerName": "Nom complet",
+    "customerNamePlaceholder": "ex. Jean Dupont",
+    "customerPhone": "Numéro de téléphone",
+    "formSection": "Détails de la commande",
+    "liveRates": "Taux en direct",
+    "missingToken": "Lien invalide. Veuillez utiliser le bouton du bot.",
+    "noRatesYet": "Aucun taux disponible pour l'instant.",
+    "note": "Notes",
+    "notePlaceholder": "Notes facultatives...",
+    "orderContactMessage": "Notre équipe vous contactera sous peu au numéro de téléphone fourni.",
+    "orderContactMessageBot": "Notre équipe vous contactera sous peu sur Telegram.",
+    "orderPendingReview": "Merci de garder votre téléphone disponible. Merci de votre patience.",
+    "orderSubmitted": "Votre commande a été envoyée avec succès",
+    "orderTitle": "Commande rapide",
+    "phonePlaceholder": "0612...",
+    "priceType": "Type de taux",
+    "publicIntro": "Consultez les taux en direct et envoyez votre commande.",
+    "ratesUpdated": "Mis à jour",
+    "selectCategory": "Sélectionner",
+    "selectPriceType": "Sélectionner un type de taux (facultatif)",
+    "selectPriceTypeLabel": "Sélectionnez un taux",
+    "selectedRate": "Votre taux sélectionné",
+    "sell": "Vente",
+    "submitFailed": "Impossible d'envoyer la commande.",
+    "submitOrder": "Envoyer la commande",
+    "tradeType": "Type d'opération",
+    "welcome": "Bonjour {name}"
+  },
+  "priceTypeForm": {
+    "backToCategories": "Retour aux catégories",
+    "pageTitleCreate": "Nouveau type de prix",
+    "pageTitleEdit": "Modifier le type de prix",
+    "sourceCurrency": "Devise source",
+    "targetCurrency": "Devise cible",
+    "tradeType": "Type d'opération (achat / vente)",
+    "tradeTypeHelp": "Définit comment ce prix est utilisé dans les colonnes de mise à jour groupée et lors de la publication finale.",
+    "buy": "Achat",
+    "sell": "Vente",
+    "descriptionOptional": "Description (facultatif)",
+    "loadCurrenciesError": "Impossible de charger les devises",
+    "missingCategoryId": "Identifiant de catégorie manquant",
+    "selectBothCurrencies": "Veuillez sélectionner la devise source et la devise cible.",
+    "createSuccess": "Type de prix créé avec succès",
+    "updateSuccess": "Type de prix mis à jour avec succès",
+    "saveError": "Impossible d'enregistrer le type de prix",
+    "loadPriceTypeError": "Impossible de charger le type de prix"
   }
 }

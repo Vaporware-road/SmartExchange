@@ -17,7 +17,9 @@
     "userManagement": "Kullanıcı Yönetimi",
     "registerUser": "Kullanıcı Kaydet",
     "plans": "Planlar ve Şablonlar",
-    "fleet": "Filo"
+    "fleet": "Filo",
+    "orders": "Sipariş Kuyruğu",
+    "ownerConsole": "Sahip konsolu"
   },
   "common": {
     "save": "Kaydet",
@@ -47,7 +49,24 @@
     "date": "Tarih",
     "logout": "Çıkış",
     "login": "Giriş",
-    "history": "Geçmiş"
+    "history": "Geçmiş",
+    "all": "Tümü",
+    "aboutPage": "Hakkında",
+    "active": "Aktif",
+    "inactive": "Pasif",
+    "saved": "Kaydedildi",
+    "brandLogo": "Marka logosu",
+    "breadcrumb": "Gezinme yolu",
+    "toggleSidebar": "Kenar çubuğunu aç/kapat",
+    "dismiss": "Kapat",
+    "poweredBy": "Destekleyen",
+    "price": "Fiyat",
+    "notes": "Notlar",
+    "noHistory": "Geçmiş bulunamadı.",
+    "category": "Kategori",
+    "copyLink": "Bağlantıyı kopyala",
+    "linkCopied": "Bağlantı kopyalandı",
+    "copyFailed": "Kopyalanamadı"
   },
   "header": {
     "openMenu": "Menüyü aç",
@@ -120,7 +139,47 @@
     "password": "Şifre",
     "loginButton": "Giriş Yap",
     "loggingIn": "Giriş yapılıyor…",
-    "signingIn": "Giriş yapılıyor…"
+    "signingIn": "Giriş yapılıyor…",
+    "email": "E-posta adresi",
+    "emailPlaceholder": "siz{'@'}dovizburonuz.com",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "exchangeName": "Döviz bürosu adı",
+    "exchangeNamePlaceholder": "Müşterilerinizin bildiği isim",
+    "passwordHint": "En az 8 karakter.",
+    "signupTitle": "{days} günlük ücretsiz denemenizi başlatın",
+    "signupButton": "{days} ücretsiz günümü başlat",
+    "signingUp": "Paneliniz oluşturuluyor…",
+    "signupNoCard": "Kart gerekmez. Paneliniz hemen açılır.",
+    "haveAccount": "Zaten hesabınız var mı?",
+    "verifying": "E-posta adresiniz onaylanıyor…",
+    "verifiedTitle": "E-posta onaylandı",
+    "verifiedText": "Teşekkürler — artık size ulaşabiliriz. Deneme süreniz etkilenmedi.",
+    "verifyFailedTitle": "Bu bağlantı çalışmadı",
+    "verifyFailedText": "Süresi dolmuş olabilir. Panelinizdeki banner'dan yenisini isteyin.",
+    "goToPanel": "Panelime git",
+    "verifyBanner": {
+      "title": "E-postanızı onaylayın",
+      "text": "{email} adresine bir bağlantı gönderdik. Paneliniz her durumda çalışır.",
+      "resend": "Tekrar gönder",
+      "sent": "Onay e-postası gönderildi.",
+      "sendFailed": "E-postayı gönderemedik. Bir süre sonra tekrar deneyin."
+    },
+    "identifier": "E-posta veya kullanıcı adı",
+    "identifierPlaceholder": "siz{'@'}dovizburonuz.com",
+    "or": "veya",
+    "googleUnavailable": "Google ile giriş yüklenemedi. E-posta ve şifrenizi kullanın.",
+    "noAccount": "Hesabınız yok mu?",
+    "signupLink": "Ücretsiz denemenizi başlatın",
+    "confirmTitle": "Sizin olduğunuzu onaylayın",
+    "confirmSentEmail": "{to} adresine altı haneli bir kod gönderdik.",
+    "confirmSentSms": "{to} numarasına altı haneli bir kod gönderdik.",
+    "confirmCode": "Onay kodu",
+    "confirmButton": "Onayla",
+    "confirmResend": "Yeni kod gönder",
+    "confirmResent": "Yeni kod yolda.",
+    "confirmSkip": "Bunu daha sonra yap",
+    "confirmSendFailed": "Kodu gönderemedik. Bir süre sonra tekrar deneyin."
   },
   "routes": {
     "dashboard": "Kontrol Paneli",
@@ -154,9 +213,29 @@
     "templateMediaLibrary": "Medya Kütüphanesi",
     "telegramStudio": "Telegram Mesaj Stüdyosu",
     "instagramHub": "Instagram Merkezi",
-    "userCenter": "Yönetici Yönetimi",
     "programmerHub": "Geliştirici Merkezi",
-    "programmerFleet": "Filo"
+    "programmerFleet": "Filo",
+    "userCenter": "Yönetici Yönetimi",
+    "orders": "Sipariş Kuyruğu",
+    "webappOrder": "Sipariş Ver",
+    "programmerConsole": "Sahip konsolu"
+  },
+  "instagramHub": {
+    "description": "Onaylanmış fiyatlarınızdan gönderi ve hikaye görselleri oluşturun. Bir tema ve kategoriler seçin, ardından Instagram'da yayınlamadan önce önizleyin.",
+    "statusDescription": "Instagram, Ayarlar'da yapılandırılır. Fiyatları onayladığınızda bunlar bağlı Instagram hesabınıza otomatik olarak gönderilir (Telegram gibi).",
+    "connected": "Bağlı",
+    "disconnected": "Bağlı değil",
+    "configureInSettings": "Ayarlar'da App ID ve Secret bilgilerini yapılandırın, ardından aşağıdan bağlanın.",
+    "reconnect": "Yeniden bağlan",
+    "setAppIdFirst": "Önce Ayarlar'da App ID ve App Secret bilgilerini ayarlayın.",
+    "theme": "Tema",
+    "themeDark": "Koyu (Altın)",
+    "themeLight": "Açık (Mavi)",
+    "categoriesForPreview": "Önizleme için kategoriler",
+    "noPendingCategories": "Bekleyen fiyatı olan kategori yok. Onaylama panosu bunları listeleyecek.",
+    "generatePreview": "Önizleme oluştur",
+    "previewPost": "Gönderi",
+    "previewStory": "Hikaye"
   },
   "lang": {
     "fa": "فارسی",
@@ -174,16 +253,74 @@
     "urlInvalid": "Geçerli bir URL girin (örn. https://example.com)",
     "requiredMarkHint": "* ile işaretli alanlar zorunludur"
   },
-  "prices": {
-    "backToPrices": "Fiyatlara Dön",
-    "newPrice": "Yeni Fiyat",
-    "notesOptional": "Notlar (isteğe bağlı)",
-    "optionalNotes": "İsteğe bağlı notlar",
-    "priceType": "Fiyat Türü",
-    "category": "Kategori",
-    "pair": "Parite",
-    "latestPrice": "Son Fiyat",
-    "history": "Geçmiş"
+  "collaboration": {
+    "title": "İş Birliği Şekli",
+    "hint": "Bu müşteri için ortaklık modelini seçin",
+    "placeholder": "İş birliği türü seçin",
+    "reseller": "Bayi",
+    "white_label": "Beyaz Etiket",
+    "agency": "Ajans",
+    "direct": "Doğrudan"
+  },
+  "onboarding": {
+    "badge": "Başlarken",
+    "tour": {
+      "title": "Bu panel ne işe yarar",
+      "intro": "Bir kur masasının kullandığı sırayla {count} durak. Her biri gerçek sayfayı açar — bu sizin kendi paneliniz, burada ayarladığınız her şey kalıcıdır.",
+      "progress": "Adım {current} / {total}",
+      "prev": "Geri",
+      "next": "İleri",
+      "finish": "Paneli kullanmaya başla",
+      "steps": {
+        "dashboard": {
+          "title": "Sabah ekranı",
+          "body": "Tüm kur, bot ve kanallar tek bir görünümde: ne değişti, ne yayınlanmayı bekliyor ve Telegram ile Instagram bağlantılarınız çalışıyor mu.",
+          "look": "Bot durumu, son kur değişiklikleri ve kanal sayıları — hepsi canlı, tablo yok."
+        },
+        "prices": {
+          "title": "Kurlarınızı belirleyin",
+          "body": "İşlem yaptığınız her para birimi için alış ve satış. Tek bir sayı girin, ya da bir taban kur belirleyin ve panel her çift için farkı hesaplasın.",
+          "look": "Bir para birimini açın ve kuru değiştirin — panel geçmişi ve yüzde değişimi tutar."
+        },
+        "finalize": {
+          "title": "Onaylayın, sonra yayınlayın",
+          "body": "Biri onaylamadan hiçbir şey müşterilerinize ulaşmaz. Bir yönetici yeni kurları inceler, oluşturulan görseli görür ve yayınlar.",
+          "look": "Oluşturulan kur görseli, yayınlanmadan önce burada kendi şablonunuzdan üretilir."
+        },
+        "categories": {
+          "title": "Kendi para birimleriniz, kendi kurallarınız",
+          "body": "Gerçekten teklif verdiğiniz para birimlerini, çiftleri ve fiyat türlerini tanımlayın — nakit, havale, VIP — her biri kendi yuvarlama ve biçimlendirmesiyle.",
+          "look": "Bir fiyat türü ekleyin, panelde, kanal gönderisinde ve görselde görünsün."
+        },
+        "templates": {
+          "title": "Her gönderide markanız",
+          "body": "Kur görselleri şablonunuz üzerine çizilir: logonuz, renkleriniz, yazı tipleriniz ve arka planınız. Düzenleyici tam burada, tasarımcıya gerek yok.",
+          "look": "Bir şablonu açın ve bir alanı taşıyın — müşterilerinizin alacağı tam olarak budur."
+        },
+        "telegram": {
+          "title": "Telegram, otomatik olarak",
+          "body": "Kurlar onaylanır onaylanmaz biçimlendirilmiş kur mesajları ve görseller kanalınıza gider, bir bot da müşterileriniz için fiyat sorularını yanıtlar.",
+          "look": "Kanallar, botlar ve gönderilen mesaj — hepsi bu sayfadan yapılandırılır."
+        },
+        "instagram": {
+          "title": "Telefonsuz Instagram",
+          "body": "Aynı markalı kur görseli, Instagram API üzerinden doğrudan sayfanıza, sizin belirlediğiniz zamanda yayınlanır.",
+          "look": "Gönderi kuyruğu ve hesap bağlantısı burada."
+        },
+        "analytics": {
+          "title": "Çalıştığının kanıtı",
+          "body": "Kur geçmişi, yayın etkinliği ve kanal erişimi; ne sıklıkla değiştirdiğinizi ve kaç kişinin gördüğünü görebilirsiniz.",
+          "look": "Bir aralık seçin ve karşılaştırın — yöneticinizin isteyeceği aynı sayılar."
+        },
+        "support": {
+          "title": "Takıldınız mı? Bizimle konuşun",
+          "body": "Panelin yapamadığı herhangi bir şey, ya da yanlış görünen bir kur — doğrudan yöneticilerimize mesaj atın, biri yanıtlasın.",
+          "look": "Bunlar canlı iletişim bilgileridir; aynıları panel alt bilgisinde ve sitede de görünür."
+        }
+      },
+      "skip": "Şimdilik atla",
+      "replay": "Turu tekrar oynat"
+    }
   },
   "templateEditor": {
     "back": "Geri",
@@ -254,6 +391,10 @@
     "libraryBrandingHint": "Logolar ve rozetler",
     "snapToGrid": "Izgaraya hizala",
     "inspectorTypography": "Tipografi",
+    "priceDigitLocale": "Fiyat rakamları",
+    "priceDigitsEnglish": "İngilizce (0–9)",
+    "priceDigitsPersian": "Farsça (۰–۹)",
+    "priceDigitLocaleHint": "Düzenleyici önizlemesi ve PNG çıktısı için geçerlidir.",
     "inspectorAppearance": "Görünüm",
     "inspectorPosition": "Konum",
     "fontWeight": "Kalınlık",
@@ -267,12 +408,6 @@
     "dateSource": "Tarih kaynağı",
     "dateSourceHelp": "Yayınlandığında canlı değerleri kullanır.",
     "weekdaySource": "Gün kaynağı",
-    "priceDigitLocale": "Fiyat rakamları",
-    "priceDigitsEnglish": "İngilizce (0–9)",
-    "priceDigitsPersian": "Farsça (۰–۹)",
-    "priceDigitLocaleHint": "Düzenleyici önizlemesi ve PNG çıktısı için geçerlidir.",
-    "arabicShapingLabel": "Farsça/Arapça şekillendirme (dışa aktarım)",
-    "arabicShapingHelp": "PNG'de RTL metnin doğru çizilmesi için arabic reshaper + bidi kullanır.",
     "dateFormats": {
       "date_fa": "Farsça — gün, ay adı, yıl",
       "farsi_date": "Farsça — tam Farsça tarih gibi",
@@ -292,7 +427,61 @@
     "weekdayFormats": {
       "farsi_weekday": "Farsça gün adı",
       "english_weekday": "İngilizce gün adı"
-    }
+    },
+    "arabicShapingLabel": "Farsça/Arapça şekillendirme (dışa aktarım)",
+    "arabicShapingHelp": "PNG'de RTL metnin doğru çizilmesi için arabic reshaper + bidi kullanır.",
+    "inspector": "Denetçi",
+    "templateSettings": "Şablon ayarları",
+    "templateName": "Şablon adı",
+    "width": "Genişlik",
+    "height": "Yükseklik",
+    "canvasBackground": "Tuval arka planı",
+    "selectWidgetHint": "Stil, tipografi ve veri bağlamalarını düzenlemek için bir widget seçin.",
+    "name": "Ad",
+    "type": "Tür",
+    "priceTypeBinding": "Fiyat Türü bağlaması",
+    "selectPriceType": "Fiyat Türü seçin",
+    "stableKey": "Sabit anahtar:",
+    "previewSource": "Önizleme kaynağı:",
+    "fallbackValue": "Yedek değer (canlı değer kullanılamadığında kullanılır)",
+    "typography": "Tipografi",
+    "fontSize": "Yazı tipi boyutu",
+    "textColor": "Metin rengi",
+    "fontFile": "Yazı tipi dosyası (PNG dışa aktarım)",
+    "fontDefault": "Varsayılan (sunucu)",
+    "alignLabel": "Hizalama",
+    "verticalAlign": "Dikey (kutu içinde)",
+    "alignMiddle": "Orta",
+    "weight": "Kalınlık",
+    "weightNormal": "Normal",
+    "weightBold": "Kalın",
+    "lineHeight": "Satır yüksekliği (isteğe bağlı)",
+    "plainOnExport": "Dışa aktarımda düz metin (çerçeve / gölge yok)",
+    "dropShadow": "Gölge düşür (PNG)",
+    "textOutline": "Metin çerçevesi (PNG)",
+    "snapToBackground": "Arka plan görseline yasla",
+    "imageUrl": "Görsel URL'si",
+    "openMediaLibrary": "Medya kitaplığını aç",
+    "opacityLabel": "Opaklık (düzenleyici + PNG)",
+    "rotation": "Döndürme",
+    "deleteWidget": "Widget'ı sil",
+    "alignLeft": "Sol",
+    "alignCenter": "Orta",
+    "alignRight": "Sağ",
+    "alignBottom": "Alt",
+    "widgetLibrary": "Widget kitaplığı",
+    "priceBindings": "Fiyat bağlamaları",
+    "mediaLibrary": "Medya kitaplığı",
+    "uploadBaseImage": "Temel görseli yükle",
+    "setBackgroundFirst": "Önce tuval arka planını ayarlayın",
+    "loadingEllipsis": "Yükleniyor…",
+    "noUploads": "Henüz yükleme yok.",
+    "clockSource": "Sunucunun zaman değerini kullanır.",
+    "previewValue": "Değer:",
+    "pickColor": "Renk seç",
+    "imageUploaded": "Görsel yüklendi",
+    "imageWidgetAdded": "Görsel widget'ı eklendi — taşımak veya yeniden boyutlandırmak için seçin",
+    "mediaLoadFailed": "Medya yüklenemedi"
   },
   "categories": {
     "backToList": "Kategorilere Dön",
@@ -300,6 +489,7 @@
     "specialOffers": "Özel Teklifler",
     "editTitle": "Kategoriyi Düzenle",
     "newTitle": "Yeni Kategori",
+    "modalPlaceholder": "Tam formdan yeni bir kategori oluşturun, ya da formu daha sonra buraya entegre edin.",
     "openFullForm": "Tam formu aç",
     "deleteConfirmTitle": "Kategori silinsin mi?",
     "deleteConfirmAria": "Kategori silme onayı",
@@ -349,7 +539,9 @@
       "RUB": "Ruble kurları için hazır kategori.",
       "USDT": "Tether kurları için hazır kategori.",
       "XAU": "Altın kurları için hazır kategori."
-    }
+    },
+    "deletePriceTypeConfirm": "'{name}' fiyat türü silinsin mi?",
+    "deleteBlockedByOrdersCount": "Silinemez: {count} aktif sipariş bu kategoriyi kullanıyor"
   },
   "bulkUpdate": {
     "backToCategories": "Kategorilere Dön",
@@ -460,7 +652,42 @@
     "offline": "Çevrimdışı",
     "connectionStatus": "Bağlantı",
     "cashPrice": "Nakit",
-    "accountPrice": "Hesap"
+    "accountPrice": "Hesap",
+    "exchangeRequests": "Döviz Talepleri",
+    "last30Days": "Son 30 Gün",
+    "viewAll": "Tümünü Gör",
+    "customer": "Müşteri",
+    "exchange": "Döviz",
+    "amount": "Tutar",
+    "ttl": "TTL",
+    "noPendingRequests": "Bekleyen döviz talebi yok",
+    "botStatus": "Bot Durumu",
+    "activeBot": "Aktif",
+    "inactiveBot": "Pasif",
+    "telegramAnalytics": "Telegram Analitiği",
+    "dailyActiveUsers": "Günlük Aktif Kullanıcı",
+    "usersYesterday": "düne göre",
+    "channelMembers": "Kanal Üyeleri",
+    "totalMembers": "Toplam",
+    "channelViews": "Kanal Görüntülenmeleri",
+    "viewsNotAvailable": "Görüntülenme sayıları mevcut değil. Bu metriği etkinleştirmek için kanal analitiği erişimi olan bir bot bağlayın.",
+    "recentPriceUpdates": "Son Fiyat Güncellemeleri",
+    "noRecentUpdates": "Son zamanlarda fiyat güncellemesi yok.",
+    "quickActions": "Hızlı İşlemler",
+    "channels": "Kanallar",
+    "goToAnalysis": "Analitik",
+    "goToFinalize": "Onayla",
+    "goToTelegram": "Telegram",
+    "statusNew": "Yeni",
+    "statusCancelled": "İptal Edildi",
+    "statusSuccessful": "Tamamlandı",
+    "relative": {
+      "justNow": "az önce",
+      "minutes": "{count} dk önce",
+      "hours": "{count} sa önce",
+      "days": "{count} gün önce"
+    },
+    "topCategories": "En çok fiyat türüne sahip kategoriler"
   },
   "finalize": {
     "title": "Kategoriyi Sonlandır",
@@ -501,7 +728,31 @@
     "completed": "Sonlandırma başarıyla tamamlandı",
     "completedNoTelegram": "Fiyatlar sonlandırıldı ancak Telegram gönderisi yapılmadı",
     "telegramNotSent": "Telegram gönderiyi kabul etmedi.",
-    "failed": "Sonlandırma başarısız"
+    "failed": "Sonlandırma başarısız",
+    "addChannelLink": "Bir kanal ekle →",
+    "noChannelsHint": "Onaylamayı etkinleştirmek için Telegram ayarlarında kanal oluşturun.",
+    "wizard": {
+      "backToCategories": "Kategorilere Dön",
+      "chooseCategory": "Kategori Seç",
+      "confirmContent": "İçeriği Onayla",
+      "confirmed": "Onaylandı",
+      "details": "Detaylar",
+      "editContent": "İçeriği Düzenle",
+      "noChannelHint": "Yayınlamadan önce bir Telegram kanalı ekleyin.",
+      "noChannelTitle": "Kullanılabilir Kanal Yok",
+      "publish": "Yayınla",
+      "publishTitle": "Telegram'a Yayınla",
+      "publishingHint": "Mesaj Telegram kanalınıza gönderilecek.",
+      "select": "Seç",
+      "telegramContentHint": "Telegram kanalınıza gönderilecek mesajı düzenleyin.",
+      "telegramContentTitle": "Telegram İçeriği",
+      "updatePricesHint": "Onaylamaya geçmeden önce fiyatları güncelleyin.",
+      "publishedSuccessfully": "Başarıyla yayınlandı!",
+      "publishTelegramFailed": "Telegram'a yayınlama başarısız oldu",
+      "stepChoose": "Seç",
+      "stepPublish": "Yayınla",
+      "stepReview": "İncele"
+    }
   },
   "search": {
     "placeholder": "Fiyat, kategori, ayar ara...",
@@ -514,6 +765,17 @@
     "settings": "Ayarlar",
     "pages": "Sayfalar",
     "clearRecent": "Temizle"
+  },
+  "prices": {
+    "backToPrices": "Fiyatlara Dön",
+    "newPrice": "Yeni Fiyat",
+    "notesOptional": "Notlar (isteğe bağlı)",
+    "optionalNotes": "İsteğe bağlı notlar",
+    "priceType": "Fiyat Türü",
+    "category": "Kategori",
+    "pair": "Parite",
+    "latestPrice": "Son Fiyat",
+    "history": "Geçmiş"
   },
   "pwa": {
     "installTitle": "Uygulamayı Yükle",
@@ -606,6 +868,14 @@
       "copyLink": "Bağlantıyı kopyala",
       "copied": "Kopyalandı",
       "save": "API ayarlarını kaydet"
+    },
+    "confirmClearCache": "Önbelleği temizlemeyi onayla",
+    "confirmDeleteFont": "Yazı tipini silmeyi onayla",
+    "iosInstall": {
+      "step1": "iPhone/iPad'de Safari kullanın (Chrome'da kurulum seçeneği görünmez).",
+      "step2": "Paylaş'a dokunun, ardından Ana Ekrana Ekle'yi seçin.",
+      "step3": "Sonraki ekranda Ekle'ye dokunarak uygulama simgesini ana ekrana yerleştirin.",
+      "step4": "Tam uygulama deneyimi için ana ekrandan açın."
     }
   },
   "specialPrices": {
@@ -693,11 +963,116 @@
     "hubTitle": "Telegram Yönetim Merkezi",
     "timezonePlaceholder": "Europe/Istanbul",
     "timezoneDefault": "Asia/Tehran",
+    "admin": {
+      "analytics": {
+        "title": "Analitik",
+        "channelMembers": "Kanal Üyeleri",
+        "channelViews": "Kanal Görüntülenmeleri",
+        "channelViewsStub": "Analitik bağlandıktan sonra görüntülenme verisi kullanılabilir",
+        "dailyUsage": "Günlük Kullanım",
+        "publishActivity": "Yayın Etkinliği"
+      },
+      "botSettings": {
+        "title": "Bot Ayarları",
+        "hint": "Varsayılan döviz TTL'sini ve davranışını yapılandırın."
+      },
+      "campaigns": {
+        "daily": "Günlük",
+        "weekly": "Haftalık",
+        "monthly": "Aylık",
+        "save": "Kampanyayı Kaydet"
+      },
+      "customerAnalysis": {
+        "title": "Müşteri Analizi",
+        "hint": "Kullanıcı ID'lerini arayın ve etkileşim istatistiklerini inceleyin.",
+        "userid": "Kullanıcı kimliği",
+        "prompt": "Analiz etmek için bir Telegram kullanıcı ID'si girin.",
+        "inactive": "Pasif Kullanıcılar",
+        "returned": "Geri Dönen Kullanıcılar",
+        "requests": "Talepler",
+        "vipRatio": "VIP Oranı",
+        "peakHours": "Yoğun Saatler",
+        "setTag": "Etiket Ata"
+      },
+      "customersStatus": {
+        "title": "Müşteri Durumu",
+        "hint": "Müşteri etiketlerine ve etkinliğine genel bakış.",
+        "manageTags": "Etiketleri Yönet",
+        "total": "Toplam Müşteri"
+      },
+      "exchangeRequests": {
+        "title": "Döviz Talepleri",
+        "hint": "Gelen döviz taleplerini yönetin ve inceleyin.",
+        "new": "Yeni",
+        "hold": "Beklemede",
+        "successful": "Başarılı",
+        "canceled": "İptal Edildi",
+        "changeState": "Durumu Değiştir",
+        "customer": "Müşteri",
+        "amount": "Tutar",
+        "pair": "Çift",
+        "ttl": "TTL",
+        "mostRequested": "En Çok Talep Edilen",
+        "newMembers": "Yeni Üyeler",
+        "holdOk": "Talep beklemeye alındı ({ttl} dakika)",
+        "loadError": "Döviz talepleri yüklenemedi",
+        "stateUpdated": "Durum güncellendi"
+      },
+      "notifications": {
+        "title": "Bildirimler",
+        "total": "{n} toplam",
+        "active": "{n} aktif",
+        "customer": "Müşteri",
+        "pair": "Çift",
+        "direction": "Yön"
+      },
+      "offers": {
+        "validUntil": "Son geçerlilik",
+        "saveAndSend": "Kaydet ve Gönder"
+      },
+      "reengage": {
+        "title": "Yeniden Etkileşim",
+        "hint": "Pasif kullanıcılara hedefli teklifler gönderin.",
+        "message": "Teklif metni",
+        "inactive": "Pasif Kullanıcılar",
+        "audience": "Kitle",
+        "send": "Gönder",
+        "result": "Sonuç",
+        "sentOk": "Mesaj gönderildi"
+      },
+      "reports": {
+        "title": "Raporlar",
+        "hint": "Toplu verileri ve dışa aktarımları görüntüleyin.",
+        "pending": "Bekleyen Raporlar",
+        "cancelled": "İptal Edildi",
+        "new": "Yeni",
+        "running": "Çalışıyor",
+        "successful": "Tamamlandı"
+      },
+      "stubs": {
+        "messagePlaceholder": "Kampanya mesajı",
+        "offerPlaceholder": "Teklif başlığı",
+        "offerTitle": "Teklif Başlığı",
+        "periodicTitle": "Periyodik Teklif",
+        "schedulePlaceholder": "Zamanlama (cron veya saat)"
+      },
+      "navLabel": "Yönetici Bölümü",
+      "gate": {
+        "verifying": "Yetki doğrulanıyor...",
+        "verifyingHint": "Yönetici yetkisi onaylanıyor...",
+        "failedTitle": "Erişim Reddedildi",
+        "failedHint": "Yönetici yetkiniz bulunmamaktadır.",
+        "retry": "Tekrar dene",
+        "scopedTo": "{name} ile sınırlı",
+        "dashboardError": "Kontrol paneli yüklenemedi"
+      }
+    },
     "tabs": {
       "messenger": "Mesajlaşma",
       "botSetup": "Bot Kurulumu",
       "channels": "Kanallar",
-      "automation": "Otomasyon"
+      "automation": "Otomasyon",
+      "customers": "Müşteriler"
     },
     "messenger": {
       "channelLabel": "Kanal",
@@ -743,7 +1118,9 @@
       "newBotTitle": "Yeni Bot",
       "editBot": "Botu Düzenle",
       "deleteBotConfirm": "{name} botunu silmek istediğinize emin misiniz?",
-      "tokenRequired": "Bot token'ı zorunludur"
+      "tokenRequired": "Bot token'ı zorunludur",
+      "defaultExchangeTtl": "Varsayılan Döviz TTL'si (dakika)",
+      "defaultExchangeTtlHint": "Döviz taleplerine otomatik olarak uygulanır. Talep başına TTL kullanmak için boş bırakın."
     },
     "channels": {
       "title": "Kanallar",
@@ -759,7 +1136,8 @@
       "inactive": "Pasif",
       "add": "Ekle",
       "editChannel": "Kanalı düzenle",
-      "noChannels": "Henüz kanal yok."
+      "noChannels": "Henüz kanal yok.",
+      "deleteConfirm": "'{name}' kanalı silinsin mi?"
     },
     "automation": {
       "title": "Otomasyon",
@@ -781,37 +1159,33 @@
       "add": "Ekle",
       "schedules": "Zamanlamalar",
       "noSchedules": "Henüz zamanlama yok.",
-      "hint": "Otomasyon şu anda yalnızca yapılandırmadır."
+      "hint": "Otomasyon şu anda yalnızca yapılandırmadır.",
+      "deleteScheduleConfirm": "Bu zamanlama silinsin mi?"
     },
     "settings": {
       "description": "Telegram botlarını ve kanallarını yapılandırın.",
       "openHub": "Telegram Merkezini Aç"
     },
-    "admin": {
-      "navLabel": "Yönetici Bölümü",
-      "gate": {
-        "verifying": "Yetki doğrulanıyor...",
-        "verifyingHint": "Yönetici yetkisi onaylanıyor...",
-        "failedTitle": "Erişim Reddedildi",
-        "failedHint": "Yönetici yetkiniz bulunmamaktadır.",
-        "retry": "Tekrar dene",
-        "scopedTo": "{name} ile sınırlı"
+    "customers": {
+      "description": "Müşteri etiketleri ve Telegram profilleri.",
+      "empty": "Müşteri bulunamadı.",
+      "name": "Ad",
+      "tag": "Etiket",
+      "staffTelegramHint": "Personel Telegram ID'si (isteğe bağlı)",
+      "telegramId": "Telegram ID",
+      "username": "Kullanıcı adı",
+      "tags": {
+        "admin": "Yönetici",
+        "global": "Genel",
+        "special": "Özel",
+        "vip": "VIP"
       },
-      "customerAnalysis": {
-        "title": "Müşteri Analizi",
-        "userid": "Kullanıcı kimliği"
-      },
-      "stubs": {
-        "messagePlaceholder": "Kampanya mesajı",
-        "offerPlaceholder": "Teklif başlığı"
-      },
-      "reengage": {
-        "title": "Yeniden Etkileşim",
-        "message": "Teklif metni"
-      },
-      "offers": {
-        "validUntil": "Son geçerlilik"
-      }
+      "loadError": "Müşteriler yüklenemedi",
+      "tagError": "Etiket güncellenemedi",
+      "tagUpdated": "Etiket güncellendi"
+    },
+    "bots": {
+      "verificationFailed": "Bot doğrulaması başarısız oldu"
     }
   },
   "telegramStudio": {
@@ -837,7 +1211,8 @@
     "categoryNotFound": "Kategori bulunamadı.",
     "previewImageError": "Görsel",
     "incompleteMessage": "Medya veya açıklama ayarlanmamış.",
-    "templateMediaHint": "Şablon Kimliği:"
+    "templateMediaHint": "Şablon Kimliği:",
+    "commonVariables": "Ortak Değişkenler"
   },
   "apiErrors": {
     "codes": {
@@ -863,6 +1238,8 @@
       "invalid_json": "Geçersiz JSON.",
       "template_config_empty_payload": "Güncelleme için şablon ayarı sağlanmadı.",
       "template_config_invalid_type": "Şablon yapılandırması bir JSON nesnesi olmalıdır.",
+      "template_config_json_invalid_type": "Şablon config_json bir JSON nesnesi olmalıdır.",
+      "template_config_json_invalid": "Şablon config JSON'u geçersiz.",
       "template_canvas_width_invalid": "Tuval genişliği pozitif tam sayı olmalıdır.",
       "template_canvas_height_invalid": "Tuval yüksekliği pozitif tam sayı olmalıdır.",
       "template_orientation_invalid": "Şablon yönü geçersiz.",
@@ -916,14 +1293,20 @@
       "update": "Güncelle",
       "delete": "Sil",
       "force_logout": "Zorla çıkış",
-      "other": "Diğer"
+      "other": "Diğer",
+      "bulk_price_update": "Toplu Fiyat Güncelleme",
+      "login_failed": "Giriş Başarısız",
+      "login_success": "Giriş Başarılı",
+      "price_update": "Fiyat Güncelleme",
+      "special_price_update": "Özel Fiyat Güncelleme"
     },
     "roles": {
       "super_admin": "Süper Admin",
       "management": "Yönetim",
       "operator": "Operatör",
       "viewer": "İzleyici",
-      "developer": "Geliştirici"
+      "developer": "Geliştirici",
+      "employee": "Çalışan"
     }
   },
   "programmerHub": {
@@ -982,11 +1365,23 @@
       "templates": "Şablonlar",
       "audit": "Denetim Kaydı"
     },
+    "plan": "Plan",
+    "saving": "Oluşturuluyor…",
+    "telegramIdHint": "Sayısal Telegram kimliği veya kullanıcı adı",
     "website": "Web sitesi adresi",
     "websiteHint": "İsteğe bağlı",
-    "telegramIdHint": "Sayısal Telegram kimliği veya kullanıcı adı",
-    "plan": "Plan",
-    "saving": "Oluşturuluyor…"
+    "subRole": "Devredilen Rol",
+    "subRoleHint": "Devredilen operatörler, başka bir kullanıcının botunun bot içi yönetici panelini yönetir",
+    "operator": "Operatör",
+    "ownerUsername": "Sahip Kullanıcı Adı",
+    "ownerUsernameHint": "Bu operatörün botunu yönettiği yönetim hesabının kullanıcı adı",
+    "telegramUsername": "Telegram Kullanıcı Adı",
+    "ownerUsernameRequired": "Devredilen operatörler için sahip kullanıcı adı gereklidir",
+    "delegatedNoBotHint": "Devredilen operatörler sahibin botunu kullanır — bot token'ı gerekmez.",
+    "delegationTitle": "Devredilen Operatör",
+    "delegationDesc": "Bu kullanıcıya başka bir hesabın botunun bot içi yönetici paneline erişim verin.",
+    "admin": "Yönetici",
+    "head_operator": "Baş Operatör"
   },
   "fleet": {
     "title": "Müşteri filosu",
@@ -1031,15 +1426,6 @@
       "failed": "Başarısız"
     }
   },
-  "collaboration": {
-    "title": "İş Birliği Şekli",
-    "hint": "Bu müşteri için ortaklık modelini seçin",
-    "placeholder": "İş birliği türü seçin",
-    "reseller": "Bayi",
-    "white_label": "Beyaz Etiket",
-    "agency": "Ajans",
-    "direct": "Doğrudan"
-  },
   "landing": {
     "meta": {
       "title": "MrExchange — Döviz Kuru Otomasyon Paneli"
@@ -1052,7 +1438,8 @@
       "contact": "Bize ulaşın",
       "cta": "Demo alın",
       "menu": "Menü",
-      "language": "Dil"
+      "language": "Dil",
+      "tutorials": "Eğitimler"
     },
     "hero": {
       "badge": "Kur yayını, tamamen otomatik",
@@ -1064,7 +1451,8 @@
       "panelTitle": "Kur yönetimi",
       "live": "Canlı güncelleme",
       "buy": "Alış",
-      "sell": "Satış"
+      "sell": "Satış",
+      "ctaTutorials": "Nasıl çalıştığını görün"
     },
     "stats": {
       "saved": "Kur yayınında günlük tasarruf",
@@ -1176,11 +1564,13 @@
         },
         "api": {
           "title": "Özel API entegrasyonu",
-          "desc": "Kurları küresel bir kaynaktan otomatik çekin veya kurlarınızı başka bir sisteme açın."
+          "desc": "Kurları küresel bir kaynaktan otomatik çekin veya kurlarınızı başka bir sisteme açın.",
+          "note": "Paketi satın aldığınızda ücretsiz."
         },
         "accounting": {
           "title": "Muhasebe entegrasyonu",
-          "desc": "Paneli muhasebe veya arka ofis yazılımınıza bağlayın; kurlar ve kayıtlar uyumlu kalsın."
+          "desc": "Paneli muhasebe veya arka ofis yazılımınıza bağlayın; kurlar ve kayıtlar uyumlu kalsın.",
+          "note": "Paket satın alımıyla ücretsiz — 5 bağlantıya kadar; sonraki her değişiklik için 50 $."
         },
         "brandTemplate": {
           "title": "Özel marka şablonu",
@@ -1200,7 +1590,8 @@
         },
         "branch": {
           "title": "Ek şube",
-          "desc": "Kendi erişimi, personel hesapları ve kur ayarları olan başka bir şube."
+          "desc": "Kendi erişimi, personel hesapları ve kur ayarları olan başka bir şube.",
+          "note": "2 şubeye kadar ücretsiz; ek her şube için 130 $."
         },
         "migration": {
           "title": "Veri taşıma",
@@ -1208,11 +1599,13 @@
         },
         "training": {
           "title": "Ekip eğitimi",
-          "desc": "Ekibiniz için canlı bir eğitim oturumu ve kendi dilinizde yazılı bir rehber."
+          "desc": "Ekibiniz için canlı bir eğitim oturumu ve kendi dilinizde yazılı bir rehber.",
+          "note": "Pakete ücretsiz dahildir."
         },
         "domain": {
           "title": "Alan adı ve SSL kurulumu",
-          "desc": "Alan adı, DNS, sertifikalar ve e-posta kayıtları sizin adınıza yapılandırılır."
+          "desc": "Alan adı, DNS, sertifikalar ve e-posta kayıtları sizin adınıza yapılandırılır.",
+          "note": "Paket satın alımıyla ücretsiz."
         },
         "support": {
           "title": "Destek ve bakım",
@@ -1359,7 +1752,12 @@
         }
       },
       "ctaTitle": "Önce bakmayı mı tercih edersiniz?",
-      "ctaText": "Demo panelini şimdi açın ya da bize yazmadan önce paketin tam olarak neleri içerdiğini okuyun."
+      "ctaText": "Demo panelini şimdi açın ya da bize yazmadan önce paketin tam olarak neleri içerdiğini okuyun.",
+      "trial": {
+        "eyebrow": "Ücretsiz deneme",
+        "title": "Kendi alt alan adınızda, kendi paneliniz",
+        "text": "Denemeler bir kayıt formuyla değil, bizim tarafımızdan kurulur — bu yüzden paneliniz zaten kendi para birimleriniz, şablonunuz ve Telegram kanalınız bağlı olarak gelir. Yukarıdaki kanallardan birinden bize mesaj atın, genellikle aynı gün çalışır hale gelir. On dört gün, kart yok, taahhüt yok."
+      }
     },
     "footer": {
       "about": "Döviz büroları için kur yayın paneli: tek giriş, tüm kanallar.",
@@ -1369,7 +1767,291 @@
       "faq": "SSS",
       "login": "Giriş yap",
       "bottom": "mrexchange.co.uk. Tüm hakları saklıdır."
+    },
+    "tutorials": {
+      "title": "Eğitimler",
+      "subtitle": "Her sabah yapacağınız işlerin kısa, kayıtlı anlatımları.",
+      "readMore": "Anlatımı oku",
+      "backToIndex": "Tüm eğitimler",
+      "steps": "Adımlar",
+      "notFound": "Bu eğitim mevcut değil.",
+      "minutes": "{count} dakikalık okuma",
+      "more": "Daha fazla anlatım",
+      "posts": {
+        "publish-prices": {
+          "title": "Kurlarınızı güncelleyin ve her yerde yayınlayın",
+          "summary": "Sabah rutini: yeni alış ve satış kurlarını girin, onaylayın ve panelin değişikliği çalıştırdığınız her kanala göndermesine izin verin.",
+          "intro": "Bu, her döviz bürosunun günde birkaç kez çalıştırdığı akıştır. Burada hiçbir şey bir tasarımcı veya geliştirici gerektirmez — sayıları girersiniz, onaylarsınız ve panel web sitesini, Telegram kanalını, Instagram gönderisini ve kur widget'ını halleder.",
+          "steps": {
+            "open": {
+              "title": "Fiyat merkezini açın",
+              "body": "Sattığınız her para birimi bir kategori altında yer alır. Yeniden fiyatlandıracağınız kategoriyi seçin, panel mevcut alış ve satış kurunu son değişiklikle yan yana gösterir."
+            },
+            "enter": {
+              "title": "Yeni kurları girin",
+              "body": "Bir taban kur girin ve marjların gerisini halletmesine izin verin, ya da alış ve satışı açıkça girin. Panel, ne kadar hareket ettiğinizi tam olarak görebilmeniz için önceki değeri görünür tutar."
+            },
+            "finalize": {
+              "title": "Değişikliği onaylayın",
+              "body": "Siz onaylamadan hiçbir şey müşterilerinize ulaşmaz. Bu tek onay, bir yazım hatasını yayınlanmış bir kurdan ayıran şeydir ve adınız ile saatiniz kaydedilir."
+            },
+            "publish": {
+              "title": "Yayınlandığını izleyin",
+              "body": "Değişiklik kesinleştiği anda web sitesi sayfası, Telegram mesajı, oluşturulan kur görseli ve widget hepsi güncellenir. İkinci bir araç yok, kopyala yapıştır yok."
+            }
+          },
+          "outro": "Döngünün tamamı bu kadar. Ücretsiz denemenizi başlatın ve bunu kendi para birimlerinizde bugün çalıştırın."
+        },
+        "template-editor": {
+          "title": "Kendi şablonunuzda bir kur görseli tasarlayın",
+          "summary": "Tuvale bir widget sürükleyin, onu canlı bir fiyata bağlayın ve müşterilerinizin göreceği görseli önizleyin.",
+          "intro": "Telegram ve Instagram'a gönderdiğiniz görseller, bir kez tasarladığınız bir şablondan oluşturulur. Düzenleyici bir tuvaldir: widget'ları yerleştirir, onları bir fiyata işaret edersiniz ve her gelecekteki yayın, güncel sayılarla otomatik olarak oluşturulur.",
+          "steps": {
+            "open": {
+              "title": "Arka planınızla başlayın",
+              "body": "Kendi görselinizi yükleyin, ya da paketlenmiş şablonlardan biriyle başlayıp renkleri ve yazı tiplerini kendi markanızla değiştirin."
+            },
+            "drag": {
+              "title": "Tuvale bir widget sürükleyin",
+              "body": "Kur satırları, başlıklar, logolar, tarihler ve serbest metin hepsi widget'tır. Birini istediğiniz yere bırakın ve yerine oturtun; katmanlar yığın sırasını öngörülebilir tutar."
+            },
+            "bind": {
+              "title": "Onu canlı bir fiyata bağlayın",
+              "body": "Bir kur widget'ı bir sayıya değil, bir fiyat türüne bağlıdır. Kur değiştiğinde widget da değişir — görseli bir daha asla düzenlemezsiniz."
+            },
+            "preview": {
+              "title": "Gerçek sayılarla önizleyin",
+              "body": "Önizleme, şablonu yayıncının yapacağı şekilde tam olarak, bugünün kurlarını kullanarak oluşturur; böylece onayladığınız şey kanalınızın alacağı şeydir."
+            }
+          },
+          "outro": "Bir şablon, her yayın. Deneme sırasında düzenleyiciyi kendi markanız üzerinde deneyin."
+        },
+        "telegram-bot": {
+          "title": "Telegram kanalınızı ve botunuzu bağlayın",
+          "summary": "Bir bot token'ı yapıştırın, kanalı ekleyin, neyin yayınlanacağını seçin ve canlıya geçmeden önce bir test mesajı gönderin.",
+          "intro": "Telegram, çoğu döviz müşterisinin kurlarınızı gerçekten okuduğu yerdir. Panel, kendi botunuzla, kendi kanalınızda konuşur; böylece kitle ve marka sizin kalır.",
+          "steps": {
+            "token": {
+              "title": "Bot token'ınızı ekleyin",
+              "body": "{'@'}BotFather ile bir bot oluşturun ve token'ı panele yapıştırın. Token şifrelenmiş olarak saklanır ve bir daha asla tam olarak gösterilmez."
+            },
+            "channel": {
+              "title": "Kanalı ekleyin",
+              "body": "Botu kanalınızın yöneticisi yapın, ardından kanalı buradan kaydedin. Panel, herhangi bir şey kaydetmeden önce izni doğrular."
+            },
+            "settings": {
+              "title": "Neyin yayınlanacağını seçin",
+              "body": "Metin mesajı, oluşturulan görsel ya da her ikisi; sabitlenmiş ya da değil; her değişiklikte ya da bir zamanlamada. Varsayılan mesaj şablonu kanal başına düzenlenebilir."
+            },
+            "test": {
+              "title": "Bir test mesajı gönderin",
+              "body": "Canlıya geçmeden önce kanala bir mesaj gönderin. Botta eksik bir izin varsa müşterilerinizin önünde değil, burada öğrenirsiniz."
+            }
+          },
+          "outro": "Kendi kanalınız, kendi botunuz, kendi kurlarınız — birkaç dakikada bağlandı."
+        },
+        "signup-tour": {
+          "title": "Kaydolun ve etrafta gezinmeyi öğrenin",
+          "summary": "E-posta ve şifre ya da bir Google hesabı, sizin olduğunuzu onaylamak için tek kullanımlık bir kod, ardından panelde rehberli bir tur.",
+          "intro": "Ortada paylaşılan bir demo hesap ya da satış görüşmesi yok. Kaydolursunuz, adresinizi onaylarsınız ve on dört gün boyunca ürünün tamamına sahip kendi panelinize inersiniz.",
+          "steps": {
+            "signup": {
+              "title": "Hesabınızı oluşturun",
+              "body": "Döviz bürosu adınızı, bir e-posta adresi ve bir şifre girin — ya da Google ile kaydolun ve şifreyi tamamen atlayın."
+            },
+            "code": {
+              "title": "Tek kullanımlık bir kodla onaylayın",
+              "body": "Altı haneli bir kod e-postayla, ya da verdiğiniz tek iletişim buysa SMS ile gelir. On dakika geçerlidir ve beş yanlış denemeden sonra geçersiz olur."
+            },
+            "tour": {
+              "title": "Turu yapın",
+              "body": "İlk giriş yaptığınızda kısa, rehberli bir tur sizi fiyatlar, şablonlar, kanallar ve ayarlar boyunca gezdirir. İstediğiniz zaman kullanıcı menüsünden tekrar oynatabilirsiniz."
+            },
+            "trial": {
+              "title": "Ürünün tamamını 14 gün kullanın",
+              "body": "Hiçbir şey kilitli ya da paylaşılan değildir: kurlarınız, şablonlarınız ve kanallarınız yalnızca size aittir. Takılırsanız, destek iletişim bilgileri panelde bir tık ötede."
+            }
+          },
+          "outro": "On dört gün, ürünün tamamı, kart gerekmez."
+        }
+      }
     }
+  },
+  "orders": {
+    "queueTitle": "Bot sipariş kuyruğu",
+    "customerLinkTitle": "Müşteri sipariş bağlantısı",
+    "customerLinkHint": "Bu bağlantıyı müşterilerle paylaşın. Canlı kurları görürler ve siparişler bu kuyrukta belirir.",
+    "copyLink": "Bağlantıyı kopyala",
+    "copied": "Kopyalandı",
+    "copyFailed": "Bağlantı kopyalanamadı",
+    "openLink": "Aç",
+    "pendingBadge": "{count} bekleyen sipariş",
+    "empty": "Sipariş bulunamadı.",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "viewDetails": "Detayları görüntüle",
+    "detailTitle": "Sipariş detayları",
+    "sectionStatus": "Durum",
+    "sectionCustomer": "Müşteri",
+    "sectionOrder": "Sipariş",
+    "sectionMetadata": "Alınan veriler",
+    "platform": "Kaynak",
+    "platformTelegram": "Telegram",
+    "platformWhatsapp": "WhatsApp",
+    "platformWeb": "Web / genel bağlantı",
+    "telegramChatId": "Telegram sohbet ID'si",
+    "telegramUsername": "Telegram kullanıcı adı",
+    "customerId": "Müşteri ID'si",
+    "reviewedAt": "İncelenme tarihi",
+    "adminNote": "Yönetici notu",
+    "adminNotePlaceholder": "İsteğe bağlı not...",
+    "metaSource": "Gönderim kaynağı",
+    "metaUserAgent": "Tarayıcı / cihaz",
+    "deleteOrder": "Siparişi sil",
+    "deleteConfirm": "\"{name}\" siparişi kalıcı olarak silinsin mi? Kategorisini silmeden önce gereklidir.",
+    "deleteSuccess": "Sipariş silindi.",
+    "reviewSuccess": "Sipariş durumu güncellendi.",
+    "status": {
+      "pending": "Beklemede",
+      "approved": "Onaylandı",
+      "rejected": "Reddedildi",
+      "cancelled": "İptal Edildi",
+      "all": "Tümü"
+    }
+  },
+  "webapp": {
+    "orderTitle": "Hızlı Sipariş",
+    "welcome": "Merhaba {name}",
+    "tradeType": "İşlem türü",
+    "buy": "Alış",
+    "sell": "Satış",
+    "category": "Para birimi / kategori",
+    "selectCategory": "Seç",
+    "amount": "Tutar",
+    "note": "Notlar",
+    "notePlaceholder": "İsteğe bağlı notlar...",
+    "submitOrder": "Siparişi gönder",
+    "orderSubmitted": "Siparişiniz başarıyla gönderildi",
+    "orderContactMessage": "Ekibimiz kısa süre içinde verdiğiniz telefon numarasından sizinle iletişime geçecek.",
+    "orderContactMessageBot": "Ekibimiz kısa süre içinde Telegram üzerinden sizinle iletişime geçecek.",
+    "orderPendingReview": "Lütfen telefonunuzu yanınızda bulundurun. Sabrınız için teşekkür ederiz.",
+    "missingToken": "Geçersiz bağlantı. Lütfen bot düğmesini kullanın.",
+    "authFailed": "Kimlik doğrulama başarısız. Bağlantının süresi dolmuş olabilir.",
+    "submitFailed": "Sipariş gönderilemedi.",
+    "publicIntro": "Canlı kurları görüntüleyin ve siparişinizi gönderin.",
+    "liveRates": "Canlı kurlar",
+    "customerName": "Ad soyad",
+    "customerPhone": "Telefon numarası",
+    "priceType": "Kur türü",
+    "selectPriceType": "Kur türü seçin (isteğe bağlı)",
+    "selectPriceTypeLabel": "Bir kur seçin",
+    "ratesUpdated": "Güncellendi",
+    "noRatesYet": "Henüz kur bulunmuyor.",
+    "selectedRate": "Seçtiğiniz kur",
+    "formSection": "Sipariş detayları",
+    "customerNamePlaceholder": "örn. Ahmet Yılmaz",
+    "amountPlaceholder": "Tutarı girin",
+    "phonePlaceholder": "0532..."
+  },
+  "trial": {
+    "expiredTitle": "Ücretsiz deneme süreniz sona erdi.",
+    "expiredText": "Verileriniz güvende ve hâlâ görünür durumda, ancak yükseltme yapana kadar değişiklikler duraklatıldı.",
+    "talkToUs": "Bizimle konuşun",
+    "daysLeft": "Deneme sürenizde {days} gün kaldı"
+  },
+  "support": {
+    "title": "Yardıma mı ihtiyacınız var?",
+    "text": "Yöneticilerimize mesaj atın — biri yanıtlar.",
+    "kinds": {
+      "phone": "Telefon",
+      "whatsapp": "WhatsApp",
+      "telegram": "Telegram",
+      "email": "E-posta",
+      "instagram": "Instagram",
+      "custom": "Diğer"
+    }
+  },
+  "ownerConsole": {
+    "title": "Sahip konsolu",
+    "tabs": {
+      "activity": "Girişler ve IP'ler",
+      "accounts": "Hesaplar ve denemeler",
+      "sales": "Satışlar",
+      "support": "Destek kanalları"
+    },
+    "search": "Ara",
+    "searchHint": "E-posta, ad, IP veya detaylar",
+    "apply": "Uygula",
+    "exportCsv": "CSV Dışa Aktar",
+    "allActions": "Tüm işlemler",
+    "from": "Başlangıç",
+    "to": "Bitiş",
+    "user": "Kullanıcı",
+    "account": "Hesap",
+    "action": "İşlem",
+    "ip": "IP adresi",
+    "device": "Cihaz",
+    "when": "Ne zaman",
+    "unknownUser": "Bilinmiyor",
+    "unknownDevice": "Bilinmiyor",
+    "noActivity": "Bu filtrelerle eşleşen etkinlik yok.",
+    "actions": {
+      "signup": "Kayıt",
+      "login_success": "Giriş",
+      "login_failed": "Başarısız giriş",
+      "logout": "Çıkış",
+      "price_update": "Fiyat güncelleme",
+      "bulk_price_update": "Toplu fiyat güncelleme",
+      "special_price_update": "Özel fiyat güncelleme",
+      "template_change": "Şablon değişikliği",
+      "finalize": "Onaylama",
+      "impersonate_start": "Kimliğine bürünme",
+      "other": "Diğer"
+    },
+    "noAccounts": "Henüz kimse kaydolmadı.",
+    "signedUp": "Kaydoldu",
+    "lastLogin": "Son giriş",
+    "seats": "Kullanıcılar",
+    "revenue": "Gelir",
+    "verified": "E-posta doğrulandı",
+    "paid": "Ödendi",
+    "suspend": "Askıya al",
+    "suspended": "Askıya alındı",
+    "reinstate": "Yeniden etkinleştir",
+    "reinstated": "Hesap yeniden etkinleştirildi",
+    "forceLogout": "Zorla çıkış yaptır",
+    "forcedLogout": "Bu hesap için tüm oturumlar sonlandırıldı.",
+    "recordSale": "Satış kaydet",
+    "saleHint": "Bir satış kaydetmek deneme duvarını kaldırır ve bir lisans anahtarı verir.",
+    "pickCustomer": "Bir müşteri seçin",
+    "customer": "Müşteri",
+    "amount": "Tutar",
+    "currency": "Para birimi",
+    "salePlan": "Plan",
+    "salePlans": {
+      "one_time": "Tek seferlik",
+      "lifetime": "Ömür boyu",
+      "renewal": "Yenileme",
+      "addon": "Eklenti"
+    },
+    "soldAt": "Satıldı",
+    "reference": "Referans",
+    "note": "Not",
+    "recordedBy": "Kaydeden",
+    "noSales": "Henüz kayıtlı satış yok.",
+    "salesTotal": "Toplam: {total}",
+    "saleRecorded": "Satış kaydedildi — deneme duvarı kaldırıldı.",
+    "saleDeleted": "Satış kaldırıldı.",
+    "addChannel": "Bir kanal ekle",
+    "noChannels": "Henüz destek kanalı yok. Müşteriler yardıma ihtiyaç duyduklarında hiçbir şey görmeyecek.",
+    "channelTitle": "Destek kanalı",
+    "channelKind": "Tür",
+    "channelLabel": "Etiket",
+    "channelValue": "Değer",
+    "channelValueHint": "Telefon numarası, {'@'}kullanıcı adı, e-posta adresi veya URL.",
+    "channelOrder": "Sıra",
+    "preview": "Müşterilerin gördüğü",
+    "previewEmpty": "Hiçbir şey aktif değil, bu yüzden hiçbir yerde iletişim gösterilmiyor."
   },
   "registerClient": {
     "backToList": "Geliştirici Merkezine Dön",
@@ -1382,5 +2064,35 @@
     "systemAccessDesc": "Telegram bot kimlik bilgileri ve erişim seviyesi.",
     "registeredBy": "Kaydeden",
     "registeredByHint": "Otomatik olarak giriş yapan yönetici olarak kaydedilir."
+  },
+  "about": {
+    "motto": "Her ürün, kalıcı bir iz bırakmak için bir fırsattır."
+  },
+  "templates": {
+    "selectCategory": "Kategori seç",
+    "addTemplate": "Şablon Ekle",
+    "editor": "Düzenleyici",
+    "nameRequired": "Lütfen bir şablon adı girin.",
+    "categoryRequired": "Şablonu oluşturmadan önce bir kategori seçin.",
+    "deleted": "Şablon silindi."
+  },
+  "priceTypeForm": {
+    "backToCategories": "Kategorilere dön",
+    "pageTitleCreate": "Yeni fiyat türü",
+    "pageTitleEdit": "Fiyat türünü düzenle",
+    "sourceCurrency": "Kaynak para birimi",
+    "targetCurrency": "Hedef para birimi",
+    "tradeType": "İşlem türü (Alış / Satış)",
+    "tradeTypeHelp": "Bu fiyatın toplu güncelleme sütunlarında ve son yayınlama mantığında nasıl kullanılacağını belirler.",
+    "buy": "Alış",
+    "sell": "Satış",
+    "descriptionOptional": "Açıklama (isteğe bağlı)",
+    "loadCurrenciesError": "Para birimleri yüklenemedi",
+    "missingCategoryId": "Kategori kimliği eksik",
+    "selectBothCurrencies": "Lütfen kaynak ve hedef para birimini seçin.",
+    "createSuccess": "Fiyat türü başarıyla oluşturuldu",
+    "updateSuccess": "Fiyat türü başarıyla güncellendi",
+    "saveError": "Fiyat türü kaydedilemedi",
+    "loadPriceTypeError": "Fiyat türü yüklenemedi"
   }
 }

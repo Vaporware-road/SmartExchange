@@ -680,7 +680,14 @@
     "goToTelegram": "Telegram",
     "statusNew": "New",
     "statusCancelled": "Cancelled",
-    "statusSuccessful": "Done"
+    "statusSuccessful": "Done",
+    "relative": {
+      "justNow": "just now",
+      "minutes": "{count}m ago",
+      "hours": "{count}h ago",
+      "days": "{count}d ago"
+    },
+    "topCategories": "Top Categories by Price Types"
   },
   "finalize": {
     "title": "Finalize Category",
@@ -863,7 +870,13 @@
       "save": "Save API settings"
     },
     "confirmClearCache": "Confirm clear cache",
-    "confirmDeleteFont": "Confirm delete font"
+    "confirmDeleteFont": "Confirm delete font",
+    "iosInstall": {
+      "step1": "Use Safari on iPhone/iPad (install option is not available in Chrome).",
+      "step2": "Tap Share, then choose Add to Home Screen.",
+      "step3": "Tap Add on the next screen to place the app icon on your home screen.",
+      "step4": "Open it from Home Screen for full app-like experience."
+    }
   },
   "specialPrices": {
     "backToList": "Back to Special Prices",
@@ -2062,5 +2075,24 @@
     "nameRequired": "Please enter a template name.",
     "categoryRequired": "Pick a category before creating the template.",
     "deleted": "Template deleted."
+  },
+  "priceTypeForm": {
+    "backToCategories": "Back to Categories",
+    "pageTitleCreate": "New Price Type",
+    "pageTitleEdit": "Edit Price Type",
+    "sourceCurrency": "Source Currency",
+    "targetCurrency": "Target Currency",
+    "tradeType": "Trade Type (Buy / Sell)",
+    "tradeTypeHelp": "Choose how this price is used in Bulk Update columns and final publish logic.",
+    "buy": "Buy",
+    "sell": "Sell",
+    "descriptionOptional": "Description (optional)",
+    "loadCurrenciesError": "Could not load currencies",
+    "missingCategoryId": "Missing category id",
+    "selectBothCurrencies": "Please select both source and target currencies.",
+    "createSuccess": "Price type created successfully",
+    "updateSuccess": "Price type updated successfully",
+    "saveError": "Could not save price type",
+    "loadPriceTypeError": "Could not load price type"
   }
 }

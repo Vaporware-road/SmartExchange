@@ -536,7 +536,7 @@ import BaseSwitch from '@/components/ui/BaseSwitch.vue'
 
 const route = useRoute()
 const toast = useToast()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const siteSettings = useSiteSettingsStore()
 const currenciesStore = useCurrenciesStore()
 const auth = useAuthStore()
@@ -654,19 +654,7 @@ const fontsGroupedForLtr = computed(() => {
 })
 
 const iosInstallSteps = computed(() =>
-  locale.value === 'fa'
-    ? [
-      'حتماً مرورگر Safari را استفاده کنید (در Chrome آیفون گزینه نصب نمایش داده نمی‌شود).',
-      'روی دکمه Share بزنید و گزینه Add to Home Screen را انتخاب کنید.',
-      'در صفحه بعد روی Add بزنید تا آیکن برنامه به صفحه اصلی اضافه شود.',
-      'بعد از نصب، برنامه را از Home Screen باز کنید تا مثل اپ کامل اجرا شود.',
-    ]
-    : [
-      'Use Safari on iPhone/iPad (install option is not available in Chrome).',
-      'Tap Share, then choose Add to Home Screen.',
-      'Tap Add on the next screen to place the app icon on your home screen.',
-      'Open it from Home Screen for full app-like experience.',
-    ]
+  [1, 2, 3, 4].map((step) => t(`settings.iosInstall.step${step}`))
 )
 
 function setTab(id) {
