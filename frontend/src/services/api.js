@@ -231,6 +231,13 @@ export function extractApiErrorDetails(data) {
 export function resolveApiErrorMessage({ data, status } = {}) {
   const { message, code } = extractApiErrorDetails(data)
   const trimmed = typeof message === 'string' ? message.trim() : ''
+  // A bare permission failure carries DRF's own English sentence as its message,
+  // which is the one piece of untranslated UI an ordinary customer runs into.
+  // Views that mean something specific by a 403 send their own code and keep it.
+  if (code === 'permission_denied' || code === 'authentication_failed') {
+    const byAuthCode = translateApiErrorCode(code)
+    if (byAuthCode) return byAuthCode
+  }
   // Prefer the API message (e.g. buy/sell spread) over generic code copy like validation_error.
   if (trimmed && trimmed !== 'Request failed') {
     return trimmed
