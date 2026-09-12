@@ -299,6 +299,93 @@ class ProgrammerDelegatedOperatorApiTests(APITestCase):
         self.assertFalse(BotAdmin.objects.filter(bot=self.bot, user=user).exists())
 
 
+class AdminManagementTeamApiTests(APITestCase):
+    """Owners add their own bot operators from Admin Management (/users)."""
+
+    def setUp(self):
+        self.owner = CustomUser.objects.create_user(
+            username="desk_owner", password="pass12345",
+            role=CustomUser.ROLE_MANAGEMENT, plan=PLAN_GOLD,
+        )
+        self.bot = TelegramBot.objects.create(
+            name="Desk Bot", token="444:desk", owner=self.owner, is_active=True,
+        )
+        self.other_owner = CustomUser.objects.create_user(
+            username="rival_owner", password="pass12345", role=CustomUser.ROLE_MANAGEMENT,
+        )
+        self.rival_op = CustomUser.objects.create_user(
+            username="rival_op", password="pass12345", role=CustomUser.ROLE_EMPLOYEE,
+            owner=self.other_owner, sub_role=CustomUser.SUB_ROLE_OPERATOR,
+            telegram_username="rival_tg",
+        )
+
+    def _create(self, **overrides):
+        payload = {
+            "username": "desk_op", "password": "pass12345",
+            "sub_role": CustomUser.SUB_ROLE_HEAD_OPERATOR, "telegram_username": "@desk_tg",
+        }
+        payload.update(overrides)
+        return self.client.post("/api/auth/users/", payload, format="json")
+
+    def test_owner_creates_operator_with_fixed_role_and_owner(self):
+        self.client.force_authenticate(self.owner)
+        r = self._create(role=CustomUser.ROLE_SUPER_ADMIN)
+        self.assertEqual(r.status_code, 201, r.content)
+        op = CustomUser.objects.get(username="desk_op")
+        self.assertEqual(op.role, CustomUser.ROLE_EMPLOYEE)
+        self.assertEqual(op.owner_id, self.owner.pk)
+        self.assertEqual(op.account_id, self.owner.account_id)
+        self.assertEqual(op.sub_role, CustomUser.SUB_ROLE_HEAD_OPERATOR)
+        self.assertEqual(op.telegram_username, "desk_tg")
+        self.assertTrue(BotAdmin.objects.filter(bot=self.bot, user=op).exists())
+
+    def test_owner_sees_and_edits_only_own_operators(self):
+        self.client.force_authenticate(self.owner)
+        self._create()
+        names = {u["username"] for u in self.client.get("/api/auth/users/").json()}
+        self.assertEqual(names, {"desk_op"})
+        r = self.client.patch(f"/api/auth/users/{self.rival_op.pk}/", {"full_name": "x"}, format="json")
+        self.assertEqual(r.status_code, 404)
+        r = self.client.post(f"/api/auth/users/{self.rival_op.pk}/force-logout/")
+        self.assertEqual(r.status_code, 404)
+
+    def test_owner_cannot_escalate_operator_role(self):
+        self.client.force_authenticate(self.owner)
+        self._create()
+        op = CustomUser.objects.get(username="desk_op")
+        r = self.client.patch(
+            f"/api/auth/users/{op.pk}/", {"role": CustomUser.ROLE_SUPER_ADMIN}, format="json"
+        )
+        self.assertEqual(r.status_code, 200, r.content)
+        op.refresh_from_db()
+        self.assertEqual(op.role, CustomUser.ROLE_EMPLOYEE)
+
+    def test_owner_position_must_be_operator_or_head(self):
+        self.client.force_authenticate(self.owner)
+        r = self._create(sub_role=CustomUser.SUB_ROLE_ADMIN)
+        self.assertEqual(r.status_code, 400, r.content)
+
+    def test_telegram_identity_cannot_be_reused_across_desks(self):
+        self.client.force_authenticate(self.owner)
+        r = self._create(telegram_username="RIVAL_TG")
+        self.assertEqual(r.status_code, 400, r.content)
+
+    def test_employee_cannot_manage_users(self):
+        self.client.force_authenticate(self.rival_op)
+        self.assertEqual(self._create().status_code, 403)
+
+    def test_super_admin_operator_requires_owner(self):
+        admin = CustomUser.objects.create_user(
+            username="root", password="pass12345", role=CustomUser.ROLE_SUPER_ADMIN,
+        )
+        self.client.force_authenticate(admin)
+        r = self._create(role=CustomUser.ROLE_EMPLOYEE)
+        self.assertEqual(r.status_code, 400, r.content)
+        r = self._create(role=CustomUser.ROLE_EMPLOYEE, owner_username="desk_owner")
+        self.assertEqual(r.status_code, 201, r.content)
+        self.assertEqual(CustomUser.objects.get(username="desk_op").owner_id, self.owner.pk)
+
+
 class SelfServeSignupTests(APITestCase):
     """Signup must hand back a usable session and a running trial in one call."""
 

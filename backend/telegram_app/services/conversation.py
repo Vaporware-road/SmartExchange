@@ -29,6 +29,7 @@ from .admin_conversation import (
     handle_admin_action,
     handle_admin_text,
     resolve_admin_label,
+    staff_for_session,
 )
 from .admin_notify import notify_staff_of_exchange_request
 
@@ -420,10 +421,19 @@ class ConversationEngine:
             if admin_home is not None:
                 return admin_home
             if cmd == CMD_ADMIN:
+                # go_admin_menu refuses both non-staff and plan-gated staff;
+                # telling a real admin "not registered" sends them hunting
+                # for a registration problem that does not exist.
+                if staff_for_session(session) is not None:
+                    return _reply(
+                        "🔒 The in-bot admin panel isn't included in this "
+                        "exchange's plan. Upgrade to Silver or higher to use it.",
+                        buttons=main_menu_buttons_for_bot(self.bot),
+                    )
                 return _reply(
                     "🔒 You are not registered as an admin for this bot.\n"
                     "Ask your exchange owner to add your Telegram username "
-                    "under Admin Management (Operator / Head of Operator / Admin).",
+                    "under Admin Management (Operator / Head Operator).",
                     buttons=main_menu_buttons_for_bot(self.bot),
                 )
             return self._go_main_menu(session)

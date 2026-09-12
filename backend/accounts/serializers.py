@@ -7,6 +7,7 @@ from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser, UserActivityLog
+from .permissions import is_team_manager
 from .plans import COLLABORATION_CHOICES, PLAN_BRONZE, PLAN_CHOICES, normalize_plan
 from .tokens import issue_tokens_for_user
 from .trial import trial_expires_at
@@ -144,12 +145,89 @@ class UserSerializer(serializers.ModelSerializer):
         return f"{token[:4]}…{token[-4:]}"
 
 
-class UserCreateSerializer(serializers.ModelSerializer):
+DELEGATED_SUB_ROLES = (CustomUser.SUB_ROLE_OPERATOR, CustomUser.SUB_ROLE_HEAD_OPERATOR)
+
+
+class TeamMemberFieldsMixin(serializers.Serializer):
+    """Position and Telegram identity for Admin Management writes.
+
+    A management user only ever manages its own delegated operators, so role
+    and owner are fixed server-side whatever the payload says. Telegram id and
+    username are unique because the bot resolves staff by them: a duplicate
+    would let one desk shadow another desk's operator.
+    """
+
+    owner_username = serializers.CharField(max_length=150, required=False, allow_blank=True, write_only=True)
+
+    def _others(self):
+        qs = CustomUser.objects.all()
+        if self.instance is not None:
+            qs = qs.exclude(pk=self.instance.pk)
+        return qs
+
+    def validate_telegram_id(self, value):
+        tid = (value or "").strip()
+        if tid and not tid.isdigit():
+            raise serializers.ValidationError("Telegram ID must contain digits only.")
+        if tid and self._others().filter(telegram_id=tid).exists():
+            raise serializers.ValidationError("Another user already has this Telegram ID.")
+        return tid
+
+    def validate_telegram_username(self, value):
+        uname = (value or "").strip().lstrip("@")
+        if uname and self._others().filter(telegram_username__iexact=uname).exists():
+            raise serializers.ValidationError("Another user already has this Telegram username.")
+        return uname
+
+    def validate(self, attrs):
+        actor = self.context["request"].user
+        owner_username = (attrs.pop("owner_username", "") or "").strip()
+        instance = self.instance
+
+        if is_team_manager(actor):
+            attrs.pop("role", None)
+            if instance is None:
+                attrs["role"] = CustomUser.ROLE_EMPLOYEE
+                attrs["owner"] = actor
+                attrs.setdefault("sub_role", CustomUser.SUB_ROLE_OPERATOR)
+            sub_role = attrs.get("sub_role", getattr(instance, "sub_role", None))
+            if sub_role not in DELEGATED_SUB_ROLES:
+                raise serializers.ValidationError({"sub_role": "Choose Operator or Head Operator."})
+            return attrs
+
+        if owner_username:
+            owner = CustomUser.objects.filter(username__iexact=owner_username).first()
+            if owner is None:
+                raise serializers.ValidationError({"owner_username": "No user with this username exists."})
+            attrs["owner"] = owner
+        sub_role = attrs.get("sub_role", getattr(instance, "sub_role", CustomUser.SUB_ROLE_ADMIN))
+        if sub_role in DELEGATED_SUB_ROLES:
+            role = attrs.get("role", getattr(instance, "role", CustomUser.ROLE_EMPLOYEE))
+            if role != CustomUser.ROLE_EMPLOYEE:
+                raise serializers.ValidationError({"role": "Operators must have the employee role."})
+            if attrs.get("owner", getattr(instance, "owner", None)) is None:
+                raise serializers.ValidationError(
+                    {"owner_username": "Owner username is required for operators."}
+                )
+        return attrs
+
+
+class UserCreateSerializer(TeamMemberFieldsMixin, serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
 
     class Meta:
         model = CustomUser
-        fields = ["username", "password", "full_name", "role", "is_active"]
+        fields = [
+            "username",
+            "password",
+            "full_name",
+            "role",
+            "is_active",
+            "sub_role",
+            "telegram_id",
+            "telegram_username",
+            "owner_username",
+        ]
 
     def create(self, validated_data):
         password = validated_data.pop("password")
@@ -158,12 +236,21 @@ class UserCreateSerializer(serializers.ModelSerializer):
         return user
 
 
-class UserUpdateSerializer(serializers.ModelSerializer):
+class UserUpdateSerializer(TeamMemberFieldsMixin, serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8, required=False)
 
     class Meta:
         model = CustomUser
-        fields = ["full_name", "role", "is_active", "password"]
+        fields = [
+            "full_name",
+            "role",
+            "is_active",
+            "password",
+            "sub_role",
+            "telegram_id",
+            "telegram_username",
+            "owner_username",
+        ]
 
     def update(self, instance, validated_data):
         password = validated_data.pop("password", None)

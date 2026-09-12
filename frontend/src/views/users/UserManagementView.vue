@@ -57,11 +57,20 @@
                 {{ roleLabel(u.role) }}
               </span>
               <span
+                v-if="isDelegated(u.sub_role)"
+                class="inline-block mt-1 ml-1 px-2 py-0.5 rounded text-xs font-medium bg-sky-500/20 text-sky-400"
+              >
+                {{ t(`programmerHub.${u.sub_role}`) }}
+              </span>
+              <span
                 v-if="!u.is_active"
                 class="inline-block ml-1 px-2 py-0.5 rounded text-xs bg-red-500/20 text-red-400"
               >
                 {{ t('userCenter.inactive') }}
               </span>
+              <p v-if="u.telegram_username" class="text-xs text-[var(--text-secondary)] truncate mt-1" dir="ltr">
+                <i class="fab fa-telegram-plane me-1"></i>@{{ u.telegram_username }}
+              </p>
             </div>
             <div class="flex flex-col gap-2 shrink-0">
               <button
@@ -212,7 +221,7 @@
           <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ t('userCenter.fullName') }}</label>
           <input v-model="userForm.full_name" type="text" class="input-luxury w-full" />
         </div>
-        <div>
+        <div v-if="isSuperAdmin">
           <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ t('userCenter.role') }}</label>
           <select v-model="userForm.role" class="input-luxury w-full" required>
             <option value="super_admin">{{ roleLabel('super_admin') }}</option>
@@ -220,6 +229,32 @@
             <option value="developer">{{ roleLabel('developer') }}</option>
             <option value="employee">{{ roleLabel('employee') }}</option>
           </select>
+        </div>
+        <div v-if="showPosition">
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ t('programmerHub.subRole') }}</label>
+          <select v-model="userForm.sub_role" class="input-luxury w-full" required>
+            <option v-for="r in subRoleOptions" :key="r" :value="r">{{ t(`programmerHub.${r}`) }}</option>
+          </select>
+        </div>
+        <div v-if="isSuperAdmin && showPosition && isDelegated(userForm.sub_role)">
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ t('programmerHub.ownerUsername') }}</label>
+          <input
+            v-model="userForm.owner_username"
+            type="text"
+            class="input-luxury w-full"
+            dir="ltr"
+            :required="!editingUser?.owner"
+            :placeholder="editingUser?.owner_username || ''"
+          />
+          <p class="text-xs text-[var(--text-secondary)] mt-1">{{ t('programmerHub.ownerUsernameHint') }}</p>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ t('programmerHub.telegramUsername') }}</label>
+          <input v-model="userForm.telegram_username" type="text" class="input-luxury w-full" dir="ltr" placeholder="@username" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-[var(--text-secondary)] mb-2">{{ t('programmerHub.telegramId') }}</label>
+          <input v-model="userForm.telegram_id" type="text" inputmode="numeric" pattern="[0-9]*" class="input-luxury w-full" dir="ltr" />
         </div>
         <div v-if="editingUser" class="flex items-center gap-2">
           <BaseCheckbox id="user-active" v-model="userForm.is_active">{{ t('userCenter.active') }}</BaseCheckbox>
@@ -239,9 +274,10 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useToast } from 'vue-toastification'
 import { authApi } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
 import { useI18n } from 'vue-i18n'
 import BaseCard from '@/components/ui/BaseCard.vue'
 import BaseCheckbox from '@/components/ui/BaseCheckbox.vue'
@@ -260,13 +296,32 @@ const userModalOpen = ref(false)
 const editingUser = ref(null)
 const saveUserLoading = ref(false)
 
+const auth = useAuthStore()
+// Owners (management) only manage their own bot operators; the server fixes
+// role and owner for them, so the form hides what they cannot choose.
+const isSuperAdmin = computed(() => auth.role === 'super_admin')
+const DELEGATED_SUB_ROLES = ['operator', 'head_operator']
+const subRoleOptions = computed(() =>
+  isSuperAdmin.value ? ['admin', ...DELEGATED_SUB_ROLES] : DELEGATED_SUB_ROLES
+)
+
 const userForm = reactive({
   username: '',
   password: '',
   full_name: '',
   role: 'employee',
   is_active: true,
+  sub_role: 'operator',
+  telegram_username: '',
+  telegram_id: '',
+  owner_username: '',
 })
+
+const showPosition = computed(() => !isSuperAdmin.value || userForm.role === 'employee')
+
+function isDelegated(subRole) {
+  return DELEGATED_SUB_ROLES.includes(subRole)
+}
 
 const activityFilters = reactive({
   action_type: '',
@@ -370,27 +425,40 @@ function openUserModal(user = null) {
   userForm.full_name = user?.full_name ?? ''
   userForm.role = user?.role ?? 'employee'
   userForm.is_active = user?.is_active ?? true
+  userForm.sub_role = user?.sub_role ?? subRoleOptions.value[0]
+  userForm.telegram_username = user?.telegram_username ?? ''
+  userForm.telegram_id = user?.telegram_id ?? ''
+  userForm.owner_username = ''
   userModalOpen.value = true
+}
+
+function teamFields() {
+  const fields = {
+    full_name: userForm.full_name,
+    sub_role: showPosition.value ? userForm.sub_role : 'admin',
+    telegram_username: userForm.telegram_username.trim().replace(/^@/, ''),
+    telegram_id: userForm.telegram_id.trim(),
+  }
+  if (isSuperAdmin.value) {
+    fields.role = userForm.role
+    if (userForm.owner_username.trim()) fields.owner_username = userForm.owner_username.trim()
+  }
+  return fields
 }
 
 async function saveUser() {
   saveUserLoading.value = true
   try {
     if (editingUser.value) {
-      const payload = {
-        full_name: userForm.full_name,
-        role: userForm.role,
-        is_active: userForm.is_active,
-      }
+      const payload = { ...teamFields(), is_active: userForm.is_active }
       if (userForm.password) payload.password = userForm.password
       await authApi.users.update(editingUser.value.id, payload)
       toast.success(t('userCenter.userUpdated'))
     } else {
       await authApi.users.create({
+        ...teamFields(),
         username: userForm.username,
         password: userForm.password,
-        full_name: userForm.full_name,
-        role: userForm.role,
         is_active: true,
       })
       toast.success(t('userCenter.userCreated'))

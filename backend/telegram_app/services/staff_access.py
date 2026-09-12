@@ -28,19 +28,29 @@ def resolve_staff_user(
 
     Matches staff roles (super_admin / management) first, then delegated
     sub-operators (employee role with a non-admin sub_role).
+
+    The numeric id wins. Admin Management records operators by username only,
+    so a user with no id yet is matched by username once and the id is bound
+    then; an account that already has an id can never be claimed by username.
     """
     tid = normalize_telegram_id(telegram_user_id)
-    q = Q(is_active=True)
     if tid:
-        q &= Q(telegram_id=tid)
-    else:
-        uname = (telegram_username or "").strip().lstrip("@")
-        if not uname:
-            return None
-        q &= Q(telegram_username__iexact=uname)
-    staff = (
-        User.objects.filter(q, role__in=STAFF_ROLES).order_by("id").first()
-    )
+        user = _first_staff(Q(telegram_id=tid))
+        if user is not None:
+            return user
+    uname = (telegram_username or "").strip().lstrip("@")
+    if not uname:
+        return None
+    user = _first_staff(Q(telegram_username__iexact=uname, telegram_id=""))
+    if user is not None and tid:
+        User.objects.filter(pk=user.pk, telegram_id="").update(telegram_id=tid)
+        user.telegram_id = tid
+    return user
+
+
+def _first_staff(match: Q) -> CustomUser | None:
+    q = Q(is_active=True) & match
+    staff = User.objects.filter(q, role__in=STAFF_ROLES).order_by("id").first()
     if staff is not None:
         return staff
     return (

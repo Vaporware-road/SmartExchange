@@ -9,7 +9,7 @@ from django.test import TestCase
 from rest_framework.test import APITestCase
 
 from accounts.models import CustomUser
-from accounts.plans import PLAN_GOLD
+from accounts.plans import PLAN_BRONZE, PLAN_GOLD
 from setting.models import SiteSettings
 from telegram_app.services.conversation import (
     CB_ALERT_CONFIRM,
@@ -658,6 +658,43 @@ class InBotAdminPanelTests(TestCase):
         self.assertIn("not registered", out["text"].lower())
         self.assertEqual(session.state, BotSession.State.START)
         _ = other  # created for telegram_id uniqueness
+
+    def _username_only_operator(self, uname="nameonly"):
+        operator = CustomUser.objects.create_user(
+            username=f"op_{uname}",
+            password=None,
+            role=CustomUser.ROLE_EMPLOYEE,
+            owner=self.owner,
+            sub_role=CustomUser.SUB_ROLE_OPERATOR,
+            telegram_username=uname,
+        )
+        CustomerProfile.objects.create(telegram_user_id=700100, username=uname)
+        return operator
+
+    def test_username_only_operator_opens_panel_and_binds_id(self):
+        operator = self._username_only_operator()
+        session = self.engine.get_or_create_session(700100)
+        out = self.engine.process_update(session, text="/admin")
+        self.assertIn("Admin panel", out["text"])
+        operator.refresh_from_db()
+        self.assertEqual(operator.telegram_id, "700100")
+
+    def test_username_cannot_claim_account_with_bound_id(self):
+        operator = self._username_only_operator()
+        operator.telegram_id = "123456"
+        operator.save(update_fields=["telegram_id"])
+        session = self.engine.get_or_create_session(700100)
+        out = self.engine.process_update(session, text="/admin")
+        self.assertIn("not registered", out["text"].lower())
+        operator.refresh_from_db()
+        self.assertEqual(operator.telegram_id, "123456")
+
+    def test_plan_gated_staff_told_about_plan(self):
+        self.owner.plan = PLAN_BRONZE
+        self.owner.save(update_fields=["plan"])
+        out = self.engine.process_update(self.admin_session, text="/admin")
+        self.assertIn("plan", out["text"].lower())
+        self.assertNotIn("not registered", out["text"].lower())
 
 
 class BotAdminAutoSyncTests(TestCase):

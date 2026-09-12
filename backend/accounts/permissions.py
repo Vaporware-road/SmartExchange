@@ -103,6 +103,26 @@ class IsSuperAdminOrManagement(permissions.BasePermission):
         return allowed
 
 
+def is_team_manager(user) -> bool:
+    """A management user: it manages the operators it owns, never other users."""
+    if not user or not getattr(user, "is_authenticated", False):
+        return False
+    if getattr(user, "is_superuser", False):
+        return False
+    return _normalize_role(getattr(user, "role", None)) == "management"
+
+
+class CanManageTeam(permissions.BasePermission):
+    """Super admins manage every user; management users manage their own operators.
+
+    This only admits the caller. Views must also narrow their queryset for
+    ``is_team_manager`` users, because users are not account-scoped rows.
+    """
+
+    def has_permission(self, request, view):
+        return IsSuperAdmin().has_permission(request, view) or is_team_manager(request.user)
+
+
 class IsSuperAdminOrManagementOrEmployee(permissions.BasePermission):
     """
     Allows access for users with role super_admin, management, or employee.

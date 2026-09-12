@@ -33,7 +33,13 @@ from .serializers import (
     UserActivityLogSerializer,
 )
 from .utils import get_client_ip, get_user_agent, log_activity
-from .permissions import IsSuperAdminOrManagement, IsSuperAdmin, IsProgrammer
+from .permissions import (
+    CanManageTeam,
+    IsProgrammer,
+    IsSuperAdmin,
+    IsSuperAdminOrManagement,
+    is_team_manager,
+)
 
 
 def _mask_bot_token(plain: str) -> str:
@@ -458,16 +464,31 @@ class MeAPIView(APIView):
         return Response(payload)
 
 
+def users_managed_by(user):
+    """Users the caller may see in Admin Management.
+
+    Users are not account-scoped rows, so a management user is narrowed to the
+    operators it owns here; everyone else admitted by the view sees all users.
+    """
+    qs = CustomUser.objects.all()
+    if is_team_manager(user):
+        return qs.filter(owner=user)
+    return qs
+
+
 class UserListCreateAPIView(ListCreateAPIView):
-    """GET: list users (programmers). POST: create user (super admin)."""
+    """GET: list users (programmers; management sees its own operators).
+    POST: create user (super admin; management creates its own operators)."""
 
     pagination_class = None
-    queryset = CustomUser.objects.all().order_by('-date_joined')
+
+    def get_queryset(self):
+        return users_managed_by(self.request.user).order_by('-date_joined')
 
     def get_permissions(self):
-        if self.request.method == "GET":
+        if self.request.method == "GET" and not is_team_manager(self.request.user):
             return [IsAuthenticated(), IsProgrammer()]
-        return [IsAuthenticated(), IsSuperAdmin()]
+        return [IsAuthenticated(), CanManageTeam()]
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -623,10 +644,12 @@ class ImpersonateAPIView(APIView):
 
 
 class UserDetailAPIView(RetrieveUpdateAPIView):
-    """GET/PATCH/PUT: retrieve or update user. Super Admin only."""
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
-    queryset = CustomUser.objects.all()
+    """GET/PATCH/PUT: retrieve or update user. Super Admin, or management for its own operators."""
+    permission_classes = [IsAuthenticated, CanManageTeam]
     serializer_class = UserSerializer
+
+    def get_queryset(self):
+        return users_managed_by(self.request.user)
 
     def get_serializer_class(self):
         if self.request.method in ('PUT', 'PATCH'):
@@ -635,12 +658,12 @@ class UserDetailAPIView(RetrieveUpdateAPIView):
 
 
 class ForceLogoutAPIView(APIView):
-    """POST: invalidate all tokens for a user. Super Admin only."""
-    permission_classes = [IsAuthenticated, IsSuperAdmin]
+    """POST: invalidate all tokens for a user. Super Admin, or management for its own operators."""
+    permission_classes = [IsAuthenticated, CanManageTeam]
 
     def post(self, request, pk):
         try:
-            user = CustomUser.objects.get(pk=pk)
+            user = users_managed_by(request.user).get(pk=pk)
         except CustomUser.DoesNotExist:
             return error_response(
                 "User not found.",
