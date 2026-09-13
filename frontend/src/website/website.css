@@ -1,0 +1,531 @@
+/*
+ * The customer website design system.
+ *
+ * Every rule is scoped to `.ws-root` and every value comes from a `--ws-*`
+ * custom property, which is what lets one theme dress ten layouts: a section
+ * component never names a colour, a radius or a font, so swapping the token set
+ * on the wrapper re-skins the whole page without touching a single component.
+ *
+ * Deliberately plain CSS rather than Tailwind — the token values arrive at
+ * runtime from the API, and Tailwind's scanner only ever sees build-time source.
+ */
+
+/* Everything inside the site sizes itself against this box rather than the
+   browser window, which is what makes the builder's phone and tablet previews
+   show the real layout instead of a shrunken desktop one. */
+/*
+ * Self-hosted, because this product sells to desks in markets where
+ * fonts.googleapis.com is slow or blocked outright. Vazirmatn is the fallback
+ * in every font pair, so hosting it here means Persian and Arabic text always
+ * renders in the right face even when the Google request never lands.
+ *
+ * Variable files: one request covers every weight the themes ask for.
+ */
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('/static/fonts/VazirmatnVF.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/static/fonts/InterVF.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+.ws-shell {
+  container: ws / inline-size;
+  width: 100%;
+}
+
+.ws-root {
+  color: var(--ws-text);
+  background: var(--ws-bg);
+  font-family: var(--ws-font-body);
+  font-size: 16px;
+  line-height: 1.65;
+  position: relative;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+}
+
+.ws-root *,
+.ws-root *::before,
+.ws-root *::after {
+  box-sizing: border-box;
+}
+
+.ws-root img {
+  max-width: 100%;
+  display: block;
+}
+
+.ws-root a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* ---------------------------------------------------------------- rhythm */
+
+.ws-container {
+  width: 100%;
+  max-width: var(--ws-container);
+  margin-inline: auto;
+  padding-inline: 24px;
+}
+
+.ws-section {
+  padding-block: var(--ws-section-gap);
+  position: relative;
+}
+
+.ws-section--tight {
+  padding-block: calc(var(--ws-section-gap) * 0.55);
+}
+
+.ws-section--alt {
+  background: var(--ws-bg-alt);
+}
+
+.ws-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ws-block-gap);
+}
+
+/* ------------------------------------------------------------ typography */
+
+.ws-root h1,
+.ws-root h2,
+.ws-root h3,
+.ws-root h4 {
+  font-family: var(--ws-font-heading);
+  font-weight: var(--ws-heading-weight);
+  letter-spacing: var(--ws-heading-tracking);
+  color: var(--ws-heading);
+  line-height: 1.15;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.ws-display {
+  font-size: clamp(2.25rem, 1.3rem + 3.9cqi, 4.25rem);
+}
+
+.ws-h2 {
+  font-size: clamp(1.7rem, 1.15rem + 2.1cqi, 2.75rem);
+}
+
+.ws-h3 {
+  font-size: clamp(1.15rem, 1rem + 0.7cqi, 1.45rem);
+}
+
+.ws-eyebrow {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ws-primary);
+}
+
+.ws-lead {
+  font-size: clamp(1.02rem, 0.97rem + 0.32cqi, 1.2rem);
+  color: var(--ws-text-muted);
+  margin: 0;
+  max-width: 62ch;
+  text-wrap: pretty;
+}
+
+.ws-muted {
+  color: var(--ws-text-muted);
+}
+
+.ws-body {
+  margin: 0;
+  color: var(--ws-text-muted);
+  white-space: pre-line;
+}
+
+.ws-head {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: calc(var(--ws-block-gap) * 1.5);
+}
+
+.ws-head--center {
+  align-items: center;
+  text-align: center;
+}
+
+.ws-head--center .ws-lead {
+  margin-inline: auto;
+}
+
+/* --------------------------------------------------------------- buttons */
+
+.ws-btn {
+  --_bg: var(--ws-primary);
+  --_fg: var(--ws-on-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  padding: 0.85em 1.7em;
+  border-radius: var(--ws-btn-radius);
+  border: 1px solid transparent;
+  background: var(--_bg);
+  color: var(--_fg);
+  font-family: inherit;
+  font-size: 0.97rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease,
+    border-color 0.18s ease, color 0.18s ease;
+  white-space: nowrap;
+}
+
+.ws-btn:hover {
+  transform: translateY(-2px);
+  background: var(--ws-primary-hover);
+  box-shadow: var(--ws-glow);
+}
+
+.ws-btn--ghost {
+  --_bg: transparent;
+  --_fg: var(--ws-heading);
+  border-color: var(--ws-border-strong);
+}
+
+.ws-btn--ghost:hover {
+  background: transparent;
+  border-color: var(--ws-primary);
+  color: var(--ws-primary);
+  box-shadow: none;
+}
+
+/* Button personality, chosen per site and applied to every button at once. */
+[data-ws-button='outline'] .ws-btn:not(.ws-btn--ghost) {
+  background: transparent;
+  color: var(--ws-primary);
+  border-color: var(--ws-primary);
+}
+
+[data-ws-button='outline'] .ws-btn:not(.ws-btn--ghost):hover {
+  background: var(--ws-primary);
+  color: var(--ws-on-primary);
+}
+
+[data-ws-button='soft'] .ws-btn:not(.ws-btn--ghost) {
+  background: color-mix(in srgb, var(--ws-primary) 16%, transparent);
+  color: var(--ws-primary);
+}
+
+[data-ws-button='soft'] .ws-btn:not(.ws-btn--ghost):hover {
+  background: color-mix(in srgb, var(--ws-primary) 28%, transparent);
+}
+
+[data-ws-button='sharp'] .ws-btn {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+}
+
+/* ----------------------------------------------------------------- cards */
+
+.ws-card {
+  background: var(--ws-surface);
+  border: 1px solid var(--ws-border);
+  border-radius: var(--ws-radius);
+  padding: calc(var(--ws-block-gap) * 0.9);
+  position: relative;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.ws-card--hover:hover {
+  transform: translateY(-4px);
+  border-color: var(--ws-primary);
+  box-shadow: var(--ws-shadow-lg);
+}
+
+[data-ws-card='elevated'] .ws-card {
+  border-color: transparent;
+  box-shadow: var(--ws-shadow);
+}
+
+[data-ws-card='glass'] .ws-card {
+  background: color-mix(in srgb, var(--ws-surface) 62%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+[data-ws-card='outline'] .ws-card {
+  background: transparent;
+  border-color: var(--ws-border-strong);
+}
+
+[data-ws-card='gradient'] .ws-card {
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--ws-primary) 12%, var(--ws-surface)),
+    var(--ws-surface) 62%
+  );
+  border-color: transparent;
+  box-shadow: var(--ws-shadow);
+}
+
+/* ------------------------------------------------------------ background */
+
+.ws-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ws-bg + * {
+  position: relative;
+  z-index: 1;
+}
+
+[data-ws-background='plain'] .ws-bg {
+  display: none;
+}
+
+[data-ws-background='grid'] .ws-bg {
+  background-image: linear-gradient(var(--ws-border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ws-border) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 35%, transparent 78%);
+}
+
+[data-ws-background='mesh'] .ws-bg {
+  background:
+    radial-gradient(38rem 26rem at 12% -6%, color-mix(in srgb, var(--ws-primary) 26%, transparent), transparent 65%),
+    radial-gradient(32rem 24rem at 92% 8%, color-mix(in srgb, var(--ws-accent) 24%, transparent), transparent 62%);
+}
+
+[data-ws-background='gradient'] .ws-bg {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--ws-primary) 13%, transparent),
+    transparent 46%
+  );
+}
+
+[data-ws-background='noise'] .ws-bg {
+  background-image: radial-gradient(
+    color-mix(in srgb, var(--ws-text) 16%, transparent) 0.5px,
+    transparent 0.5px
+  );
+  background-size: 4px 4px;
+  opacity: 0.5;
+}
+
+[data-ws-background='aurora'] .ws-bg {
+  background:
+    radial-gradient(44rem 30rem at 8% -12%, color-mix(in srgb, var(--ws-primary) 40%, transparent), transparent 60%),
+    radial-gradient(36rem 26rem at 88% 4%, color-mix(in srgb, var(--ws-accent) 34%, transparent), transparent 58%),
+    radial-gradient(30rem 22rem at 50% 108%, color-mix(in srgb, var(--ws-primary) 22%, transparent), transparent 60%);
+  filter: blur(6px);
+}
+
+/* ------------------------------------------------------------ primitives */
+
+.ws-grid {
+  display: grid;
+  gap: var(--ws-block-gap);
+  grid-template-columns: repeat(var(--ws-cols, 3), minmax(0, 1fr));
+}
+
+.ws-split {
+  display: grid;
+  gap: calc(var(--ws-block-gap) * 1.6);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+}
+
+.ws-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ws-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.42em 0.95em;
+  border-radius: 999px;
+  border: 1px solid var(--ws-border);
+  background: color-mix(in srgb, var(--ws-surface) 70%, transparent);
+  font-size: 0.85rem;
+  color: var(--ws-text-muted);
+}
+
+.ws-media {
+  border-radius: var(--ws-radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--ws-border);
+  background: var(--ws-surface-alt);
+}
+
+.ws-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ws-media--ratio {
+  aspect-ratio: 4 / 3;
+}
+
+.ws-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--ws-radius-sm);
+  background: color-mix(in srgb, var(--ws-primary) 14%, transparent);
+  color: var(--ws-primary);
+  font-size: 1.15rem;
+  flex: none;
+}
+
+.ws-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  font-family: var(--ws-font-heading);
+  font-weight: var(--ws-heading-weight);
+  font-size: 1.12rem;
+  color: var(--ws-heading);
+}
+
+.ws-logo img {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+.ws-divider {
+  height: 1px;
+  background: var(--ws-border);
+  border: 0;
+  margin: 0;
+}
+
+/* ----------------------------------------------------------- price marks */
+
+.ws-up {
+  color: var(--ws-buy);
+}
+
+.ws-down {
+  color: var(--ws-sell);
+}
+
+.ws-num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+/* ------------------------------------------------------------ responsive */
+
+@container ws (max-width: 1024px) {
+  .ws-grid {
+    grid-template-columns: repeat(min(var(--ws-cols, 3), 2), minmax(0, 1fr));
+  }
+}
+
+@container ws (max-width: 760px) {
+  .ws-root {
+    font-size: 15px;
+  }
+
+  .ws-container {
+    padding-inline: 18px;
+  }
+
+  .ws-section {
+    padding-block: calc(var(--ws-section-gap) * 0.62);
+  }
+
+  .ws-grid,
+  .ws-split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ws-root *,
+  .ws-root *::before,
+  .ws-root *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ------------------------------------------------------------ navigation */
+
+.ws-nav {
+  position: relative;
+  z-index: 20;
+  background: color-mix(in srgb, var(--ws-bg) 88%, transparent);
+  border-bottom: 1px solid var(--ws-border);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.ws-nav--sticky {
+  position: sticky;
+  top: 0;
+}
+
+.ws-nav--floating {
+  position: sticky;
+  top: 16px;
+  width: min(var(--ws-container), calc(100% - 32px));
+  margin-inline: auto;
+  margin-block-start: 16px;
+  border: 1px solid var(--ws-border);
+  border-radius: 999px;
+  box-shadow: var(--ws-shadow);
+}
+
+.ws-nav--floating .ws-container {
+  padding-inline: 22px;
+}
+
+@container ws (max-width: 860px) {
+  .ws-nav--floating {
+    border-radius: var(--ws-radius);
+  }
+}
+
+/* ---------------------------------------------------------------- footer */
+
+.ws-footer {
+  background: var(--ws-bg-alt);
+  border-top: 1px solid var(--ws-border);
+}
+
+.ws-footer__disclaimer {
+  color: var(--ws-text-muted);
+  font-size: 0.78rem;
+  white-space: pre-line;
+  margin: 0;
+  max-width: 70ch;
+}
+
+.ws-footer--rich {
+  background: var(--ws-surface);
+}

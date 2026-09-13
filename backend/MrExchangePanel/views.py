@@ -96,6 +96,29 @@ def spa_not_built_response():
     )
 
 
+def spa_with_head(seo_head):
+    """The built SPA shell with its generic ``<title>`` swapped for ``seo_head``.
+
+    Only the crawler-facing metadata is rendered server-side: the SPA fills
+    ``<head>`` after hydration, which is too late for a bot that never runs the
+    bundle. Used by the marketing landing page and by every customer website.
+    """
+    index_path = spa_index_path()
+    if index_path is None:
+        return spa_not_built_response()
+
+    shell = index_path.read_text()
+    # Drop the shell's generic <title> first: browsers and crawlers honour the
+    # first <title> in the document, so leaving it would shadow ours.
+    html = shell.replace("<title>MrExchange</title>", "", 1)
+    # The shell always carries a </head>; str.replace is a no-op if it ever does not.
+    html = html.replace("</head>", f"{seo_head}\n</head>", 1)
+
+    response = HttpResponse(html, content_type="text/html")
+    response["Cache-Control"] = "no-store, no-cache, must-revalidate"
+    return response
+
+
 class SPAView(View):
     """
     Serve the Vue SPA index.html for client-side routing.

@@ -36,10 +36,15 @@ def _currency_mini(c):
     return {"code": c.code, "name": c.name, "symbol": c.symbol or ""}
 
 
-def build_prices_public_snapshot():
+def build_prices_public_snapshot(finalized_only=False):
     """
     Return a JSON-serializable dict: categories with price types and latest history,
     plus special price types with per-pair latest history.
+
+    ``finalized_only=True`` reports only prices that went through the finalize
+    pipeline. The public website uses it so a rate reaches visitors when a
+    manager finalizes it and not a keystroke earlier; the existing price feed
+    and webhook keep the default and are unchanged.
     """
     now = timezone.now()
     categories = (
@@ -51,7 +56,7 @@ def build_prices_public_snapshot():
                 queryset=(
                     PriceType.objects.select_related("source_currency", "target_currency")
                     .order_by("order", "id")
-                    .prefetch_related(prefetch_price_histories_latest())
+                    .prefetch_related(prefetch_price_histories_latest(finalized_only))
                 ),
             )
         )
@@ -91,6 +96,8 @@ def build_prices_public_snapshot():
         )
 
     pair_histories_qs = SpecialPriceHistory.objects.defer("event_at").order_by("-created_at")
+    if finalized_only:
+        pair_histories_qs = pair_histories_qs.filter(finalizations__isnull=False).distinct()
     special_types = (
         SpecialPriceType.objects.all()
         .order_by("name")

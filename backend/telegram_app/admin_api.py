@@ -12,7 +12,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from accounts.permissions import IsSuperAdminOrManagement
 from core.exceptions import error_response
 
 from .models import (
@@ -55,7 +54,7 @@ def _bot_summary(bot, telegram_me=None):
 class VerifyBotAPIView(APIView):
     """POST /api/telegram/admin/verify-bot/ — getMe gate for hub unlock."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         bot_id = request.data.get("bot_id")
@@ -115,7 +114,7 @@ class VerifyBotAPIView(APIView):
 class DashboardAPIView(APIView):
     """GET /api/telegram/admin/dashboard/?bot_id= — scoped hub aggregates."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         bot_id = request.query_params.get("bot_id")
@@ -147,7 +146,7 @@ class DashboardAPIView(APIView):
 class ChannelMemberSnapshotsAPIView(APIView):
     """GET /api/telegram/admin/snapshots/channel-members/?bot_id=&months="""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         bot_id = request.query_params.get("bot_id")
@@ -196,7 +195,7 @@ class ReengageSerializer(drf_serializers.Serializer):
 class ReengageAPIView(APIView):
     """POST /api/telegram/admin/reengage/ — one-shot audience DM send."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         serializer = ReengageSerializer(data=request.data)
@@ -252,7 +251,7 @@ class ReengageCampaignSerializer(drf_serializers.ModelSerializer):
 
 
 class ReengageCampaignListCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         bot_id = request.query_params.get("bot_id")
@@ -283,7 +282,7 @@ class ReengageCampaignListCreateAPIView(APIView):
 
 
 class ReengageCampaignDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
 
     def _get_campaign(self, request, pk):
         try:
@@ -337,7 +336,7 @@ class ReengageOfferSerializer(drf_serializers.ModelSerializer):
 
 
 class ReengageOfferListCreateAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         bot_id = request.query_params.get("bot_id")
@@ -367,7 +366,7 @@ class ReengageOfferListCreateAPIView(APIView):
 
 
 class ReengageOfferDetailAPIView(APIView):
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
 
     def _get_offer(self, request, pk):
         try:

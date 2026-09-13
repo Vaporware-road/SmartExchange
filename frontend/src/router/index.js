@@ -50,6 +50,20 @@ const routes = [
     meta: { public: true, titleKey: 'routes.webappOrder' },
   },
   {
+    // A customer's own published website. Public and chrome-free: the visitor
+    // is the desk's customer, not a panel user, and never sees panel furniture.
+    path: '/site',
+    name: 'public-site',
+    component: () => import('@/views/website/PublicSiteView.vue'),
+    meta: { public: true },
+  },
+  {
+    path: '/site/:slug',
+    name: 'public-site-slug',
+    component: () => import('@/views/website/PublicSiteView.vue'),
+    meta: { public: true },
+  },
+  {
     path: '/signup',
     name: 'signup',
     component: () => import('@/views/auth/SignupView.vue'),
@@ -313,6 +327,12 @@ const routes = [
         meta: { titleKey: 'routes.orders' },
       },
       {
+        path: '/website',
+        name: 'website',
+        component: () => import('@/views/website/WebsiteBuilderView.vue'),
+        meta: { titleKey: 'routes.website' },
+      },
+      {
         path: '/settings',
         name: 'settings',
         component: () => import('@/views/settings/SettingsView.vue'),
@@ -435,6 +455,8 @@ router.beforeEach(async (to, from, next) => {
     if (path.startsWith('/finalize') && !auth.can('finalize')) {
       next({ name: 'error-403' })
     } else if (path.startsWith('/orders') && !auth.can('orders')) {
+      next({ name: 'error-403' })
+    } else if (path.startsWith('/website') && !auth.can('website')) {
       next({ name: 'error-403' })
     } else if ((path === '/settings' || path.startsWith('/settings/')) && !auth.can('settings')) {
       next({ name: 'error-403' })

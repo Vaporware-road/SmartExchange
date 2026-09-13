@@ -228,13 +228,27 @@ export function extractApiErrorDetails(data) {
   return { message, code, fieldErrors }
 }
 
+// Codes whose server message is a fixed English sentence rather than
+// request-specific detail, so the locale's copy is always the better text.
+const TRANSLATED_FIRST_CODES = new Set([
+  'permission_denied',
+  'authentication_failed',
+  'no_bot',
+  'bot_not_found',
+  'bot_forbidden',
+  'invalid_bot_id',
+  'no_token',
+  'get_me_failed',
+  'telegram_unreachable',
+])
+
 export function resolveApiErrorMessage({ data, status } = {}) {
   const { message, code } = extractApiErrorDetails(data)
   const trimmed = typeof message === 'string' ? message.trim() : ''
   // A bare permission failure carries DRF's own English sentence as its message,
   // which is the one piece of untranslated UI an ordinary customer runs into.
   // Views that mean something specific by a 403 send their own code and keep it.
-  if (code === 'permission_denied' || code === 'authentication_failed') {
+  if (TRANSLATED_FIRST_CODES.has(code)) {
     const byAuthCode = translateApiErrorCode(code)
     if (byAuthCode) return byAuthCode
   }
@@ -559,6 +573,25 @@ export const templateEditorApi = {
     api.delete(`/template-editor/fonts/${encodeURIComponent(filename)}/`),
   priceBindingsPreview: (params = {}) => api.get('/template-editor/price-bindings-preview/', { params }),
   categoryPriceTypes: (params = {}) => api.get('/template-editor/category-price-types/', { params }),
+}
+
+export const websiteApi = {
+  site: () => api.get('/website/site/'),
+  updateSite: (data) => api.patch('/website/site/', data),
+  applyLayout: (layoutSlug) => api.post('/website/layout/', { layout_slug: layoutSlug }),
+  sections: () => api.get('/website/sections/'),
+  addSection: (data) => api.post('/website/sections/', data),
+  updateSection: (id, data) => api.patch(`/website/sections/${id}/`, data),
+  deleteSection: (id) => api.delete(`/website/sections/${id}/`),
+  reorderSections: (order) => api.post('/website/sections/reorder/', { order }),
+  assets: () => api.get('/website/assets/'),
+  uploadAsset: (formData) => api.post('/website/assets/', formData),
+  deleteAsset: (id) => api.delete(`/website/assets/${id}/`),
+  preview: () => api.get('/website/preview/'),
+  publish: (note = '') => api.post('/website/publish/', { note }),
+  unpublish: () => api.post('/website/unpublish/'),
+  publications: () => api.get('/website/publications/'),
+  restore: (version) => api.post(`/website/publications/${version}/restore/`),
 }
 
 export default api

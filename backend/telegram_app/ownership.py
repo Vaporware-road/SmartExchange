@@ -38,51 +38,39 @@ def primary_owned_bot(user):
 
 def bots_queryset_for_user(user):
     """
-    Scope bot lists for hub APIs.
+    Bots the user may work with on the Telegram page.
 
-    - super_admin: all bots (global view)
-    - management: owned bots only
-    - others (employee): all bots (operational messenger/channels)
+    Every signed-in panel user reaches every bot of their own desk, with no role
+    or ownership gate on top: the account-scoped manager is the boundary, and it
+    fails closed (super_admin runs unscoped and sees all).
     """
-    if user_is_super_admin(user):
-        return TelegramBot.objects.all()
-    if user_is_management(user):
-        return owned_bots_qs(user)
     return TelegramBot.objects.all()
 
 
 def resolve_bot_for_user(user, bot_id=None):
     """
-    Resolve a TelegramBot the user may administer.
+    Resolve the TelegramBot a hub request works on: the one asked for, else the
+    user's own bot, else the desk's newest bot.
 
     Returns (bot, error_code, error_message).
     error_code is None on success.
     """
+    bots = bots_queryset_for_user(user)
     if bot_id is not None:
         try:
             bot_id = int(bot_id)
         except (TypeError, ValueError):
             return None, "invalid_bot_id", "Invalid bot_id."
-        try:
-            bot = TelegramBot.objects.get(pk=bot_id)
-        except TelegramBot.DoesNotExist:
+        bot = bots.filter(pk=bot_id).first()
+        if bot is None:
             return None, "bot_not_found", "Bot not found."
-        if user_is_super_admin(user):
-            return bot, None, None
-        if bot.owner_id == getattr(user, "id", None):
-            return bot, None, None
-        return None, "bot_forbidden", "You do not own this bot."
-
-    bot = primary_owned_bot(user)
-    if bot is not None:
         return bot, None, None
 
-    if user_is_super_admin(user):
-        bot = (
-            TelegramBot.objects.filter(is_active=True).order_by("-created_at").first()
-            or TelegramBot.objects.order_by("-created_at").first()
-        )
-        if bot is not None:
-            return bot, None, None
-
+    bot = (
+        primary_owned_bot(user)
+        or bots.filter(is_active=True).order_by("-created_at").first()
+        or bots.order_by("-created_at").first()
+    )
+    if bot is not None:
+        return bot, None, None
     return None, "no_bot", "No bot token configured for this account."

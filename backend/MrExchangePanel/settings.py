@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'fleet',
     'bot_gateway',
     'orders',
+    'website',
     # third-party apps
     'corsheaders',
     'rest_framework',
@@ -98,6 +99,7 @@ REST_FRAMEWORK = {
         'finalize': '60/hour',
         'settings': '200/hour',
         'public_prices': '2000/hour',
+        'public_site': '1000/hour',
         # One heartbeat a day per install; the headroom absorbs restarts and
         # retries without letting an unknown key hammer the endpoint.
         'fleet_checkin': '60/hour',

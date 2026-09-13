@@ -50,16 +50,18 @@ export const PERMISSIONS = {
   finalize: SUPER_ADMIN_OR_MANAGEMENT,
   /** تنظیمات پنل (برندینگ، آپلود، فونت، وبهوک) — IsSuperAdminOrManagement */
   settings: SUPER_ADMIN_OR_MANAGEMENT,
+  /** سایت و صفحهٔ فرود صرافی — IsSuperAdminOrManagement */
+  website: SUPER_ADMIN_OR_MANAGEMENT,
   /** بخش‌های سراسری تنظیمات (ربات، کانال، لاگ‌ها) — IsSuperAdmin */
   settingsAdmin: SUPER_ADMIN_ONLY,
-  /** ربات و کانال تلگرام — IsSuperAdminOrManagementOrEmployee */
-  telegram: SUPER_ADMIN_OR_MANAGEMENT_OR_EMPLOYEE,
+  /** صفحهٔ تلگرام — IsAuthenticated (همه؛ داده به حساب خود کاربر محدود است) */
+  telegram: ALL_PANEL_ROLES,
   /** صف سفارش‌های واتس‌اپ و مینی‌اپ — IsSuperAdminOrManagementOrEmployee */
   orders: SUPER_ADMIN_OR_MANAGEMENT_OR_EMPLOYEE,
   /** حذف آیتم‌ها (دسته‌بندی، قالب و غیره) — IsSuperAdminOrManagement */
   deleteItems: SUPER_ADMIN_OR_MANAGEMENT,
-  /** مدیریت کاربران / ادمین‌ها (اضافه، ویرایش، حذف، لاگ فعالیت) — IsSuperAdmin */
-  adminManagement: SUPER_ADMIN_ONLY,
+  /** مدیریت ادمین‌ها — CanManageTeam (مدیریت فقط اپراتورهای خودش را می‌بیند) */
+  adminManagement: SUPER_ADMIN_OR_MANAGEMENT,
   programmerHub: [ROLES.DEVELOPER, ROLES.SUPER_ADMIN],
 }
 

@@ -30,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('favicon.ico', views.favicon_view, name='favicon'),
     path("api/", include("MrExchangePanel.api_urls")),
+    path('', include('website.urls', namespace='website')),
     path('', include('landing.urls', namespace='landing')),
     path('landingpage/', RedirectView.as_view(pattern_name='landing:home', permanent=True)),
     path('landing/', RedirectView.as_view(pattern_name='landing:home', permanent=True)),

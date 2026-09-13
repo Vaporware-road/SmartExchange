@@ -19,7 +19,8 @@
     "plans": "الخطط والقوالب",
     "fleet": "الأسطول",
     "orders": "قائمة انتظار الطلبات",
-    "ownerConsole": "لوحة تحكم المالك"
+    "ownerConsole": "لوحة تحكم المالك",
+    "website": "الموقع"
   },
   "common": {
     "save": "حفظ",
@@ -218,7 +219,8 @@
     "userCenter": "إدارة المشرفين",
     "orders": "قائمة انتظار الطلبات",
     "webappOrder": "إرسال طلب",
-    "programmerConsole": "لوحة تحكم المالك"
+    "programmerConsole": "لوحة تحكم المالك",
+    "website": "الموقع"
   },
   "instagramHub": {
     "description": "أنشئ صور منشورات وقصص من أسعارك النهائية. اختر نمطًا وفئات، ثم عاين قبل النشر على إنستغرام.",
@@ -970,7 +972,8 @@
         "channelViews": "مشاهدات القناة",
         "channelViewsStub": "بيانات المشاهدات متاحة بعد ربط التحليلات",
         "dailyUsage": "الاستخدام اليومي",
-        "publishActivity": "نشاط النشر"
+        "publishActivity": "نشاط النشر",
+        "noAdmin": "البوت ليس مشرفًا"
       },
       "botSettings": {
         "title": "إعدادات البوت",
@@ -1016,7 +1019,8 @@
         "newMembers": "أعضاء جدد",
         "holdOk": "تم تعليق الطلب ({ttl} دقيقة)",
         "loadError": "تعذر تحميل طلبات الصرف",
-        "stateUpdated": "تم تحديث الحالة"
+        "stateUpdated": "تم تحديث الحالة",
+        "growthSplit": "القناة {channel} · البوت {bot}"
       },
       "notifications": {
         "title": "الإشعارات",
@@ -1245,7 +1249,14 @@
       "template_orientation_invalid": "اتجاه القالب غير صالح.",
       "template_publish_order_invalid": "ترتيب النشر يجب أن يكون رقماً غير سالب.",
       "template_telegram_buttons_invalid": "أزرار تليجرام يجب أن تكون مصفوفة.",
-      "template_widget_sync_failed": "فشلت مزامنة ودجات القالب."
+      "template_widget_sync_failed": "فشلت مزامنة ودجات القالب.",
+      "no_bot": "لم يتم ربط أي بوت تيليجرام بهذا الحساب بعد. أضف بوتًا لاستخدام مركز تيليجرام.",
+      "bot_not_found": "لم يتم العثور على هذا البوت.",
+      "bot_forbidden": "هذا البوت يتبع حسابًا آخر.",
+      "invalid_bot_id": "اختيار البوت غير صالح.",
+      "no_token": "هذا البوت ليس لديه رمز. افتح إعدادات البوت والصق رمز BotFather.",
+      "get_me_failed": "رفض تيليجرام رمز هذا البوت. تحقق من الرمز في إعدادات البوت.",
+      "telegram_unreachable": "تعذر الوصول إلى تيليجرام. تحقق من اتصال الخادم بالإنترنت وحاول مرة أخرى."
     },
     "fallback": {
       "badRequest": "تعذر معالجة الطلب.",
@@ -2094,5 +2105,349 @@
     "updateSuccess": "تم تحديث نوع السعر بنجاح",
     "saveError": "تعذّر حفظ نوع السعر",
     "loadPriceTypeError": "تعذّر تحميل نوع السعر"
+  },
+  "website": {
+    "builder": {
+      "title": "موقعك الإلكتروني",
+      "subtitle": "اختر تصميمًا، واكتب نصوصك، ثم انشر. محتواك يبقى معك.",
+      "steps": "خطوات الإنشاء",
+      "step": {
+        "design": "التصميم",
+        "theme": "السمة",
+        "branding": "الهوية",
+        "sections": "الأقسام",
+        "content": "المحتوى",
+        "prices": "لوحة الأسعار",
+        "publish": "النشر"
+      },
+      "hint": {
+        "design": "عشرة تخطيطات للاختيار",
+        "theme": "الألوان والخطوط والأشكال",
+        "branding": "الشعار والاسم واللغات",
+        "sections": "الترتيب وتفعيل الأقسام",
+        "content": "كتابة النصوص",
+        "prices": "أي الأسعار تُعرض",
+        "publish": "النشر وإدارة الإصدارات"
+      },
+      "device": {
+        "desktop": "سطح المكتب",
+        "tablet": "جهاز لوحي",
+        "mobile": "الهاتف"
+      },
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم حفظ كل التغييرات",
+      "designNote": "تغيير التصميم يحتفظ بكل ما كتبته. الترتيب وحده هو ما يتغير.",
+      "sectionsNote": "اسحب لإعادة الترتيب. القسم الذي لا يدعمه التصميم الحالي يُوقَف ولا يُحذف.",
+      "pricesNote": "تظهر الأسعار على موقعك لحظة اعتمادها من المدير، ولا يُنشر شيء قبل ذلك.",
+      "inheritPanel": "استخدام الهوية من الإعدادات",
+      "inheritPanelNote": "عند التفعيل، يؤخذ الشعار والهاتف والعنوان من صفحة الإعدادات. وما تكتبه هنا له الأولوية.",
+      "themeTitle": "سمة الألوان",
+      "style": {
+        "button": "الأزرار",
+        "card": "البطاقات",
+        "background": "الخلفية",
+        "corner": "الزوايا",
+        "density": "المسافات",
+        "font_pair": "الخطوط",
+        "brand_color": "لون العلامة"
+      },
+      "useThemeColor": "استخدام لون السمة",
+      "languages": "اللغات",
+      "languagesNote": "بإضافة لغة يحصل كل حقل نصي على تبويب لها. يمكن للزائر التبديل، وما لم يُترجَم يُعرض بلغتك الأساسية.",
+      "primaryLanguage": "اللغة الأساسية",
+      "addSection": "إضافة قسم",
+      "addItem": "إضافة عنصر",
+      "item": "عنصر",
+      "layoutDefault": "افتراضي التصميم ({name})",
+      "notInLayout": "لا مكان لهذا القسم في هذا التصميم",
+      "editingSection": "قيد التحرير",
+      "noSectionSelected": "اختر قسمًا لتحريره.",
+      "noRatesSection": "لا توجد لوحة أسعار في هذا التصميم بعد.",
+      "addRates": "إضافة لوحة الأسعار",
+      "boardStyle": "شكل اللوحة",
+      "chooseImage": "اختيار صورة",
+      "imageLibrary": "الصور",
+      "upload": "رفع",
+      "uploadFailed": "تعذّر رفع هذه الصورة.",
+      "noImages": "لا صور بعد. ارفع صورة للبدء.",
+      "iconPlaceholder": "مثال: coins",
+      "allSelected": "عرض الكل",
+      "someSelected": "عرض {n} فئة مختارة",
+      "noCategories": "لا توجد فئات بعد. أضف واحدة من قسم الأسعار أولًا.",
+      "live": "منشور",
+      "draft": "غير منشور بعد",
+      "pendingChanges": "لديك تغييرات لم تُنشر بعد.",
+      "publish": "نشر",
+      "republish": "نشر التغييرات",
+      "unpublish": "إيقاف النشر",
+      "viewSite": "فتح الموقع",
+      "seo": "البحث والمشاركة",
+      "history": "الإصدارات المنشورة",
+      "restore": "استعادة"
+    },
+    "fields": {
+      "about": "نص التعريف",
+      "address": "العنوان",
+      "answer": "الإجابة",
+      "author": "الاسم",
+      "avatar": "الصورة",
+      "badges": "الشارات",
+      "body": "النص",
+      "caption": "تعليق الصورة",
+      "category_ids": "الفئات",
+      "columns": "الأعمدة",
+      "copyright": "سطر حقوق النشر",
+      "cta_href": "رابط الزر",
+      "cta_label": "نص الزر",
+      "decimals": "عدد الخانات العشرية",
+      "disclaimer": "ملاحظة قانونية",
+      "email": "البريد الإلكتروني",
+      "eyebrow": "عنوان تمهيدي",
+      "hours": "ساعات العمل",
+      "href": "الرابط",
+      "icon": "الأيقونة",
+      "image": "الصورة",
+      "image_alt": "وصف الصورة",
+      "inherit_panel_contact": "استخدام بيانات التواصل من الإعدادات",
+      "items": "العناصر",
+      "label": "التسمية",
+      "links": "الروابط",
+      "map_embed_url": "رابط الخريطة",
+      "nav_links": "روابط القائمة",
+      "note": "ملاحظة",
+      "phone": "الهاتف",
+      "phone_2": "هاتف ثانٍ",
+      "points": "النقاط",
+      "price_type_ids": "أنواع الأسعار",
+      "primary_cta_href": "رابط الزر الرئيسي",
+      "primary_cta_label": "نص الزر الرئيسي",
+      "question": "السؤال",
+      "quote": "الاقتباس",
+      "rating": "التقييم",
+      "refresh_seconds": "التحديث كل (ثانية)",
+      "role": "الصفة",
+      "secondary_cta_href": "رابط الزر الثاني",
+      "secondary_cta_label": "نص الزر الثاني",
+      "show_buy_sell": "إظهار الشراء والبيع",
+      "show_currency_icons": "إظهار أيقونات العملات",
+      "show_form": "إظهار نموذج الرسالة",
+      "show_language": "إظهار مبدّل اللغة",
+      "show_logo": "إظهار الشعار",
+      "show_socials": "إظهار روابط التواصل",
+      "show_updated_at": "إظهار وقت التحديث",
+      "source": "الأسعار المعروضة",
+      "sticky": "تثبيت في الأعلى",
+      "subtitle": "العنوان الفرعي",
+      "suffix": "لاحقة",
+      "text": "النص",
+      "title": "العنوان",
+      "value": "القيمة",
+      "business_name": "اسم النشاط",
+      "tagline": "الشعار النصي",
+      "logo": "الشعار",
+      "favicon": "أيقونة الموقع",
+      "seo_title": "عنوان الصفحة",
+      "seo_description": "وصف الصفحة",
+      "keywords": "الكلمات المفتاحية",
+      "og_image": "صورة المشاركة"
+    },
+    "sectionFields": {
+      "rates": {
+        "title": "عنوان اللوحة",
+        "subtitle": "مقدمة اللوحة",
+        "note": "ملاحظة أسفل اللوحة"
+      }
+    },
+    "sections": {
+      "header": "الترويسة",
+      "hero": "القسم الافتتاحي",
+      "rates": "لوحة الأسعار",
+      "about": "من نحن",
+      "services": "الخدمات",
+      "features": "المزايا",
+      "stats": "الأرقام",
+      "steps": "طريقة العمل",
+      "testimonials": "آراء العملاء",
+      "gallery": "المعرض",
+      "faq": "الأسئلة الشائعة",
+      "contact": "التواصل",
+      "cta": "دعوة لاتخاذ إجراء",
+      "footer": "التذييل"
+    },
+    "variants": {
+      "accordion": "أكورديون",
+      "alternating": "متناوب",
+      "banner": "شريط عريض",
+      "bar": "شريط",
+      "bento": "بينتو",
+      "boxed": "صندوقي",
+      "cards": "بطاقات",
+      "carousel": "شرائح",
+      "centered": "موسّط",
+      "columns": "أعمدة",
+      "featured": "مميّز",
+      "floating": "عائم",
+      "form": "نموذج",
+      "full-bleed": "ملء الشاشة",
+      "gradient": "متدرّج",
+      "grid": "شبكة",
+      "icon-grid": "شبكة أيقونات",
+      "list": "قائمة",
+      "masonry": "متراصّ",
+      "minimal": "بسيط",
+      "numbered-cards": "بطاقات مرقّمة",
+      "rates-first": "الأسعار أولًا",
+      "rich": "موسّع",
+      "simple": "بسيط",
+      "slider": "متزحلق",
+      "split": "منقسم",
+      "split-image": "نص وصورة",
+      "split-map": "منقسم مع خريطة",
+      "stacked": "مُكدّس",
+      "statement": "عبارة بارزة",
+      "table": "جدول",
+      "text-image": "نص وصورة",
+      "ticker": "شريط متحرك",
+      "timeline": "خط زمني",
+      "two-column": "عمودان"
+    },
+    "layouts": {
+      "aurora": {
+        "name": "أورورا",
+        "blurb": "عصري وواثق، مع صورة بجانب الرسالة."
+      },
+      "ledger": {
+        "name": "ليدجر",
+        "blurb": "الأسعار أولًا وكل شيء بعدها. لمكتب يأتيه العميل من أجل الأرقام."
+      },
+      "bazaar": {
+        "name": "بازار",
+        "blurb": "دافئ وحيوي، مع مساحة لصور المكتب."
+      },
+      "vault": {
+        "name": "فولت",
+        "blurb": "داكن ورسمي، مبني حول صورة واحدة كبيرة."
+      },
+      "pulse": {
+        "name": "بالس",
+        "blurb": "صفحة واحدة طويلة مع شريط أسعار متحرك."
+      },
+      "atlas": {
+        "name": "أطلس",
+        "blurb": "مؤسسي ومطمئن: أرقام وخدمات وإثبات."
+      },
+      "prism": {
+        "name": "بريزم",
+        "blurb": "تحريري عالي التباين، لمكتب لديه ما يقوله."
+      },
+      "harbor": {
+        "name": "هاربر",
+        "blurb": "قائمة جانبية والمحتوى بجوارها."
+      },
+      "quartz": {
+        "name": "كوارتز",
+        "blurb": "بسيط وسريع؛ أقل صفحة تؤدي الغرض."
+      },
+      "meridian": {
+        "name": "ميريديان",
+        "blurb": "يبقى القسم الافتتاحي ثابتًا بينما يمر الباقي بجانبه."
+      }
+    },
+    "themes": {
+      "midnight": "منتصف الليل",
+      "aurora-light": "ضوء النهار",
+      "gold-luxe": "ذهبي",
+      "emerald-trust": "زمردي",
+      "slate-minimal": "حجري",
+      "sunset-warm": "غروب",
+      "mono-editorial": "أحادي",
+      "royal-violet": "بنفسجي"
+    },
+    "styles": {
+      "button": {
+        "solid": "مصمت",
+        "pill": "بيضاوي",
+        "sharp": "حادّ",
+        "outline": "محدّد",
+        "soft": "ناعم"
+      },
+      "card": {
+        "flat": "مسطّح",
+        "elevated": "مرتفع",
+        "glass": "زجاجي",
+        "outline": "محدّد",
+        "gradient": "متدرّج"
+      },
+      "background": {
+        "plain": "سادة",
+        "grid": "شبكة",
+        "mesh": "تدرّج ناعم",
+        "gradient": "متدرّج",
+        "noise": "حُبيبي",
+        "aurora": "شفقي"
+      },
+      "corner": {
+        "sharp": "حادّة",
+        "soft": "ناعمة",
+        "round": "دائرية"
+      },
+      "density": {
+        "compact": "متراص",
+        "comfortable": "مريح",
+        "spacious": "واسع"
+      },
+      "font_pair": {
+        "vazir-vazir": "وزير متن",
+        "inter-vazir": "إنتر",
+        "manrope-vazir": "مانروب",
+        "spacegrotesk-vazir": "سبيس غروتسك",
+        "playfair-vazir": "بلاي فير",
+        "cairo-cairo": "القاهرة"
+      }
+    },
+    "options": {
+      "source": {
+        "categories": "الفئات",
+        "special": "الأسعار الخاصة",
+        "both": "كلاهما"
+      }
+    },
+    "widget": {
+      "buy": "شراء",
+      "sell": "بيع",
+      "price": "السعر",
+      "currency": "العملة",
+      "updated": "التحديث",
+      "featured": "سعر اليوم",
+      "loading": "جارٍ تحميل الأسعار…",
+      "empty": "لا توجد أسعار معتمدة للعرض بعد.",
+      "unavailable": "الأسعار غير متاحة حاليًا.",
+      "stale": "يُعرض آخر سعر تم استلامه."
+    },
+    "contact": {
+      "yourName": "اسمك",
+      "namePlaceholder": "الاسم",
+      "message": "الرسالة",
+      "messagePlaceholder": "بماذا نساعدك؟",
+      "sendTelegram": "أرسل عبر تيليجرام",
+      "sendWhatsapp": "أرسل عبر واتساب",
+      "sendEmail": "أرسل بريدًا",
+      "formHint": "يفتح هذا تطبيق المراسلة لديك، ولا يُحفظ شيء على هذا الموقع.",
+      "noChannel": "أضف رقم هاتف أو رابط تيليجرام في الإعدادات لاستقبال الرسائل.",
+      "callUs": "اتصل بنا",
+      "visitUs": "زُرنا",
+      "openHours": "ساعات العمل",
+      "emailUs": "راسلنا"
+    },
+    "public": {
+      "missingTitle": "لا شيء منشور هنا",
+      "missingBody": "لا يوجد موقع منشور على هذا العنوان."
+    },
+    "renderer": {
+      "nothingToShow": "لا شيء لعرضه بعد."
+    },
+    "chrome": {
+      "sectionNav": "الانتقال إلى قسم"
+    }
   }
 }

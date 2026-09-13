@@ -19,7 +19,8 @@
     "plans": "Pläne & Vorlagen",
     "fleet": "Flotte",
     "orders": "Bestellwarteschlange",
-    "ownerConsole": "Inhaber-Konsole"
+    "ownerConsole": "Inhaber-Konsole",
+    "website": "Website"
   },
   "common": {
     "save": "Speichern",
@@ -218,7 +219,8 @@
     "userCenter": "Admin-Verwaltung",
     "orders": "Bestellwarteschlange",
     "webappOrder": "Bestellung aufgeben",
-    "programmerConsole": "Inhaber-Konsole"
+    "programmerConsole": "Inhaber-Konsole",
+    "website": "Website"
   },
   "instagramHub": {
     "description": "Erstellen Sie Beitrags- und Story-Bilder aus Ihren finalisierten Preisen. Wählen Sie ein Design und Kategorien und sehen Sie sich eine Vorschau an, bevor Sie auf Instagram veröffentlichen.",
@@ -970,7 +972,8 @@
         "channelViews": "Kanalaufrufe",
         "channelViewsStub": "Aufrufdaten verfügbar nach Verbindung mit Statistiken",
         "dailyUsage": "Tägliche Nutzung",
-        "publishActivity": "Veröffentlichungsaktivität"
+        "publishActivity": "Veröffentlichungsaktivität",
+        "noAdmin": "Bot ist kein Admin"
       },
       "botSettings": {
         "title": "Bot-Einstellungen",
@@ -1016,7 +1019,8 @@
         "newMembers": "Neue Mitglieder",
         "holdOk": "Anfrage zurückgestellt ({ttl} Minuten)",
         "loadError": "Wechselanfragen konnten nicht geladen werden",
-        "stateUpdated": "Status aktualisiert"
+        "stateUpdated": "Status aktualisiert",
+        "growthSplit": "Kanal {channel} · Bot {bot}"
       },
       "notifications": {
         "title": "Benachrichtigungen",
@@ -1245,7 +1249,14 @@
       "template_orientation_invalid": "Vorlagenausrichtung ungültig.",
       "template_publish_order_invalid": "Veröffentlichungsreihenfolge muss nicht-negative Zahl sein.",
       "template_telegram_buttons_invalid": "Telegram-Schaltflächen müssen Array sein.",
-      "template_widget_sync_failed": "Widget-Synchronisation fehlgeschlagen."
+      "template_widget_sync_failed": "Widget-Synchronisation fehlgeschlagen.",
+      "no_bot": "Mit diesem Konto ist noch kein Telegram-Bot verbunden. Füge einen hinzu, um den Telegram-Hub zu nutzen.",
+      "bot_not_found": "Dieser Bot wurde nicht gefunden.",
+      "bot_forbidden": "Dieser Bot gehört zu einem anderen Konto.",
+      "invalid_bot_id": "Ungültige Bot-Auswahl.",
+      "no_token": "Dieser Bot hat kein Token. Öffne die Bot-Einstellungen und füge das BotFather-Token ein.",
+      "get_me_failed": "Telegram hat das Token dieses Bots abgelehnt. Prüfe das Token in den Bot-Einstellungen.",
+      "telegram_unreachable": "Telegram ist nicht erreichbar. Prüfe die Internetverbindung des Servers und versuche es erneut."
     },
     "fallback": {
       "badRequest": "Anfrage konnte nicht verarbeitet werden.",
@@ -2094,5 +2105,349 @@
     "updateSuccess": "Preistyp erfolgreich aktualisiert",
     "saveError": "Preistyp konnte nicht gespeichert werden",
     "loadPriceTypeError": "Preistyp konnte nicht geladen werden"
+  },
+  "website": {
+    "builder": {
+      "title": "Ihre Website",
+      "subtitle": "Design wählen, Texte schreiben, veröffentlichen. Ihre Inhalte bleiben erhalten.",
+      "steps": "Schritte",
+      "step": {
+        "design": "Design",
+        "theme": "Farbwelt",
+        "branding": "Marke",
+        "sections": "Abschnitte",
+        "content": "Inhalte",
+        "prices": "Kurstafel",
+        "publish": "Veröffentlichen"
+      },
+      "hint": {
+        "design": "Zehn Layouts zur Auswahl",
+        "theme": "Farben, Schrift und Formen",
+        "branding": "Logo, Name und Sprachen",
+        "sections": "Reihenfolge und Sichtbarkeit",
+        "content": "Die Texte schreiben",
+        "prices": "Welche Kurse gezeigt werden",
+        "publish": "Live gehen und Versionen verwalten"
+      },
+      "device": {
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Handy"
+      },
+      "saving": "Wird gespeichert…",
+      "saved": "Alle Änderungen gespeichert",
+      "designNote": "Ein Designwechsel behält alles Geschriebene. Nur die Anordnung ändert sich.",
+      "sectionsNote": "Zum Umsortieren ziehen. Ein Block, den das Design nicht zeigen kann, wird ausgeschaltet, nicht gelöscht.",
+      "pricesNote": "Kurse erscheinen, sobald eine Führungskraft sie finalisiert – vorher wird nichts veröffentlicht.",
+      "inheritPanel": "Marke aus den Einstellungen übernehmen",
+      "inheritPanelNote": "Aktiv kommen Logo, Telefon und Adresse aus den Panel-Einstellungen. Was Sie hier eintragen, hat Vorrang.",
+      "themeTitle": "Farbthema",
+      "style": {
+        "button": "Buttons",
+        "card": "Karten",
+        "background": "Hintergrund",
+        "corner": "Ecken",
+        "density": "Abstände",
+        "font_pair": "Typografie",
+        "brand_color": "Markenfarbe"
+      },
+      "useThemeColor": "Themenfarbe verwenden",
+      "languages": "Sprachen",
+      "languagesNote": "Mit jeder Sprache bekommt jedes Textfeld einen Reiter. Besucher können wechseln; Unübersetztes fällt auf Ihre Hauptsprache zurück.",
+      "primaryLanguage": "Hauptsprache",
+      "addSection": "Block hinzufügen",
+      "addItem": "Eintrag hinzufügen",
+      "item": "Eintrag",
+      "layoutDefault": "Design-Standard ({name})",
+      "notInLayout": "Dieses Design hat keinen Platz für diesen Block",
+      "editingSection": "Bearbeitet wird",
+      "noSectionSelected": "Wählen Sie einen Block zum Bearbeiten.",
+      "noRatesSection": "Dieses Design hat noch keine Kurstafel.",
+      "addRates": "Kurstafel hinzufügen",
+      "boardStyle": "Tafelstil",
+      "chooseImage": "Bild auswählen",
+      "imageLibrary": "Bilder",
+      "upload": "Hochladen",
+      "uploadFailed": "Dieses Bild konnte nicht hochgeladen werden.",
+      "noImages": "Noch keine Bilder. Laden Sie eines hoch.",
+      "iconPlaceholder": "z. B. coins",
+      "allSelected": "Alles wird gezeigt",
+      "someSelected": "{n} ausgewählte werden gezeigt",
+      "noCategories": "Noch keine Kategorien. Legen Sie zuerst eine im Kursbereich an.",
+      "live": "Veröffentlicht",
+      "draft": "Noch nicht veröffentlicht",
+      "pendingChanges": "Sie haben Änderungen, die noch nicht veröffentlicht sind.",
+      "publish": "Veröffentlichen",
+      "republish": "Änderungen veröffentlichen",
+      "unpublish": "Offline nehmen",
+      "viewSite": "Website öffnen",
+      "seo": "Suche und Teilen",
+      "history": "Veröffentlichte Versionen",
+      "restore": "Wiederherstellen"
+    },
+    "fields": {
+      "about": "Über-Text",
+      "address": "Adresse",
+      "answer": "Antwort",
+      "author": "Name",
+      "avatar": "Foto",
+      "badges": "Badges",
+      "body": "Text",
+      "caption": "Bildunterschrift",
+      "category_ids": "Kategorien",
+      "columns": "Spalten",
+      "copyright": "Copyright-Zeile",
+      "cta_href": "Button-Link",
+      "cta_label": "Button-Text",
+      "decimals": "Nachkommastellen",
+      "disclaimer": "Kleingedrucktes",
+      "email": "E-Mail",
+      "eyebrow": "Dachzeile",
+      "hours": "Öffnungszeiten",
+      "href": "Link",
+      "icon": "Symbol",
+      "image": "Bild",
+      "image_alt": "Bildbeschreibung",
+      "inherit_panel_contact": "Kontaktdaten aus den Einstellungen",
+      "items": "Einträge",
+      "label": "Bezeichnung",
+      "links": "Links",
+      "map_embed_url": "Karten-URL",
+      "nav_links": "Menü-Links",
+      "note": "Hinweis",
+      "phone": "Telefon",
+      "phone_2": "Zweites Telefon",
+      "points": "Stichpunkte",
+      "price_type_ids": "Kursarten",
+      "primary_cta_href": "Link Hauptbutton",
+      "primary_cta_label": "Text Hauptbutton",
+      "question": "Frage",
+      "quote": "Zitat",
+      "rating": "Bewertung",
+      "refresh_seconds": "Aktualisierung alle (Sekunden)",
+      "role": "Funktion",
+      "secondary_cta_href": "Link zweiter Button",
+      "secondary_cta_label": "Text zweiter Button",
+      "show_buy_sell": "An- und Verkauf zeigen",
+      "show_currency_icons": "Währungssymbole zeigen",
+      "show_form": "Nachrichtenformular zeigen",
+      "show_language": "Sprachumschalter zeigen",
+      "show_logo": "Logo zeigen",
+      "show_socials": "Social-Links zeigen",
+      "show_updated_at": "Aktualisierungszeit zeigen",
+      "source": "Anzuzeigende Kurse",
+      "sticky": "Oben fixieren",
+      "subtitle": "Untertitel",
+      "suffix": "Suffix",
+      "text": "Text",
+      "title": "Titel",
+      "value": "Wert",
+      "business_name": "Firmenname",
+      "tagline": "Slogan",
+      "logo": "Logo",
+      "favicon": "Favicon",
+      "seo_title": "Seitentitel",
+      "seo_description": "Seitenbeschreibung",
+      "keywords": "Schlüsselwörter",
+      "og_image": "Vorschaubild"
+    },
+    "sectionFields": {
+      "rates": {
+        "title": "Überschrift der Tafel",
+        "subtitle": "Einleitung der Tafel",
+        "note": "Hinweis unter der Tafel"
+      }
+    },
+    "sections": {
+      "header": "Kopfbereich",
+      "hero": "Auftakt",
+      "rates": "Kurstafel",
+      "about": "Über uns",
+      "services": "Leistungen",
+      "features": "Vorteile",
+      "stats": "Zahlen",
+      "steps": "So funktioniert es",
+      "testimonials": "Kundenstimmen",
+      "gallery": "Galerie",
+      "faq": "Fragen",
+      "contact": "Kontakt",
+      "cta": "Handlungsaufruf",
+      "footer": "Fußbereich"
+    },
+    "variants": {
+      "accordion": "Akkordeon",
+      "alternating": "Abwechselnd",
+      "banner": "Banner",
+      "bar": "Leiste",
+      "bento": "Bento",
+      "boxed": "Kasten",
+      "cards": "Karten",
+      "carousel": "Karussell",
+      "centered": "Zentriert",
+      "columns": "Spalten",
+      "featured": "Hervorgehoben",
+      "floating": "Schwebend",
+      "form": "Formular",
+      "full-bleed": "Randlos",
+      "gradient": "Verlauf",
+      "grid": "Raster",
+      "icon-grid": "Symbolraster",
+      "list": "Liste",
+      "masonry": "Mauerwerk",
+      "minimal": "Minimal",
+      "numbered-cards": "Nummerierte Karten",
+      "rates-first": "Kurse zuerst",
+      "rich": "Ausführlich",
+      "simple": "Schlicht",
+      "slider": "Slider",
+      "split": "Geteilt",
+      "split-image": "Text und Bild",
+      "split-map": "Geteilt mit Karte",
+      "stacked": "Gestapelt",
+      "statement": "Statement",
+      "table": "Tabelle",
+      "text-image": "Text und Bild",
+      "ticker": "Laufband",
+      "timeline": "Zeitstrahl",
+      "two-column": "Zweispaltig"
+    },
+    "layouts": {
+      "aurora": {
+        "name": "Aurora",
+        "blurb": "Modern und selbstbewusst, mit Bild neben der Botschaft."
+      },
+      "ledger": {
+        "name": "Ledger",
+        "blurb": "Kurse zuerst, alles andere danach. Für Schalter, zu denen man wegen der Zahlen kommt."
+      },
+      "bazaar": {
+        "name": "Bazaar",
+        "blurb": "Warm und lebendig, mit Platz für Fotos vom Büro."
+      },
+      "vault": {
+        "name": "Vault",
+        "blurb": "Dunkel und förmlich, um ein großes Bild herum gebaut."
+      },
+      "pulse": {
+        "name": "Pulse",
+        "blurb": "Eine lange Seite mit laufendem Kursband."
+      },
+      "atlas": {
+        "name": "Atlas",
+        "blurb": "Seriös und vertrauensbildend: Zahlen, Leistungen, Belege."
+      },
+      "prism": {
+        "name": "Prism",
+        "blurb": "Redaktionell und kontrastreich, für ein Haus mit Haltung."
+      },
+      "harbor": {
+        "name": "Harbor",
+        "blurb": "Menü an der Seite, Inhalt daneben."
+      },
+      "quartz": {
+        "name": "Quartz",
+        "blurb": "Schlicht und schnell. Die kleinste Seite, die den Zweck erfüllt."
+      },
+      "meridian": {
+        "name": "Meridian",
+        "blurb": "Der Auftakt bleibt stehen, während der Rest vorbeiläuft."
+      }
+    },
+    "themes": {
+      "midnight": "Mitternacht",
+      "aurora-light": "Tageslicht",
+      "gold-luxe": "Gold",
+      "emerald-trust": "Smaragd",
+      "slate-minimal": "Schiefer",
+      "sunset-warm": "Sonnenuntergang",
+      "mono-editorial": "Mono",
+      "royal-violet": "Violett"
+    },
+    "styles": {
+      "button": {
+        "solid": "Gefüllt",
+        "pill": "Pille",
+        "sharp": "Kantig",
+        "outline": "Umrandet",
+        "soft": "Weich"
+      },
+      "card": {
+        "flat": "Flach",
+        "elevated": "Erhöht",
+        "glass": "Glas",
+        "outline": "Umrandet",
+        "gradient": "Verlauf"
+      },
+      "background": {
+        "plain": "Schlicht",
+        "grid": "Raster",
+        "mesh": "Mesh",
+        "gradient": "Verlauf",
+        "noise": "Korn",
+        "aurora": "Aurora"
+      },
+      "corner": {
+        "sharp": "Kantig",
+        "soft": "Weich",
+        "round": "Rund"
+      },
+      "density": {
+        "compact": "Kompakt",
+        "comfortable": "Ausgewogen",
+        "spacious": "Luftig"
+      },
+      "font_pair": {
+        "vazir-vazir": "Vazirmatn",
+        "inter-vazir": "Inter",
+        "manrope-vazir": "Manrope",
+        "spacegrotesk-vazir": "Space Grotesk",
+        "playfair-vazir": "Playfair",
+        "cairo-cairo": "Cairo"
+      }
+    },
+    "options": {
+      "source": {
+        "categories": "Kategorien",
+        "special": "Sonderkurse",
+        "both": "Beides"
+      }
+    },
+    "widget": {
+      "buy": "Ankauf",
+      "sell": "Verkauf",
+      "price": "Kurs",
+      "currency": "Währung",
+      "updated": "Aktualisiert",
+      "featured": "Kurs des Tages",
+      "loading": "Kurse werden geladen…",
+      "empty": "Noch keine finalisierten Kurse vorhanden.",
+      "unavailable": "Kurse sind derzeit nicht verfügbar.",
+      "stale": "Es werden die zuletzt empfangenen Kurse gezeigt."
+    },
+    "contact": {
+      "yourName": "Ihr Name",
+      "namePlaceholder": "Name",
+      "message": "Nachricht",
+      "messagePlaceholder": "Worum geht es?",
+      "sendTelegram": "Über Telegram senden",
+      "sendWhatsapp": "Über WhatsApp senden",
+      "sendEmail": "E-Mail senden",
+      "formHint": "Das öffnet Ihre eigene Messenger-App – auf dieser Seite wird nichts gespeichert.",
+      "noChannel": "Hinterlegen Sie in den Einstellungen eine Telefonnummer oder einen Telegram-Link.",
+      "callUs": "Rufen Sie an",
+      "visitUs": "Besuchen Sie uns",
+      "openHours": "Öffnungszeiten",
+      "emailUs": "Schreiben Sie uns"
+    },
+    "public": {
+      "missingTitle": "Hier ist nichts veröffentlicht",
+      "missingBody": "Unter dieser Adresse gibt es keine veröffentlichte Website."
+    },
+    "renderer": {
+      "nothingToShow": "Noch nichts zu zeigen."
+    },
+    "chrome": {
+      "sectionNav": "Zu einem Abschnitt springen"
+    }
   }
 }

@@ -1,0 +1,94 @@
+{
+  "button": {
+    "solid":   { "tokens": { "--ws-btn-radius": "var(--ws-radius-sm)" } },
+    "pill":    { "tokens": { "--ws-btn-radius": "999px" } },
+    "sharp":   { "tokens": { "--ws-btn-radius": "0px" } },
+    "outline": { "tokens": { "--ws-btn-radius": "var(--ws-radius-sm)" } },
+    "soft":    { "tokens": { "--ws-btn-radius": "var(--ws-radius)" } }
+  },
+  "card": {
+    "flat":     { "tokens": {} },
+    "elevated": { "tokens": {} },
+    "glass":    { "tokens": {} },
+    "outline":  { "tokens": {} },
+    "gradient": { "tokens": {} }
+  },
+  "background": {
+    "plain":    { "tokens": {} },
+    "grid":     { "tokens": {} },
+    "mesh":     { "tokens": {} },
+    "gradient": { "tokens": {} },
+    "noise":    { "tokens": {} },
+    "aurora":   { "tokens": {} }
+  },
+  "corner": {
+    "sharp": { "tokens": { "--ws-radius": "2px",  "--ws-radius-sm": "0px",  "--ws-radius-lg": "4px" } },
+    "soft":  { "tokens": { "--ws-radius": "12px", "--ws-radius-sm": "8px",  "--ws-radius-lg": "20px" } },
+    "round": { "tokens": { "--ws-radius": "22px", "--ws-radius-sm": "14px", "--ws-radius-lg": "34px" } }
+  },
+  "density": {
+    "compact":     { "tokens": { "--ws-section-gap": "56px",  "--ws-container": "1120px", "--ws-block-gap": "20px" } },
+    "comfortable": { "tokens": { "--ws-section-gap": "84px",  "--ws-container": "1200px", "--ws-block-gap": "28px" } },
+    "spacious":    { "tokens": { "--ws-section-gap": "124px", "--ws-container": "1280px", "--ws-block-gap": "36px" } }
+  },
+  "font_pair": {
+    "vazir-vazir": {
+      "families": ["Vazirmatn:wght@300;400;500;600;700;800"],
+      "tokens": {
+        "--ws-font-heading": "'Vazirmatn', system-ui, sans-serif",
+        "--ws-font-body": "'Vazirmatn', system-ui, sans-serif",
+        "--ws-heading-weight": "700",
+        "--ws-heading-tracking": "-0.01em"
+      }
+    },
+    "inter-vazir": {
+      "families": ["Inter:wght@400;500;600;700;800", "Vazirmatn:wght@300;400;500;600;700"],
+      "tokens": {
+        "--ws-font-heading": "'Inter', 'Vazirmatn', system-ui, sans-serif",
+        "--ws-font-body": "'Inter', 'Vazirmatn', system-ui, sans-serif",
+        "--ws-heading-weight": "700",
+        "--ws-heading-tracking": "-0.02em"
+      }
+    },
+    "manrope-vazir": {
+      "families": ["Manrope:wght@400;500;600;700;800", "Vazirmatn:wght@300;400;500;600;700"],
+      "tokens": {
+        "--ws-font-heading": "'Manrope', 'Vazirmatn', system-ui, sans-serif",
+        "--ws-font-body": "'Vazirmatn', system-ui, sans-serif",
+        "--ws-heading-weight": "800",
+        "--ws-heading-tracking": "-0.03em"
+      }
+    },
+    "spacegrotesk-vazir": {
+      "families": ["Space+Grotesk:wght@400;500;600;700", "Vazirmatn:wght@300;400;500;600;700"],
+      "tokens": {
+        "--ws-font-heading": "'Space Grotesk', 'Vazirmatn', system-ui, sans-serif",
+        "--ws-font-body": "'Vazirmatn', system-ui, sans-serif",
+        "--ws-heading-weight": "700",
+        "--ws-heading-tracking": "-0.02em"
+      }
+    },
+    "playfair-vazir": {
+      "families": ["Playfair+Display:wght@500;600;700;800", "Vazirmatn:wght@300;400;500;600;700"],
+      "tokens": {
+        "--ws-font-heading": "'Playfair Display', 'Vazirmatn', Georgia, serif",
+        "--ws-font-body": "'Vazirmatn', system-ui, sans-serif",
+        "--ws-heading-weight": "600",
+        "--ws-heading-tracking": "0em"
+      }
+    },
+    "cairo-cairo": {
+      "families": ["Cairo:wght@400;500;600;700;800"],
+      "tokens": {
+        "--ws-font-heading": "'Cairo', 'Vazirmatn', system-ui, sans-serif",
+        "--ws-font-body": "'Cairo', 'Vazirmatn', system-ui, sans-serif",
+        "--ws-heading-weight": "700",
+        "--ws-heading-tracking": "0em"
+      }
+    }
+  },
+  "brand_color": {
+    "type": "color",
+    "tokens": ["--ws-primary", "--ws-primary-hover", "--ws-on-primary"]
+  }
+}

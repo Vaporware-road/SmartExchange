@@ -19,7 +19,8 @@
     "plans": "Planlar ve Şablonlar",
     "fleet": "Filo",
     "orders": "Sipariş Kuyruğu",
-    "ownerConsole": "Sahip konsolu"
+    "ownerConsole": "Sahip konsolu",
+    "website": "Web sitesi"
   },
   "common": {
     "save": "Kaydet",
@@ -218,7 +219,8 @@
     "userCenter": "Yönetici Yönetimi",
     "orders": "Sipariş Kuyruğu",
     "webappOrder": "Sipariş Ver",
-    "programmerConsole": "Sahip konsolu"
+    "programmerConsole": "Sahip konsolu",
+    "website": "Web sitesi"
   },
   "instagramHub": {
     "description": "Onaylanmış fiyatlarınızdan gönderi ve hikaye görselleri oluşturun. Bir tema ve kategoriler seçin, ardından Instagram'da yayınlamadan önce önizleyin.",
@@ -970,7 +972,8 @@
         "channelViews": "Kanal Görüntülenmeleri",
         "channelViewsStub": "Analitik bağlandıktan sonra görüntülenme verisi kullanılabilir",
         "dailyUsage": "Günlük Kullanım",
-        "publishActivity": "Yayın Etkinliği"
+        "publishActivity": "Yayın Etkinliği",
+        "noAdmin": "bot yönetici değil"
       },
       "botSettings": {
         "title": "Bot Ayarları",
@@ -1016,7 +1019,8 @@
         "newMembers": "Yeni Üyeler",
         "holdOk": "Talep beklemeye alındı ({ttl} dakika)",
         "loadError": "Döviz talepleri yüklenemedi",
-        "stateUpdated": "Durum güncellendi"
+        "stateUpdated": "Durum güncellendi",
+        "growthSplit": "kanal {channel} · bot {bot}"
       },
       "notifications": {
         "title": "Bildirimler",
@@ -1245,7 +1249,14 @@
       "template_orientation_invalid": "Şablon yönü geçersiz.",
       "template_publish_order_invalid": "Yayın sırası negatif olmayan tam sayı olmalıdır.",
       "template_telegram_buttons_invalid": "Telegram düğmeleri bir dizi olmalıdır.",
-      "template_widget_sync_failed": "Şablon bileşen senkronizasyonu başarısız."
+      "template_widget_sync_failed": "Şablon bileşen senkronizasyonu başarısız.",
+      "no_bot": "Bu hesaba henüz bir Telegram botu bağlanmadı. Telegram merkezini kullanmak için bir bot ekleyin.",
+      "bot_not_found": "Bu bot bulunamadı.",
+      "bot_forbidden": "Bu bot başka bir hesaba ait.",
+      "invalid_bot_id": "Geçersiz bot seçimi.",
+      "no_token": "Bu botun tokenı yok. Bot ayarlarını açıp BotFather tokenını yapıştırın.",
+      "get_me_failed": "Telegram bu botun tokenını reddetti. Bot ayarlarındaki tokenı kontrol edin.",
+      "telegram_unreachable": "Telegram'a ulaşılamadı. Sunucunun internet bağlantısını kontrol edip tekrar deneyin."
     },
     "fallback": {
       "badRequest": "İstek işlenemedi.",
@@ -2094,5 +2105,349 @@
     "updateSuccess": "Fiyat türü başarıyla güncellendi",
     "saveError": "Fiyat türü kaydedilemedi",
     "loadPriceTypeError": "Fiyat türü yüklenemedi"
+  },
+  "website": {
+    "builder": {
+      "title": "Web siteniz",
+      "subtitle": "Bir tasarım seçin, metinlerinizi yazın, yayınlayın. İçeriğiniz sizinle kalır.",
+      "steps": "Adımlar",
+      "step": {
+        "design": "Tasarım",
+        "theme": "Tema",
+        "branding": "Marka",
+        "sections": "Bölümler",
+        "content": "İçerik",
+        "prices": "Kur tablosu",
+        "publish": "Yayınla"
+      },
+      "hint": {
+        "design": "Seçilecek on düzen",
+        "theme": "Renkler, yazı tipi ve biçimler",
+        "branding": "Logo, ad ve diller",
+        "sections": "Sıralama ve açma-kapama",
+        "content": "Metinleri yazın",
+        "prices": "Hangi kurlar gösterilsin",
+        "publish": "Yayına alın ve sürümleri yönetin"
+      },
+      "device": {
+        "desktop": "Masaüstü",
+        "tablet": "Tablet",
+        "mobile": "Telefon"
+      },
+      "saving": "Kaydediliyor…",
+      "saved": "Tüm değişiklikler kaydedildi",
+      "designNote": "Tasarımı değiştirmek yazdığınız her şeyi korur. Yalnızca yerleşim değişir.",
+      "sectionsNote": "Sıralamak için sürükleyin. Geçerli tasarımın gösteremediği bölüm silinmez, kapatılır.",
+      "pricesNote": "Kurlar bir yönetici onayladığı anda sitenizde görünür; öncesinde hiçbir şey yayınlanmaz.",
+      "inheritPanel": "Markayı Ayarlar'dan al",
+      "inheritPanelNote": "Açıkken logo, telefon ve adres panel Ayarlar sayfasından gelir. Burada yazdıklarınız önceliklidir.",
+      "themeTitle": "Renk teması",
+      "style": {
+        "button": "Düğmeler",
+        "card": "Kartlar",
+        "background": "Arka plan",
+        "corner": "Köşeler",
+        "density": "Boşluklar",
+        "font_pair": "Tipografi",
+        "brand_color": "Marka rengi"
+      },
+      "useThemeColor": "Tema rengini kullan",
+      "languages": "Diller",
+      "languagesNote": "Eklediğiniz her dil, her metin kutusuna bir sekme ekler. Ziyaretçi dili değiştirebilir; çevrilmeyenler ana dilinize düşer.",
+      "primaryLanguage": "Ana dil",
+      "addSection": "Bölüm ekle",
+      "addItem": "Öğe ekle",
+      "item": "Öğe",
+      "layoutDefault": "Tasarım varsayılanı ({name})",
+      "notInLayout": "Bu tasarımda bu bölüme yer yok",
+      "editingSection": "Düzenlenen",
+      "noSectionSelected": "Düzenlemek için bir bölüm seçin.",
+      "noRatesSection": "Bu tasarımda henüz kur tablosu yok.",
+      "addRates": "Kur tablosu ekle",
+      "boardStyle": "Tablo biçimi",
+      "chooseImage": "Görsel seç",
+      "imageLibrary": "Görseller",
+      "upload": "Yükle",
+      "uploadFailed": "Bu görsel yüklenemedi.",
+      "noImages": "Henüz görsel yok. Başlamak için bir tane yükleyin.",
+      "iconPlaceholder": "örn. coins",
+      "allSelected": "Hepsi gösteriliyor",
+      "someSelected": "Seçili {n} kategori gösteriliyor",
+      "noCategories": "Henüz kategori yok. Önce kur bölümünden bir tane ekleyin.",
+      "live": "Yayında",
+      "draft": "Henüz yayında değil",
+      "pendingChanges": "Yayınlanmamış değişiklikleriniz var.",
+      "publish": "Yayınla",
+      "republish": "Değişiklikleri yayınla",
+      "unpublish": "Yayından kaldır",
+      "viewSite": "Siteyi aç",
+      "seo": "Arama ve paylaşım",
+      "history": "Yayınlanan sürümler",
+      "restore": "Geri yükle"
+    },
+    "fields": {
+      "about": "Tanıtım metni",
+      "address": "Adres",
+      "answer": "Cevap",
+      "author": "Ad",
+      "avatar": "Fotoğraf",
+      "badges": "Rozetler",
+      "body": "Metin",
+      "caption": "Görsel açıklaması",
+      "category_ids": "Kategoriler",
+      "columns": "Sütunlar",
+      "copyright": "Telif satırı",
+      "cta_href": "Düğme bağlantısı",
+      "cta_label": "Düğme metni",
+      "decimals": "Ondalık basamak",
+      "disclaimer": "Küçük not",
+      "email": "E-posta",
+      "eyebrow": "Üst başlık",
+      "hours": "Çalışma saatleri",
+      "href": "Bağlantı",
+      "icon": "Simge",
+      "image": "Görsel",
+      "image_alt": "Görsel açıklaması",
+      "inherit_panel_contact": "İletişim bilgileri Ayarlar'dan",
+      "items": "Öğeler",
+      "label": "Etiket",
+      "links": "Bağlantılar",
+      "map_embed_url": "Harita bağlantısı",
+      "nav_links": "Menü bağlantıları",
+      "note": "Not",
+      "phone": "Telefon",
+      "phone_2": "İkinci telefon",
+      "points": "Maddeler",
+      "price_type_ids": "Kur türleri",
+      "primary_cta_href": "Ana düğme bağlantısı",
+      "primary_cta_label": "Ana düğme metni",
+      "question": "Soru",
+      "quote": "Alıntı",
+      "rating": "Puan",
+      "refresh_seconds": "Yenileme aralığı (saniye)",
+      "role": "Unvan",
+      "secondary_cta_href": "İkinci düğme bağlantısı",
+      "secondary_cta_label": "İkinci düğme metni",
+      "show_buy_sell": "Alış ve satışı göster",
+      "show_currency_icons": "Döviz simgelerini göster",
+      "show_form": "Mesaj formunu göster",
+      "show_language": "Dil seçiciyi göster",
+      "show_logo": "Logoyu göster",
+      "show_socials": "Sosyal bağlantıları göster",
+      "show_updated_at": "Güncelleme zamanını göster",
+      "source": "Gösterilecek kurlar",
+      "sticky": "Üstte sabitle",
+      "subtitle": "Alt başlık",
+      "suffix": "Sonek",
+      "text": "Metin",
+      "title": "Başlık",
+      "value": "Değer",
+      "business_name": "İşletme adı",
+      "tagline": "Slogan",
+      "logo": "Logo",
+      "favicon": "Site simgesi",
+      "seo_title": "Sayfa başlığı",
+      "seo_description": "Sayfa açıklaması",
+      "keywords": "Anahtar kelimeler",
+      "og_image": "Paylaşım görseli"
+    },
+    "sectionFields": {
+      "rates": {
+        "title": "Tablo başlığı",
+        "subtitle": "Tablo girişi",
+        "note": "Tablo altı not"
+      }
+    },
+    "sections": {
+      "header": "Üst bölüm",
+      "hero": "Açılış",
+      "rates": "Kur tablosu",
+      "about": "Hakkımızda",
+      "services": "Hizmetler",
+      "features": "Öne çıkanlar",
+      "stats": "Rakamlar",
+      "steps": "Nasıl çalışır",
+      "testimonials": "Yorumlar",
+      "gallery": "Galeri",
+      "faq": "Sorular",
+      "contact": "İletişim",
+      "cta": "Harekete geçirme",
+      "footer": "Alt bölüm"
+    },
+    "variants": {
+      "accordion": "Akordeon",
+      "alternating": "Dönüşümlü",
+      "banner": "Afiş",
+      "bar": "Şerit",
+      "bento": "Bento",
+      "boxed": "Kutulu",
+      "cards": "Kartlar",
+      "carousel": "Karusel",
+      "centered": "Ortalı",
+      "columns": "Sütunlar",
+      "featured": "Öne çıkan",
+      "floating": "Yüzen",
+      "form": "Form",
+      "full-bleed": "Tam ekran",
+      "gradient": "Geçişli",
+      "grid": "Izgara",
+      "icon-grid": "Simge ızgarası",
+      "list": "Liste",
+      "masonry": "Duvar",
+      "minimal": "Sade",
+      "numbered-cards": "Numaralı kartlar",
+      "rates-first": "Önce kurlar",
+      "rich": "Zengin",
+      "simple": "Basit",
+      "slider": "Kaydırıcı",
+      "split": "Bölünmüş",
+      "split-image": "Metin ve görsel",
+      "split-map": "Haritalı bölünmüş",
+      "stacked": "Yığılmış",
+      "statement": "Vurgu cümlesi",
+      "table": "Tablo",
+      "text-image": "Metin ve görsel",
+      "ticker": "Akan şerit",
+      "timeline": "Zaman çizelgesi",
+      "two-column": "İki sütun"
+    },
+    "layouts": {
+      "aurora": {
+        "name": "Aurora",
+        "blurb": "Modern ve kendinden emin; mesajın yanında bir görsel."
+      },
+      "ledger": {
+        "name": "Ledger",
+        "blurb": "Önce kurlar, sonra gerisi. Müşterinin rakam için geldiği ofisler için."
+      },
+      "bazaar": {
+        "name": "Bazaar",
+        "blurb": "Sıcak ve hareketli; ofis fotoğraflarına yer var."
+      },
+      "vault": {
+        "name": "Vault",
+        "blurb": "Koyu ve resmî; tek büyük görselin çevresine kurulu."
+      },
+      "pulse": {
+        "name": "Pulse",
+        "blurb": "Akan kur şeridi olan tek uzun sayfa."
+      },
+      "atlas": {
+        "name": "Atlas",
+        "blurb": "Kurumsal ve güven veren: rakamlar, hizmetler, kanıt."
+      },
+      "prism": {
+        "name": "Prism",
+        "blurb": "Dergi havasında ve yüksek kontrastlı; söyleyecek sözü olanlar için."
+      },
+      "harbor": {
+        "name": "Harbor",
+        "blurb": "Menü yanda, içerik onun yanında."
+      },
+      "quartz": {
+        "name": "Quartz",
+        "blurb": "Sade ve hızlı. İşi gören en küçük sayfa."
+      },
+      "meridian": {
+        "name": "Meridian",
+        "blurb": "Açılış yerinde durur, gerisi yanından akar."
+      }
+    },
+    "themes": {
+      "midnight": "Gece yarısı",
+      "aurora-light": "Gün ışığı",
+      "gold-luxe": "Altın",
+      "emerald-trust": "Zümrüt",
+      "slate-minimal": "Arduvaz",
+      "sunset-warm": "Gün batımı",
+      "mono-editorial": "Mono",
+      "royal-violet": "Mor"
+    },
+    "styles": {
+      "button": {
+        "solid": "Dolu",
+        "pill": "Hap",
+        "sharp": "Keskin",
+        "outline": "Çerçeveli",
+        "soft": "Yumuşak"
+      },
+      "card": {
+        "flat": "Düz",
+        "elevated": "Yükseltilmiş",
+        "glass": "Cam",
+        "outline": "Çerçeveli",
+        "gradient": "Geçişli"
+      },
+      "background": {
+        "plain": "Düz",
+        "grid": "Izgara",
+        "mesh": "Örgü",
+        "gradient": "Geçişli",
+        "noise": "Tanecikli",
+        "aurora": "Aurora"
+      },
+      "corner": {
+        "sharp": "Keskin",
+        "soft": "Yumuşak",
+        "round": "Yuvarlak"
+      },
+      "density": {
+        "compact": "Sıkı",
+        "comfortable": "Dengeli",
+        "spacious": "Ferah"
+      },
+      "font_pair": {
+        "vazir-vazir": "Vazirmatn",
+        "inter-vazir": "Inter",
+        "manrope-vazir": "Manrope",
+        "spacegrotesk-vazir": "Space Grotesk",
+        "playfair-vazir": "Playfair",
+        "cairo-cairo": "Cairo"
+      }
+    },
+    "options": {
+      "source": {
+        "categories": "Kategoriler",
+        "special": "Özel kurlar",
+        "both": "İkisi de"
+      }
+    },
+    "widget": {
+      "buy": "Alış",
+      "sell": "Satış",
+      "price": "Kur",
+      "currency": "Döviz",
+      "updated": "Güncellendi",
+      "featured": "Günün kuru",
+      "loading": "Kurlar yükleniyor…",
+      "empty": "Gösterilecek onaylanmış kur henüz yok.",
+      "unavailable": "Kurlar şu anda kullanılamıyor.",
+      "stale": "Alınan son kurlar gösteriliyor."
+    },
+    "contact": {
+      "yourName": "Adınız",
+      "namePlaceholder": "Ad",
+      "message": "Mesaj",
+      "messagePlaceholder": "Nasıl yardımcı olabiliriz?",
+      "sendTelegram": "Telegram'dan gönder",
+      "sendWhatsapp": "WhatsApp'tan gönder",
+      "sendEmail": "E-posta gönder",
+      "formHint": "Bu, kendi mesajlaşma uygulamanızı açar; bu sitede hiçbir şey saklanmaz.",
+      "noChannel": "Mesaj alabilmek için Ayarlar'da bir telefon veya Telegram bağlantısı ekleyin.",
+      "callUs": "Bizi arayın",
+      "visitUs": "Bizi ziyaret edin",
+      "openHours": "Çalışma saatleri",
+      "emailUs": "Bize yazın"
+    },
+    "public": {
+      "missingTitle": "Burada yayınlanmış bir şey yok",
+      "missingBody": "Bu adreste yayınlanmış bir web sitesi yok."
+    },
+    "renderer": {
+      "nothingToShow": "Henüz gösterilecek bir şey yok."
+    },
+    "chrome": {
+      "sectionNav": "Bir bölüme atla"
+    }
   }
 }

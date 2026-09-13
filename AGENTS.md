@@ -101,9 +101,12 @@ whenever the frontend actually changed — commit them with the source change.
 | Instagram OAuth + image gen + publish | `backend/instagram_hub/` |
 | Visual template editor (backend) | `backend/template_editor/` |
 | Public prices API, webhooks, utils | `backend/core/` |
+| Customer website builder (models, catalog, publish) | `backend/website/` |
 | Trial stacks, license keys, fleet check-in | `backend/fleet/` |
 | WhatsApp channel + Telegram Mini App order form | `backend/bot_gateway/` |
 | Order intake queue behind the bot gateway | `backend/orders/` |
+| Customer website renderer (layouts, sections, themes) | `frontend/src/website/` |
+| Website builder UI | `frontend/src/views/website/` |
 | Vue SPA (all views, stores, services) | `frontend/src/` |
 | Iraniu ad-request system ONLY | `backend/Request-Manage-System/` |
 
@@ -139,11 +142,11 @@ update prices (change_price / special_price)
 ## Frontend patterns
 
 **API service** — all calls go through `frontend/src/services/api.js` (427 lines):
-- Exports: `authApi`, `dashboardApi`, `categoryApi`, `priceTypeApi`, `priceApi`, `specialPriceApi`, `finalizeApi`, `instagramHubApi`, `settingsApi`, `analysisApi`, `telegramApi`, `templateApi`, `templateEditorApi`, `fleetApi`, `botGatewayApi`, `ordersApi`
+- Exports: `authApi`, `dashboardApi`, `categoryApi`, `priceTypeApi`, `priceApi`, `specialPriceApi`, `finalizeApi`, `instagramHubApi`, `settingsApi`, `analysisApi`, `telegramApi`, `templateApi`, `templateEditorApi`, `fleetApi`, `botGatewayApi`, `ordersApi`, `websiteApi`
 - Auto-injects Bearer token, single-flight JWT refresh + replay, CSRF from cookie
 - Error format: `{ error: true, message: "...", code: "validation_error" }`
 
-**Pinia stores**: `auth`, `siteSettings`, `templatesEditor`, `currencies`, `sidebar`, `theme`
+**Pinia stores**: `auth`, `siteSettings`, `templatesEditor`, `currencies`, `sidebar`, `theme`, `website`
 
 **Roles** (must match `backend/accounts/permissions.py`):
 - `super_admin` — everything
@@ -240,6 +243,41 @@ alone so the two cannot collide in one browser.
 To give Telegram customers the same order form, have `telegram_app` send the
 button built by `bot_gateway.services.dispatcher._build_order_button`; that is
 the only piece the dropped Telegram half was still providing.
+
+---
+
+## The customer website: one system, not ten pages
+
+`backend/website/` + `frontend/src/website/` give each desk a public site at
+`/site/` (or `/site/<account-slug>/` where one install serves several desks).
+Seven concerns are kept apart so a new design costs a manifest entry, not a page:
+
+| Concern | Lives in |
+|---------|----------|
+| Layout | `backend/website/catalog/layouts.json` → a chrome in `frontend/src/website/layouts/` |
+| Section variants | `frontend/src/website/sections/<type>/<Variant>.vue` (42 of them, shared by every layout) |
+| Theme | `catalog/themes.json` + `styles.json`, resolved to `--ws-*` custom properties |
+| Content | `website.WebsiteSection.content`, keyed by section **type** — which is why switching layout keeps every word |
+| Branding | `setting.SiteSettings`, overridable per site |
+| Rates | `core.prices_snapshot` with `finalized_only=True` |
+| Config | `website.WebsiteSite` |
+
+Rules worth knowing before editing:
+
+- **The catalog is shared.** Python validates against `website/catalog/*.json`; the
+  SPA imports the same files through the `@catalog` Vite alias. `website/tests.py::CatalogIntegrityTests`
+  fails if a catalog entry has no component in `frontend/src/website/registry.js`.
+- **Themes are CSS custom properties, never Tailwind classes.** Token values arrive
+  at runtime from the API, and Tailwind only generates what it sees at build time.
+- **The site sizes itself with container queries**, not media queries, so the builder's
+  phone/tablet preview shows the real layout. Add `@container ws (...)`, not `@media`.
+- **The public page reads a frozen `WebsitePublication`**, never the draft. Publishing
+  writes a new numbered snapshot; restoring re-publishes an old one forward.
+- **Only finalized prices reach a customer site.** `build_prices_public_snapshot(finalized_only=True)`
+  is the gate; the existing `/api/public/prices/` feed and the WordPress webhook keep the old behaviour.
+- **Vazirmatn and Inter are self-hosted** from `backend/static/fonts/`; the Google Fonts
+  link for the other pairs is loaded non-blocking, because this product sells into
+  markets where that CDN is slow or blocked.
 
 ---
 

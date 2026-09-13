@@ -1,27 +1,29 @@
 <template>
   <div class="relative w-full min-w-0 overflow-hidden">
-    <!-- Token gate: block hub until getMe succeeds (management / super_admin) -->
-    <div
-      v-if="requiresGate && hubLocked"
-      class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
-    >
-      <div class="card-luxury max-w-md w-[90%] px-6 py-8 text-center space-y-4">
-        <template v-if="verifyLoading">
-          <LoadingSpinner class="w-12 h-12 text-gold mx-auto" />
-          <p class="text-[var(--text-primary)] font-medium">{{ $t('telegram.admin.gate.verifying') }}</p>
-          <p class="text-sm text-[var(--text-secondary)]">{{ $t('telegram.admin.gate.verifyingHint') }}</p>
-        </template>
+    <div>
+      <!-- Bot check never blocks the page: without a verified bot the admin
+           panels stay hidden but messenger, channels and bots remain usable. -->
+      <div v-if="hubLocked" class="card-luxury mb-4 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <div v-if="verifyLoading" class="flex items-center gap-3">
+          <LoadingSpinner class="w-5 h-5 text-gold" />
+          <p class="text-sm text-[var(--text-secondary)]">{{ $t('telegram.admin.gate.verifying') }}</p>
+        </div>
         <template v-else>
-          <p class="text-lg font-semibold text-gold">{{ $t('telegram.admin.gate.failedTitle') }}</p>
-          <p class="text-sm text-[var(--text-secondary)]">{{ verifyError || $t('telegram.admin.gate.failedHint') }}</p>
-          <button type="button" class="btn-luxury-gradient min-h-[44px]" @click="runVerify">
-            {{ $t('telegram.admin.gate.retry') }}
-          </button>
+          <div class="min-w-0">
+            <p class="text-sm font-semibold text-gold">{{ $t('telegram.admin.gate.failedTitle') }}</p>
+            <p class="text-sm text-[var(--text-secondary)]">{{ verifyError || $t('telegram.admin.gate.failedHint') }}</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <router-link to="/telegram/bots/new" class="btn-luxury-outline text-sm">
+              {{ $t('telegram.botSetup.newBotTitle') }}
+            </router-link>
+            <button type="button" class="btn-luxury text-sm" @click="runVerify">
+              {{ $t('telegram.admin.gate.retry') }}
+            </button>
+          </div>
         </template>
       </div>
-    </div>
 
-    <div :class="{ 'pointer-events-none select-none opacity-40': requiresGate && hubLocked }">
       <div class="flex flex-wrap items-end justify-between gap-3 mb-6">
         <h1 class="text-2xl font-bold text-gold animate-fade-in-up">
           {{ $t('telegram.hubTitle') }}
@@ -776,14 +778,14 @@ import { useAuthStore } from '@/stores/auth'
 import { useTelegramHubStore } from '@/stores/telegramHub'
 import TelegramHubAdminPanels from './TelegramHubAdminPanels.vue'
 
-const { t, locale } = useI18n()
+const { t, te, locale } = useI18n()
 const toast = useToast()
 const auth = useAuthStore()
 const telegramHub = useTelegramHubStore()
 
-const requiresGate = computed(() => auth.isSuperAdmin || auth.isManager)
-const showAdminNav = computed(() => requiresGate.value)
-const hubLocked = ref(requiresGate.value && !telegramHub.isSessionValid)
+const hubLocked = ref(!telegramHub.isSessionValid)
+// Admin panels need a verified bot to scope to; every role gets them once one is.
+const showAdminNav = computed(() => !hubLocked.value)
 const verifyLoading = ref(false)
 const verifyError = ref('')
 const verifiedBot = ref(telegramHub.isSessionValid ? telegramHub.verifiedBot : null)
@@ -874,11 +876,6 @@ async function runVerify() {
 }
 
 async function unlockHub({ force = false } = {}) {
-  if (!requiresGate.value) {
-    hubLocked.value = false
-    await loadHubToolsData()
-    return
-  }
   const showGate = force || !telegramHub.isSessionValid
   if (showGate) {
     verifyLoading.value = true
@@ -909,11 +906,14 @@ async function unlockHub({ force = false } = {}) {
     hubLocked.value = true
     verifiedBot.value = null
     dashboard.value = null
+    // The server's message is English; its code has copy in every locale.
+    const code = err?.response?.data?.code
+    const codeKey = `apiErrors.codes.${code}`
     verifyError.value =
+      (code && te(codeKey) ? t(codeKey) : '') ||
       err?.response?.data?.message ||
-      err?.response?.data?.detail ||
-      err?.message ||
       t('telegram.admin.gate.failedHint')
+    loadHubToolsData()
   } finally {
     verifyLoading.value = false
   }
@@ -957,15 +957,8 @@ const tabs = computed(() => {
     { id: 'bot', labelKey: 'telegram.tabs.botSetup', icon: 'fas fa-robot' },
     { id: 'channels', labelKey: 'telegram.tabs.channels', icon: 'fas fa-broadcast-tower' },
     { id: 'automation', labelKey: 'telegram.tabs.automation', icon: 'fas fa-clock' },
+    { id: 'customers', labelKey: 'telegram.tabs.customers', icon: 'fas fa-users' },
   ]
-  // Customer tags API is management / super_admin only (matches backend).
-  if (auth.isSuperAdmin || auth.isManager) {
-    base.push({
-      id: 'customers',
-      labelKey: 'telegram.tabs.customers',
-      icon: 'fas fa-users',
-    })
-  }
   return base
 })
 

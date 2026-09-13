@@ -5,9 +5,16 @@ All DRF endpoints are mounted under /api/.
 from django.urls import path, include
 
 from core.public_api_views import PublicPricesAPIView
+from website.api_views import PublicWebsiteAPIView, PublicWebsitePricesAPIView
 
 urlpatterns = [
     path("public/prices/", PublicPricesAPIView.as_view(), name="api-public-prices"),
+    path("public/website/", PublicWebsiteAPIView.as_view(), name="api-public-website"),
+    path(
+        "public/website/prices/",
+        PublicWebsitePricesAPIView.as_view(),
+        name="api-public-website-prices",
+    ),
     path("auth/", include("accounts.api_urls")),
     path("dashboard/", include("dashboard.api_urls")),
     path("categories/", include("category.api_urls")),
@@ -23,4 +30,5 @@ urlpatterns = [
     path("fleet/", include("fleet.api_urls")),
     path("bot-gateway/", include("bot_gateway.api_urls")),
     path("orders/", include("orders.api_urls")),
+    path("website/", include("website.api_urls")),
 ]

@@ -256,14 +256,14 @@ class AutomationSettingsApiTests(APITestCase):
         self.assertIn("auto_post_on_update", r.json())
         self.assertIsInstance(r.json()["auto_post_on_update"], bool)
 
-    def test_put_automation_settings_requires_client_owner(self):
+    def test_employee_can_put_automation_settings(self):
         self.client.force_authenticate(self.employee)
         r = self.client.put(
             "/api/telegram/automation-settings/",
             {"auto_post_on_update": True},
             format="json",
         )
-        self.assertEqual(r.status_code, 403, r.content)
+        self.assertEqual(r.status_code, 200, r.content)
 
     def test_put_automation_settings_updates_flag(self):
         self.client.force_authenticate(self.owner)
@@ -1510,14 +1510,14 @@ class CustomerTagApiTests(APITestCase):
         self.assertEqual(r.json()["telegram_user_id"], 55)
         self.assertEqual(r.json()["tag"], "global")
 
-    def test_employee_cannot_patch_tag(self):
+    def test_employee_can_patch_tag(self):
         self.client.force_authenticate(self.employee)
         r = self.client.patch(
             f"/api/telegram/customers/{self.customer.pk}/",
             {"tag": "special"},
             format="json",
         )
-        self.assertEqual(r.status_code, 403)
+        self.assertEqual(r.status_code, 200, r.content)
 
     def test_staff_customer_tag_is_admin_and_locked(self):
         CustomUser.objects.create_user(
@@ -1612,6 +1612,16 @@ class TelegramAdminVerifyApiTests(APITestCase):
         self.assertEqual(body.get("code"), "get_me_failed")
 
 
+def foreign_desk_bot():
+    """A bot on another desk: the account boundary is the only gate left."""
+    from accounts.models import Account
+    from accounts.scoping import act_as_account
+
+    desk = Account.objects.create(name="Other desk", slug="other-desk")
+    with act_as_account(desk):
+        return TelegramBot.objects.create(name="Foreign", token="444:DDD", is_active=True)
+
+
 class TelegramAdminDashboardApiTests(APITestCase):
     def setUp(self):
         self.mgmt = CustomUser.objects.create_user(
@@ -1689,12 +1699,16 @@ class TelegramAdminDashboardApiTests(APITestCase):
         self.assertNotIn("EUR", currencies)
         self.assertTrue(body["analytics"]["channel_views"]["stub"])
 
-    def test_dashboard_forbidden_other_bot_id(self):
+    def test_dashboard_other_desk_bot_not_found(self):
+        foreign = foreign_desk_bot()
         self.client.force_authenticate(self.mgmt)
-        r = self.client.get(
-            f"/api/telegram/admin/dashboard/?bot_id={self.other_bot.id}"
-        )
-        self.assertEqual(r.status_code, 403, r.content)
+        r = self.client.get(f"/api/telegram/admin/dashboard/?bot_id={foreign.id}")
+        self.assertEqual(r.status_code, 404, r.content)
+
+    def test_dashboard_same_desk_bot_needs_no_ownership(self):
+        self.client.force_authenticate(self.mgmt)
+        r = self.client.get(f"/api/telegram/admin/dashboard/?bot_id={self.other_bot.id}")
+        self.assertEqual(r.status_code, 200, r.content)
 
     def _exchange_list_ids(self, response):
         body = response.json()
@@ -1723,15 +1737,14 @@ class TelegramAdminDashboardApiTests(APITestCase):
         default = self.client.get("/api/telegram/exchange-requests/")
         self.assertEqual(default.status_code, 200, default.content)
         default_ids = self._exchange_list_ids(default)
-        for pk in theirs:
-            self.assertNotIn(pk, default_ids)
+        for pk in mine + theirs:
+            self.assertIn(pk, default_ids)
 
-    def test_exchange_requests_forbidden_other_bot_id(self):
+    def test_exchange_requests_other_desk_bot_not_found(self):
+        foreign = foreign_desk_bot()
         self.client.force_authenticate(self.mgmt)
-        r = self.client.get(
-            f"/api/telegram/exchange-requests/?bot_id={self.other_bot.id}"
-        )
-        self.assertEqual(r.status_code, 403, r.content)
+        r = self.client.get(f"/api/telegram/exchange-requests/?bot_id={foreign.id}")
+        self.assertEqual(r.status_code, 404, r.content)
 
     def test_exchange_requests_invalid_bot_id(self):
         self.client.force_authenticate(self.mgmt)
@@ -1816,7 +1829,7 @@ class TelegramAdminDashboardApiTests(APITestCase):
         req.refresh_from_db()
         self.assertEqual(req.ttl_minutes, 15)
 
-    def test_employee_cannot_patch_or_hold_exchange_request(self):
+    def test_employee_can_patch_exchange_request(self):
         employee = CustomUser.objects.create_user(
             username="dash-emp",
             password="pass12345",
@@ -1838,11 +1851,9 @@ class TelegramAdminDashboardApiTests(APITestCase):
             {"status": "successful"},
             format="json",
         )
-        self.assertEqual(patched.status_code, 403)
-        held = self.client.post(f"/api/telegram/exchange-requests/{req.pk}/hold/")
-        self.assertEqual(held.status_code, 403)
+        self.assertEqual(patched.status_code, 200, patched.content)
         req.refresh_from_db()
-        self.assertEqual(req.status, ExchangeRequest.Status.NEW)
+        self.assertEqual(req.status, ExchangeRequest.Status.SUCCESSFUL)
         self.assertEqual(req.ttl_minutes, 5)
 
 
@@ -1925,18 +1936,19 @@ class TelegramAdminReengageApiTests(APITestCase):
         self.assertEqual(body["failed"], 0)
         service_cls.return_value.send_message.assert_not_called()
 
-    def test_reengage_forbidden_other_bot(self):
+    def test_reengage_other_desk_bot_not_found(self):
+        foreign = foreign_desk_bot()
         self.client.force_authenticate(self.mgmt)
         r = self.client.post(
             "/api/telegram/admin/reengage/",
             {
-                "bot_id": self.other_bot.id,
+                "bot_id": foreign.id,
                 "audience": "global",
                 "message": "Nope",
             },
             format="json",
         )
-        self.assertEqual(r.status_code, 403, r.content)
+        self.assertEqual(r.status_code, 404, r.content)
 
     @patch("telegram_app.services.reengage_service.TelegramService")
     def test_reengage_inactive_audience(self, service_cls):

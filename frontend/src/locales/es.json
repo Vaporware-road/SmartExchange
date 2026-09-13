@@ -19,7 +19,8 @@
     "plans": "Planes y plantillas",
     "fleet": "Flota",
     "orders": "Cola de pedidos",
-    "ownerConsole": "Consola del propietario"
+    "ownerConsole": "Consola del propietario",
+    "website": "Sitio web"
   },
   "common": {
     "save": "Guardar",
@@ -218,7 +219,8 @@
     "userCenter": "Gestión de admins",
     "orders": "Cola de pedidos",
     "webappOrder": "Realizar pedido",
-    "programmerConsole": "Consola del propietario"
+    "programmerConsole": "Consola del propietario",
+    "website": "Sitio web"
   },
   "instagramHub": {
     "description": "Genere imágenes de publicaciones e historias a partir de sus precios finalizados. Elija un tema y categorías, y previsualice antes de publicar en Instagram.",
@@ -970,7 +972,8 @@
         "channelViews": "Vistas del canal",
         "channelViewsStub": "Los datos de vistas estarán disponibles tras conectar las estadísticas",
         "dailyUsage": "Uso diario",
-        "publishActivity": "Actividad de publicación"
+        "publishActivity": "Actividad de publicación",
+        "noAdmin": "el bot no es administrador"
       },
       "botSettings": {
         "title": "Ajustes del bot",
@@ -1016,7 +1019,8 @@
         "newMembers": "Nuevos miembros",
         "holdOk": "Solicitud puesta en espera ({ttl} minutos)",
         "loadError": "No se pudieron cargar las solicitudes de cambio",
-        "stateUpdated": "Estado actualizado"
+        "stateUpdated": "Estado actualizado",
+        "growthSplit": "canal {channel} · bot {bot}"
       },
       "notifications": {
         "title": "Notificaciones",
@@ -1245,7 +1249,14 @@
       "template_orientation_invalid": "Orientación inválida.",
       "template_publish_order_invalid": "Orden inválido.",
       "template_telegram_buttons_invalid": "Botones deben ser array.",
-      "template_widget_sync_failed": "Error sincronización widgets."
+      "template_widget_sync_failed": "Error sincronización widgets.",
+      "no_bot": "Todavía no hay ningún bot de Telegram conectado a esta cuenta. Añade uno para usar el centro de Telegram.",
+      "bot_not_found": "No se encontró este bot.",
+      "bot_forbidden": "Este bot pertenece a otra cuenta.",
+      "invalid_bot_id": "Selección de bot no válida.",
+      "no_token": "Este bot no tiene token. Abre la configuración del bot y pega el token de BotFather.",
+      "get_me_failed": "Telegram rechazó el token de este bot. Revisa el token en la configuración del bot.",
+      "telegram_unreachable": "No se pudo conectar con Telegram. Revisa la conexión a internet del servidor e inténtalo de nuevo."
     },
     "fallback": {
       "badRequest": "Solicitud no procesada.",
@@ -2094,5 +2105,349 @@
     "updateSuccess": "Tipo de precio actualizado correctamente",
     "saveError": "No se pudo guardar el tipo de precio",
     "loadPriceTypeError": "No se pudo cargar el tipo de precio"
+  },
+  "website": {
+    "builder": {
+      "title": "Tu sitio web",
+      "subtitle": "Elige un diseño, escribe tus textos y publica. Tu contenido te acompaña.",
+      "steps": "Pasos",
+      "step": {
+        "design": "Diseño",
+        "theme": "Tema",
+        "branding": "Marca",
+        "sections": "Secciones",
+        "content": "Contenido",
+        "prices": "Tablero de tasas",
+        "publish": "Publicar"
+      },
+      "hint": {
+        "design": "Diez diseños para elegir",
+        "theme": "Colores, tipografía y formas",
+        "branding": "Logo, nombre e idiomas",
+        "sections": "Orden y activación de bloques",
+        "content": "Escribir los textos",
+        "prices": "Qué tasas mostrar",
+        "publish": "Publicar y gestionar versiones"
+      },
+      "device": {
+        "desktop": "Escritorio",
+        "tablet": "Tableta",
+        "mobile": "Móvil"
+      },
+      "saving": "Guardando…",
+      "saved": "Todos los cambios guardados",
+      "designNote": "Cambiar de diseño conserva todo lo que has escrito. Solo cambia la disposición.",
+      "sectionsNote": "Arrastra para reordenar. Un bloque que el diseño actual no puede mostrar se desactiva, no se borra.",
+      "pricesNote": "Las tasas aparecen en cuanto un responsable las finaliza; antes no se publica nada.",
+      "inheritPanel": "Usar la marca de Ajustes",
+      "inheritPanelNote": "Activado, el logo, el teléfono y la dirección vienen de Ajustes. Lo que escribas aquí tiene prioridad.",
+      "themeTitle": "Tema de color",
+      "style": {
+        "button": "Botones",
+        "card": "Tarjetas",
+        "background": "Fondo",
+        "corner": "Esquinas",
+        "density": "Espaciado",
+        "font_pair": "Tipografía",
+        "brand_color": "Color de marca"
+      },
+      "useThemeColor": "Usar el color del tema",
+      "languages": "Idiomas",
+      "languagesNote": "Cada idioma añade una pestaña a todos los campos de texto. El visitante puede cambiar; lo no traducido usa tu idioma principal.",
+      "primaryLanguage": "Idioma principal",
+      "addSection": "Añadir bloque",
+      "addItem": "Añadir elemento",
+      "item": "Elemento",
+      "layoutDefault": "Predeterminado del diseño ({name})",
+      "notInLayout": "Este diseño no tiene sitio para este bloque",
+      "editingSection": "Editando",
+      "noSectionSelected": "Elige un bloque para editar.",
+      "noRatesSection": "Este diseño aún no tiene tablero de tasas.",
+      "addRates": "Añadir el tablero de tasas",
+      "boardStyle": "Estilo del tablero",
+      "chooseImage": "Elegir imagen",
+      "imageLibrary": "Imágenes",
+      "upload": "Subir",
+      "uploadFailed": "No se pudo subir esta imagen.",
+      "noImages": "Aún no hay imágenes. Sube una para empezar.",
+      "iconPlaceholder": "p. ej. coins",
+      "allSelected": "Mostrando todo",
+      "someSelected": "Mostrando {n} seleccionadas",
+      "noCategories": "Aún no hay categorías. Crea una en el área de tasas.",
+      "live": "Publicado",
+      "draft": "Aún sin publicar",
+      "pendingChanges": "Tienes cambios sin publicar.",
+      "publish": "Publicar",
+      "republish": "Publicar cambios",
+      "unpublish": "Retirar del aire",
+      "viewSite": "Abrir el sitio",
+      "seo": "Búsqueda y compartir",
+      "history": "Versiones publicadas",
+      "restore": "Restaurar"
+    },
+    "fields": {
+      "about": "Texto de presentación",
+      "address": "Dirección",
+      "answer": "Respuesta",
+      "author": "Nombre",
+      "avatar": "Foto",
+      "badges": "Distintivos",
+      "body": "Texto",
+      "caption": "Pie de imagen",
+      "category_ids": "Categorías",
+      "columns": "Columnas",
+      "copyright": "Línea de copyright",
+      "cta_href": "Enlace del botón",
+      "cta_label": "Texto del botón",
+      "decimals": "Decimales",
+      "disclaimer": "Letra pequeña",
+      "email": "Correo",
+      "eyebrow": "Antetítulo",
+      "hours": "Horario",
+      "href": "Enlace",
+      "icon": "Icono",
+      "image": "Imagen",
+      "image_alt": "Descripción de la imagen",
+      "inherit_panel_contact": "Datos de contacto desde Ajustes",
+      "items": "Elementos",
+      "label": "Etiqueta",
+      "links": "Enlaces",
+      "map_embed_url": "URL del mapa",
+      "nav_links": "Enlaces del menú",
+      "note": "Nota",
+      "phone": "Teléfono",
+      "phone_2": "Segundo teléfono",
+      "points": "Puntos clave",
+      "price_type_ids": "Tipos de tasa",
+      "primary_cta_href": "Enlace del botón principal",
+      "primary_cta_label": "Texto del botón principal",
+      "question": "Pregunta",
+      "quote": "Cita",
+      "rating": "Valoración",
+      "refresh_seconds": "Actualizar cada (segundos)",
+      "role": "Cargo",
+      "secondary_cta_href": "Enlace del segundo botón",
+      "secondary_cta_label": "Texto del segundo botón",
+      "show_buy_sell": "Mostrar compra y venta",
+      "show_currency_icons": "Mostrar iconos de divisas",
+      "show_form": "Mostrar formulario",
+      "show_language": "Mostrar selector de idioma",
+      "show_logo": "Mostrar logo",
+      "show_socials": "Mostrar redes sociales",
+      "show_updated_at": "Mostrar hora de actualización",
+      "source": "Tasas a mostrar",
+      "sticky": "Fijar arriba",
+      "subtitle": "Subtítulo",
+      "suffix": "Sufijo",
+      "text": "Texto",
+      "title": "Título",
+      "value": "Valor",
+      "business_name": "Nombre del negocio",
+      "tagline": "Lema",
+      "logo": "Logo",
+      "favicon": "Favicon",
+      "seo_title": "Título de la página",
+      "seo_description": "Descripción de la página",
+      "keywords": "Palabras clave",
+      "og_image": "Imagen para compartir"
+    },
+    "sectionFields": {
+      "rates": {
+        "title": "Título del tablero",
+        "subtitle": "Introducción del tablero",
+        "note": "Nota bajo el tablero"
+      }
+    },
+    "sections": {
+      "header": "Cabecera",
+      "hero": "Apertura",
+      "rates": "Tablero de tasas",
+      "about": "Sobre nosotros",
+      "services": "Servicios",
+      "features": "Ventajas",
+      "stats": "Cifras",
+      "steps": "Cómo funciona",
+      "testimonials": "Opiniones",
+      "gallery": "Galería",
+      "faq": "Preguntas",
+      "contact": "Contacto",
+      "cta": "Llamada a la acción",
+      "footer": "Pie de página"
+    },
+    "variants": {
+      "accordion": "Acordeón",
+      "alternating": "Alterno",
+      "banner": "Banner",
+      "bar": "Franja",
+      "bento": "Bento",
+      "boxed": "En caja",
+      "cards": "Tarjetas",
+      "carousel": "Carrusel",
+      "centered": "Centrado",
+      "columns": "Columnas",
+      "featured": "Destacado",
+      "floating": "Flotante",
+      "form": "Formulario",
+      "full-bleed": "A sangre",
+      "gradient": "Degradado",
+      "grid": "Cuadrícula",
+      "icon-grid": "Cuadrícula de iconos",
+      "list": "Lista",
+      "masonry": "Mosaico",
+      "minimal": "Mínimo",
+      "numbered-cards": "Tarjetas numeradas",
+      "rates-first": "Tasas primero",
+      "rich": "Completo",
+      "simple": "Sencillo",
+      "slider": "Deslizador",
+      "split": "Dividido",
+      "split-image": "Texto e imagen",
+      "split-map": "Dividido con mapa",
+      "stacked": "Apilado",
+      "statement": "Declaración",
+      "table": "Tabla",
+      "text-image": "Texto e imagen",
+      "ticker": "Cinta",
+      "timeline": "Cronología",
+      "two-column": "Dos columnas"
+    },
+    "layouts": {
+      "aurora": {
+        "name": "Aurora",
+        "blurb": "Moderno y seguro, con una imagen junto al mensaje."
+      },
+      "ledger": {
+        "name": "Ledger",
+        "blurb": "Primero las tasas, después todo lo demás. Para una casa a la que se viene por los números."
+      },
+      "bazaar": {
+        "name": "Bazaar",
+        "blurb": "Cálido y animado, con sitio para fotos de la oficina."
+      },
+      "vault": {
+        "name": "Vault",
+        "blurb": "Oscuro y formal, construido alrededor de una gran imagen."
+      },
+      "pulse": {
+        "name": "Pulse",
+        "blurb": "Una página larga con una cinta de tasas en movimiento."
+      },
+      "atlas": {
+        "name": "Atlas",
+        "blurb": "Corporativo y tranquilizador: cifras, servicios, pruebas."
+      },
+      "prism": {
+        "name": "Prism",
+        "blurb": "Editorial y de alto contraste, para quien tiene algo que decir."
+      },
+      "harbor": {
+        "name": "Harbor",
+        "blurb": "Menú lateral y el contenido al lado."
+      },
+      "quartz": {
+        "name": "Quartz",
+        "blurb": "Sobrio y rápido. La página mínima que cumple."
+      },
+      "meridian": {
+        "name": "Meridian",
+        "blurb": "La apertura se queda fija mientras el resto pasa por delante."
+      }
+    },
+    "themes": {
+      "midnight": "Medianoche",
+      "aurora-light": "Luz de día",
+      "gold-luxe": "Oro",
+      "emerald-trust": "Esmeralda",
+      "slate-minimal": "Pizarra",
+      "sunset-warm": "Atardecer",
+      "mono-editorial": "Mono",
+      "royal-violet": "Violeta"
+    },
+    "styles": {
+      "button": {
+        "solid": "Sólido",
+        "pill": "Pastilla",
+        "sharp": "Recto",
+        "outline": "Contorno",
+        "soft": "Suave"
+      },
+      "card": {
+        "flat": "Plano",
+        "elevated": "Elevado",
+        "glass": "Cristal",
+        "outline": "Contorno",
+        "gradient": "Degradado"
+      },
+      "background": {
+        "plain": "Liso",
+        "grid": "Cuadrícula",
+        "mesh": "Malla",
+        "gradient": "Degradado",
+        "noise": "Grano",
+        "aurora": "Aurora"
+      },
+      "corner": {
+        "sharp": "Rectas",
+        "soft": "Suaves",
+        "round": "Redondeadas"
+      },
+      "density": {
+        "compact": "Compacto",
+        "comfortable": "Equilibrado",
+        "spacious": "Amplio"
+      },
+      "font_pair": {
+        "vazir-vazir": "Vazirmatn",
+        "inter-vazir": "Inter",
+        "manrope-vazir": "Manrope",
+        "spacegrotesk-vazir": "Space Grotesk",
+        "playfair-vazir": "Playfair",
+        "cairo-cairo": "Cairo"
+      }
+    },
+    "options": {
+      "source": {
+        "categories": "Categorías",
+        "special": "Tasas especiales",
+        "both": "Ambas"
+      }
+    },
+    "widget": {
+      "buy": "Compra",
+      "sell": "Venta",
+      "price": "Tasa",
+      "currency": "Divisa",
+      "updated": "Actualizado",
+      "featured": "Tasa del día",
+      "loading": "Cargando tasas…",
+      "empty": "Aún no hay tasas finalizadas que mostrar.",
+      "unavailable": "Las tasas no están disponibles ahora mismo.",
+      "stale": "Mostrando las últimas tasas recibidas."
+    },
+    "contact": {
+      "yourName": "Tu nombre",
+      "namePlaceholder": "Nombre",
+      "message": "Mensaje",
+      "messagePlaceholder": "¿Qué necesitas?",
+      "sendTelegram": "Enviar por Telegram",
+      "sendWhatsapp": "Enviar por WhatsApp",
+      "sendEmail": "Enviar correo",
+      "formHint": "Esto abre tu propia app de mensajería; no se guarda nada en este sitio.",
+      "noChannel": "Añade un teléfono o un enlace de Telegram en Ajustes para recibir mensajes.",
+      "callUs": "Llámanos",
+      "visitUs": "Visítanos",
+      "openHours": "Horario",
+      "emailUs": "Escríbenos"
+    },
+    "public": {
+      "missingTitle": "Aquí no hay nada publicado",
+      "missingBody": "No hay ningún sitio publicado en esta dirección."
+    },
+    "renderer": {
+      "nothingToShow": "Todavía no hay nada que mostrar."
+    },
+    "chrome": {
+      "sectionNav": "Ir a una sección"
+    }
   }
 }

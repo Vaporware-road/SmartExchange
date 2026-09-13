@@ -1,35 +1,12 @@
 import json
 
-from django.http import HttpResponse
 from django.template.loader import render_to_string
 
-from MrExchangePanel.views import spa_index_path, spa_not_built_response
+from MrExchangePanel.views import spa_with_head
 
 from . import tutorials
 
 _OG_IMAGE = f"{tutorials.SITE_URL}/static/landing/images/Mr%20Exchange.png"
-
-
-def _spa_with_head(seo_head):
-    """The built SPA shell with its generic ``<title>`` swapped for ``seo_head``.
-
-    Only the crawler-facing metadata is rendered here: the SPA fills ``<head>``
-    after hydration, which is too late for a bot that never runs the bundle.
-    """
-    index_path = spa_index_path()
-    if index_path is None:
-        return spa_not_built_response()
-
-    shell = index_path.read_text()
-    # Drop the shell's generic <title> first: browsers and crawlers honour the
-    # first <title> in the document, so leaving it would shadow ours.
-    html = shell.replace("<title>MrExchange</title>", "", 1)
-    # The shell always carries a </head>; str.replace is a no-op if it ever does not.
-    html = html.replace("</head>", f"{seo_head}\n</head>", 1)
-
-    response = HttpResponse(html, content_type="text/html")
-    response["Cache-Control"] = "no-store, no-cache, must-revalidate"
-    return response
 
 
 def landing_page(request):
@@ -42,7 +19,7 @@ def landing_page(request):
     """
     # No `request=`: the fragment is static, and passing one would run every
     # context processor (a SiteSettings query included) on every page view.
-    return _spa_with_head(render_to_string("landing/seo_head.html"))
+    return spa_with_head(render_to_string("landing/seo_head.html"))
 
 
 def tutorial_index(request):
@@ -78,7 +55,7 @@ def tutorial_index(request):
             "structured_data": structured_data,
         },
     )
-    return _spa_with_head(seo_head)
+    return spa_with_head(seo_head)
 
 
 def tutorial_detail(request, slug):
@@ -116,4 +93,4 @@ def tutorial_detail(request, slug):
             "structured_data": structured_data,
         },
     )
-    return _spa_with_head(seo_head)
+    return spa_with_head(seo_head)

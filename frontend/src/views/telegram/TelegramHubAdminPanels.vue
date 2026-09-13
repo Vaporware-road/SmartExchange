@@ -96,7 +96,7 @@
               <span v-if="ch.publish_activity_total != null" class="block text-xs">
                 {{ $t('telegram.admin.analytics.publishActivity', { n: ch.publish_activity_total }) }}
               </span>
-              <span v-if="!ch.bot_admin_verified" class="text-amber-400/80"> (no admin)</span>
+              <span v-if="!ch.bot_admin_verified" class="text-amber-400/80"> ({{ $t('telegram.admin.analytics.noAdmin') }})</span>
             </span>
           </li>
           <li v-if="!(dashboard?.analytics?.channel_members || []).length" class="text-gray-500 py-2">
@@ -165,7 +165,7 @@
           <p class="text-xs text-gray-400">{{ detail.label || $t('telegram.admin.exchangeRequests.newMembers', { months }) }}</p>
           <p class="text-lg font-semibold mt-1">+{{ (detail.channel_growth || 0) + (detail.bot_dm_growth || 0) }}</p>
           <p class="text-xs text-gray-500 mt-1">
-            ch {{ detail.channel_growth || 0 }} · bot {{ detail.bot_dm_growth || 0 }}
+            {{ $t('telegram.admin.exchangeRequests.growthSplit', { channel: detail.channel_growth || 0, bot: detail.bot_dm_growth || 0 }) }}
           </p>
         </div>
       </div>
@@ -216,7 +216,7 @@
       </div>
       <div v-if="selectedExchange" class="rounded-xl bg-white/5 border border-white/10 px-3 py-3 space-y-3">
         <p class="text-sm">
-          #{{ selectedExchange.id }} · {{ statusLabel(selectedExchange.status) }} · TTL {{ selectedExchange.ttl_minutes }}
+          #{{ selectedExchange.id }} · {{ statusLabel(selectedExchange.status) }} · {{ $t('telegram.admin.exchangeRequests.ttl') }} {{ selectedExchange.ttl_minutes }}
         </p>
         <div v-if="changeStateOpen" class="flex flex-wrap gap-2">
           <button type="button" class="btn-luxury-outline text-sm" @click="setExchangeStatus('new')">

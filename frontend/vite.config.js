@@ -173,10 +173,17 @@ export default defineConfig(({ command, mode }) => {
   resolve: {
     alias: {
       '@': resolve(__dirname, 'src'),
+      // The website catalog lives with the Django app that validates it, so the
+      // builder and the API cannot drift into disagreeing about what a layout is.
+      '@catalog': resolve(__dirname, '../backend/website/catalog'),
     },
   },
   server: {
     host: true,
+    fs: {
+      // Needed for '@catalog', which resolves outside the Vite root.
+      allow: [resolve(__dirname, '..')],
+    },
     port: devServerPort,
     strictPort: env.VITE_DEV_STRICT_PORT === 'false' ? false : true,
     /** When behind a reverse proxy, set e.g. VITE_DEV_ORIGIN=http://localhost:5250 */

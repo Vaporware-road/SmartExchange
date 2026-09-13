@@ -9,10 +9,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
-from accounts.permissions import (
-    IsSuperAdminOrManagement,
-    IsSuperAdminOrManagementOrEmployee,
-)
 from rest_framework.exceptions import MethodNotAllowed, NotFound, PermissionDenied, ValidationError
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import action
@@ -69,7 +65,7 @@ from .serializers import (
 class TelegramChannelListAPIView(APIView):
     """GET /api/telegram/channels/ - list active channels with their bots."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         channels = (
@@ -88,7 +84,7 @@ class TelegramChannelListAPIView(APIView):
 class SendMessageAPIView(APIView):
     """POST /api/telegram/send-message/ - send a message to a channel."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
+    permission_classes = [IsAuthenticated]
 
     def _build_message_from_payload(self, data):
         """Build message text from banner_key and price fields when provided."""
@@ -184,7 +180,7 @@ class SendMessageAPIView(APIView):
 class DefaultMessageSettingsListAPIView(APIView):
     """GET /api/telegram/default-settings/ - list default settings (optionally by bot)."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         bot_id = request.query_params.get("bot")
@@ -200,7 +196,7 @@ class DefaultMessageSettingsListAPIView(APIView):
 class DefaultMessageSettingsDetailAPIView(APIView):
     """GET/PUT /api/telegram/default-settings/<id>/ - get or update a default setting."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
+    permission_classes = [IsAuthenticated]
 
     def get_object(self, pk):
         from django.shortcuts import get_object_or_404
@@ -240,7 +236,7 @@ class DefaultMessageSettingsDetailAPIView(APIView):
 class DefaultMessageSettingsCreateAPIView(APIView):
     """POST /api/telegram/default-settings/ - create default settings for a bot."""
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request):
         data = dict(request.data)
@@ -269,7 +265,7 @@ class TelegramBotViewSet(ModelViewSet):
     List/retrieve operations hide the token; create/update use the detail serializer.
     """
 
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return bots_queryset_for_user(self.request.user).order_by("-created_at")
@@ -360,7 +356,7 @@ class TelegramChannelViewSet(ModelViewSet):
         "-created_at"
     )
     serializer_class = TelegramChannelSerializer
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return (
@@ -384,7 +380,7 @@ class AutoPostConfigViewSet(ModelViewSet):
         "channel", "category", "special_price_type"
     ).all()
     serializer_class = AutoPostConfigSerializer
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return (
@@ -410,14 +406,7 @@ class AutomationSettingsAPIView(APIView):
     is handled elsewhere.
     """
 
-    # GET is available to any authenticated staff (dashboard reads it); only
-    # management / super_admin may flip the flag.
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagementOrEmployee]
-
-    def get_permissions(self):
-        if self.request.method == "PUT":
-            return [IsAuthenticated(), IsSuperAdminOrManagement()]
-        return super().get_permissions()
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         payload = read_auto_post_on_update_safe()
@@ -488,16 +477,14 @@ class TelegramCustomerWebhookAPIView(APIView):
 
 class CustomerProfileViewSet(ModelViewSet):
     """
-    Staff: list/retrieve customers; PATCH tag (management / super_admin only).
+    Panel users: list/retrieve customers of their desk's bots; PATCH tag.
     """
 
     queryset = CustomerProfile.objects.all().order_by("-updated_at")
     serializer_class = CustomerProfileSerializer
+    permission_classes = [IsAuthenticated]
     http_method_names = ["get", "patch", "head", "options"]
     pagination_class = None
-
-    def get_permissions(self):
-        return [IsAuthenticated(), IsSuperAdminOrManagement()]
 
     def get_queryset(self):
         qs = CustomerProfile.objects.annotate(
@@ -548,7 +535,7 @@ class ExchangeRequestViewSet(ModelViewSet):
         "-created_at"
     )
     serializer_class = ExchangeRequestSerializer
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
     http_method_names = ["get", "patch", "post", "head", "options"]
 
     def get_queryset(self):
@@ -606,7 +593,7 @@ class ExchangeRequestViewSet(ModelViewSet):
 class PriceAlertViewSet(ReadOnlyModelViewSet):
     queryset = PriceAlert.objects.select_related("customer").order_by("-created_at")
     serializer_class = PriceAlertSerializer
-    permission_classes = [IsAuthenticated, IsSuperAdminOrManagement]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         qs = PriceAlert.objects.select_related("customer").order_by("-created_at")

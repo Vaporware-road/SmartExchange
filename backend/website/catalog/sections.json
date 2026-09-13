@@ -1,0 +1,190 @@
+{
+  "header": {
+    "variants": ["minimal", "centered", "floating", "split"],
+    "singleton": true,
+    "fields": [
+      { "key": "show_logo", "type": "bool", "default": true },
+      { "key": "show_language", "type": "bool", "default": true },
+      { "key": "sticky", "type": "bool", "default": true },
+      { "key": "cta_label", "type": "text", "localized": true },
+      { "key": "cta_href", "type": "url" },
+      { "key": "nav_links", "type": "list", "max": 8, "fields": [
+        { "key": "label", "type": "text", "localized": true },
+        { "key": "href", "type": "text" }
+      ] }
+    ]
+  },
+  "hero": {
+    "variants": ["split-image", "centered", "full-bleed", "rates-first", "stacked"],
+    "singleton": true,
+    "fields": [
+      { "key": "eyebrow", "type": "text", "localized": true },
+      { "key": "title", "type": "text", "localized": true, "required": true },
+      { "key": "subtitle", "type": "textarea", "localized": true },
+      { "key": "primary_cta_label", "type": "text", "localized": true },
+      { "key": "primary_cta_href", "type": "text" },
+      { "key": "secondary_cta_label", "type": "text", "localized": true },
+      { "key": "secondary_cta_href", "type": "text" },
+      { "key": "image", "type": "image" },
+      { "key": "image_alt", "type": "text", "localized": true },
+      { "key": "badges", "type": "list", "max": 4, "fields": [
+        { "key": "icon", "type": "icon" },
+        { "key": "label", "type": "text", "localized": true }
+      ] }
+    ]
+  },
+  "rates": {
+    "variants": ["cards", "table", "ticker", "grid", "featured"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "subtitle", "type": "textarea", "localized": true },
+      { "key": "source", "type": "select", "options": ["categories", "special", "both"], "default": "categories" },
+      { "key": "category_ids", "type": "category_picker", "default": [] },
+      { "key": "price_type_ids", "type": "price_type_picker", "default": [] },
+      { "key": "show_buy_sell", "type": "bool", "default": true },
+      { "key": "show_currency_icons", "type": "bool", "default": true },
+      { "key": "show_updated_at", "type": "bool", "default": true },
+      { "key": "decimals", "type": "number", "default": 2, "min": 0, "max": 8 },
+      { "key": "columns", "type": "number", "default": 3, "min": 1, "max": 4 },
+      { "key": "refresh_seconds", "type": "number", "default": 60, "min": 15, "max": 3600 },
+      { "key": "note", "type": "textarea", "localized": true }
+    ]
+  },
+  "about": {
+    "variants": ["text-image", "columns", "statement"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "body", "type": "textarea", "localized": true },
+      { "key": "image", "type": "image" },
+      { "key": "image_alt", "type": "text", "localized": true },
+      { "key": "points", "type": "list", "max": 6, "fields": [
+        { "key": "text", "type": "text", "localized": true }
+      ] }
+    ]
+  },
+  "services": {
+    "variants": ["icon-grid", "cards", "list"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "subtitle", "type": "textarea", "localized": true },
+      { "key": "items", "type": "list", "max": 9, "fields": [
+        { "key": "icon", "type": "icon" },
+        { "key": "title", "type": "text", "localized": true },
+        { "key": "body", "type": "textarea", "localized": true },
+        { "key": "href", "type": "text" }
+      ] }
+    ]
+  },
+  "features": {
+    "variants": ["grid", "alternating", "bento"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "subtitle", "type": "textarea", "localized": true },
+      { "key": "items", "type": "list", "max": 8, "fields": [
+        { "key": "icon", "type": "icon" },
+        { "key": "title", "type": "text", "localized": true },
+        { "key": "body", "type": "textarea", "localized": true },
+        { "key": "image", "type": "image" }
+      ] }
+    ]
+  },
+  "stats": {
+    "variants": ["bar", "cards"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "items", "type": "list", "max": 6, "fields": [
+        { "key": "value", "type": "text" },
+        { "key": "suffix", "type": "text" },
+        { "key": "label", "type": "text", "localized": true }
+      ] }
+    ]
+  },
+  "steps": {
+    "variants": ["timeline", "numbered-cards"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "subtitle", "type": "textarea", "localized": true },
+      { "key": "items", "type": "list", "max": 6, "fields": [
+        { "key": "icon", "type": "icon" },
+        { "key": "title", "type": "text", "localized": true },
+        { "key": "body", "type": "textarea", "localized": true }
+      ] }
+    ]
+  },
+  "testimonials": {
+    "variants": ["slider", "grid"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "items", "type": "list", "max": 9, "fields": [
+        { "key": "quote", "type": "textarea", "localized": true },
+        { "key": "author", "type": "text" },
+        { "key": "role", "type": "text", "localized": true },
+        { "key": "avatar", "type": "image" },
+        { "key": "rating", "type": "number", "default": 5, "min": 1, "max": 5 }
+      ] }
+    ]
+  },
+  "gallery": {
+    "variants": ["masonry", "carousel"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "items", "type": "list", "max": 12, "fields": [
+        { "key": "image", "type": "image" },
+        { "key": "caption", "type": "text", "localized": true }
+      ] }
+    ]
+  },
+  "faq": {
+    "variants": ["accordion", "two-column"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "subtitle", "type": "textarea", "localized": true },
+      { "key": "items", "type": "list", "max": 12, "fields": [
+        { "key": "question", "type": "text", "localized": true },
+        { "key": "answer", "type": "textarea", "localized": true }
+      ] }
+    ]
+  },
+  "contact": {
+    "variants": ["split-map", "cards", "form"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "subtitle", "type": "textarea", "localized": true },
+      { "key": "inherit_panel_contact", "type": "bool", "default": true },
+      { "key": "address", "type": "textarea", "localized": true },
+      { "key": "phone", "type": "text" },
+      { "key": "phone_2", "type": "text" },
+      { "key": "email", "type": "text" },
+      { "key": "map_embed_url", "type": "url" },
+      { "key": "hours", "type": "textarea", "localized": true },
+      { "key": "show_form", "type": "bool", "default": true }
+    ]
+  },
+  "cta": {
+    "variants": ["banner", "boxed", "gradient"],
+    "fields": [
+      { "key": "title", "type": "text", "localized": true },
+      { "key": "body", "type": "textarea", "localized": true },
+      { "key": "cta_label", "type": "text", "localized": true },
+      { "key": "cta_href", "type": "text" },
+      { "key": "image", "type": "image" }
+    ]
+  },
+  "footer": {
+    "variants": ["simple", "columns", "rich"],
+    "singleton": true,
+    "fields": [
+      { "key": "about", "type": "textarea", "localized": true },
+      { "key": "copyright", "type": "text", "localized": true },
+      { "key": "show_socials", "type": "bool", "default": true },
+      { "key": "disclaimer", "type": "textarea", "localized": true },
+      { "key": "columns", "type": "list", "max": 4, "fields": [
+        { "key": "title", "type": "text", "localized": true },
+        { "key": "links", "type": "list", "max": 6, "fields": [
+          { "key": "label", "type": "text", "localized": true },
+          { "key": "href", "type": "text" }
+        ] }
+      ] }
+    ]
+  }
+}

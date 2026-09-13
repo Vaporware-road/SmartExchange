@@ -19,7 +19,8 @@
     "plans": "Plans & Templates",
     "fleet": "Fleet",
     "orders": "Orders Queue",
-    "ownerConsole": "Owner console"
+    "ownerConsole": "Owner console",
+    "website": "Website"
   },
   "common": {
     "save": "Save",
@@ -218,7 +219,8 @@
     "userCenter": "Admin Management",
     "orders": "Orders Queue",
     "webappOrder": "Place Order",
-    "programmerConsole": "Owner console"
+    "programmerConsole": "Owner console",
+    "website": "Website"
   },
   "instagramHub": {
     "description": "Generate post and story images from your finalized prices. Choose a theme and categories, then preview before publishing to Instagram.",
@@ -970,7 +972,8 @@
         "channelViews": "Channel Views",
         "channelViewsStub": "Views data available after connecting analytics",
         "dailyUsage": "Daily Usage",
-        "publishActivity": "Publish Activity"
+        "publishActivity": "Publish Activity",
+        "noAdmin": "bot not admin"
       },
       "botSettings": {
         "title": "Bot Settings",
@@ -1016,7 +1019,8 @@
         "newMembers": "New Members",
         "holdOk": "Request placed on hold ({ttl} minutes)",
         "loadError": "Could not load exchange requests",
-        "stateUpdated": "Status updated"
+        "stateUpdated": "Status updated",
+        "growthSplit": "channel {channel} · bot {bot}"
       },
       "notifications": {
         "title": "Notifications",
@@ -1245,7 +1249,14 @@
       "template_orientation_invalid": "Template orientation is invalid.",
       "template_publish_order_invalid": "Publish order must be a non-negative integer.",
       "template_telegram_buttons_invalid": "Telegram buttons must be an array.",
-      "template_widget_sync_failed": "Template widget sync failed."
+      "template_widget_sync_failed": "Template widget sync failed.",
+      "no_bot": "No Telegram bot is connected to this account yet. Add one to use the Telegram hub.",
+      "bot_not_found": "This bot was not found.",
+      "bot_forbidden": "This bot belongs to another account.",
+      "invalid_bot_id": "Invalid bot selection.",
+      "no_token": "This bot has no token. Open the bot settings and paste its BotFather token.",
+      "get_me_failed": "Telegram rejected this bot's token. Check the token in the bot settings.",
+      "telegram_unreachable": "Could not reach Telegram. Check the server's internet connection and try again."
     },
     "fallback": {
       "badRequest": "Request could not be processed.",
@@ -2094,5 +2105,349 @@
     "updateSuccess": "Price type updated successfully",
     "saveError": "Could not save price type",
     "loadPriceTypeError": "Could not load price type"
+  },
+  "website": {
+    "builder": {
+      "title": "Your website",
+      "subtitle": "Pick a design, add your words, publish. Your content moves with you.",
+      "steps": "Builder steps",
+      "step": {
+        "design": "Design",
+        "theme": "Theme",
+        "branding": "Branding",
+        "sections": "Sections",
+        "content": "Content",
+        "prices": "Rate board",
+        "publish": "Publish"
+      },
+      "hint": {
+        "design": "Ten layouts to choose from",
+        "theme": "Colours, type and shapes",
+        "branding": "Logo, name and languages",
+        "sections": "Order and turn blocks on",
+        "content": "Write the words",
+        "prices": "Which rates to show",
+        "publish": "Go live and manage versions"
+      },
+      "device": {
+        "desktop": "Desktop",
+        "tablet": "Tablet",
+        "mobile": "Phone"
+      },
+      "saving": "Saving…",
+      "saved": "All changes saved",
+      "designNote": "Switching design keeps everything you have written. Only the arrangement changes.",
+      "sectionsNote": "Drag to reorder. A block the current design cannot show is kept and switched off, not deleted.",
+      "pricesNote": "Rates appear on your site the moment a manager finalizes them. Nothing is published before that.",
+      "inheritPanel": "Use the branding from Settings",
+      "inheritPanelNote": "On, your logo, phone and address come from the panel's Settings page. Anything you type here wins.",
+      "themeTitle": "Colour theme",
+      "style": {
+        "button": "Buttons",
+        "card": "Cards",
+        "background": "Background",
+        "corner": "Corners",
+        "density": "Spacing",
+        "font_pair": "Typography",
+        "brand_color": "Brand colour"
+      },
+      "useThemeColor": "Use theme colour",
+      "languages": "Languages",
+      "languagesNote": "Add a language and every text box gains a tab for it. Visitors can switch; anything untranslated falls back to your main language.",
+      "primaryLanguage": "Main language",
+      "addSection": "Add a block",
+      "addItem": "Add item",
+      "item": "Item",
+      "layoutDefault": "Design default ({name})",
+      "notInLayout": "This design has no place for this block",
+      "editingSection": "Editing",
+      "noSectionSelected": "Pick a block to edit.",
+      "noRatesSection": "This design has no rate board yet.",
+      "addRates": "Add the rate board",
+      "boardStyle": "Board style",
+      "chooseImage": "Choose an image",
+      "imageLibrary": "Images",
+      "upload": "Upload",
+      "uploadFailed": "That image could not be uploaded.",
+      "noImages": "No images yet. Upload one to get started.",
+      "iconPlaceholder": "e.g. coins",
+      "allSelected": "Showing everything",
+      "someSelected": "Showing {n} selected",
+      "noCategories": "No categories yet. Add one in the price hub first.",
+      "live": "Published",
+      "draft": "Not published yet",
+      "pendingChanges": "You have changes that are not published yet.",
+      "publish": "Publish",
+      "republish": "Publish changes",
+      "unpublish": "Take offline",
+      "viewSite": "Open site",
+      "seo": "Search and sharing",
+      "history": "Published versions",
+      "restore": "Restore"
+    },
+    "fields": {
+      "about": "About text",
+      "address": "Address",
+      "answer": "Answer",
+      "author": "Name",
+      "avatar": "Photo",
+      "badges": "Badges",
+      "body": "Text",
+      "caption": "Caption",
+      "category_ids": "Categories",
+      "columns": "Columns",
+      "copyright": "Copyright line",
+      "cta_href": "Button link",
+      "cta_label": "Button text",
+      "decimals": "Decimal places",
+      "disclaimer": "Small print",
+      "email": "Email",
+      "eyebrow": "Kicker",
+      "hours": "Opening hours",
+      "href": "Link",
+      "icon": "Icon",
+      "image": "Image",
+      "image_alt": "Image description",
+      "inherit_panel_contact": "Use contact details from Settings",
+      "items": "Items",
+      "label": "Label",
+      "links": "Links",
+      "map_embed_url": "Map embed URL",
+      "nav_links": "Menu links",
+      "note": "Note",
+      "phone": "Phone",
+      "phone_2": "Second phone",
+      "points": "Bullet points",
+      "price_type_ids": "Price types",
+      "primary_cta_href": "Main button link",
+      "primary_cta_label": "Main button text",
+      "question": "Question",
+      "quote": "Quote",
+      "rating": "Rating",
+      "refresh_seconds": "Refresh every (seconds)",
+      "role": "Role",
+      "secondary_cta_href": "Second button link",
+      "secondary_cta_label": "Second button text",
+      "show_buy_sell": "Show buy and sell",
+      "show_currency_icons": "Show currency icons",
+      "show_form": "Show message form",
+      "show_language": "Show language switch",
+      "show_logo": "Show logo",
+      "show_socials": "Show social links",
+      "show_updated_at": "Show last updated",
+      "source": "Rates to show",
+      "sticky": "Stick to the top",
+      "subtitle": "Subtitle",
+      "suffix": "Suffix",
+      "text": "Text",
+      "title": "Title",
+      "value": "Value",
+      "business_name": "Business name",
+      "tagline": "Tagline",
+      "logo": "Logo",
+      "favicon": "Favicon",
+      "seo_title": "Page title",
+      "seo_description": "Page description",
+      "keywords": "Keywords",
+      "og_image": "Sharing image"
+    },
+    "sectionFields": {
+      "rates": {
+        "title": "Board heading",
+        "subtitle": "Board intro",
+        "note": "Note under the board"
+      }
+    },
+    "sections": {
+      "header": "Header",
+      "hero": "Opening",
+      "rates": "Rate board",
+      "about": "About",
+      "services": "Services",
+      "features": "Highlights",
+      "stats": "Numbers",
+      "steps": "How it works",
+      "testimonials": "Reviews",
+      "gallery": "Gallery",
+      "faq": "Questions",
+      "contact": "Contact",
+      "cta": "Call to action",
+      "footer": "Footer"
+    },
+    "variants": {
+      "accordion": "Accordion",
+      "alternating": "Alternating",
+      "banner": "Banner",
+      "bar": "Strip",
+      "bento": "Bento",
+      "boxed": "Boxed",
+      "cards": "Cards",
+      "carousel": "Carousel",
+      "centered": "Centred",
+      "columns": "Columns",
+      "featured": "Featured",
+      "floating": "Floating",
+      "form": "Form",
+      "full-bleed": "Full bleed",
+      "gradient": "Gradient",
+      "grid": "Grid",
+      "icon-grid": "Icon grid",
+      "list": "List",
+      "masonry": "Masonry",
+      "minimal": "Minimal",
+      "numbered-cards": "Numbered cards",
+      "rates-first": "Rates first",
+      "rich": "Rich",
+      "simple": "Simple",
+      "slider": "Slider",
+      "split": "Split",
+      "split-image": "Split image",
+      "split-map": "Split with map",
+      "stacked": "Stacked",
+      "statement": "Statement",
+      "table": "Table",
+      "text-image": "Text and image",
+      "ticker": "Ticker",
+      "timeline": "Timeline",
+      "two-column": "Two columns"
+    },
+    "layouts": {
+      "aurora": {
+        "name": "Aurora",
+        "blurb": "Modern and confident, with a picture beside the pitch."
+      },
+      "ledger": {
+        "name": "Ledger",
+        "blurb": "Rates first, everything else second. For desks people come to for numbers."
+      },
+      "bazaar": {
+        "name": "Bazaar",
+        "blurb": "Warm and busy, with room for photos of the shop."
+      },
+      "vault": {
+        "name": "Vault",
+        "blurb": "Dark and formal. Built around one large image."
+      },
+      "pulse": {
+        "name": "Pulse",
+        "blurb": "One long page with a running rate ticker."
+      },
+      "atlas": {
+        "name": "Atlas",
+        "blurb": "Corporate and reassuring. Numbers, services, proof."
+      },
+      "prism": {
+        "name": "Prism",
+        "blurb": "Editorial and high contrast, for a desk with something to say."
+      },
+      "harbor": {
+        "name": "Harbor",
+        "blurb": "Menu down the side, content beside it."
+      },
+      "quartz": {
+        "name": "Quartz",
+        "blurb": "Plain and quick. The least page that does the job."
+      },
+      "meridian": {
+        "name": "Meridian",
+        "blurb": "The opening stays put while the rest scrolls past."
+      }
+    },
+    "themes": {
+      "midnight": "Midnight",
+      "aurora-light": "Daylight",
+      "gold-luxe": "Gold",
+      "emerald-trust": "Emerald",
+      "slate-minimal": "Slate",
+      "sunset-warm": "Sunset",
+      "mono-editorial": "Mono",
+      "royal-violet": "Violet"
+    },
+    "styles": {
+      "button": {
+        "solid": "Solid",
+        "pill": "Pill",
+        "sharp": "Sharp",
+        "outline": "Outline",
+        "soft": "Soft"
+      },
+      "card": {
+        "flat": "Flat",
+        "elevated": "Raised",
+        "glass": "Glass",
+        "outline": "Outline",
+        "gradient": "Gradient"
+      },
+      "background": {
+        "plain": "Plain",
+        "grid": "Grid",
+        "mesh": "Mesh",
+        "gradient": "Gradient",
+        "noise": "Grain",
+        "aurora": "Aurora"
+      },
+      "corner": {
+        "sharp": "Sharp",
+        "soft": "Soft",
+        "round": "Round"
+      },
+      "density": {
+        "compact": "Compact",
+        "comfortable": "Comfortable",
+        "spacious": "Spacious"
+      },
+      "font_pair": {
+        "vazir-vazir": "Vazirmatn",
+        "inter-vazir": "Inter",
+        "manrope-vazir": "Manrope",
+        "spacegrotesk-vazir": "Space Grotesk",
+        "playfair-vazir": "Playfair",
+        "cairo-cairo": "Cairo"
+      }
+    },
+    "options": {
+      "source": {
+        "categories": "Categories",
+        "special": "Special prices",
+        "both": "Both"
+      }
+    },
+    "widget": {
+      "buy": "Buy",
+      "sell": "Sell",
+      "price": "Rate",
+      "currency": "Currency",
+      "updated": "Updated",
+      "featured": "Today's rate",
+      "loading": "Loading rates…",
+      "empty": "No finalized rates to show yet.",
+      "unavailable": "Rates are unavailable right now.",
+      "stale": "Showing the last rates we received."
+    },
+    "contact": {
+      "yourName": "Your name",
+      "namePlaceholder": "Name",
+      "message": "Message",
+      "messagePlaceholder": "What do you need?",
+      "sendTelegram": "Send on Telegram",
+      "sendWhatsapp": "Send on WhatsApp",
+      "sendEmail": "Send email",
+      "formHint": "This opens your own messaging app — nothing is stored on this site.",
+      "noChannel": "Add a phone number or Telegram link in Settings to accept messages.",
+      "callUs": "Call us",
+      "visitUs": "Visit us",
+      "openHours": "Opening hours",
+      "emailUs": "Email us"
+    },
+    "public": {
+      "missingTitle": "Nothing published here",
+      "missingBody": "This address does not have a published website."
+    },
+    "renderer": {
+      "nothingToShow": "Nothing to show yet."
+    },
+    "chrome": {
+      "sectionNav": "Jump to a section"
+    }
   }
 }
